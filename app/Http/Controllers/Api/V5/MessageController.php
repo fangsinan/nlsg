@@ -163,7 +163,7 @@ class MessageController extends Controller
             }
         }
 
-        return success($lists);
+        return success($lists['data']);
     }
 
     /**
@@ -301,7 +301,6 @@ class MessageController extends Controller
             foreach ($follow_lists as &$items) {
                 //是不是360vip
                 $items['send_user']['is_vip']=VipUser::newVipInfo($v['user']['id']??0)['vip_id'] ?1:0;
-
                 $items['created_at'] = History::DateTime($items['created_at']);
                 $items['is_follow'] = UserFollow::IsFollow($items['receive_user'], $items['send_user']);
             }
@@ -309,7 +308,7 @@ class MessageController extends Controller
             $msg['follow_list']=$follow_lists;
         }
 
-        return success($lists);
+        return success($lists['data']);
     }
 
 
@@ -390,7 +389,7 @@ class MessageController extends Controller
 
         }
 
-        return success($lists);
+        return success($lists['data']);
     }
 
     /**
@@ -444,7 +443,7 @@ class MessageController extends Controller
             $items['message']['created_at'] = WorkNewDateTime( $items['created_at']);
         }
 
-        return success($lists);
+        return success($lists['data']);
     }
 
 
@@ -488,7 +487,7 @@ class MessageController extends Controller
 
         }
 
-        return success($lists);
+        return success($lists['data']);
     }
 
     /**
@@ -539,7 +538,7 @@ class MessageController extends Controller
             $items['created_at'] = History::DateTime($items['created_at']);
         }
 
-        return success($lists);
+        return success($lists['data']);
     }
 
     /**
