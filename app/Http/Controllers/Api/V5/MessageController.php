@@ -129,7 +129,7 @@ class MessageController extends Controller
         foreach ($lists['data'] as &$items) {
 
             //是不是360vip
-            $items['send_user']['is_vip']=VipUser::newVipInfo($v['user']['id']??0)['vip_id'] ?1:0;
+            $items['send_user']['is_vip']=VipUser::newVipInfo( $items['send_user']['id']??0)['vip_id'] ?1:0;
 
             //格式化时间
             $items['created_at'] = History::DateTime($items['created_at']);
@@ -264,6 +264,7 @@ class MessageController extends Controller
             $reply['from_user']['is_vip']=VipUser::newVipInfo($reply['from_user']['id'])['vip_id'] ?1:0;
 
             $reply['is_like'] = Like::isLike($reply['id'],2,$user_id,1);
+
             $reply['created_at']=History::DateTime($reply['created_at']);
 
             $reply['is_follow']=0; //判断是否关注 0否 1是
@@ -274,6 +275,7 @@ class MessageController extends Controller
             }else{
                 $reply['is_follow']=UserFollow::IsFollow($user_id, $reply['from_user']['id']);
             }
+
         }
 
         $items['reply_list']=$reply_list;
@@ -334,7 +336,7 @@ class MessageController extends Controller
             foreach ($follow_lists as &$items) {
 
                 //是不是360vip
-                $items['send_user']['is_vip']=VipUser::newVipInfo($v['user']['id']??0)['vip_id'] ?1:0;
+                $items['send_user']['is_vip']=VipUser::newVipInfo( $items['send_user']['id']??0)['vip_id'] ?1:0;
                 $items['created_at'] = History::DateTime($items['created_at']);
 
                 $is_follow_me=UserFollow::IsFollow( $items['send_user'],$user_id);
@@ -396,7 +398,10 @@ class MessageController extends Controller
         foreach ($lists['data'] as &$items) {
 
             //是不是360vip
-            $items['send_user']['is_vip']=VipUser::newVipInfo($v['user']['id']??0)['vip_id'] ?1:0;
+            $items['send_user']['is_vip']=VipUser::newVipInfo($items['send_user']['id'])['vip_id'] ?1:0;
+
+            //是否点赞
+            $items['send_user']['is_follow']=UserFollow::IsFollow($user_id, $items['send_user']['id']);
 
             //格式化时间
             $items['created_at'] = History::DateTime($items['created_at']);
