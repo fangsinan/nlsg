@@ -581,5 +581,26 @@ class MessageController extends Controller
         MessageServers::clear_msg($user_id);
         return success([]);
     }
-
+    /**
+     * @api {get} /api/v5/message/get_message_info 清除未读消息
+     * @apiName get_message_info
+     * @apiVersion 1.0.0
+     * @apiGroup message
+     * @apiParam message
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": { }
+     * }
+     */
+    public function get_message_info(Request $request){
+        $data=[
+            'title'=>'系统通知',
+            'cover_pic'=>'/wechat/works/video/161627/2017061411462579459.jpg',
+            'content'=>'<p>系统通知系统通知系统通知系统通知系统通知系统通知系统通知系统通知系统通知系统通知系统通知</p>'
+        ];
+        return success($data);
+    }
 }
