@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\ConfigModel;
 use App\Models\Coupon;
+use App\Models\Message\Message;
 use App\Models\User;
 use App\Models\UserInvite;
 use App\Models\BackendUser;
@@ -114,7 +115,8 @@ class AuthController extends Controller
                 'ref' => $ref
             ]);
             $user = User::find($list->id);
-
+            //发送注册消息
+            Message::pushMessage(0,$list->id,'REGISTER');
             //新人优惠券
             $model->giveCoupon($list->id, ConfigModel::getData(41));
 
