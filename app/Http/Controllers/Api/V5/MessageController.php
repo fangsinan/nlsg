@@ -131,6 +131,8 @@ class MessageController extends Controller
             //是不是360vip
             $items['send_user']['is_vip']=VipUser::newVipInfo( $items['send_user']['id']??0)['vip_id'] ?1:0;
 
+            $items['send_user']['is_follow']=UserFollow::IsFollow($user_id, $items['send_user']['id']);
+
             //格式化时间
             $items['created_at'] = History::DateTime($items['created_at']);
 
