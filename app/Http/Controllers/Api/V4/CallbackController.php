@@ -3,15 +3,14 @@
 
 namespace App\Http\Controllers\Api\V4;
 
-
 use App\Http\Controllers\Controller;
-use App\Servers\OpenweixinApiServers;
 use EasyWeChat\Factory;
 use App\Models\PayRecord;
-use EasyWeChat\OpenPlatform\Server\Guard;
 use Illuminate\Http\Request;
 use Yansongda\Pay\Log;
 use Yansongda\Pay\Pay;
+use EasyWeChat\OpenPlatform\Server\Guard;
+use App\Servers\OpenweixinApiServers;
 
 class CallbackController extends Controller
 {
@@ -192,7 +191,7 @@ class CallbackController extends Controller
 
     }
 
-
+    /**--------------以下文件备份----------------*/
     //微信公众号回调
     public function callBackWeixinEvent(Request $request){
         PayRecord::PayLog('openweixin_msg',json_encode($request->input()));
@@ -258,7 +257,6 @@ class CallbackController extends Controller
 
     }
 
-
-
+    /**--------------以下文件备份----------------*/
 
 }
