@@ -16,7 +16,7 @@ class CallbackController extends Controller
 {
     //APP端   接收微信发送的异步支付结果通知
     public function WechatNotify(Request $request){
-        $config = Config('wechat.payment.default');
+//        $config = Config('wechat.payment.default');
         $config = Config('wechat.payment.old_default');
         $app = Factory::payment($config);
         $response = $app->handlePaidNotify(function ($message, $fail) {
@@ -50,7 +50,7 @@ class CallbackController extends Controller
     public function WechatNotifyJsapi(Request $request){
 
 
-        $config = Config('wechat.payment.default');
+//        $config = Config('wechat.payment.default');
         $config = Config('wechat.payment.old_default');
         $app = Factory::payment($config);
         $response = $app->handlePaidNotify(function ($message, $fail) {

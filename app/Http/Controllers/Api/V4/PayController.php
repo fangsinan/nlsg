@@ -74,11 +74,11 @@ class PayController extends Controller
             Order::where('id', '=', $order_id)->update(['activity_tag' => 'cytx']);
         }
 
-        $config = Config('wechat.payment.default');
+//        $config = Config('wechat.payment.default');
         $config = Config('wechat.payment.old_default'); //老商户
 
         if ($is_h5 == 1 || $is_h5 == 2) { // 公众号openid
-            $config = Config('wechat.payment.wx_wechat');
+//            $config = Config('wechat.payment.wx_wechat');
             $config = Config('wechat.payment.old_wx_wechat');
         }
         $app = Factory::payment($config);
