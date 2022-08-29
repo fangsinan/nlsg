@@ -144,7 +144,12 @@ class MsgConsoleServers
             $params['type'] = 23;
         }
 
-        $params['timing_send_time'] = date('Y-m-d H:i:00', strtotime($params['timing_send_time']));
+        if (isset($params['timing_send_time'])){
+            $params['timing_send_time'] = date('Y-m-d H:i:00', strtotime($params['timing_send_time']));
+        }else{
+            $params['timing_send_time'] = date('Y-m-d H:i:00');
+        }
+     
 
         $is_old = $params['id'] ?? 0;
 
