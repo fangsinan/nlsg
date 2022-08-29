@@ -656,10 +656,16 @@ class MessageController extends Controller
      * }
      */
     public function get_message_info(Request $request){
+        $message_id =$request->query('message_id');
+        if(empty($message_id)){
+            return $this->error(0, '参数错误');
+        }
+
+        $content=Message::query()->where('id',$message_id)->value('rich_text');
         $data=[
-            'title'=>'系统通知',
-            'cover_pic'=>'/wechat/works/video/161627/2017061411462579459.jpg',
-            'content'=>'<p>系统通知系统通知系统通知系统通知系统通知系统通知系统通知系统通知系统通知系统通知系统通知</p>'
+//            'title'=>'系统通知',
+//            'cover_pic'=>'/wechat/works/video/161627/2017061411462579459.jpg',
+            'content'=>$content
         ];
         return success($data);
     }
