@@ -149,7 +149,7 @@ class MsgConsoleServers
         }else{
             $params['timing_send_time'] = date('Y-m-d H:i:00');
         }
-     
+
 
         $is_old = $params['id'] ?? 0;
 
@@ -309,14 +309,18 @@ class MsgConsoleServers
 
         $temp = [];
 
-        foreach ($list as $v) {
+        foreach ($list as $k => $v) {
             if (!isset($temp[$v->group_name])) {
-                $temp[$v->group_name] = [];
+                $temp[$v->group_name] = [
+                    'title'=>$v->group_name,
+                    'id'=>$k,
+                    'child_list'=>[]
+                ];
             }
-            $temp[$v->group_name][] = $v;
+            $temp[$v->group_name]['child_list'][] = $v;
         }
 
-        return $temp;
+        return Array_values($temp);
     }
 
     public function templateStatus($params, $admin): array
