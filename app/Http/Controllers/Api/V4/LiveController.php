@@ -1846,6 +1846,7 @@ class LiveController extends Controller
             }
         }
 
+        $live_admin_id = Order::getAdminIDByLiveID($this->user['id'],$from_live_info_id);
         $ordernum = MallOrder::createOrderNumber($this->user['id'], 3);
         $data = [
             'ordernum' => $ordernum,
@@ -1865,6 +1866,7 @@ class LiveController extends Controller
             'activity_tag' => $activity_tag,
             'remark' => $from_live_info_id,
             'protect_user_id' => $tweeter_code??0,
+            'live_admin_id'=>$live_admin_id??0,
 
         ];
         $order = Order::firstOrCreate($data);
