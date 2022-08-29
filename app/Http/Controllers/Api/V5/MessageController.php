@@ -493,7 +493,7 @@ class MessageController extends Controller
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
-                'message:id,type,title,message,action_id,relation_type,relation_id,relation_info_id,open_type,rich_text,url',
+                'message:id,type,title,message,action_id,relation_type,relation_id,relation_info_id,open_type,url',
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
@@ -552,7 +552,7 @@ class MessageController extends Controller
         $lists = MessageUser::query()
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
-                'message:id,type,title,message,action_id,created_at,relation_type,relation_id,relation_info_id,open_type,rich_text,url',
+                'message:id,type,title,message,action_id,created_at,relation_type,relation_id,relation_info_id,open_type,url',
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
