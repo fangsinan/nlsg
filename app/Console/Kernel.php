@@ -28,6 +28,7 @@ use App\Servers\MallRefundJob;
 use App\Servers\LiveConsoleServers;
 use App\Servers\removeDataServers;
 use App\Servers\UserWechatServers;
+use App\Servers\V5\JpushService;
 use App\Servers\V5\ShareServers;
 use App\Servers\V5\WechatServers;
 use EasyWeChat\Factory;
@@ -77,9 +78,13 @@ class Kernel extends ConsoleKernel
             ->everyFifteenMinutes()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
 
-
-
-
+        $schedule->call(function () {
+            JpushService::TimedPush();
+        })->everyMinute()->runInBackground();//每分发送极光消息
+        $schedule->call(function () {
+            $servers = new JpushService();
+            $servers->Statistics();
+        })->everyFiveMinutes()->runInBackground();//每5分同步发送到达量
 
         //im社群的发送任务
 //        $schedule->command('imJob')
