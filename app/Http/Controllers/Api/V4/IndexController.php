@@ -17,13 +17,12 @@ use App\Models\User;
 use App\Models\Versions;
 use App\Models\Works;
 use App\Servers\StatisticsServers;
+use App\Servers\V5\JpushService;
 use EasyWeChat\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use JPush;
 use Carbon\Carbon;
 use App\Models\Task;
-use JPush\Client as JPushClient;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 
 class IndexController extends Controller
@@ -130,7 +129,7 @@ class IndexController extends Controller
         $res["teacher_list"] = $recommendModel->getIndexRecommend(14, 35);
         //精品专题
         $res['special_list'] = $recommendModel->getIndexRecommend(15, 37);
- 
+
         //榜单
         $res['hot_list'] = $recommendModel->getIndexRecommend(11, 38,3);
 
@@ -274,7 +273,7 @@ class IndexController extends Controller
         }
 
         $user_id = $this->user['id'] ?? 0;
-        
+
 
         $recommendModel = new Recommend();
         $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
@@ -284,8 +283,8 @@ class IndexController extends Controller
         //     ->where('end_at',   '<', date('Y-m-d',strtotime('+1 day')))
         //     ->where('is_del', 0)
         //     ->orderBy('created_at', 'desc')
-        //     ->first();  
-            
+        //     ->first();
+
         // if (!empty($list)){
         //     $list->live_length = strtotime($list->end_at)-strtotime($list->begin_at);
         //     $list->begin_at =  date('H:i:s',strtotime($list->begin_at));
@@ -1171,7 +1170,7 @@ class IndexController extends Controller
             $platform_type = $request->get('platform_type') ?? 0;
             $platform_type = strtolower($platform_type);  //转小写
         }
-        
+
         $list = Versions::select('id', 'number', 'content', 'url', 'is_force', 'str_at','down_type')
             ->where('status', 1)
             ->where('os_type', $os_type)
@@ -1257,9 +1256,9 @@ class IndexController extends Controller
     {
         $bannerModel = new Banner();
         $data = $bannerModel->appPopup(60);
-        
+
         $data = $bannerModel->CheckBannerVersion($data,$request->get('version') ?? 0);
-        
+
 
         $data  = !empty($data) ? $data : new \StdClass();
         return success($data);
@@ -1309,7 +1308,7 @@ class IndexController extends Controller
 
 
 
-    
+
 
     public function share(Request $request)
     {
@@ -1380,11 +1379,15 @@ class IndexController extends Controller
         return $this->getRes($data);
     }
 
+    //极光别名删除，重置绑定
     public function  jpushAlias(Request $request)
     {
+//        $JpushObj=new JpushService();
+//        $JpushObj->test();;
+//        return ;
         $user_id =  $request->get('user_id');
-        $client   = new JPushClient(config('services.jpush.app_key'), config('services.jpush.master_secret'),config('services.jpush.log_file'));
-        $response = $client->device()->deleteAlias(strval($user_id));
+        $JpushObj=new JpushService();
+        $JpushObj->DeleteAlias($user_id);
         return success();
     }
 

@@ -335,7 +335,13 @@ class PushPayload {
     # new methods
     public function iosNotification($alert = '', array $notification = array()) {
         $ios = array();
-        $ios['alert'] = (is_string($alert) || is_array($alert)) ? $alert : '';
+
+        if(is_string($alert)){ //兼容老版本
+            $ios['alert'] = is_string($alert) ? $alert : '';
+        }else if(is_array($alert)){
+            $ios['alert'] = ['title'=>$alert['title'],'body'=>$alert['body']];
+        }
+
         if (!empty($notification)) {
             if (isset($notification['sound'])) {
                 if (is_string($notification['sound']) || is_array($notification['sound'])) {
@@ -379,7 +385,14 @@ class PushPayload {
 
     public function androidNotification($alert = '', array $notification = array()) {
         $android = array();
-        $android['alert'] = is_string($alert) ? $alert : '';
+
+        if(is_string($alert)){ //兼容老版本
+            $android['alert'] = is_string($alert) ? $alert : '';
+        }else if(is_array($alert)){
+            $android['title'] = $alert['title'];
+            $android['alert'] = $alert['body'];
+        }
+
         if (!empty($notification)) {
             if (isset($notification['builder_id'])) {
                 if (is_int($notification['builder_id'])) {
