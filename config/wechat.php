@@ -103,7 +103,7 @@ return [
     /*
      * 微信支付
      */
-    
+
      'payment' => [
 
         //提现用old_default的配置  1460495202
