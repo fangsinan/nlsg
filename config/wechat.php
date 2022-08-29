@@ -103,9 +103,10 @@ return [
     /*
      * 微信支付
      */
+    
      'payment' => [
 
-        //提现用old_default的配置     修改提现流程
+        //提现用old_default的配置  1460495202
          'old_default' => [
              'sandbox'            => env('WECHAT_PAYMENT_SANDBOX', false),
              'app_id'             => env('WECHAT_PAYMENT_APPID', ''),
@@ -116,7 +117,19 @@ return [
              'notify_url'         => env('APP_URL').env('WECHAT_PAYMENT_CALLBACK_URL', 'wechat_pay/notify'),                           // 默认支付结果通知地址
              'refund_url'         => env('WECHAT_PAYMENT_REFUND_URL','https://api.mch.weixin.qq.com/secapi/pay/refund'),
          ],
-         //默认使用新的商户配置 继续用支付
+         //微信端配置
+         'old_wx_wechat' => [
+             'sandbox'            => env('WECHAT_PAYMENT_SANDBOX', false),
+             'app_id'             => env('WX_WECHAT_PAYMENT_APPID', ''),
+             'mch_id'             => env('WECHAT_PAYMENT_MCH_ID', 'your-mch-id'),
+             'key'                => env('WECHAT_PAYMENT_KEY', 'key-for-signature'),
+             'cert_path'          => base_path().env('WECHAT_PAYMENT_CERT_PATH', 'path/to/cert/apiclient_cert.pem'),    // XXX: 绝对路径！！！！
+             'key_path'           => base_path().env('WECHAT_PAYMENT_KEY_PATH', 'path/to/cert/apiclient_key.pem'),      // XXX: 绝对路径！！！！
+             'notify_url'         => env('APP_URL').env('WECHAT_PAYMENT_CALLBACK_URL_H5', 'wechat_pay/notify'),                           // 默认支付结果通知地址
+             'refund_url'         => env('WECHAT_PAYMENT_REFUND_URL','https://api.mch.weixin.qq.com/secapi/pay/refund'),
+         ],
+
+         //默认使用新的商户配置 1617058880
          'default' => [
              'sandbox'            => env('WECHAT_PAYMENT_SANDBOX', false),
              'app_id'             => env('WECHAT_PAYMENT_APPID', ''),
@@ -127,7 +140,6 @@ return [
              'notify_url'         => env('APP_URL').env('WECHAT_PAYMENT_CALLBACK_URL', 'wechat_pay/notify'),                           // 默认支付结果通知地址
              'refund_url'         => env('WECHAT_PAYMENT_REFUND_URL','https://api.mch.weixin.qq.com/secapi/pay/refund'),
          ],
-
 
          'wx_wechat' => [
              'sandbox'            => env('WECHAT_PAYMENT_SANDBOX', false),
