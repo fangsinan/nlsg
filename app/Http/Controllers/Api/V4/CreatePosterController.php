@@ -1132,7 +1132,7 @@ class CreatePosterController extends Controller
                 return ConfigModel::getData(45) .$url_temp. '?time=' . time() . '&inviter=' . $uid .
                     '&live_id=' . $live_id . '&live_info_id=' . $live_info_id;
 
-            
+
         }
         $twitterObj = new MallTwitter();
         //  1:专栏  2:课程视频  3:课程音频  4:课程文章  5:听书
@@ -1253,7 +1253,7 @@ class CreatePosterController extends Controller
 
         //type_flag1 头像  2 作品  3 专栏  4 商品  5身份证审核  6 banner  7 书单 8 企业 9问题反馈  10晒单评价  100其他
         //1 头像 10评论 9退货 5身份证审核  8 企业  100发票 9吐槽
-        if (!in_array($type_flag, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100])) {
+        if (!in_array($type_flag, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100,101,102,103])) {
             return $this->error(0, '上传类型有误');
         }
 
