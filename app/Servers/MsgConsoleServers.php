@@ -121,6 +121,7 @@ class MsgConsoleServers
                 'relation_id'      => 'exclude_unless:open_type,3|required|integer|min:1',
                 'is_timing'        => 'bail|required|in:1,2',
                 'timing_send_time' => 'exclude_unless:is_timing,1|required|date',
+                'type'             => 'integer'
             ],
             [
                 'phone_list.*.distinct' => '手机号内有重复值',
@@ -144,9 +145,9 @@ class MsgConsoleServers
             $params['type'] = 23;
         }
 
-        if (isset($params['timing_send_time'])){
+        if (isset($params['timing_send_time'])) {
             $params['timing_send_time'] = date('Y-m-d H:i:00', strtotime($params['timing_send_time']));
-        }else{
+        } else {
             $params['timing_send_time'] = date('Y-m-d H:i:00');
         }
 
@@ -312,9 +313,9 @@ class MsgConsoleServers
         foreach ($list as $k => $v) {
             if (!isset($temp[$v->group_name])) {
                 $temp[$v->group_name] = [
-                    'title'=>$v->group_name,
-                    'id'=>$k,
-                    'child_list'=>[]
+                    'title'      => $v->group_name,
+                    'id'         => $k,
+                    'child_list' => []
                 ];
             }
             $temp[$v->group_name]['child_list'][] = $v;
