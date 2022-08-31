@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\Comment;
 use App\Models\CommentReply;
+use App\Models\Message\Message;
 use App\Models\Notify;
 use App\Models\ShortVideoModel;
 use Illuminate\Http\Request;
@@ -109,7 +110,9 @@ class ReplyController extends Controller
 //            $from_user = User::where('id', $user_id)->value('nickname');
 //            //发送通知
 //            Task::send(12, $comment->user_id, $result->id, 0, '',false,false, 0, $from_user, $comment->type, $comment->relation_id);
-
+            if(!empty($add_data['from_uid']) && !empty($add_data['to_uid'])){
+                Message::pushMessage($add_data['from_uid'],$add_data['to_uid'],'COMMENT_REPLY',["action_id"=>$result->id,]);
+            }
             return success();
         }
     }
