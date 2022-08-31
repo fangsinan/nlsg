@@ -2,6 +2,7 @@
 
 namespace App\Servers\V5;
 
+use App\Models\Lists;
 use App\Models\Message\Message;
 use App\Models\Message\MessageUser;
 use App\Models\Message\MessageType;
@@ -164,6 +165,10 @@ class JpushService
             $data['message_id'] = $item['id']; //图文类型 消息id
 //            $data['rich_text'] = $item['rich_text']; //图文类型 不在此返回，提供接口获取
         }
+        if(in_array($item['relation_type'],[161,162,163])){
+            $ListsObj=Lists::query()->where('id',$item['relation_id'])->select('title')->first();
+            $data['name']=$ListsObj->title;
+        }
         switch ($item['relation_type']){
             case 101 : $data['type']= 1;    break;  //课程详情                id
             case 102 : $data['type']= 102;  break;  //课程章节播放器           id  info_id
@@ -175,9 +180,9 @@ class JpushService
             case 141 : $data['type']= 7;    break;  //训练营父类               id
             case 142 : $data['type']= 142;  break;  //训练营期数               id
             case 151 : $data['type']= 3;    break;  //360会员介绍页
-            case 161 : $data['type']= 161;  break;  //课程列表页
-            case 162 : $data['type']= 162;  break;  //讲座列表页
-            case 163 : $data['type']= 163;  break;  //专题列表页
+            case 161 : $data['type']= 161;  break;  //课程列表页               id    name
+            case 162 : $data['type']= 162;  break;  //讲座列表页               id    name
+            case 163 : $data['type']= 163;  break;  //专题列表页               id    name
             case 171 : $data['type']= 171;  break;  //大咖讲书详情             id
             case 172 : $data['type']= 172;  break;  //大咖讲书章节播放器        id  info_id
             //老版本类型
