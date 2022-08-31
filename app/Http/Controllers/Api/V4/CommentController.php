@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V4;
 use App\Http\Controllers\Controller;
 use App\Models\Column;
 use App\Models\CommentReply;
+use App\Models\Message\Message;
 use App\Models\Notify;
 use App\Models\ShortVideoModel;
 use Illuminate\Http\Request;
@@ -240,6 +241,9 @@ class CommentController extends Controller
                     ];
                 }
                 Attach::insert($data);
+            }
+            if(!empty($user_id)){
+                Message::pushMessage($this->user['id'],$user_id,'COMMENT',["action_id"=>$result->id,]);
             }
 
             return success();
