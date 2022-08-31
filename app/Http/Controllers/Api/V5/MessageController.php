@@ -108,9 +108,16 @@ class MessageController extends Controller
      */
     public function msg_comment_list(Request $request)
     {
-        $user_id = 233785;
+        if($request->query('os_type')==2){
+            $user_id = $this->user['id'];
+        }else{
+            $user_id = 233785;
+        }
 
-//        $user_id = $this->user['id'] ?? 233785;
+        if(empty($user_id)){
+            return $this->error(0, '请登录');
+        }
+
 
         //type :9=评论 10=回复
         $type_arr=MessageType::get_comment_msg_type();
@@ -195,10 +202,18 @@ class MessageController extends Controller
     public function msg_comment_info(Request $request)
     {
 
-//        $user_id = $this->user['id'] ?? 233785;
-        $user_id = 233785;
+        if($request->query('os_type')==2){
+            $user_id = $this->user['id'];
+            $id =$request->query('id');
 
-        $id =$request->query('id',61);
+        }else{
+            $user_id = 233785;
+            $id =$request->query('id',61);
+        }
+
+        if(empty($user_id)){
+            return $this->error(0, '请登录');
+        }
 
         if(empty($id)){
             return $this->error(0, '参数错误');
