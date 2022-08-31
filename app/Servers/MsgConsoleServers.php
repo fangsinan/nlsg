@@ -354,7 +354,7 @@ class MsgConsoleServers
     {
         $query = MessageView::query()
             ->where('status', '=', 1)
-            ->with(['typeInfo:id,title'])
+            ->with(['typeInfo:id,title,pid'])
             ->select(['id', 'title', 'message', 'created_at', 'type'])
             ->orderBy('id', 'desc');
 
