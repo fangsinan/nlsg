@@ -167,7 +167,10 @@ class JpushService
         }
         if(in_array($item['relation_type'],[161,162,163])){
             $ListsObj=Lists::query()->where('id',$item['relation_id'])->select('title')->first();
-            $data['name']=$ListsObj->title;
+            $data['name']='精彩集锦';
+            if(!empty($ListsObj)){
+                $data['name']=$ListsObj->title;
+            }
         }
         switch ($item['relation_type']){
             case 101 : $data['type']= 1;    break;  //课程详情                id
