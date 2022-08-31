@@ -352,12 +352,18 @@ class MsgConsoleServers
     //消息模板列表
     public function templateList($params, $admin): LengthAwarePaginator
     {
-        return MessageView::query()
+        $query = MessageView::query()
             ->where('status', '=', 1)
             ->with(['typeInfo:id,title'])
             ->select(['id', 'title', 'message', 'created_at', 'type'])
-            ->orderBy('id', 'desc')
-            ->paginate($params['size'] ?? 10);
+            ->orderBy('id', 'desc');
+
+        if ($params['id'] ?? 0) {
+            $query->where('id', '=', $params['id']);
+        }
+
+        return $query->paginate($params['size'] ?? 10);
+
     }
 
     //创建模板
