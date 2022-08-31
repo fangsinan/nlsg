@@ -527,6 +527,28 @@ class MsgConsoleServers
                     ];
                 }
                 break;
+            //5.0新用  1课程集合  7精品专题   8课程榜单   9学习榜单  10大咖讲书   11讲座专题
+            case '161':
+                //课程
+                $res = [
+                    'have_info' => 0,
+                    'data'      => $this->getListsList(1),
+                ];
+                break;
+            case '162':
+                //讲座
+                $res = [
+                    'have_info' => 0,
+                    'data'      => $this->getListsList(11),
+                ];
+                break;
+            case '163':
+                //专题
+                $res = [
+                    'have_info' => 0,
+                    'data'      => $this->getListsList(7),
+                ];
+                break;
             default:
                 $res = [
                     'have_info' => 0,
@@ -537,6 +559,15 @@ class MsgConsoleServers
 
         return $res;
 
+    }
+
+    public function getListsList($type)
+    {
+        return Lists::query()
+            ->where('type', '=', $type)
+            ->where('status', '=', 1)
+            ->select(['id as relation_id', 'title'])
+            ->get();
     }
 
     public function getWorksList()
