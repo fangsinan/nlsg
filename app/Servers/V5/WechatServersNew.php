@@ -173,7 +173,7 @@ class WechatServersNew
             $map_all_temp['created_at'] = $day_time;
             $map_all[] = $map_all_temp;
             //加入队列等待执行
-            $Redis->rpush('push_wechat_openid_list', $fv);
+            $Redis->rpush('push_wechat_openid_list_test', $fv);
         }
 
         $rst = WechatOpenid::Add($map_all, true);
@@ -181,14 +181,18 @@ class WechatServersNew
 
 
     //模板发送
-    public static function TemplateLive(){
+    public static function TemplateLive($is_test=0){
 
         try {
 
             $redisConfig = config('database.redis.default');
             $Redis = new Client($redisConfig);
             $Redis->select(5);
-            $key_name='push_wechat_openid_list';
+            if($is_test==1){
+                $key_name='push_wechat_openid_list_test';
+            }else{
+                $key_name='push_wechat_openid_list';
+            }
             $flag = true;
             while ($flag) {
                 $num = $Redis->llen($key_name);
@@ -241,30 +245,26 @@ class WechatServersNew
         开始时间：2017年8月1日 20:00
         请留言直播课程开始时间，以免错过课程*/
         //周三早7点  &tweeter_code=211370
-        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=614&time=1660568449095&inviter=211370';
-        $hello='王琨老师2晚家庭教育直播课：';
-        $title='卓越孩子必备的6大能力';
-        $number='ZYHZ-0810-11';
-        $abstract='培养孩子的健康观、人生观、财富观、价值观、爱情观、世界观，详见链接';
-        $remarks="温馨提示：原价699元直播课，琨哥粉丝福利价1元领取>>>";
+        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=631&time=1661997463&inviter=211370';
+        $hello='你好，提高孩子记忆力的直播课程将在19点30分开始';
+        $title='解密最强大脑，科学高效记忆';
+        $number='想提高记忆的家长孩子';
+        $remarks="帮助孩子提高记忆力，记单词、记数字、记文章，掌握高效的记忆力方法，详见链接";
 
         $data=[
             'touser'=>$open_id,
-            'template_id'=>'W4eXPP0iI3iNGHvyrCOTfUvPpNFXwgP0uULl_0ZyK7s',
+            'template_id'=>'-G4hjyuE9LOAuEGS01Of7RdMUM7ZrOnx4M0w-OJ_FdI',
             'url'=>$hrefurl, #抖音直播不需要跳转
             'topcolor'=>"#FF0000",
             'data'=>[
                 "first"=>[
                     "value"=>$hello,
                 ],
-                "keyword1"=>[ //名称
+                "keyword1"=>[ //课程
                     "value"=>$title,
                 ],
-                "keyword2"=>[ //编号
+                "keyword2"=>[ //参加人
                     "value"=>$number,
-                ],
-                "keyword3"=>[ //摘要
-                    "value"=>$abstract,
                 ],
                 "remark"=>[
                     "value"=>$remarks,
