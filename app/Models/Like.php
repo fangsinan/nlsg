@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Message\Message;
 use Illuminate\Database\Eloquent\Model;
 
 class Like extends Model
@@ -39,5 +40,23 @@ class Like extends Model
     * */
     public static function like_count($cid=0,$ctype=1){
         return  Like::where(['comment_type'=>$ctype,'relation_id' => $cid,   'status'=>1])->count();
+    }
+
+    /**
+     * LikeMsg  点赞发送消息
+     *
+     * @param $id
+     * @param $comment_type
+     * @param $uid
+     * @param $likeId
+     */
+    public static function LikeMsg($commentId,$comment_type,$uid,$likeId,$push_type="LIKE"){
+        // 发送消息
+        if($comment_type == 1 ){
+            $receive_id =  Comment::where('id', $commentId)->value('user_id');
+        }else{
+            $receive_id =  CommentReply::where('id', $commentId)->value('from_uid');
+        }
+        Message::pushMessage($uid,$receive_id,$push_type,["action_id"=>$likeId,]);
     }
 }
