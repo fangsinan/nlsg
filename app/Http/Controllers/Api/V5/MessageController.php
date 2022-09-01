@@ -319,8 +319,12 @@ class MessageController extends Controller
     public function msg_follow_list(Request $request)
     {
 
-//        $user_id = $this->user['id'] ?? 233785;
-        $user_id = 233785;
+        if($request->query('os_type')==2){
+            $user_id = $this->user['id'];
+
+        }else{
+            $user_id = 233785;
+        }
 
         //22=关注
         $type_arr=MessageType::get_follow_msg_type();
@@ -395,8 +399,12 @@ class MessageController extends Controller
      */
     public function msg_like_list(Request $request)
     {
-//        $user_id = $this->user['id'] ?? 233785;
-        $user_id = 233785;
+        if($request->query('os_type')==2){
+            $user_id = $this->user['id'];
+
+        }else{
+            $user_id = 233785;
+        }
 
         // 11=点赞
         $type_arr=MessageType::get_like_msg_type();

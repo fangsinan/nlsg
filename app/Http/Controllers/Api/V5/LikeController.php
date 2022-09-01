@@ -95,17 +95,7 @@ class LikeController extends Controller
             //增加喜欢
             Comment::where('id', $id)->increment('like_num');
 
-            if($type == 1 ){
-                // 发送消息
-                if($comment_type == 1 ){
-                    $receive_id =  Comment::where('id', $id)->value('user_id');
-                }else{
-                    $receive_id =  CommentReply::where('id', $id)->value('from_uid');
-                }
-                Message::pushMessage($this->user['id'],$receive_id,'LIKE',["action_id"=>$res->id,]);
-            }
-
-
+            Like::LikeMsg($id,$comment_type,$this->user['id'],$res->id);
             return success('操作成功');
         }
         return error(1000, '操作失败');
@@ -150,12 +140,7 @@ class LikeController extends Controller
             Comment::where('id', $id)->decrement('like_num');
 
             // 发送消息
-            if($comment_type == 1 ){
-                $receive_id =  Comment::where('id', $id)->value('user_id');
-            }else{
-                $receive_id =  CommentReply::where('id', $id)->value('from_uid');
-            }
-            Message::pushMessage($this->user['id'],$receive_id,'LIKE',["action_id"=>$res->id,]);
+            Like::LikeMsg($id,$comment_type,$this->user['id'],$res->id,"UNLIKE");
             return success('操作成功');
         }
         return error(0,'操作失败');

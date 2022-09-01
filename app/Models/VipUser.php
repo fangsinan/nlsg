@@ -4,6 +4,7 @@
 namespace App\Models;
 
 
+use App\Models\Message\Message;
 use Illuminate\Support\Facades\DB;
 
 class VipUser extends Base
@@ -661,6 +662,57 @@ where a.user_id = ' . $user_id . ' and a.status = 2
         }
         $card_data['expire_time']  = empty($card_data['expire_time']) ? 0 : strtotime($card_data['expire_time']);
         return  $card_data;
+    }
+
+
+    // 过期 发送消息
+    function VipExpirePushMsg($str_time,$end_time){
+
+
+        $times = [
+            // 即将到期
+            [
+                "str_time" => date("Y-m-d"),
+                "end_time" => date('Y-m-d', (time() + 86400)),
+            ],
+            // 已经到期  到期三天
+            [
+                "str_time" => date("Y-m-d",strtotime("+3 days")),
+                "end_time" => date("Y-m-d",strtotime("+4 days")),
+            ],
+        ];
+
+        foreach ($times as $val){
+
+            $while_flag =true;
+            $page = 2;
+            $size = 500;
+
+            while ($while_flag) {
+                $lists =   VipUser::where("status",1)->where("expire_time",">",$str_time)
+                    ->where("expire_time","<",$end_time)
+                    ->limit($size)->offset(($page - 1) * $size)->get()->toArray();
+                //处理msg
+                foreach($lists as $val){
+                    // Message::pushMessage(0,$val['user_id'],"VIP_SOON_EXPIRE",[]);
+                }
+                $page++;
+                if (empty($lists)){
+                    $while_flag = false;
+                }
+            }
+
+
+        }
+
+
+
+
+
+
+
+
+
     }
 
 
