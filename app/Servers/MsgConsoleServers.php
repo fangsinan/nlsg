@@ -31,6 +31,10 @@ class MsgConsoleServers
 
         if ($params['id'] ?? 0) {
             $query->where('id', '=', $params['id']);
+            $query->with([
+                'messageUserList:id,message_id,receive_user',
+                'messageUserList.receive_user:id,phone',
+            ]);
         }
 
         if (in_array($params['status'] ?? 0, [1, 2, 3, 4])) {
@@ -63,8 +67,23 @@ class MsgConsoleServers
             'send_count', 'get_count', 'read_count',
         ]);
 
+        $list = $query->paginate($params['size'] ?? 10);
 
-        return $query->paginate($params['size'] ?? 10);
+        if ($params['id'] ?? 0) {
+            foreach ($list as $v) {
+                $temp_phone_list = [];
+                foreach ($v->messageUserList as $mul_v) {
+                    $mul_v = $mul_v->toArray();
+                    if ($mul_v['receive_user']['phone'] ?? '') {
+                        $temp_phone_list[] = $mul_v['receive_user']['phone'];
+                    }
+                }
+                $v->phone_list = $temp_phone_list;
+                unset($v->messageUserList);
+            }
+        }
+
+        return $list;
     }
 
     public function jobStatus($params, $admin): array
@@ -121,7 +140,8 @@ class MsgConsoleServers
                 'relation_id'      => 'exclude_unless:open_type,3|required|integer|min:1',
                 'is_timing'        => 'bail|required|in:1,2',
                 'timing_send_time' => 'exclude_unless:is_timing,1|required|date',
-                'type'             => 'integer'
+                'type'             => 'integer',
+                'relation_info_id' => 'integer',
             ],
             [
                 'phone_list.*.distinct' => '手机号内有重复值',
