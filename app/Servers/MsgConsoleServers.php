@@ -29,13 +29,20 @@ class MsgConsoleServers
     {
         $query = Message::query();
 
+//        $query->with([
+//            'relationTypeInfo'
+//        ]);
+
         if ($params['id'] ?? 0) {
             $query->where('id', '=', $params['id']);
             $query->with([
                 'messageUserList:id,message_id,receive_user',
                 'messageUserList.receive_user:id,phone',
+                'relationTypeInfo:id,title,group_id'
             ]);
         }
+
+
 
         if (in_array($params['status'] ?? 0, [1, 2, 3, 4])) {
             $query->where('status', '=', $params['status']);
@@ -325,7 +332,7 @@ class MsgConsoleServers
     {
         $list = MessageRelationType::query()
             ->where('status', '=', 1)
-            ->select(['id', 'title', 'group_name'])
+            ->select(['id', 'title', 'group_name', 'group_id'])
             ->get();
 
         $temp = [];
@@ -334,7 +341,7 @@ class MsgConsoleServers
             if (!isset($temp[$v->group_name])) {
                 $temp[$v->group_name] = [
                     'title'      => $v->group_name,
-                    'id'         => $k,
+                    'id'         => $v->group_id,
                     'child_list' => []
                 ];
             }
