@@ -323,7 +323,7 @@ class MessageController extends Controller
             $user_id = $this->user['id'];
 
         }else{
-            $user_id = 233785;
+            $user_id = 318504;
         }
 
         //22=关注
@@ -360,8 +360,8 @@ class MessageController extends Controller
                 $items['send_user']['is_vip']=VipUser::newVipInfo( $items['send_user']['id']??0)['vip_id'] ?1:0;
                 $items['created_at'] = History::DateTime($items['created_at']);
 
-                $is_follow_me=UserFollow::IsFollow( $items['send_user'],$user_id);
-                $is_follow_he=UserFollow::IsFollow($user_id, $items['send_user']);
+                $is_follow_me=UserFollow::IsFollow( $items['send_user']['id'],$user_id);
+                $is_follow_he=UserFollow::IsFollow($user_id, $items['send_user']['id']);
 
                 $items['is_follow_me']=$is_follow_me;
                 $items['is_follow_he']=$is_follow_he;
