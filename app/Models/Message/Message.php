@@ -6,6 +6,7 @@ namespace App\Models\Message;
 
 use App\Models\Base;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
 class Message extends Base
@@ -102,4 +103,8 @@ class Message extends Base
     }
 
 
+    public function messageUserList(): HasMany
+    {
+        return $this->hasMany(MessageUser::class,'message_id','id');
+    }
 }
