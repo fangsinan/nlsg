@@ -44,8 +44,8 @@ class MessageController extends Controller
      */
     public function msg_type_list(Request $request)
     {
-//        $user_id = $this->user['id'] ?? 233785;
-        $user_id = 233785;
+        $user_id = $this->user['id'];
+//        $user_id = 233785;
 
         // 1=系统消息 4=内容上新 9=评论 11=点赞 12=收益 22=关注
 
@@ -108,11 +108,11 @@ class MessageController extends Controller
      */
     public function msg_comment_list(Request $request)
     {
-        if($request->query('os_type')==2){
+//        if($request->query('os_type')==2){
             $user_id = $this->user['id'];
-        }else{
-            $user_id = 233785;
-        }
+//        }else{
+//            $user_id = 233785;
+//        }
 
         if(empty($user_id)){
             return $this->error(0, '请登录');
@@ -202,14 +202,14 @@ class MessageController extends Controller
     public function msg_comment_info(Request $request)
     {
 
-        if($request->query('os_type')==2){
+//        if($request->query('os_type')==2){
             $user_id = $this->user['id'];
             $id =$request->query('id');
 
-        }else{
-            $user_id = 233785;
-            $id =$request->query('id',61);
-        }
+//        }else{
+//            $user_id = 233785;
+//            $id =$request->query('id',61);
+//        }
 
         if(empty($user_id)){
             return $this->error(0, '请登录');
@@ -319,12 +319,7 @@ class MessageController extends Controller
     public function msg_follow_list(Request $request)
     {
 
-        if($request->query('os_type')==2){
-            $user_id = $this->user['id'];
-
-        }else{
-            $user_id = 318504;
-        }
+        $user_id = $this->user['id'];
 
         //22=关注
         $type_arr=MessageType::get_follow_msg_type();
@@ -399,12 +394,7 @@ class MessageController extends Controller
      */
     public function msg_like_list(Request $request)
     {
-        if($request->query('os_type')==2){
-            $user_id = $this->user['id'];
-
-        }else{
-            $user_id = 233785;
-        }
+        $user_id = $this->user['id'];
 
         // 11=点赞
         $type_arr=MessageType::get_like_msg_type();
@@ -608,8 +598,8 @@ class MessageController extends Controller
     public function msg_profit_list(Request $request)
     {
 
-//        $user_id = $this->user['id'] ?? 233785;
-        $user_id = 233785;
+        $user_id = $this->user['id'];
+//        $user_id = 233785;
 
         // 12=收益
         $type_arr=MessageType::get_profit_msg_type();
@@ -660,7 +650,7 @@ class MessageController extends Controller
      */
     public function clear_msg(Request $request)
     {
-        $user_id = $this->user['id'] ?? 233785;
+        $user_id = $this->user['id'];
         MessageServers::clear_msg($user_id);
         return success([]);
     }
