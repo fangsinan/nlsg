@@ -117,6 +117,7 @@ class AuthController extends Controller
             $user = User::find($list->id);
             //发送注册消息
             Message::pushMessage(0,$list->id,'REGISTER');
+
             //新人优惠券
             $model->giveCoupon($list->id, ConfigModel::getData(41));
 
