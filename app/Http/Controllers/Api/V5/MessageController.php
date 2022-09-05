@@ -45,9 +45,14 @@ class MessageController extends Controller
     public function msg_type_list(Request $request)
     {
         $user_id = $this->user['id'];
+        if(empty($user_id)){
+            return $this->error(0, '请登录');
+        }
 //        $user_id = 233785;
 
         // 1=系统消息 4=内容上新 9=评论 11=点赞 12=收益 22=关注
+        //同步消息
+        Message::CheckUserMessage($user_id);
 
         $lists = [];
         //点赞
@@ -320,6 +325,9 @@ class MessageController extends Controller
     {
 
         $user_id = $this->user['id'];
+        if(empty($user_id)){
+            return $this->error(0, '请登录');
+        }
 
         //22=关注
         $type_arr=MessageType::get_follow_msg_type();
@@ -395,6 +403,9 @@ class MessageController extends Controller
     public function msg_like_list(Request $request)
     {
         $user_id = $this->user['id'];
+        if(empty($user_id)){
+            return $this->error(0, '请登录');
+        }
 
         // 11=点赞
         $type_arr=MessageType::get_like_msg_type();
@@ -498,6 +509,9 @@ class MessageController extends Controller
     {
 //        $user_id = $this->user['id'] ?? 233785;
         $user_id = 233785;
+        if(empty($user_id)){
+            return $this->error(0, '请登录');
+        }
 
         //4=内容上新
         $type_arr=MessageType::get_work_new_msg_type();
@@ -556,6 +570,9 @@ class MessageController extends Controller
 
 //        $user_id = $this->user['id'] ?? 233785;
         $user_id = 233785;
+        if(empty($user_id)){
+            return $this->error(0, '请登录');
+        }
 
         //1=系统消息
 
@@ -599,6 +616,10 @@ class MessageController extends Controller
     {
 
         $user_id = $this->user['id'];
+        if(empty($user_id)){
+            return $this->error(0, '请登录');
+        }
+
 //        $user_id = 233785;
 
         // 12=收益
@@ -651,6 +672,10 @@ class MessageController extends Controller
     public function clear_msg(Request $request)
     {
         $user_id = $this->user['id'];
+        if(empty($user_id)){
+            return $this->error(0, '请登录');
+        }
+
         MessageServers::clear_msg($user_id);
         return success([]);
     }
