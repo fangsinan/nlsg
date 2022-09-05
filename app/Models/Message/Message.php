@@ -114,4 +114,51 @@ class Message extends Base
         return $this->hasOne(MessageRelationType::class,'id','relation_type');
     }
 
+
+
+
+    /**
+     * CheckUserMessage  同步 nlsg_message_user  全员消息
+     *
+     * @param int $receive_user 用户id
+     */
+    static function CheckUserMessage(int $receive_user){
+        $msg = self::where("receive_type",2)
+            ->where("status",3)
+            ->pluck("id")->toArray();
+        if(empty($msg)){
+            return;
+        }
+        $msg_ids = MessageUser::where("receive_user",$receive_user)
+            ->whereIn("message_id",$msg)
+            ->where("is_del",1)
+            ->pluck("message_id")->toArray();
+
+        $add_msg_id = array_diff($msg,$msg_ids);
+        if(empty($add_msg_id)){
+            return;
+        }
+        $edit_msg = self::where("receive_type",2)->where("status",3)
+            ->whereIn("id",$add_msg_id)->get();
+
+        if(empty($edit_msg)){
+            return;
+        }
+        $edit_msg = $edit_msg->toArray();
+
+        $add = [];
+        foreach($edit_msg as $key=>$val){
+            $add[$key] = [
+                "receive_user"  => $receive_user,
+                "type"          => $val['type'],
+                "message_id"    => $val['id'],
+                "is_send"       => 3,
+                "plan_time"     => date('Y-m-d H:i:s')
+            ];
+        }
+        MessageUser::insert($add);
+    }
+
+
+
 }
