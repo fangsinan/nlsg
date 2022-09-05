@@ -400,7 +400,7 @@ class AuthController extends Controller
         }else if(!empty($input['is_browser'])){ //浏览器访问
 
             //注册虚拟用户
-            $phone=$this->getUniquePhone();
+            $phone=$this->VirtualUser();
 
             $data = [
                 'nickname' => 'nlsg' . rand(100000, 999999),
@@ -471,30 +471,6 @@ class AuthController extends Controller
 
     }
 
-    //注册虚拟用户
-    //$request->session()->put('user',[]);//存session信息
-    //$request->session()->get('user')；//获取session信息
-    private function getUniquePhone(){
-
-        $time = time();
-        $redis_phone = 'phone_' . date('Ymd', $time);
-
-        $key = 'phone_lock';
-        self::lock($key); //加锁
-        $num = Redis::get($redis_phone);
-        if (empty($num) || $num <= 0) {
-            $num = 1;
-        }
-        Redis::setex($redis_phone, 86400, $num + 1);
-        self::unlock($key); //释放锁
-
-        $str_num = str_pad($num, 7, "0", STR_PAD_LEFT);
-        $phone = date('ymd', $time) . $str_num; //6+7
-
-        return $phone;
-
-    }
-
     /**
      * 李总免登陆绑定手机手机号
      */
@@ -560,6 +536,28 @@ class AuthController extends Controller
 			$arra['data'] = $data;
 		}
         return success($arra);
+
+    }
+
+    //生成13位虚拟手机号
+    public function VirtualUser(){
+
+        $time = time();
+        $redis_phone = 'phone_' . date('Ymd', $time);
+
+        $key = 'phone_lock';
+        self::lock($key); //加锁
+        $num = Redis::get($redis_phone);
+        if (empty($num) || $num <= 0) {
+            $num = 1;
+        }
+        Redis::setex($redis_phone, 86400, $num + 1);
+        self::unlock($key); //释放锁
+
+        $str_num = str_pad($num, 7, "0", STR_PAD_LEFT);
+        $phone = date('ymd', $time) . $str_num; //6+7
+
+        return $phone;
 
     }
 
@@ -818,28 +816,6 @@ class AuthController extends Controller
             'is_community_admin' => $user->is_community_admin,
             'children_age' => 10,//$user->children_age,
         ];
-    }
-
-    //生成13位虚拟手机号
-    public function VirtualUser(){
-
-        $time = time();
-        $redis_phone = 'phone_' . date('Ymd', $time);
-
-        $key = 'phone_lock';
-        self::lock($key); //加锁
-        $num = Redis::get($redis_phone);
-        if (empty($num) || $num <= 0) {
-            $num = 1;
-        }
-        Redis::setex($redis_phone, 86400, $num + 1);
-        self::unlock($key); //释放锁
-
-        $str_num = str_pad($num, 7, "0", STR_PAD_LEFT);
-        $phone = date('ymd', $time) . $str_num; //6+7
-
-        return $phone;
-
     }
 
     // JWT 验证
