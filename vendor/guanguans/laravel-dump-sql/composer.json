@@ -1,0 +1,89 @@
+{
+    "name": "guanguans/laravel-dump-sql",
+    "description": "laravel 中轻松容易的输出完整的 SQL 语句。 - Easy output of complete SQL statements for laravel framework.",
+    "license": "MIT",
+    "type": "laravel",
+    "keywords": [
+        "sql",
+        "mysql",
+        "dump",
+        "dd",
+        "debug",
+        "laravel"
+    ],
+    "authors": [
+        {
+            "name": "guanguans",
+            "email": "ityaozm@gmail.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/guanguans/laravel-dump-sql/issues",
+        "source": "https://github.com/guanguans/laravel-dump-sql"
+    },
+    "require": {
+        "php": ">=7.2",
+        "illuminate/console": "^6.10 || ^7.0 || ^8.0 || ^9.0",
+        "illuminate/database": "^6.10 || ^7.0 || ^8.0 || ^9.0",
+        "illuminate/http": "^6.10 || ^7.0 || ^8.0 || ^9.0",
+        "illuminate/log": "^6.10 || ^7.0 || ^8.0 || ^9.0",
+        "illuminate/support": "^6.10 || ^7.0 || ^8.0 || ^9.0",
+        "symfony/var-dumper": "^4.3 || ^5.0 || ^6.0"
+    },
+    "require-dev": {
+        "brainmaestro/composer-git-hooks": "^2.7",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "laravel/legacy-factories": "^1.0",
+        "mockery/mockery": "^1.2",
+        "orchestra/testbench": "^3.3 || ^4.0 || ^5.0 || ^6.0",
+        "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Guanguans\\LaravelDumpSql\\": "src"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Guanguans\\LaravelDumpSqlTests\\": "tests"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "hooks": {
+            "pre-commit": [
+                "composer test",
+                "composer style-lint"
+            ],
+            "pre-push": [
+                "composer test",
+                "composer style-lint"
+            ]
+        },
+        "laravel": {
+            "providers": [
+                "Guanguans\\LaravelDumpSql\\ServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "cghooks add --ignore-lock",
+            "cghooks update"
+        ],
+        "post-update-cmd": [
+            "cghooks update"
+        ],
+        "cghooks": "vendor/bin/cghooks",
+        "style-fix": "./vendor/bin/php-cs-fixer fix --using-cache=no --config=.php-cs-fixer.php --ansi",
+        "style-lint": "./vendor/bin/php-cs-fixer fix --using-cache=no --config=.php-cs-fixer.php --diff --dry-run --ansi",
+        "test": "./vendor/bin/phpunit --coverage-text --colors=always --cache-result-file=./build/.phpunit.result.cache --verbose",
+        "test-coverage": "./vendor/bin/phpunit --coverage-html=./build/coverage/ --coverage-clover=./build/clover.xml --color=always --cache-result-file=./build/.phpunit.result.cache --verbose"
+    }
+}
