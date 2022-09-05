@@ -147,6 +147,29 @@ class MallAddress extends Base
                     ->update(['address_id' => $address->id]);
             }
 
+
+            //如果订单没有返回物流单号表示还未发货,如果修改需要重新推送
+            $order_id_list = Order::query()
+                ->where('user_id', '=', $user_id)
+                ->where('type', '=', 14)
+                ->whereIn('relation_id', [6, 7, 8, 10, 12])
+                ->where('status', '=', 1)
+                ->where('textbook_id', '<>', 0)
+                ->where('express_info_id', '=', 0)
+                ->where('address_id', '=', $address->id)
+                ->pluck('id')
+                ->toArray();
+            if (!empty($order_id_list)){
+                foreach ($order_id_list as $order_id) {
+                    OrderErpList::query()
+                        ->firstOrCreate([
+                            'order_id' => $order_id,
+                            'flag'=>1
+                        ]);
+                }
+            }
+
+
             return ['code' => true, 'msg' => '成功', 'address_id' => $address->id];
         } else {
             DB::rollBack();
