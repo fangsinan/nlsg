@@ -18,7 +18,7 @@ class MessageServers
 
         $query=MessageUser::query()->where('status',1)->where('receive_user', $user_id);
         if($type){
-            $query->where('type', $type);
+            $query->whereIn('type', $type);
         }
 
         $query->update(['status'=>2]);
