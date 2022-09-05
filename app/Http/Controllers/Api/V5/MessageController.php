@@ -48,6 +48,8 @@ class MessageController extends Controller
 //        $user_id = 233785;
 
         // 1=系统消息 4=内容上新 9=评论 11=点赞 12=收益 22=关注
+        //同步消息
+        Message::CheckUserMessage($user_id);
 
         $lists = [];
         //点赞
