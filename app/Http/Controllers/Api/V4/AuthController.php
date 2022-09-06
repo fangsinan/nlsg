@@ -46,7 +46,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
 
-        $phone = $request->input('phone');
+        $phone = strval($request->input('phone'));
         $code = $request->input('code');
         $is_invite = $request->input('is_invite');
         $user_id = $request->input('user_id');
@@ -259,7 +259,7 @@ class AuthController extends Controller
     public function bind(Request $request)
     {
         $input = $request->all();
-        $phone = $input['phone'] ?? '';
+        $phone = strval($input['phone']) ?? '';
         $code = $input['code'] ?? '';
 
         if (!$phone) {
@@ -453,7 +453,7 @@ class AuthController extends Controller
     public function sub_phone(Request $request)
     {
         $input = $request->all();
-        $phone = $input['phone'];
+        $phone = strval($input['phone']);
         $code = $input['code'];
         $user_id = $input['user_id']; //用户id
 
@@ -670,7 +670,7 @@ class AuthController extends Controller
      */
     public function sendSms(Request $request)
     {
-        $phone = $request->input('phone');
+        $phone = strval($request->input('phone'));
         if (!$phone) {
             return $this->error(400, '手机号不能为空');
         }
