@@ -420,6 +420,9 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('msg_console/jpush_msg_type_list','MsgConsoleController@jPushMsgTypeList');
         Route::post('msg_console/mrt_search_data','MsgConsoleController@msgRelationTypeSearchData');
 
+
+        //直播地图
+        Route::post('live_bgp/list','LiveBgpController@list');
     });
 
 

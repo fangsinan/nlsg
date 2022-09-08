@@ -538,6 +538,7 @@ class IndexController extends ControllerBackend
         $pre_push_time    = $input['pre_push_time'] ?? 60;
         $classify         = $input['classify'] ?? 0;
         $valid_time_range = $input['valid_time_range'] ?? 0;
+        $bgp_id           = $input['bgp_id'] ?? 0;
 
         $cover_vertical_img = !empty($input['cover_vertical_img']) ? covert_img($input['cover_vertical_img']) : '';
 
@@ -545,7 +546,9 @@ class IndexController extends ControllerBackend
         if (is_string($poster_list)) {
             $poster_list = explode(',', $poster_list);
         }
-
+        if (empty($bgp_id)){
+            return error(1000, '底图方案不能为空');
+        }
         if (!$title) {
             return error(1000, '标题不能为空');
         }
@@ -604,7 +607,8 @@ class IndexController extends ControllerBackend
             'classify'         => $classify,
             'valid_time_range' => $valid_time_range,
 
-            'cover_vertical_img'=> $cover_vertical_img,
+            'cover_vertical_img' => $cover_vertical_img,
+            'bgp_id'             => $bgp_id,
         ];
 
         $lcModel            = new LiveConsole();
@@ -1015,7 +1019,7 @@ class IndexController extends ControllerBackend
         $id   = $request->get('id');
         $live = Live::query()
             ->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at',
-                'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test',
+                'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test','bgp_id',
                 'steam_end_time', 'steam_begin_time','pre_push_time','classify','valid_time_range','cover_vertical_img'
             )
 //            ->with(['livePoster'])
