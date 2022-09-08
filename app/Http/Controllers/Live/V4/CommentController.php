@@ -136,7 +136,7 @@ class CommentController extends ControllerBackend
         }
 
         if (!empty($live_ids)) {
-            $lists_query->whereIn('live_id', $live_ids);
+                $lists_query->whereIn('live_id', $live_ids);
         }
 
         if (!empty($user_ids)) {
@@ -147,7 +147,8 @@ class CommentController extends ControllerBackend
 //            ->paginate(10)
 //            ->toArray();
         $total = $lists_query->count();
-        $list = $lists_query->orderBy('id', 'desc')
+        $list = $lists_query
+//            ->orderBy('id', 'desc')
             ->limit($size)
             ->offset(($page - 1) * $size)
             ->get();
@@ -174,7 +175,7 @@ class CommentController extends ControllerBackend
             }
         }
         $son_id_list_data = [];
-        if (!empty($son_id_list)){
+        if (!empty($son_id_list) && empty($content)){
             $son_id_list_data = BackendLiveRole::select('son_id', 'son_flag','son')
                 ->whereIn('son_id',$son_id_list)
                 ->get();
