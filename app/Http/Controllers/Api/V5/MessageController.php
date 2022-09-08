@@ -507,8 +507,7 @@ class MessageController extends Controller
      */
     public function msg_work_new_list(Request $request)
     {
-//        $user_id = $this->user['id'] ?? 233785;
-        $user_id = 233785;
+        $user_id = $this->user['id'];
         if(empty($user_id)){
             return $this->error(0, '请登录');
         }
@@ -568,8 +567,7 @@ class MessageController extends Controller
     public function msg_system_list(Request $request)
     {
 
-//        $user_id = $this->user['id'] ?? 233785;
-        $user_id = 233785;
+        $user_id = $this->user['id'];
         if(empty($user_id)){
             return $this->error(0, '请登录');
         }

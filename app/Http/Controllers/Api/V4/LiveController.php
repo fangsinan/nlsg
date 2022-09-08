@@ -1124,11 +1124,11 @@ class LiveController extends Controller
         $push_live = NULL;
         $is_push_goods = 0;
         if(time() > strtotime(date("Y-m-d 09:00:0"))){
+            $show_ids = OfflineProducts::where("show_address",1)->pluck('id')->toArray();
             $push_gid = LivePush::where([
                 'live_info_id'=>$id,
                 'push_type'=>4,
-                'push_gid'=>10,
-            ])->first();
+            ])->whereIn("push_gid",$show_ids)->first();
 
 
             $is_push_goods = empty($push_gid) ? 0 : 1;
