@@ -57,18 +57,31 @@ class LiveSonFlagPoster extends Model {
 //            ->select(['image'])
 //            ->get();
 
-        $temp_bg_img = ConfigModel::getData(57);
-        $temp_bg_img = explode(',', $temp_bg_img);
-        $bg_img      = [];
+        //背景图获取
+        $bg_colour = '#fff';
+        $bg_img = [];
 
-        $bg_colour='#fff';
-        $count=count($temp_bg_img);
-        if($count>0){
-            $temp_data['image'] = $temp_bg_img[0];
-            $bg_img[]=$temp_data;
-        }
-        if($count==2){
-            $bg_colour=$temp_bg_img[1];
+        $bgp_id=$check_live_id->bgp_id;
+        if($bgp_id>0){
+            $livebgpInfo=LiveBgp::query()->where('id',$bgp_id)->select(['url','color'])->first();
+            if(!empty($livebgpInfo)){
+                $temp_data['image'] = $livebgpInfo->url;
+                $bg_img[] = $temp_data;
+                $bg_colour = $livebgpInfo->color;
+            }
+        }else {
+
+            $temp_bg_img = ConfigModel::getData(57);
+            $temp_bg_img = explode(',', $temp_bg_img);
+
+            $count = count($temp_bg_img);
+            if ($count > 0) {
+                $temp_data['image'] = $temp_bg_img[0];
+                $bg_img[] = $temp_data;
+            }
+            if ($count == 2) {
+                $bg_colour = $temp_bg_img[1];
+            }
         }
 
         /*foreach ($temp_bg_img as $v) {
