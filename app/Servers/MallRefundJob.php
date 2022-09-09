@@ -18,6 +18,15 @@ use Yansongda\Pay\Pay;
 
 class MallRefundJob
 {
+
+    private $wechat_pay_config_h5;
+    private $wechat_pay_config_app;
+    public function __construct()
+    {
+        $this->wechat_pay_config_h5 = Config('wechat.payment.old_wx_wechat');
+        $this->wechat_pay_config_app = Config('wechat.payment.old_default');
+    }
+
     public static function refundJob($job = 1)
     {
         $self = new self();
@@ -100,9 +109,11 @@ class MallRefundJob
     public function weChatRefundCheck($v, $flag)
     {
         if ($flag == 1) {
-            $config = Config('wechat.payment.wx_wechat');
+            //h5
+            $config = $this->wechat_pay_config_h5;
         } else {
-            $config = Config('wechat.payment.default');
+            //app
+            $config = $this->wechat_pay_config_app;
         }
         $data         = array(
             'appid'          => $config['app_id'], //公众账号ID
@@ -267,10 +278,10 @@ class MallRefundJob
     {
         if ($flag == 1) {
             //h5
-            $config = Config('wechat.payment.wx_wechat');
+            $config = $this->wechat_pay_config_h5;
         } else {
-            //微信app
-            $config = Config('wechat.payment.default');
+            //app
+            $config = $this->wechat_pay_config_app;
         }
         $now_date = date('Y-m-d H:i:s');
         $app      = Factory::payment($config);
@@ -608,10 +619,10 @@ class MallRefundJob
     {
         if ($flag == 1) {
             //h5
-            $config = Config('wechat.payment.wx_wechat');
+            $config = $this->wechat_pay_config_h5;
         } else {
-            //微信app
-            $config = Config('wechat.payment.default');
+            //app
+            $config = $this->wechat_pay_config_app;
         }
 
         $app = Factory::payment($config);
@@ -796,12 +807,12 @@ class MallRefundJob
 
     private function wechatRefundCheckMethod($v, $flag): array
     {
-        if ($flag === 1) {
+        if ($flag == 1) {
             //h5
-            $config = Config('wechat.payment.wx_wechat');
+            $config = $this->wechat_pay_config_h5;
         } else {
-            //微信app
-            $config = Config('wechat.payment.default');
+            //app
+            $config = $this->wechat_pay_config_app;
         }
 
         $app    = Factory::payment($config);
