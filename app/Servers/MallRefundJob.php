@@ -23,8 +23,10 @@ class MallRefundJob
     private $wechat_pay_config_app;
     public function __construct()
     {
-        $this->wechat_pay_config_h5 = Config('wechat.payment.old_wx_wechat');
-        $this->wechat_pay_config_app = Config('wechat.payment.old_default');
+//        $this->wechat_pay_config_h5 = Config('wechat.payment.old_wx_wechat');
+//        $this->wechat_pay_config_app = Config('wechat.payment.old_default');
+        $this->wechat_pay_config_h5 = Config('wechat.payment.wx_wechat');
+        $this->wechat_pay_config_app = Config('wechat.payment.default');
     }
 
     public static function refundJob($job = 1)
