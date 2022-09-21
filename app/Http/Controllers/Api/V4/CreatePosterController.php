@@ -1219,13 +1219,6 @@ class CreatePosterController extends Controller
         return $res;
     }
 
-    public function uploadPush(Request $request)
-    {
-        return $this->success([
-            'url' => 111,
-            'name' => 222
-        ]);
-    }
     /**
      * @api {post} /api/v4/create/upload_push   上传
      * @apiName create_poster
@@ -1246,12 +1239,10 @@ class CreatePosterController extends Controller
      * ]
      * }
      */
-
-    public function uploadPush1(Request $request)
+    public function uploadPush(Request $request)
     {
 
         $params = $request->input();
-        dd($params);
         $type_flag = $params['type_flag'] ?? 0;
         $file_base64 = $params['file_base64'] ?? '';
         $type_flag = intval($type_flag);
