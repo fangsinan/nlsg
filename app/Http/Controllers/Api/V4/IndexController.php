@@ -1380,11 +1380,9 @@ class IndexController extends Controller
     }
 
     //极光别名删除，重置绑定
+    //http://127.0.0.1:8000/api/v4/jpush/remove_alias
     public function  jpushAlias(Request $request)
     {
-//        $JpushObj=new JpushService();
-//        $JpushObj->test();;
-//        return ;
         $user_id =  $request->get('user_id');
         $JpushObj=new JpushService();
         $JpushObj->DeleteAlias($user_id);
