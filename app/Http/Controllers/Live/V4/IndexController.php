@@ -7,6 +7,7 @@ use App\Models\BackendLiveDataRole;
 use App\Models\BackendLiveRole;
 use App\Models\ConfigModel;
 use App\Models\Live;
+use App\Models\LiveClassify;
 use App\Models\LiveConsole;
 use App\Models\LiveDeal;
 use App\Models\LiveInfo;
@@ -263,28 +264,36 @@ class IndexController extends ControllerBackend
             ->toArray();
 
 
-        $classify_list = [
-            '1' => [
-                'key'   => 1,
-                'value' => '交付课',
-            ],
-            '2' => [
-                'key'   => 2,
-                'value' => '公益课',
-            ],
-            '3' => [
-                'key'   => 3,
-                'value' => '分公司专场',
-            ],
-            '4' => [
-                'key'   => 4,
-                'value' => '电视渠道',
-            ],
-            '5' => [
-                'key'   => 5,
-                'value' => '其他',
-            ],
-        ];
+//        $classify_list = [
+//            '1' => [
+//                'key'   => 1,
+//                'value' => '交付课',
+//            ],
+//            '2' => [
+//                'key'   => 2,
+//                'value' => '公益课',
+//            ],
+//            '3' => [
+//                'key'   => 3,
+//                'value' => '分公司专场',
+//            ],
+//            '4' => [
+//                'key'   => 4,
+//                'value' => '电视渠道',
+//            ],
+//            '5' => [
+//                'key'   => 5,
+//                'value' => '其他',
+//            ],
+//        ];
+
+        $classify_list = LiveClassify::query()
+            ->where('type','=',1)
+            ->select([
+                'id as key','name as value'
+            ])
+            ->get()
+            ->toArray();
 
         //  直播收益   直播推广收益
         foreach ($lists['data'] as &$val) {
@@ -517,241 +526,242 @@ class IndexController extends ControllerBackend
      * }
      */
     public function create(Request $request) {
-        $input            = $request->all();
-        $cover            = !empty($input['cover']) ? covert_img($input['cover']) : '';
-        $title            = $input['title'] ?? '';
-        $describe         = $input['describe'] ?? '';
-        $userId           = (int)($input['user_id'] ?? 0);
-        $begin_at         = $input['begin_at'] ?? date('Y-m-d H:i:s');
-        $end_at           = $input['end_at'] ?? date('Y-m-d H:i:s');
-        $price            = $input['price'] ?? 0;
-        $twitter          = $input['twitter_money'] ?? 0;
-        $helper           = $input['helper'] ?? '';
-        $helper           = preg_replace('/[^0-9]/i', ',', $helper);
-        $content          = $input['content'] ?? '';
-        $playback_url     = $input['playback_url'] ?? '';
-        $back_video_url   = $input['back_video_url'] ?? '';
-        $need_virtual     = $input['need_virtual'] ?? 0;
-        $need_virtual_num = $input['need_virtual_num'] ?? 0;
-        $steam_end_time   = $input['steam_end_time'] ?? '';
-        $steam_begin_time = $input['steam_begin_time'] ?? '';
-        $pre_push_time    = $input['pre_push_time'] ?? 60;
-        $classify         = $input['classify'] ?? 0;
-        $valid_time_range = $input['valid_time_range'] ?? 0;
-        $bgp_id           = $input['bgp_id'] ?? 0;
-        $service_type = $input['service_type']??0;
+    		$input            = $request->all();
+    		$cover            = !empty($input['cover']) ? covert_img($input['cover']) : '';
+    		$title            = $input['title'] ?? '';
+    		$describe         = $input['describe'] ?? '';
+    		$userId           = (int)($input['user_id'] ?? 0);
+    		$begin_at         = $input['begin_at'] ?? date('Y-m-d H:i:s');
+    		$end_at           = $input['end_at'] ?? date('Y-m-d H:i:s');
+    		$price            = $input['price'] ?? 0;
+    		$twitter          = $input['twitter_money'] ?? 0;
+    		$helper           = $input['helper'] ?? '';
+    		$helper           = preg_replace('/[^0-9]/i', ',', $helper);
+    		$content          = $input['content'] ?? '';
+    		$playback_url     = $input['playback_url'] ?? '';
+    		$back_video_url   = $input['back_video_url'] ?? '';
+    		$need_virtual     = $input['need_virtual'] ?? 0;
+    		$need_virtual_num = $input['need_virtual_num'] ?? 0;
+    		$steam_end_time   = $input['steam_end_time'] ?? '';
+    		$steam_begin_time = $input['steam_begin_time'] ?? '';
+    		$pre_push_time    = $input['pre_push_time'] ?? 60;
+    		$classify         = $input['classify'] ?? 0;
+    		$valid_time_range = $input['valid_time_range'] ?? 0;
+    		$bgp_id           = $input['bgp_id'] ?? 0;
+            $service_type       = $input['service_type']??0;
 
-        $cover_vertical_img = !empty($input['cover_vertical_img']) ? covert_img($input['cover_vertical_img']) : '';
+    		$cover_vertical_img = !empty($input['cover_vertical_img']) ? covert_img($input['cover_vertical_img']) : '';
 
-        $poster_list = $input['poster'] ?? [];
-        if (is_string($poster_list)) {
-            $poster_list = explode(',', $poster_list);
-        }
-        if (empty($bgp_id)){
-            return error(1000, '底图方案不能为空');
-        }
-        if (!$title) {
-            return error(1000, '标题不能为空');
-        }
-        if (!$begin_at) {
-            return error(1000, '开始时间不能为空');
-        }
+    		$poster_list = $input['poster'] ?? [];
+    		if (is_string($poster_list)) {
+    			$poster_list = explode(',', $poster_list);
+    		}
+    		if (empty($bgp_id)){
+    			return error(1000, '底图方案不能为空');
+    		}
+    		if (!$title) {
+    			return error(1000, '标题不能为空');
+    		}
+    		if (!$begin_at) {
+    			return error(1000, '开始时间不能为空');
+    		}
 
-        if (empty($classify)) {
-            return error(1000, '请选择类型');
-        }
+    		if (empty($classify)) {
+    			return error(1000, '请选择类型');
+    		}
 
-        if (!empty($steam_begin_time)) {
-            $Y = substr($steam_begin_time, 0, 1);
-            if ($Y != 2) {
-                return error(1000, '拉流开始时间不能为空');
-            }
-        }
+    		if (!empty($steam_begin_time)) {
+    			$Y = substr($steam_begin_time, 0, 1);
+    			if ($Y != 2) {
+    				return error(1000, '拉流开始时间不能为空');
+    			}
+    		}
 
-        if (!empty($steam_end_time)) {
-            $Y = substr($steam_end_time, 0, 1);
-            if ($Y != 2) {
-                return error(1000, '拉流结束时间不能为空');
-            }
-        }
+    		if (!empty($steam_end_time)) {
+    			$Y = substr($steam_end_time, 0, 1);
+    			if ($Y != 2) {
+    				return error(1000, '拉流结束时间不能为空');
+    			}
+    		}
 
-        if (empty($steam_end_time) || empty($steam_begin_time)) {
-            return error(1000, '拉流时间范围不能为空');
-        }
+    		if (empty($steam_end_time) || empty($steam_begin_time)) {
+    			return error(1000, '拉流时间范围不能为空');
+    		}
 
-        if (empty($valid_time_range)) {
-            return error(1000, '有效统计时间范围不能为空');
-        }
+    		if (empty($valid_time_range)) {
+    			return error(1000, '有效统计时间范围不能为空');
+    		}
 
-        $is_test      = (int)($input['is_test'] ?? 0);
-        $qr_code      = $input['qr_code'] ?? '';
-        $channel_show = $input['channel_show'] ?? [];
+    		$is_test      = (int)($input['is_test'] ?? 0);
+    		$qr_code      = $input['qr_code'] ?? '';
+    		$channel_show = $input['channel_show'] ?? [];
 
-        $data = [
-            'user_id'          => $userId,
-            'cover_img'        => $cover,
-            'title'            => $title,
-            'describe'         => $describe,
-            'begin_at'         => $begin_at,
-            'end_at'           => $end_at,
-            'price'            => $price,
-            'twitter_money'    => $twitter,
-            'helper'           => $helper,
-            'content'          => $content,
-            'need_virtual'     => $need_virtual,
-            'need_virtual_num' => $need_virtual_num,
-            'is_free'          => $price < '0.01' ? 1 : 0,
-            'is_test'          => $is_test,
-            'steam_end_time'   => $steam_end_time,
-            'steam_begin_time' => $steam_begin_time,
-            'pre_push_time'    => $pre_push_time,
-            'classify'         => $classify,
-            'valid_time_range' => $valid_time_range,
+    		$data = [
+    			'user_id'          => $userId,
+    			'cover_img'        => $cover,
+    			'title'            => $title,
+    			'describe'         => $describe,
+    			'begin_at'         => $begin_at,
+    			'end_at'           => $end_at,
+    			'price'            => $price,
+    			'twitter_money'    => $twitter,
+    			'helper'           => $helper,
+    			'content'          => $content,
+    			'need_virtual'     => $need_virtual,
+    			'need_virtual_num' => $need_virtual_num,
+    			'is_free'          => $price < '0.01' ? 1 : 0,
+    			'is_test'          => $is_test,
+    			'steam_end_time'   => $steam_end_time,
+    			'steam_begin_time' => $steam_begin_time,
+    			'pre_push_time'    => $pre_push_time,
+    			'classify'         => $classify,
+    			'valid_time_range' => $valid_time_range,
 
-            'cover_vertical_img' => $cover_vertical_img,
-            'bgp_id'             => $bgp_id,
-            'service_type'=>$service_type,
-        ];
+    			'cover_vertical_img' => $cover_vertical_img,
+    			'bgp_id'             => $bgp_id,
+                'service_type'=>$service_type,
+    		];
 
-        $lcModel            = new LiveConsole();
-        $temp_push_end_time = date('Y-m-d 23:59:59',
-            strtotime($end_at . " +1 days")
-        );
+    		$lcModel            = new LiveConsole();
+    		$temp_push_end_time = date('Y-m-d 23:59:59',
+    			strtotime($end_at . " +1 days")
+    		);
 
-        $live_info_data = [];
-        $live_info_data['push_end_time']  = $temp_push_end_time;
-        $live_info_data['user_id']        = $userId;
-        $live_info_data['status']         = 1;
-        $live_info_data['length']         = 5;
-        $live_info_data['begin_at']       = $begin_at;
-        $live_info_data['end_at']         = $end_at;
-        $live_info_data['playback_url']   = $playback_url;
-        $live_info_data['back_video_url'] = $back_video_url;
+    		$live_info_data = [];
+    		$live_info_data['push_end_time']  = $temp_push_end_time;
+    		$live_info_data['user_id']        = $userId;
+    		$live_info_data['status']         = 1;
+    		$live_info_data['length']         = 5;
+    		$live_info_data['begin_at']       = $begin_at;
+    		$live_info_data['end_at']         = $end_at;
+    		$live_info_data['playback_url']   = $playback_url;
+    		$live_info_data['back_video_url'] = $back_video_url;
 
-        if (!empty($input['id'])) {
-            Live::query()->where('id', $input['id'])->update($data);
-            $info_first   = LiveInfo::query()
-                ->select('id', 'task_id', 'begin_at', 'end_at', 'push_end_time')
-                ->where('live_pid', '=', $input['id'])
-                ->first();
-            $live_info_id = $info_first['id'];
-            // 删除拉流任务
-            if ($info_first['task_id']) {
-                //当开始时间、结束时间、推流结束时间 变了修改     否则  不变
-                if (($info_first['begin_at'] !== $begin_at) || ($info_first['end_at'] !== $end_at) || ($info_first['push_end_time'] !== $temp_push_end_time)) {
-                    //校验 推拉流
-                    LiveInfo::liveUrlEdit('del', $live_info_id);
-                }
-            }
+    		if (!empty($input['id'])) {
+    			Live::query()->where('id', $input['id'])->update($data);
+    			$info_first   = LiveInfo::query()
+    				->select('id', 'task_id', 'begin_at', 'end_at', 'push_end_time')
+    				->where('live_pid', '=', $input['id'])
+    				->first();
+    			$live_info_id = $info_first['id'];
+    			// 删除拉流任务
+    			if ($info_first['task_id']) {
+    				//当开始时间、结束时间、推流结束时间 变了修改     否则  不变
+    				if (($info_first['begin_at'] !== $begin_at) || ($info_first['end_at'] !== $end_at) || ($info_first['push_end_time'] !== $temp_push_end_time)) {
+    					//校验 推拉流
+    					LiveInfo::liveUrlEdit('del', $live_info_id);
+    				}
+    			}
 
-            $live_info_data['id']       = $input['id'];
-            $live_info_data['live_pid'] = $input['id'];
-            LiveInfo::where('id', '=', $live_info_id)->update($live_info_data);
-        } else {
-            $Live_res = Live::create($data);
+    			$live_info_data['id']       = $input['id'];
+    			$live_info_data['live_pid'] = $input['id'];
+    			LiveInfo::where('id', '=', $live_info_id)->update($live_info_data);
+    		} else {
+    			$Live_res = Live::create($data);
 
-            $live_info_data['live_pid'] = $Live_res->id;
-            $live_info_data['id']       = $Live_res->id;
-            DB::table('nlsg_live_info')->insert($live_info_data);
+    			$live_info_data['live_pid'] = $Live_res->id;
+    			$live_info_data['id']       = $Live_res->id;
+    			DB::table('nlsg_live_info')->insert($live_info_data);
 
-            //添加,创建对应数据库
-//            $login_table_name = 'nlsg_live_online_user_'.$live_info_data['live_pid'];
-//            $create_table_sql = "
-//CREATE TABLE $login_table_name  (
-//  `id` int(11) NOT NULL AUTO_INCREMENT,
-//  `live_id` int(11) NULL DEFAULT 0 COMMENT '直播间id',
-//  `user_id` int(11) NULL DEFAULT 0 COMMENT '用户id',
-//  `live_son_flag` int(10) NULL DEFAULT 0 COMMENT '渠道标记',
-//  `online_time` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '在线时间',
-//  `online_time_str` char(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '时间',
-//  PRIMARY KEY (`id`) USING BTREE,
-//  INDEX `live_id`(`online_time_str`, `user_id`, `live_son_flag`) USING BTREE
-//) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '实时在线用户明细' ROW_FORMAT = Dynamic;
-//        ";
-//            DB::select($create_table_sql);
-        }
-
-
-        $temp_get_url                           = $lcModel->getPushUrl(
-            md5($userId . $temp_push_end_time . $live_info_data['live_pid']), strtotime($temp_push_end_time)
-        );
-        $update_live_info_data['push_live_url'] = $temp_get_url['push_url'];
-        $update_live_info_data['live_url']      = $temp_get_url['play_url'];
-        $update_live_info_data['live_url_flv']  = $temp_get_url['play_url_flv'];
-        LiveInfo::query()->where('live_pid', '=', $live_info_data['live_pid'])
-            ->update($update_live_info_data);
-
-        //是否弹出二维码
-        Qrcodeimg::query()
-            ->where('relation_type', '=', 3)
-            ->where('relation_id', '=', $live_info_data['live_pid'])
-            ->update(['status' => 0]);
-        if (!empty($qr_code)) {
-            Qrcodeimg::query()->updateOrCreate(
-                [
-                    'relation_type' => 3,
-                    'relation_id'   => $live_info_data['live_pid'],
-                    'qr_url'        => $qr_code
-                ],
-                [
-                    'status' => 1,
-                ]
-            );
-        }
-
-        if (!is_array($channel_show)) {
-            $channel_user_id  = explode(',', $channel_show);
-        }else{
-            $channel_user_id = $channel_show;
-        }
-//        $channel_user_id = [];
-//        foreach ($channel_show as $cs_v) {
-//            $channel_user_id[] = $this->channelUserData($cs_v);
-//        }
-        $channel_user_id = array_filter($channel_user_id);
-
-        BackendLiveDataRole::query()
-            ->where('live_id','=',$live_info_data['live_pid'])
-            ->delete();
-
-        if (!empty($channel_user_id)) {
-            foreach ($channel_user_id as $cui) {
-                BackendLiveDataRole::query()
-                    ->firstOrCreate([
-                        'user_id' => $cui,
-                        'live_id' => $live_info_data['live_pid'],
-                    ]);
-            }
-        }
-
-        if (!empty($poster_list)){
-            LivePoster::query()
-                ->where('live_id','=',$live_info_data['live_pid'])
-                ->whereNotIn('image',$poster_list)
-                ->update([
-                    'status'=>3
-                ]);
-
-            foreach ($poster_list as $pl_v){
-                LivePoster::query()->firstOrCreate(
-                    [
-                        'live_id'=>$live_info_data['live_pid'],
-                        'image'=>$pl_v,
-                        'status'=>1
-                    ]
-                );
-            }
-        }else{
-            LivePoster::query()
-                ->where('live_id','=',$live_info_data['live_pid'])
-                ->update([
-                    'status'=>3
-                ]);
-        }
+    			//添加,创建对应数据库
+    //            $login_table_name = 'nlsg_live_online_user_'.$live_info_data['live_pid'];
+    //            $create_table_sql = "
+    //CREATE TABLE $login_table_name  (
+    //  `id` int(11) NOT NULL AUTO_INCREMENT,
+    //  `live_id` int(11) NULL DEFAULT 0 COMMENT '直播间id',
+    //  `user_id` int(11) NULL DEFAULT 0 COMMENT '用户id',
+    //  `live_son_flag` int(10) NULL DEFAULT 0 COMMENT '渠道标记',
+    //  `online_time` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP(0) COMMENT '在线时间',
+    //  `online_time_str` char(16) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '时间',
+    //  PRIMARY KEY (`id`) USING BTREE,
+    //  INDEX `live_id`(`online_time_str`, `user_id`, `live_son_flag`) USING BTREE
+    //) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '实时在线用户明细' ROW_FORMAT = Dynamic;
+    //        ";
+    //            DB::select($create_table_sql);
+    		}
 
 
-        return success();
-    }
+    		$temp_get_url                           = $lcModel->getPushUrl(
+    			md5($userId . $temp_push_end_time . $live_info_data['live_pid']), strtotime($temp_push_end_time)
+    		);
+    		$update_live_info_data['push_live_url'] = $temp_get_url['push_url'];
+    		$update_live_info_data['live_url']      = $temp_get_url['play_url'];
+    		$update_live_info_data['live_url_flv']  = $temp_get_url['play_url_flv'];
+    		LiveInfo::query()->where('live_pid', '=', $live_info_data['live_pid'])
+    			->update($update_live_info_data);
+
+    		//是否弹出二维码
+    		Qrcodeimg::query()
+    			->where('relation_type', '=', 3)
+    			->where('relation_id', '=', $live_info_data['live_pid'])
+    			->update(['status' => 0]);
+    		if (!empty($qr_code)) {
+    			Qrcodeimg::query()->updateOrCreate(
+    				[
+    					'relation_type' => 3,
+    					'relation_id'   => $live_info_data['live_pid'],
+    					'qr_url'        => $qr_code
+    				],
+    				[
+    					'status' => 1,
+    				]
+    			);
+    		}
+
+    		if (!is_array($channel_show)) {
+    			$channel_user_id  = explode(',', $channel_show);
+    		}else{
+    			$channel_user_id = $channel_show;
+    		}
+    //        $channel_user_id = [];
+    //        foreach ($channel_show as $cs_v) {
+    //            $channel_user_id[] = $this->channelUserData($cs_v);
+    //        }
+    		$channel_user_id = array_filter($channel_user_id);
+
+    		BackendLiveDataRole::query()
+    			->where('live_id','=',$live_info_data['live_pid'])
+    			->delete();
+
+    		if (!empty($channel_user_id)) {
+    			foreach ($channel_user_id as $cui) {
+    				BackendLiveDataRole::query()
+    					->firstOrCreate([
+    						'user_id' => $cui,
+    						'live_id' => $live_info_data['live_pid'],
+    					]);
+    			}
+    		}
+
+    		if (!empty($poster_list)){
+    			LivePoster::query()
+    				->where('live_id','=',$live_info_data['live_pid'])
+    				->whereNotIn('image',$poster_list)
+    				->update([
+    					'status'=>3
+    				]);
+
+    			foreach ($poster_list as $pl_v){
+    				LivePoster::query()->firstOrCreate(
+    					[
+    						'live_id'=>$live_info_data['live_pid'],
+    						'image'=>$pl_v,
+    						'status'=>1
+    					]
+    				);
+    			}
+    		}else{
+    			LivePoster::query()
+    				->where('live_id','=',$live_info_data['live_pid'])
+    				->update([
+    					'status'=>3
+    				]);
+    		}
+
+
+    		return success();
+    	}
+
 
     /**
      * @api {post} api/live_v4/live/delete 直播删除
@@ -1018,60 +1028,61 @@ class IndexController extends ControllerBackend
      * }
      */
     public function info(Request $request) {
-        $id   = $request->get('id');
-        $live = Live::query()
-            ->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at','service_type',
-                'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test','bgp_id',
-                'steam_end_time', 'steam_begin_time','pre_push_time','classify','valid_time_range','cover_vertical_img'
-            )
-//            ->with(['livePoster'])
-            ->where('id', $id)->first();
-        if (!$live) {
-            return error('直播不存在');
-        }
-        //$live->playback_url = LiveInfo::where('live_pid', $id)->value('playback_url');
-        $liveInfo             = LiveInfo::query()->select('playback_url', 'back_video_url')->where('live_pid', $id)->first();
-        if (!$liveInfo){
-            return error('直播不存在');
-        }
-        $live->playback_url   = $liveInfo['playback_url'];
-        $live->back_video_url = $liveInfo['back_video_url'];
-        $live->qr_code        = Qrcodeimg::query()
-            ->where('relation_type', '=', 3)
-            ->where('relation_id', '=', $id)
-            ->where('status', '=', 1)
-            ->value('qr_url');
+    		$id   = $request->get('id');
+    		$live = Live::query()
+    			->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at','service_type',
+    				'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test','bgp_id',
+    				'steam_end_time', 'steam_begin_time','pre_push_time','classify','valid_time_range','cover_vertical_img'
+    			)
+    //            ->with(['livePoster'])
+    			->where('id', $id)->first();
+    		if (!$live) {
+    			return error('直播不存在');
+    		}
+    		//$live->playback_url = LiveInfo::where('live_pid', $id)->value('playback_url');
+    		$liveInfo             = LiveInfo::query()->select('playback_url', 'back_video_url')->where('live_pid', $id)->first();
+    		if (!$liveInfo){
+    			return error('直播不存在');
+    		}
+    		$live->playback_url   = $liveInfo['playback_url'];
+    		$live->back_video_url = $liveInfo['back_video_url'];
+    		$live->qr_code        = Qrcodeimg::query()
+    			->where('relation_type', '=', 3)
+    			->where('relation_id', '=', $id)
+    			->where('status', '=', 1)
+    			->value('qr_url');
 
-        $channel_user_id = BackendLiveDataRole::query()
-            ->where('live_id', '=', $id)
-            ->pluck('user_id')
-            ->toArray();
+    		$channel_user_id = BackendLiveDataRole::query()
+    			->where('live_id', '=', $id)
+    			->pluck('user_id')
+    			->toArray();
 
-//        $channel_show = [];
-//        if (!empty($channel_user_id)) {
-//            foreach ($channel_user_id as $cui) {
-//                $temp_cud = $this->channelUserData($cui, 2);
-//                if ($temp_cud) {
-//                    $channel_show[] = $temp_cud;
-//                }
-//            }
-//        }
-        $live->channel_show = $channel_user_id;
+    //        $channel_show = [];
+    //        if (!empty($channel_user_id)) {
+    //            foreach ($channel_user_id as $cui) {
+    //                $temp_cud = $this->channelUserData($cui, 2);
+    //                if ($temp_cud) {
+    //                    $channel_show[] = $temp_cud;
+    //                }
+    //            }
+    //        }
+    		$live->channel_show = $channel_user_id;
 
-        $live->poster_list = LivePoster::query()
-            ->where('live_id','=',$id)
-            ->where('status','=',1)
-            ->pluck('image')
-            ->toArray();
+    		$live->poster_list = LivePoster::query()
+    			->where('live_id','=',$id)
+    			->where('status','=',1)
+    			->pluck('image')
+    			->toArray();
 
-        return success($live);
-    }
+    		return success($live);
+    	}
+
 
 
     public function getBackVideos(Request $request)
     {
 
-        $res=LiveStreaming::query()->select(['id','title','video_url'])->where('status','=',1)->get()->toArray();
+        $res=LiveStreaming::query()->select(['id','title','video_url'])->where('status','=',1)->orderBy('id','desc')->get()->toArray();
         return success($res);
         //3701925925345062697 王琨老师19.9第一天新版 http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/2f548dea3701925925345062697/v.f100020.mp4    674M
         //3701925925345105941 王琨老师19.9第二天改版 http://1253639599.vod2.myqcloud.com/e6c8f55bvodtransgzp1253639599/313ed4c03701925925345105941/v.f100020.mp4    838M
