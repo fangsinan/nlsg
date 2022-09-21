@@ -75,6 +75,7 @@ class ConfigModel extends Base
     //上传操作
     public static function base64Upload($type_flag, $file_base64)
     {
+        dd(222);
 
 
         $dir = 'nlsg/';
