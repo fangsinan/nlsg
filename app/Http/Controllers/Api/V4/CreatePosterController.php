@@ -1249,14 +1249,14 @@ class CreatePosterController extends Controller
         $type_flag = $params['type_flag'] ?? 0;
         $file_base64 = $params['file_base64'] ?? '';
         $type_flag = intval($type_flag);
-
+dump($type_flag);
 
         //type_flag1 头像  2 作品  3 专栏  4 商品  5身份证审核  6 banner  7 书单 8 企业 9问题反馈  10晒单评价  100其他
         //1 头像 10评论 9退货 5身份证审核  8 企业  100发票 9吐槽
         if (!in_array($type_flag, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100,101,102,103])) {
             return $this->error(0, '上传类型有误');
         }
-
+        dump("start");
         $res = ConfigModel::base64Upload($type_flag, $file_base64);
         if ($res['code'] == 0) {
             return $this->success([
