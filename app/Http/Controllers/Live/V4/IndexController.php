@@ -539,6 +539,7 @@ class IndexController extends ControllerBackend
         $classify         = $input['classify'] ?? 0;
         $valid_time_range = $input['valid_time_range'] ?? 0;
         $bgp_id           = $input['bgp_id'] ?? 0;
+        $service_type = $input['service_type']??0;
 
         $cover_vertical_img = !empty($input['cover_vertical_img']) ? covert_img($input['cover_vertical_img']) : '';
 
@@ -609,6 +610,7 @@ class IndexController extends ControllerBackend
 
             'cover_vertical_img' => $cover_vertical_img,
             'bgp_id'             => $bgp_id,
+            'service_type'=>$service_type,
         ];
 
         $lcModel            = new LiveConsole();
@@ -1018,7 +1020,7 @@ class IndexController extends ControllerBackend
     public function info(Request $request) {
         $id   = $request->get('id');
         $live = Live::query()
-            ->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at',
+            ->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at','service_type',
                 'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test','bgp_id',
                 'steam_end_time', 'steam_begin_time','pre_push_time','classify','valid_time_range','cover_vertical_img'
             )
