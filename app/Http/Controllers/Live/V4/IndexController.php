@@ -7,6 +7,7 @@ use App\Models\BackendLiveDataRole;
 use App\Models\BackendLiveRole;
 use App\Models\ConfigModel;
 use App\Models\Live;
+use App\Models\LiveClassify;
 use App\Models\LiveConsole;
 use App\Models\LiveDeal;
 use App\Models\LiveInfo;
@@ -263,28 +264,36 @@ class IndexController extends ControllerBackend
             ->toArray();
 
 
-        $classify_list = [
-            '1' => [
-                'key'   => 1,
-                'value' => '交付课',
-            ],
-            '2' => [
-                'key'   => 2,
-                'value' => '公益课',
-            ],
-            '3' => [
-                'key'   => 3,
-                'value' => '分公司专场',
-            ],
-            '4' => [
-                'key'   => 4,
-                'value' => '电视渠道',
-            ],
-            '5' => [
-                'key'   => 5,
-                'value' => '其他',
-            ],
-        ];
+//        $classify_list = [
+//            '1' => [
+//                'key'   => 1,
+//                'value' => '交付课',
+//            ],
+//            '2' => [
+//                'key'   => 2,
+//                'value' => '公益课',
+//            ],
+//            '3' => [
+//                'key'   => 3,
+//                'value' => '分公司专场',
+//            ],
+//            '4' => [
+//                'key'   => 4,
+//                'value' => '电视渠道',
+//            ],
+//            '5' => [
+//                'key'   => 5,
+//                'value' => '其他',
+//            ],
+//        ];
+
+        $classify_list = LiveClassify::query()
+            ->where('type','=',1)
+            ->select([
+                'id as key','name as value'
+            ])
+            ->get()
+            ->toArray();
 
         //  直播收益   直播推广收益
         foreach ($lists['data'] as &$val) {
@@ -539,6 +548,7 @@ class IndexController extends ControllerBackend
     		$classify         = $input['classify'] ?? 0;
     		$valid_time_range = $input['valid_time_range'] ?? 0;
     		$bgp_id           = $input['bgp_id'] ?? 0;
+            $service_type       = $input['service_type']??0;
 
     		$cover_vertical_img = !empty($input['cover_vertical_img']) ? covert_img($input['cover_vertical_img']) : '';
 
@@ -609,6 +619,7 @@ class IndexController extends ControllerBackend
 
     			'cover_vertical_img' => $cover_vertical_img,
     			'bgp_id'             => $bgp_id,
+                'service_type'=>$service_type,
     		];
 
     		$lcModel            = new LiveConsole();
@@ -1019,7 +1030,7 @@ class IndexController extends ControllerBackend
     public function info(Request $request) {
     		$id   = $request->get('id');
     		$live = Live::query()
-    			->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at',
+    			->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at','service_type',
     				'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test','bgp_id',
     				'steam_end_time', 'steam_begin_time','pre_push_time','classify','valid_time_range','cover_vertical_img'
     			)
