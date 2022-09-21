@@ -75,7 +75,7 @@ class ConfigModel extends Base
     //上传操作
     public static function base64Upload($type_flag, $file_base64)
     {
-dump($type_flag);
+
 
         $dir = 'nlsg/';
         switch ($type_flag) {
@@ -136,7 +136,7 @@ dump($type_flag);
             $content = base64_decode(str_replace($match[1], '', $file_base64));
             // 文件名称
             $object = $dir . rand(100000, 999999) . '.' . $ext;
-            dump($object);
+
             // 文件内容
             $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
             if ($doesres) {
@@ -144,7 +144,7 @@ dump($type_flag);
             } else {
                 $object = $dir . rand(100000, 999999) . '.' . $ext;
             }
-            dump(1);
+
             $ossClient->putObject($bucket, $object, $content);
             return [
                 'code' => 0,
