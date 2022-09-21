@@ -1219,7 +1219,13 @@ class CreatePosterController extends Controller
         return $res;
     }
 
-
+    public function uploadPush(Request $request)
+    {
+        return $this->success([
+            'url' => 111,
+            'name' => 222
+        ]);
+    }
     /**
      * @api {post} /api/v4/create/upload_push   上传
      * @apiName create_poster
@@ -1241,7 +1247,7 @@ class CreatePosterController extends Controller
      * }
      */
 
-    public function uploadPush(Request $request)
+    public function uploadPush1(Request $request)
     {
 
         $params = $request->input();
