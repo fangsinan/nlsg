@@ -127,11 +127,9 @@ class ConfigModel extends Base
             $accessKeyId = Config('web.Ali.ACCESS_KEY_ALI');
             $accessKeySecret = Config('web.Ali.SECRET_KEY_ALI');
             $endpoint = "oss-cn-beijing.aliyuncs.com";
-            dump($endpoint);
             //上传阿里
             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
             $dir = $dir . '/' . date('YmdHis');
-            dd($dir);
             // 存储空间名称
             $bucket = Config('web.Ali.BUCKET_ALI');
             $ext = self::$MIME_TYPE_TO_TYPE["image/" . $match[2]] ?? 'jpg'; //扩展名
