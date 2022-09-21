@@ -76,7 +76,7 @@ class ConfigModel extends Base
     public static function base64Upload($type_flag, $file_base64)
     {
 
-
+dd(1);
 
         $dir = 'nlsg/';
         switch ($type_flag) {
@@ -123,6 +123,7 @@ class ConfigModel extends Base
                 $dir .= 'message';
                 break;
         }
+        dump(1);
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $file_base64, $match)) {
             $accessKeyId = Config('web.Ali.ACCESS_KEY_ALI');
             $accessKeySecret = Config('web.Ali.SECRET_KEY_ALI');
