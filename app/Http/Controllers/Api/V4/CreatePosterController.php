@@ -3,7 +3,6 @@
 
 namespace App\Http\Controllers\Api\V4;
 
-
 use App\Http\Controllers\Controller;
 use App\Models\ActionStatistics;
 use App\Models\Column;
@@ -1246,6 +1245,7 @@ class CreatePosterController extends Controller
     {
 
         $params = $request->input();
+        dd($params);
         $type_flag = $params['type_flag'] ?? 0;
         $file_base64 = $params['file_base64'] ?? '';
         $type_flag = intval($type_flag);
