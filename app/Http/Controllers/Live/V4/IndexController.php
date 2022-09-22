@@ -297,7 +297,14 @@ class IndexController extends ControllerBackend
 
         //  直播收益   直播推广收益
         foreach ($lists['data'] as &$val) {
-            $val['classify_name'] = $classify_list[$val['classify']]['value'] ?? '-';
+//            $val['classify_name'] = $classify_list[$val['classify'] + 1]['value'] ?? '-';
+            $val['classify_name'] = '-';
+            foreach ($classify_list as $clv){
+                if ($clv['key'] == $val['classify']){
+                    $val['classify_name'] = $clv['value'];
+                }
+            }
+
             $val['live_status'] = 1;  //默认值
             $channel = LiveInfo::where('live_pid', $val['id'])
                 ->where('status', 1)
