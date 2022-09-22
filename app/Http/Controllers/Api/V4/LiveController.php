@@ -2265,10 +2265,10 @@ class LiveController extends Controller
                 "user_id"   => $user_id,
                 "status"    => 1,
             ])->value("id");
-            if(empty($waiter_id)){
+            if(!empty($waiter_id)){
                 return success((object)[] );
             }
-            
+
 
             //relation_type=3时    免费传relation_id=live_id   付费传order_id
 //            if(empty($order_id)){ //直播免费预约取消二维码
