@@ -2257,7 +2257,18 @@ class LiveController extends Controller
         $relation_id = $request->input('relation_id')??0;
         $order_id = $request->input('order_id')??0;
         $is_wechat = $request->input('is_wechat')??0;
+        $user_id = $request->input('user_id')??0;
         if($relation_type == 3){
+
+            // 绑定默认客服不弹二维码
+            $waiter_id = DB::table('crm_live_user_waiter')->where([
+                "user_id"   => $user_id,
+                "status"    => 1,
+            ])->value("id");
+            if(empty($waiter_id)){
+                return success((object)[] );
+            }
+            
 
             //relation_type=3时    免费传relation_id=live_id   付费传order_id
 //            if(empty($order_id)){ //直播免费预约取消二维码
