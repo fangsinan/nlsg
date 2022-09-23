@@ -759,7 +759,7 @@ class Order extends Base
             ->where('id', '>', $max_id)
             ->whereIn('type', [10, 14])
             ->where('status', '=', 1)
-            ->where('live_id', '<>', 0)
+//            ->where('live_id', '<>', 0)
             ->where('is_shill', '=', 0)
             ->where('pay_price', '>', 0.01)
             ->select([
@@ -777,6 +777,7 @@ class Order extends Base
         }
 
         if ($this_user['role_id'] !== 1) {
+            $query->where('live_id', '<>', 0);
             $query->where('relation_id', '<>', 8);
             $query->where('channel_show', '=', 1);
             $liServers       = new LiveInfoServers();
