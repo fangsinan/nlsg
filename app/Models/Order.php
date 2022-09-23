@@ -251,6 +251,10 @@ class Order extends Base
         return $this->belongsTo(Live::class, 'live_id', 'id');
     }
 
+    public function liveRelation(){
+        return $this->hasOne(Live::class,'id','relation_id');
+    }
+
     public function liveRemark()
     {
         return $this->belongsTo(Live::class, 'remark', 'id');
@@ -792,6 +796,7 @@ class Order extends Base
             'offline:id,title,subtitle,price,cover_img,image',
             'payRecord:ordernum,price,type,created_at',
             'live:id,title,describe,begin_at,cover_img,user_id,price',
+            'liveRelation:id,title,describe,begin_at,cover_img,user_id,price',
             'liveRemark:id,title',
             'user:id,phone,nickname',
             'twitter:id,phone,nickname',
@@ -920,12 +925,12 @@ class Order extends Base
             $goods              = [];
             switch ($v->type) {
                 case 10:
-                    $goods['goods_id']   = $v->live->id ?? 0;
-                    $goods['title']      = $v->live->title ?? '数据错误';
+                    $goods['goods_id']   = $v->liveRelation->id ?? 0;
+                    $goods['title']      = $v->liveRelation->title ?? '数据错误';
                     $goods['subtitle']   = '';
-                    $goods['cover_img']  = $v->live->cover_img ?? '';
+                    $goods['cover_img']  = $v->liveRelation->cover_img ?? '';
                     $goods['detail_img'] = '';
-                    $goods['price']      = $v->live->price ?? '价格数据错误';
+                    $goods['price']      = $v->liveRelation->price ?? '价格数据错误';
                     break;
                 case 14:
                     $goods['goods_id']   = $v->offline->id ?? 0;
