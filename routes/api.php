@@ -661,5 +661,13 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::get('wechat_tools/get_url_link', 'WeChatToolsController@getUrlLink');
 
     Route::get('notIndex', 'LiveNoEnterController@index');
+
+
+
+    // 帮助与反馈
+    Route::any('help/get_help_list', 'HelpController@getHelpLists');
+    Route::any('help/send_message', 'HelpController@sendMessage');
+    Route::any('help/get_message', 'HelpController@getMessage');
+    Route::any('help/del_message', 'HelpController@delMessage');
     /**     5.0 API  END    ***/
 });
