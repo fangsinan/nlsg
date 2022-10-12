@@ -207,7 +207,7 @@ class CampController extends Controller
         // 统一全局type
         $types = FuncType(140);
         $is_sub = Subscribe::isSubscribe($user_id, $column_id, $types['sub_type']);
-        $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id])->pluck('image')->toArray();
+        $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$column_id,"status"=>1])->pluck('image')->toArray();
         if(empty($column['poster'])){ // 如果为空则取用父级
             $f_columnID = !empty($column['classify_column_id']) ?$column['classify_column_id']: $column['info_column_id'];
             $column['poster'] = Poster::where(['type'=>1,'relation_id'=>$f_columnID,"status"=>1])->pluck('image');
