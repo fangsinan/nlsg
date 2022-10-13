@@ -95,4 +95,9 @@ class SelectDataController extends ControllerBackend
         return $this->getRes((new sds())->liveList($request->input()));
     }
 
+    //直播观看统计有效时间范围列表
+    public function liveValidTimeList(): JsonResponse
+    {
+        return $this->getRes((new sds())->liveValidTimeList());
+    }
 }

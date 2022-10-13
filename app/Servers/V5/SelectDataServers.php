@@ -5,6 +5,7 @@ namespace App\Servers\V5;
 use App\Models\Lists;
 use App\Models\Live;
 use App\Models\LiveClassify;
+use App\Models\LiveValidTime;
 use App\Models\RecommendConfig;
 use App\Models\User;
 use App\Models\Works;
@@ -87,6 +88,13 @@ class SelectDataServers
             ->select([
                 'id as key','name as value'
             ])
+            ->get();
+    }
+
+    public function liveValidTimeList(){
+        return LiveValidTime::query()
+            ->where('status','=',1)
+            ->select(['id','begin_at','end_at'])
             ->get();
     }
 }
