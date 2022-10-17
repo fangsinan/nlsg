@@ -136,6 +136,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->orderBy('id','desc')
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
@@ -341,6 +342,7 @@ class MessageController extends Controller
             ])->groupBy(DB::raw("date_format(created_at,'%Y-%m-%d')"))
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->orderBy('id','desc')
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$msg){
@@ -419,6 +421,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->orderBy('id','desc')
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
@@ -523,6 +526,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->orderBy('id','desc')
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
@@ -584,6 +588,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->orderBy('id','desc')
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
@@ -635,6 +640,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->orderBy('id','desc')
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
