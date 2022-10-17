@@ -897,8 +897,9 @@ class DouDianServers
 
         $response->job_type     = 2;
         $response->decrypt_text = json_encode($response);
+        $response->err_no = $response->data->custom_err->err_code;
+        $response->err_msg = $response->data->custom_err->err_msg;
         DouDianOrderLog::query()->create((array)$response);
-
         /**
          * 之前的接口返回 error在外层
          */
@@ -974,7 +975,6 @@ class DouDianServers
         $list = $list->toArray();
 
         foreach ($list as $v) {
-
             for ($i = 1; $i <= self::DECRYPT_JOB_TYPE; $i++) {
                 //0714 出现风险后,不允许短时间继续尝试
                 $can_to_decrypt = $this->canToDecryptNew(1);
