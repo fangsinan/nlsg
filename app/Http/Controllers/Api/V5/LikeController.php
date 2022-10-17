@@ -80,7 +80,7 @@ class LikeController extends Controller
             return error(1000, '参数不全');
         }
 
-        $list = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=> $this->user['id'], 'type'=>$type])->first();
+        $list = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=> $this->user['id'], 'type'=>$type, 'status' => 1,])->first();
         if (!empty($list)){
             return error(1000,'不要重复操作');
         }
@@ -134,7 +134,13 @@ class LikeController extends Controller
         }
         // $res = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=>$this->user['id'], 'type'=>$type])->delete();
 
-        $query_res = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=>$this->user['id'], 'type'=>$type])->first();
+        $query_res = Like::where([
+            'comment_type'=>$comment_type,
+            'relation_id'=> $id,
+            'user_id'=>$this->user['id'],
+            'type'=>$type,
+            'status' => 1,
+        ])->first();
         $res = $query_res->update([
             "status" => 2,
         ]);
