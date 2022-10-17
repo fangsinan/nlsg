@@ -469,7 +469,7 @@ class UserWechat extends Controller {
 
 
 
-    public function Callback(Request $request){
+    public function Callback1(Request $request){
         $params = $request->input();
 
         $sReqData = file_get_contents("php://input");
@@ -589,6 +589,82 @@ class UserWechat extends Controller {
 
         return 1;
     }
+
+
+
+    public function Callback(Request $request){
+        $params = $request->input();
+
+        $sReqData = file_get_contents("php://input");
+        \Log::info('User_Wechat_add-xml:   '.$sReqData);
+        \Log::info('User_Wechat_add:   '.json_encode($params));
+
+        // $params = json_decode('{"msg_signature":"4ed965679bcdb1f80c2f221113114e3e92a28c03","timestamp":"1631865361","nonce":"1632589261"}', true);
+        // $sReqData = "<xml><ToUserName><![CDATA[wwb4a68b6963803c46]]></ToUserName><Encrypt><![CDATA[bLS+ckmhd4xOGrC6fRHu0ZHaLmOkXTq4AVxuSOagxsQjPIzx/QXFxs1rnZHm3XIQMOJzAdpo4mYeo7iXvjD7sQiJoOhTvjbdmGR4GPl1sVEJTvRDIVxcHgUMnl14LWIpJHLjkxgRcItCXDJ+9HPdN81xg+L/qsG2McXoLxByHAxidxth/6Te2TuVIenttCip95WvvoKLptqiu4Q0CBaN54kzk/C/XNiPkTAFjIskPmYKtA6ueoRgRbi76fRBTiSaiRRJSJo6w1YsL4eG3FpjdNrIgGr2ywnrIIvhSkxl7p1FIMRq8XpCWE8RkTzgfVG6dgSPXUkKDCVOyIFrw/kzPcTc9H5NtQ/R5OlaCdyC2QHWoarTq3Glpo4YDy6QqTiifSkQbC5HcRGVFrDpvU3BZd7P7Wr7tFuQOwKWTu0AOgfUM/FwHnxQeSZdNH45GY2vl5+fmHhE/MiQQlZJNXOuheZD3T5xvfWxZGKjlpynSrZyqwn2z2SZ7pM4VpngSJ/rCvPiDRIC+p0udqNZbOEp+U9mgeN1ty5G0epBNFMDUUCZx3pyI4CQgL8DyT5IKrLyDl/1mZHmMk1LeOREdJyFTPc7AE0cn1wE4ikmDevxCm0zkjsiq5rARIxHFaInrWkc]]></Encrypt><AgentID><![CDATA[2000003]]></AgentID></xml> ";
+        $corpId = "wwb4a68b6963803c46";
+        $token = "80343WWuvAVpa682";
+        $encodingAesKey = "gf5YT3368mO2Qgu1X9ht1x951Q3ItXCZw694S5n4yN6";
+
+        $wxcpt = new WXBizMsgCrypt($token, $encodingAesKey, $corpId);
+
+        // 校验回调用
+        if(!empty($params['echostr'])){
+            $sVerifyMsgSig      = urldecode($params['msg_signature'] ??'');
+            $sVerifyTimeStamp   = urldecode($params['timestamp'] ??'');
+            $sVerifyNonce       = urldecode($params['nonce'] ??'');
+            $sVerifyEchoStr     = urldecode($params['echostr'] ??'');
+            $sEchoStr = "";
+            $errCode = $wxcpt ->VerifyURL($sVerifyMsgSig, $sVerifyTimeStamp, $sVerifyNonce, $sVerifyEchoStr, $sEchoStr);
+
+            if ($errCode == 0) {
+                echo $sEchoStr;
+
+            } else {
+                print("ERR: " . $errCode . "\n\n");
+            }
+
+            return ;
+        }
+
+
+        $sReqMsgSig     = urldecode($params['msg_signature'] ??'');
+        $sReqTimeStamp  = urldecode($params['timestamp'] ??'');
+        $sReqNonce      = urldecode($params['nonce'] ??'');
+
+
+        if(empty($sReqData)){
+            return;
+        }
+        //解析XML
+        $errCode = $wxcpt->DecryptMsg($sReqMsgSig, $sReqTimeStamp, $sReqNonce, $sReqData, $sMsg);
+        if ($errCode == 0) {
+            // 解密成功，sMsg即为xml格式的明文
+            $obj = simplexml_load_string($sMsg, 'SimpleXMLElement', LIBXML_NOCDATA);
+            $json = json_encode($obj);
+            // 写库  跑队列任务
+            $user_arr = json_decode($json, true);
+            if($user_arr['Event'] == "change_external_contact" &&
+                in_array($user_arr['ChangeType'],['add_external_contact','del_external_contact','del_follow_user'])){
+                DB::table('nlsg_user_wechat_callback')->insert([
+                    'wechat_callback'   => $sReqData,
+                    'json'              => $json,
+                    'ChangeType'        => $user_arr['ChangeType'],
+                    'ExternalUserID'    => $user_arr['ExternalUserID'],
+                    'status'            => 1,
+                ]);
+            }
+
+
+            dump($sMsg);
+
+        } else {
+            print("ERR: " . $errCode . "\n\n");
+            //exit(-1);
+        }
+
+    }
+
+
 
 
 

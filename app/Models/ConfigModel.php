@@ -76,7 +76,6 @@ class ConfigModel extends Base
     public static function base64Upload($type_flag, $file_base64)
     {
 
-
         $dir = 'nlsg/';
         switch ($type_flag) {
             case 1:
@@ -129,13 +128,13 @@ class ConfigModel extends Base
             //上传阿里
             $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
             $dir = $dir . '/' . date('YmdHis');
-
             // 存储空间名称
             $bucket = Config('web.Ali.BUCKET_ALI');
             $ext = self::$MIME_TYPE_TO_TYPE["image/" . $match[2]] ?? 'jpg'; //扩展名
             $content = base64_decode(str_replace($match[1], '', $file_base64));
             // 文件名称
             $object = $dir . rand(100000, 999999) . '.' . $ext;
+
             // 文件内容
             $doesres = $ossClient->doesObjectExist($bucket, $object); //获取是否存在
             if ($doesres) {
@@ -143,6 +142,7 @@ class ConfigModel extends Base
             } else {
                 $object = $dir . rand(100000, 999999) . '.' . $ext;
             }
+
             $ossClient->putObject($bucket, $object, $content);
             return [
                 'code' => 0,

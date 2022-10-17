@@ -151,8 +151,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 
     //生成海报
-    Route::get('create/create_poster', 'CreatePosterController@CreatePoster');
-    Route::post('create/upload_push', 'CreatePosterController@uploadPush');
+    Route::any('create/create_poster', 'CreatePosterController@CreatePoster');
+    Route::any('create/upload_push', 'CreatePosterController@uploadPush');
     //上传阿里点播、OSS
     Route::post('upload/push_ali_auth', 'AliUploadController@PushAliAuth');
     Route::post('upload/del_ali_ydb', 'AliUploadController@DelAliYdb');
@@ -661,5 +661,13 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::get('wechat_tools/get_url_link', 'WeChatToolsController@getUrlLink');
 
     Route::get('notIndex', 'LiveNoEnterController@index');
+
+
+
+    // 帮助与反馈
+    Route::any('help/get_help_list', 'HelpController@getHelpLists');
+    Route::any('help/send_message', 'HelpController@sendMessage');
+    Route::any('help/get_message', 'HelpController@getMessage');
+    Route::any('help/del_message', 'HelpController@delMessage');
     /**     5.0 API  END    ***/
 });

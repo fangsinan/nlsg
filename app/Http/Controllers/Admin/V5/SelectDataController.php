@@ -61,37 +61,43 @@ class SelectDataController extends ControllerBackend
         return $this->getRes((new sds())->teacherList($request->input()));
     }
 
-    public function liveClassify(): JsonResponse {
-        return $this->getRes([
-            [
-                'key'=>1,
-                'value'=>'交付课',
-            ],
-            [
-                'key'=>2,
-                'value'=>'公益课',
-            ],
-            [
-                'key'=>3,
-                'value'=>'分公司专场',
-            ],
-            [
-                'key'=>4,
-                'value'=>'电视渠道',
-            ],
-            [
-                'key'=>5,
-                'value'=>'其他',
-            ],
-            [
-                'key'=>6,
-                'value'=>'新疆',
-            ]
-        ]);
+    public function liveClassify(Request $request): JsonResponse {
+        return $this->getRes((new sds())->liveClassify($request->input('type',1)));
+//        return $this->getRes([
+//            [
+//                'key'=>1,
+//                'value'=>'交付课',
+//            ],
+//            [
+//                'key'=>2,
+//                'value'=>'公益课',
+//            ],
+//            [
+//                'key'=>3,
+//                'value'=>'分公司专场',
+//            ],
+//            [
+//                'key'=>4,
+//                'value'=>'电视渠道',
+//            ],
+//            [
+//                'key'=>5,
+//                'value'=>'其他',
+//            ],
+//            [
+//                'key'=>6,
+//                'value'=>'新疆',
+//            ]
+//        ]);
     }
 
     public function liveList(Request $request): JsonResponse {
         return $this->getRes((new sds())->liveList($request->input()));
     }
 
+    //直播观看统计有效时间范围列表
+    public function liveValidTimeList(): JsonResponse
+    {
+        return $this->getRes((new sds())->liveValidTimeList());
+    }
 }

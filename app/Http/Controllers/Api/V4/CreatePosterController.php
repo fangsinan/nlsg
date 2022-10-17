@@ -3,7 +3,6 @@
 
 namespace App\Http\Controllers\Api\V4;
 
-
 use App\Http\Controllers\Controller;
 use App\Models\ActionStatistics;
 use App\Models\Column;
@@ -1220,7 +1219,6 @@ class CreatePosterController extends Controller
         return $res;
     }
 
-
     /**
      * @api {post} /api/v4/create/upload_push   上传
      * @apiName create_poster
@@ -1241,7 +1239,6 @@ class CreatePosterController extends Controller
      * ]
      * }
      */
-
     public function uploadPush(Request $request)
     {
 
