@@ -111,7 +111,7 @@ class LikeController extends Controller
 
         }
 
-        $query_res = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=>$this->user['id'], 'type'=>$type])->first();
+        $query_res = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=>$this->user['id'], 'type'=>$type,'status' => 1,])->first();
         $res = $query_res->update([
             "status" => 2,
         ]);
