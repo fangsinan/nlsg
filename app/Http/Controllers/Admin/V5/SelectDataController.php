@@ -100,4 +100,12 @@ class SelectDataController extends ControllerBackend
     {
         return $this->getRes((new sds())->liveValidTimeList());
     }
+
+    //反馈问题的类型列表
+    public function feedbackTypeList(): JsonResponse
+    {
+        return $this->getRes((new sds())->feedbackTypeList());
+    }
+
+
 }

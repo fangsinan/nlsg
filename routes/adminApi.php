@@ -424,6 +424,22 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
 
         //直播地图
         Route::post('live_bgp/list','LiveBgpController@list');
+
+
+        //***********帮助与反馈部分***********
+        Route::post('feedback/list','FeedbackController@list');
+        Route::post('feedback/change_status','FeedbackController@changeStatus');
+        Route::post('feedback/to_reply','FeedbackController@toReply');
+        Route::post('feedback/template_list','FeedbackController@templateList');
+        Route::post('feedback/template_create','FeedbackController@templateCreate');
+        Route::post('feedback/template_change_status','FeedbackController@templateChangeStatus');
+        Route::post('feedback/type_list','FeedbackController@typeList');
+        Route::post('feedback/type_create','FeedbackController@typeCreate');
+        Route::post('feedback/type_change_status','FeedbackController@typeChangeStatus');
+        Route::post('feedback/help_list','FeedbackController@helpList');
+        Route::post('feedback/help_create','FeedbackController@helpCreate');
+        Route::post('feedback/help_change_status','FeedbackController@helpChangeStatus');
+        //***********帮助与反馈部分结束***********
     });
 
 
