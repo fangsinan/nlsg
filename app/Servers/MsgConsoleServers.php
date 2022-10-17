@@ -43,7 +43,6 @@ class MsgConsoleServers
         }
 
 
-
         if (in_array($params['status'] ?? 0, [1, 2, 3, 4])) {
             $query->where('status', '=', $params['status']);
         }
@@ -250,6 +249,7 @@ class MsgConsoleServers
                         'receive_user' => $ul_v,
                         'message_id'   => $msg_id,
                         'group_id'     => $group_id,
+                        'type'         => $params['type'],
                     ];
                 }
 
