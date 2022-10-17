@@ -136,6 +136,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->orderBy('id','desc')
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
@@ -341,6 +342,7 @@ class MessageController extends Controller
             ])->groupBy(DB::raw("date_format(created_at,'%Y-%m-%d')"))
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->orderBy('id','desc')
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$msg){
@@ -419,6 +421,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->orderBy('id','desc')
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
@@ -467,13 +470,13 @@ class MessageController extends Controller
             $items=MessageServers::get_info_by_comment($comment_id,$items);
 
 
-            if($like['comment_type'] ==1 && $like['status']==1){
+            if($like['comment_type'] ==1 && $items['type']==14){
                 $items['msg']='点赞了你的评论';
-            }elseif ($like['comment_type'] ==1 && $like['status']==2){
+            }elseif ($like['comment_type'] ==1 && $items['type']==15){
                 $items['msg']='取消点赞了你的评论';
-            }elseif ($like['comment_type'] ==2 && $like['status']==1){
+            }elseif ($like['comment_type'] ==2 && $items['type']==14){
                 $items['msg']='点赞了你的回复';
-            }elseif ($like['comment_type'] ==2 && $like['status']==2){
+            }elseif ($like['comment_type'] ==2 && $items['type']==15){
                 $items['msg']='取消点赞了你的回复';
             }
 
@@ -523,6 +526,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->orderBy('id','desc')
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
@@ -584,12 +588,17 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->orderBy('id','desc')
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
             //格式化时间
             $items['message']['created_at'] = formatDataTime($items['created_at'],2);;
             $items['created_at'] =formatDataTime($items['created_at']);
+            //如果是反馈回复获取反馈内容
+            if($items['type']==24){
+
+            }
 
         }
 
@@ -631,6 +640,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->orderBy('id','desc')
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {

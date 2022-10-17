@@ -45,7 +45,7 @@ class LikeController extends Controller
             return error(1000, '参数不全');
         }
 
-        $list = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=> $this->user['id'], 'type'=>$type])->first();
+        $list = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=> $this->user['id'], 'type'=>$type,'status' => 1,])->first();
         if (!empty($list)){
             return error(1000,'不要重复操作');
         }
@@ -110,12 +110,17 @@ class LikeController extends Controller
             return error(1000, '参数不全');
 
         }
-        $res = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=>$this->user['id'], 'type'=>$type])->delete();
+
+        $query_res = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=>$this->user['id'], 'type'=>$type,'status' => 1,])->first();
+        $res = $query_res->update([
+            "status" => 2,
+        ]);
+
         if($res){
             //减少喜欢
             Comment::where('id', $id)->decrement('like_num');
             // 发送消息
-            Like::LikeMsg($id,$comment_type,$this->user['id'],$res->id,'UNLIKE');
+            Like::LikeMsg($id,$comment_type,$this->user['id'],$query_res->id??0,'UNLIKE');
             return success('操作成功');
         }
         return error(0,'操作失败');
