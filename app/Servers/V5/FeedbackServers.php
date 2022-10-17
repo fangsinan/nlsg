@@ -266,7 +266,6 @@ class FeedbackServers
         return ['code' => false, 'msg' => '失败,请重试.'];
     }
 
-
     public function typeList($params, $admin)
     {
         if (!in_array($params['type'] ?? 0, [1, 2])) {
@@ -280,7 +279,7 @@ class FeedbackServers
             ->get();
     }
 
-    public function typeCreate($params, $admin)
+    public function typeCreate($params, $admin): array
     {
         $type = $params['type'] ?? 0;
         $name = $params['name'] ?? '';
@@ -291,13 +290,58 @@ class FeedbackServers
 
         $id = $params['id'] ?? 0;
 
+        if ($id) {
+            $model = FeedbackType::query()
+                ->where('id', '=', $id)
+                ->where('type','=',$type)
+                ->first();
+            if (empty($model)) {
+                return ['code' => false, 'msg' => 'id错误'];
+            }
+        } else {
+            $model = new FeedbackType();
+        }
 
-        return [__LINE__];
+        $model->type = $type;
+        $model->name = $name;
+
+        $res = $model->save();
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败'];
     }
 
-    public function typeChangeStatus($params, $admin)
+    public function typeChangeStatus($params, $admin): array
     {
-        return [__LINE__];
+        $flag = $params['flag'] ?? '';
+        $id   = $params['id'] ?? '';
+        if (is_string($id)) {
+            $id = explode(',', $id);
+            $id = array_filter($id);
+        }
+
+        if (empty($id)) {
+            return ['code' => false, 'msg' => 'id不能为空'];
+        }
+
+        if (!in_array($flag, ['del'])) {
+            return ['code' => false, 'msg' => '操作类型错误'];
+        }
+
+        $res = FeedbackType::query()
+            ->whereIn('id', $id)
+            ->update([
+                'status' => 2,
+            ]);
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败,请重试.'];
     }
 
     public function helpList($params, $admin)
