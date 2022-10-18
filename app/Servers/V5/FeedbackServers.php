@@ -273,7 +273,7 @@ class FeedbackServers
 
     public function typeList($params, $admin)
     {
-        if (!in_array($params['type'] ?? 0, [1, 2])) {
+        if (!in_array($params['type'] ?? 0, [1, 2, 3])) {
             return ['code' => false, 'msg' => '类型错误'];
         }
 
@@ -289,7 +289,7 @@ class FeedbackServers
         $type = $params['type'] ?? 0;
         $name = $params['name'] ?? '';
 
-        if (empty($type) || empty($name) || !in_array($type, [1, 2])) {
+        if (empty($type) || empty($name) || !in_array($type, [1, 2, 3])) {
             return ['code' => false, 'msg' => '参数错误'];
         }
 
@@ -420,34 +420,34 @@ class FeedbackServers
         DB::beginTransaction();
 
         //写入问答表
-        if ($id){
-            $ha = HelpAnswer::query()->where('id','=',$id)->where('status','<>',2)->first();
-            if (!$ha){
+        if ($id) {
+            $ha = HelpAnswer::query()->where('id', '=', $id)->where('status', '<>', 2)->first();
+            if (!$ha) {
                 DB::rollBack();
-                return ['code'=>false,'msg'=>'id错误'];
+                return ['code' => false, 'msg' => 'id错误'];
             }
-        }else{
+        } else {
             $ha = new HelpAnswer();
         }
 
-        $ha->type = $params['type'];
+        $ha->type     = $params['type'];
         $ha->question = $params['question'];
-        $ha->answer = $params['answer'];
-        $ha->qr_code = $params['qr_code'];
-        $ha->status = $params['status'];
+        $ha->answer   = $params['answer'];
+        $ha->qr_code  = $params['qr_code'];
+        $ha->status   = $params['status'];
 
         $ha_res = $ha->save();
-        if (!$ha_res){
+        if (!$ha_res) {
             DB::rollBack();
-            return ['code'=>false,'msg'=>'失败,请重试.'];
+            return ['code' => false, 'msg' => '失败,请重试.'];
         }
 
         //存入关键字
         $keywords_id_list = [];
-        foreach ($params['keywords'] as $v){
-            $temp_k = HelpAnswerKeywords::query()
+        foreach ($params['keywords'] as $v) {
+            $temp_k             = HelpAnswerKeywords::query()
                 ->firstOrCreate([
-                    'keywords'=>$v
+                    'keywords' => $v
                 ]);
             $keywords_id_list[] = $temp_k->id;
         }
@@ -455,21 +455,21 @@ class FeedbackServers
 
         //绑定关键词
         HelpAnswerKeywordsBind::query()
-            ->where('help_answer_id','=',$ha->id)
-            ->whereNotIn('keywords_id',$keywords_id_list)
+            ->where('help_answer_id', '=', $ha->id)
+            ->whereNotIn('keywords_id', $keywords_id_list)
             ->delete();
 
-        foreach ($keywords_id_list as $v){
+        foreach ($keywords_id_list as $v) {
             HelpAnswerKeywordsBind::query()
                 ->firstOrCreate([
-                    'help_answer_id'=>$ha->id,
-                    'keywords_id'=>$v,
+                    'help_answer_id' => $ha->id,
+                    'keywords_id'    => $v,
                 ]);
         }
 
 
         DB::commit();
-        return ['code'=>true,'msg'=>'成功'];
+        return ['code' => true, 'msg' => '成功'];
     }
 
     public function helpChangeStatus($params, $admin): array
