@@ -43,37 +43,37 @@ class FeedbackController extends ControllerBackend
         return $this->getRes((new FeedbackServers())->templateChangeStatus($request->input(), $this->user));
     }
 
-    //todo 帮助与反馈的类型列表
+    //帮助与反馈的类型列表
     public function typeList(Request $request): JsonResponse
     {
         return $this->getRes((new FeedbackServers())->typeList($request->input(), $this->user));
     }
 
-    //todo 添加类型
+    //添加类型
     public function typeCreate(Request $request): JsonResponse
     {
         return $this->getRes((new FeedbackServers())->typeCreate($request->input(), $this->user));
     }
 
-    //todo 类型状态修改
+    //类型状态修改
     public function typeChangeStatus(Request $request): JsonResponse
     {
         return $this->getRes((new FeedbackServers())->typeChangeStatus($request->input(), $this->user));
     }
 
-    //todo 帮助列表
+    //帮助列表
     public function helpList(Request $request): JsonResponse
     {
         return $this->getRes((new FeedbackServers())->helpList($request->input(), $this->user));
     }
 
-    //todo 创建帮助
+    //创建帮助
     public function helpCreate(Request $request): JsonResponse
     {
         return $this->getRes((new FeedbackServers())->helpCreate($request->input(), $this->user));
     }
 
-    //todo 帮助状态修改
+    //帮助状态修改
     public function helpChangeStatus(Request $request): JsonResponse
     {
         return $this->getRes((new FeedbackServers())->helpChangeStatus($request->input(), $this->user));

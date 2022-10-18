@@ -7,7 +7,12 @@ namespace App\Servers\V5;
 use App\Models\FeedbackNew;
 use App\Models\FeedbackReplyTemplate;
 use App\Models\FeedbackType;
+use App\Models\HelpAnswer;
+use App\Models\HelpAnswerKeywords;
+use App\Models\HelpAnswerKeywordsBind;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class FeedbackServers
 {
@@ -293,7 +298,7 @@ class FeedbackServers
         if ($id) {
             $model = FeedbackType::query()
                 ->where('id', '=', $id)
-                ->where('type','=',$type)
+                ->where('type', '=', $type)
                 ->first();
             if (empty($model)) {
                 return ['code' => false, 'msg' => 'id错误'];
@@ -344,19 +349,157 @@ class FeedbackServers
         return ['code' => false, 'msg' => '失败,请重试.'];
     }
 
-    public function helpList($params, $admin)
+    public function helpList($params, $admin): LengthAwarePaginator
     {
-        return [__LINE__];
+        $query = HelpAnswer::query()
+            ->with([
+                'typeInfo:id,name',
+                'keywordsBind:id,help_answer_id,keywords_id',
+                'keywordsBind.keywords:id,keywords',
+            ])
+            ->where('status', '<>', 2);
+
+        //类型,标题,内容
+        $type        = $params['type'] ?? 0;
+        $question    = $params['question'] ?? '';
+        $answer      = $params['answer'] ?? '';
+        $keywords_id = $params['keywords_id'] ?? 0;
+
+        if ($type) {
+            $query->where('type', '=', $type);
+        }
+
+        if ($question) {
+            $query->where('question', 'like', "%$question%");
+        }
+
+        if ($answer) {
+            $query->where('answer', 'like', "%$answer%");
+        }
+
+        if ($keywords_id) {
+            $query->whereHas('keywordsBind', function ($q) use ($keywords_id) {
+                $q->where('keywords_id', '=', $keywords_id);
+            });
+        }
+
+        $query->select([
+            'id', 'type', 'question', 'answer', 'qr_code', 'created_at', 'status',
+        ]);
+        return $query->paginate($params['size'] ?? 10);
     }
 
-    public function helpCreate($params, $admin)
+    public function helpCreate($params, $admin): array
     {
-        return [__LINE__];
+        $validator = Validator::make($params,
+            [
+                'type'       => 'bail|required|exists:nlsg_feedback_type,id',
+                'question'   => 'bail|required|string|max:20',
+                'answer'     => 'bail|required|string|max:200',
+                'status'     => 'bail|required|in:1,3',
+                'keywords'   => 'bail|required|array|max:5',
+                'keywords.*' => 'bail|distinct|max:20',
+                'qr_code'    => 'bail|string|max:100',
+            ],
+            [
+                'type.exists'         => '类型id错误',
+                'keywords.max'        => '关键字最多允许5个',
+                'keywords.*.distinct' => '关键字内有重复值',
+                'keywords.*.size'     => '关键字最多允许20个字',
+                'question.max'        => '最多允许20个字',
+                'answer.max'          => '最多允许200个字',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        $id = $params['id'] ?? 0;
+
+        DB::beginTransaction();
+
+        //写入问答表
+        if ($id){
+            $ha = HelpAnswer::query()->where('id','=',$id)->where('status','<>',2)->first();
+            if (!$ha){
+                DB::rollBack();
+                return ['code'=>false,'msg'=>'id错误'];
+            }
+        }else{
+            $ha = new HelpAnswer();
+        }
+
+        $ha->type = $params['type'];
+        $ha->question = $params['question'];
+        $ha->answer = $params['answer'];
+        $ha->qr_code = $params['qr_code'];
+        $ha->status = $params['status'];
+
+        $ha_res = $ha->save();
+        if (!$ha_res){
+            DB::rollBack();
+            return ['code'=>false,'msg'=>'失败,请重试.'];
+        }
+
+        //存入关键字
+        $keywords_id_list = [];
+        foreach ($params['keywords'] as $v){
+            $temp_k = HelpAnswerKeywords::query()
+                ->firstOrCreate([
+                    'keywords'=>$v
+                ]);
+            $keywords_id_list[] = $temp_k->id;
+        }
+
+
+        //绑定关键词
+        HelpAnswerKeywordsBind::query()
+            ->where('help_answer_id','=',$ha->id)
+            ->whereNotIn('keywords_id',$keywords_id_list)
+            ->delete();
+
+        foreach ($keywords_id_list as $v){
+            HelpAnswerKeywordsBind::query()
+                ->firstOrCreate([
+                    'help_answer_id'=>$ha->id,
+                    'keywords_id'=>$v,
+                ]);
+        }
+
+
+        DB::commit();
+        return ['code'=>true,'msg'=>'成功'];
     }
 
-    public function helpChangeStatus($params, $admin)
+    public function helpChangeStatus($params, $admin): array
     {
-        return [__LINE__];
+        $flag = $params['flag'] ?? '';
+        $id   = $params['id'] ?? '';
+        if (is_string($id)) {
+            $id = explode(',', $id);
+            $id = array_filter($id);
+        }
+
+        if (empty($id)) {
+            return ['code' => false, 'msg' => 'id不能为空'];
+        }
+
+        if (!in_array($flag, ['del', 'on', 'off'])) {
+            return ['code' => false, 'msg' => '操作类型错误'];
+        }
+
+        $res = HelpAnswer::query()
+            ->whereIn('id', $id)
+            ->update([
+                'status' => $flag === 'del' ? 2 : ($flag == 'on' ? 1 : 3),
+            ]);
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败,请重试.'];
     }
 
 
