@@ -3,6 +3,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
 class Talk extends Base
 {
     protected $table = 'nlsg_talk';
@@ -31,6 +33,16 @@ class Talk extends Base
         }
 
         return $id;
+    }
+
+    public function userInfo(): HasOne
+    {
+        return $this->hasOne(User::class,'id','user_id');
+    }
+
+    public function adminInfo(): HasOne
+    {
+        return $this->hasOne(BackendUser::class,'id','finish_admin_id');
     }
 
 }

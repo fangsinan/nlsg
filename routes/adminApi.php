@@ -426,7 +426,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('live_bgp/list','LiveBgpController@list');
 
 
-        //***********帮助与反馈部分***********
+        //***********帮助留言与反馈部分***********
         Route::post('feedback/list','FeedbackController@list');
         Route::post('feedback/change_status','FeedbackController@changeStatus');
         Route::post('feedback/to_reply','FeedbackController@toReply');
@@ -439,7 +439,18 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('feedback/help_list','FeedbackController@helpList');
         Route::post('feedback/help_create','FeedbackController@helpCreate');
         Route::post('feedback/help_change_status','FeedbackController@helpChangeStatus');
-        //***********帮助与反馈部分结束***********
+
+
+        Route::post('talk/list','TalkController@list');
+        Route::post('talk/change_status','TalkController@changeStatus');
+        Route::post('talk/remark','TalkController@remark');
+        Route::post('talk/talk_list','TalkController@talkList');
+        Route::post('talk/finish','TalkController@finish');
+        Route::post('talk/template_list','TalkController@templateList');
+        Route::post('talk/template_list_create','TalkController@templateListCreate');
+        Route::post('talk/template_list_change_status','TalkController@templateListChangeStatus');
+
+        //***********帮助留言与反馈部分结束***********
     });
 
 
