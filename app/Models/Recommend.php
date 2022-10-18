@@ -167,7 +167,7 @@ class Recommend extends Base
             return false;
         }
         $list = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num',
-            'is_free', 'helper')
+            'is_free', 'helper','hide_sub_count')
             ->whereIn('id', $ids)
             ->where('is_del', 0)
             ->orderBy('created_at', 'desc')

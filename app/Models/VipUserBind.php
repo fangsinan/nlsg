@@ -67,7 +67,7 @@ class VipUserBind extends Base
 
             DB::table('nlsg_vip_user_bind')->insert($map);
         }
-        
+
         $clear_sql = "update  nlsg_vip_user_bind set status = 2 where status in (0,1) and end_at <= SYSDATE()";
         DB::select($clear_sql);
 
