@@ -3,6 +3,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Talk extends Base
@@ -43,6 +44,11 @@ class Talk extends Base
     public function adminInfo(): HasOne
     {
         return $this->hasOne(BackendUser::class,'id','finish_admin_id');
+    }
+
+    public function remarkList(): HasMany
+    {
+        return $this->hasMany(TalkRemark::class,'talk_id','id');
     }
 
 }
