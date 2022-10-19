@@ -359,8 +359,9 @@ class MessageController extends Controller
                 ->where('receive_user', $user_id)
                 ->get()->toArray();
 
+            $user_ids=[];
             foreach ($follow_lists as &$items) {
-
+                $user_ids[$items['send_user']['id']]=$items['send_user']['id'];
                 //是不是360vip
                 $items['send_user']['is_vip']=VipUser::newVipInfo( $items['send_user']['id']??0)['vip_id'] ?1:0;
                 $items['created_at'] = History::DateTime($items['created_at']);
@@ -381,6 +382,7 @@ class MessageController extends Controller
 
             }
 
+            $msg['user_count']=count($user_ids);
             $msg['follow_list']=$follow_lists;
         }
 
@@ -545,7 +547,7 @@ class MessageController extends Controller
             }
 
             //格式化时间
-            $items['message']['created_at'] = WorkNewDateTime( $items['created_at']);
+            $items['message']['created_at'] = WorkNewDateTime( $items['created_at']).'上新';
             $items['created_at'] =formatDataTime($items['created_at']);
 
         }

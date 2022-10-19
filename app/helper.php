@@ -319,17 +319,13 @@ function dd_db_log(){
 
 function  WorkNewDateTime($param_time = '')
 {
-    //date_default_timezone_set('PRC');
     $ptime = strtotime($param_time);
-    $etime = time() - $ptime;
-    if($etime <= 0){  // 防止提前请求
-        return '今日';
-    }
-    if( $etime <= 24 * 60 * 60){
-        return '今日';
-    }
+    $today=strtotime(date("Y-m-d"));
+    $yesterday=$today-86400;
 
-    if( $etime <= 2 * 24 * 60 * 60){
+    if($ptime > $today){  // 防止提前请求
+        return '今日';
+    }elseif ($ptime <=$today && $today>$yesterday){
         return '昨日';
     }
 
