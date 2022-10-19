@@ -386,6 +386,7 @@ class MessageController extends Controller
             }
 
             $msg['user_count']=count($user_ids);
+            $msg['count']=$msg['user_count'];
             $msg['follow_list']=$follow_lists;
         }
 
