@@ -569,7 +569,7 @@ class CampController extends Controller
                             "relation_id"   => $sub_val['relation_id'],
                             "relation_info_id"   => 0,
                             "week_column_id"   => $column_id,
-                            "week_works_id"   => $week_ids,
+                            "week_works_id"   => $sub_val['relation_id'],
                         ]);
 
                     }
