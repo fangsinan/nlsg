@@ -64,7 +64,7 @@ class MsgConsoleServers
         }
 
         $query->orderBy('status');
-        $query->orderBy('timing_send_time');
+//        $query->orderBy('timing_send_time');
         $query->orderBy('id', 'desc');
         $query->select([
             'id', 'title', 'message', 'receive_type', 'relation_type', 'relation_id',
