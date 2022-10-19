@@ -53,14 +53,14 @@ class VipUserBind extends Base
             foreach ($data as $key=>$val){
                 $map[]=[
                     'parent'=>'18512378959', //保护到公司
-                    'son'=>$val['son'],
+                    'son'=>$val->son,
                     'life'=>2, //有效期
                     'begin_at'=>$now_date,
                     'end_at'=>'2030-12-31 23:59:59',
                     'status'=>1,
                     'is_manual'=>1, //1 手动绑定 配合小鹅通
                     'channel'=>2, //'来源渠道 1导入 2平台 3抖音 4直播渠道 5:哈佛订单绑定平台'
-                    'remark'=>'保护过期，自动保护：'.$val['id'],
+                    'remark'=>'保护过期，自动保护：'.$val->id,
                     'created_at'=>$now_date,
                 ];
             }
