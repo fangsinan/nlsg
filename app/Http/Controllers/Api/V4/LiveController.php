@@ -1085,16 +1085,22 @@ class LiveController extends Controller
 
                 $live_son_flag_num=$list['live_son_flag_count'];
 
-                //渠道是否开启直播
-                $SonFlagInfo= LiveSonFlagPoster::query()->where([
-                    'live_id'   =>$list->live_pid,
-                    'son_id'    =>$live_son_flag,
-                    'is_del'    =>0,
-                ])->first();
-                if(!empty($SonFlagInfo)){
-                    $list['show_wechat_button_status']=$SonFlagInfo->show_wechat_button;
-                    $list['live_son_flag_status']=$SonFlagInfo->status;
-                    $list['live_son_flag_brush_status'] = $SonFlagInfo->live_son_flag_brush_status;
+                if($live_son_flag==158291){
+                    $list['show_wechat_button_status'] = 2; //不显示
+                    $list['live_son_flag_status'] = 2; //开启
+                    $list['live_son_flag_brush_status'] = 1; //可刷单
+                }else {
+                    //渠道是否开启直播
+                    $SonFlagInfo = LiveSonFlagPoster::query()->where([
+                        'live_id' => $list->live_pid,
+                        'son_id' => $live_son_flag,
+                        'is_del' => 0,
+                    ])->first();
+                    if (!empty($SonFlagInfo)) {
+                        $list['show_wechat_button_status'] = $SonFlagInfo->show_wechat_button;
+                        $list['live_son_flag_status'] = $SonFlagInfo->status;
+                        $list['live_son_flag_brush_status'] = $SonFlagInfo->live_son_flag_brush_status;
+                    }
                 }
             }else{
                 $key="live_number:$id"; //此key值只要直播间live_key_存在(有socket连接)就会15s刷新一次
@@ -2268,7 +2274,6 @@ class LiveController extends Controller
             if(!empty($waiter_id)){
                 return success((object)[] );
             }
-
 
             //relation_type=3时    免费传relation_id=live_id   付费传order_id
 //            if(empty($order_id)){ //直播免费预约取消二维码

@@ -424,6 +424,33 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
 
         //直播地图
         Route::post('live_bgp/list','LiveBgpController@list');
+
+
+        //***********帮助留言与反馈部分***********
+        Route::post('feedback/list','FeedbackController@list');
+        Route::post('feedback/change_status','FeedbackController@changeStatus');
+        Route::post('feedback/to_reply','FeedbackController@toReply');
+        Route::post('feedback/template_list','FeedbackController@templateList');
+        Route::post('feedback/template_create','FeedbackController@templateCreate');
+        Route::post('feedback/template_change_status','FeedbackController@templateChangeStatus');
+        Route::post('feedback/type_list','FeedbackController@typeList');
+        Route::post('feedback/type_create','FeedbackController@typeCreate');
+        Route::post('feedback/type_change_status','FeedbackController@typeChangeStatus');
+        Route::post('feedback/help_list','FeedbackController@helpList');
+        Route::post('feedback/help_create','FeedbackController@helpCreate');
+        Route::post('feedback/help_change_status','FeedbackController@helpChangeStatus');
+
+
+        Route::post('talk/list','TalkController@list');
+        Route::post('talk/change_status','TalkController@changeStatus');
+        Route::post('talk/remark','TalkController@remark');
+        Route::post('talk/talk_list','TalkController@talkList');
+        Route::post('talk/finish','TalkController@finish');
+        Route::post('talk/template_list','TalkController@templateList');
+        Route::post('talk/template_list_create','TalkController@templateListCreate');
+        Route::post('talk/template_list_change_status','TalkController@templateListChangeStatus');
+
+        //***********帮助留言与反馈部分结束***********
     });
 
 

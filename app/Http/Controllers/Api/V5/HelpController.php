@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
 use App\Models\HelpAnswer;
-use App\Models\HelpMessage;
+use App\Models\Talk;
+use App\Models\TalkList;
 use Illuminate\Http\Request;
 
 class HelpController extends Controller
@@ -12,7 +13,9 @@ class HelpController extends Controller
 
 
     /**
+     *
      * getHelpLists  获取问答帮助列表
+     *  {get}  /api/v5/help/get_help_list
      */
     function getHelpLists(Request $request){
 
@@ -54,6 +57,7 @@ class HelpController extends Controller
 
     /**
      * sendMessage  客户发送留言
+     * {get}  /api/v5/help/send_message?message=解决问题&user_id=211172
      */
     function sendMessage(Request $request){
 
@@ -65,10 +69,14 @@ class HelpController extends Controller
             return $this->error(0,'参数错误',[]);
         }
 
-        HelpMessage::insert([
-            "user_id"       =>$uid,
-            "send_user_id"  =>$uid,
-            "message"       =>$message,
+        //处理会话id
+        $talk_id = Talk::getTalkId($uid);
+
+        TalkList::insert([
+            "talk_id"    => $talk_id,
+            "type"       => 1,
+            "user_id"    => $uid,
+            "content"    => $message,
         ]);
         return $this->success();
     }
@@ -78,12 +86,13 @@ class HelpController extends Controller
 
     /**
      * getHelpMessage  获取留言message对话列表
+     * {get} /api/v5/help/get_message?user_id=211172
      */
     function getMessage(Request $request){
 
         // $uid = $this->user['id'];
         $uid = $request->input("user_id");
-        $list = HelpMessage::GetListByUserId($uid);
+        $list = TalkList::GetListByUserId($uid);
         return $this->success($list);
     }
 
@@ -92,12 +101,13 @@ class HelpController extends Controller
 
     /**
      * delMessage  客户清空留言
+     * {get} /api/v5/help/get_message?user_id=211172
      */
     function delMessage(Request $request){
 
         // $uid = $this->user['id'];
         $uid = $request->input("user_id");
-        HelpMessage::where("user_id",$uid)->update([
+        TalkList::where(["user_id",$uid,'status'=>1])->update([
             'status' =>2
         ]);
         return $this->success();

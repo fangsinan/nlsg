@@ -3,6 +3,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class HelpAnswer extends Base
 {
     protected $table = 'nlsg_help_answer';
@@ -38,6 +40,16 @@ class HelpAnswer extends Base
             "list"      => $list->toArray(),
             "is_show_qr"=> $is_show_qr,
         ];
+    }
+
+
+    public function keywordsBind(): HasMany
+    {
+        return $this->hasMany(HelpAnswerKeywordsBind::class,'help_answer_id','id');
+    }
+
+    public function typeInfo(){
+        return $this->hasOne(FeedbackType::class,'id','type');
     }
 
 }

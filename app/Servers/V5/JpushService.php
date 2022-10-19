@@ -50,9 +50,9 @@ class JpushService
     {
         $time=time();
         $CronTabTime=date('Y-m-d H:i',$time);
-        $lists = Message::query()->select(['id','title','message','type','receive_type','relation_type','relation_id','relation_info_id','open_type','url'])
-            ->where('is_timing', 1)->where('status',1)->where('is_jpush',1)->where('timing_send_time','<=',$CronTabTime)
-            ->where('id','>',126) //测试时使用，生成环境需注释
+        $lists = Message::query()->select(['id','title','message','type','receive_type','relation_type','relation_id','relation_info_id','open_type','url'])//->where('is_timing', 1)
+            ->where('status',1)->where('is_jpush',1)->where('timing_send_time','<=',$CronTabTime)
+//            ->where('id','>',126) //测试时使用，生成环境需注释
             ->orderBy('id','asc')->limit(5)->get()->toArray();
         if (!empty($lists)){
 //            self::Printout($lists);
