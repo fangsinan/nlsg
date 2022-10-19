@@ -7,6 +7,7 @@ namespace App\Servers\V5;
 use App\Models\Talk;
 use App\Models\TalkList;
 use App\Models\TalkRemark;
+use App\Models\TalkUserStatistics;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -160,33 +161,101 @@ class TalkServers
         if (!$user_id) {
             return ['code' => false, 'msg' => '用户id错误'];
         }
-        //如果传了talk_id,则返回本次会话内容.否则从开始返回
-        $page = 1;
-        $size = $params['size'] ?? 10;
 
+        $flag    = $params['flag'] ?? 'begin';
         $talk_id = $params['talk_id'] ?? 0;
+        $page    = $params['page'] ?? 0;//如果是0 表示可以根据返回的page替换
+
+        //如果传了talk_id,则返回本次会话内容.否则从开始返回
+        $size = $params['size'] ?? 10;
+        $page = 1;
+
         if ($talk_id) {
             $check_talk_id = Talk::query()
                 ->where('id', '=', $talk_id)
+                ->where('user_id', '=', $user_id)
                 ->where('status', '=', 1)
                 ->first();
-            if ($check_talk_id) {
-                $begin_id = TalkList::query()
-                    ->where('talk_id', '=', $talk_id)
-                    ->value('id');
-
-                $before_begin_count = TalkList::query()
-                    ->where('user_id', '=', $user_id)
-                    ->where('id', '<', $begin_id)
-                    ->count();
-
-                if ($before_begin_count > 0 && $before_begin_count <= $size) {
-                    $page = 1;
-                } elseif ($before_begin_count > $size) {
-                    $page = ceil($before_begin_count / $size);
-                }
+            if (!$check_talk_id) {
+                return ['code' => false, 'msg' => '会话id错误'];
             }
         }
+
+        if ($page) {
+            return [
+                'page' => $page,
+                'size' => $size,
+                'list' => TalkList::query()
+                    ->with([
+                        'userInfo:id,phone,nickname,headimg',
+                        'adminInfo:id,username,user_remark',
+                        'talkInfo:id'
+                    ])
+                    ->whereHas('talkInfo', function ($q) {
+                        $q->where('status', '=', 1);
+                    })->select([
+                        'id', 'talk_id', 'type', 'user_id', 'admin_id', 'content', 'created_at', 'status',
+                    ])
+                    ->limit($size)
+                    ->offset(($page - 1) * $size)
+                    ->get(),
+            ];
+        } else {
+
+        }
+
+        //指定会话
+        //读出会话的第一条id,计算这条id所在那个page的第一条
+        //末尾,读取末尾倒数size条是在那个page的第一条
+
+        //不指定会话
+        //第一条
+        //末尾,读取末尾倒数size在那个page的第一条
+
+
+//        $talk_id = $params['talk_id'] ?? 0;
+//        if ($talk_id) {
+//            $check_talk_id = Talk::query()
+//                ->where('id', '=', $talk_id)
+//                ->where('status', '=', 1)
+//                ->first();
+//            if ($check_talk_id) {
+//                if ($ob === 'begin'){
+//                    $begin_id = TalkList::query()
+//                        ->where('talk_id', '=', $talk_id)
+//                        ->value('id');
+//
+//                    $before_begin_count = TalkList::query()
+//                        ->where('user_id', '=', $user_id)
+//                        ->where('id', '<', $begin_id)
+//                        ->count();
+//
+//                    if ($before_begin_count > 0 && $before_begin_count <= $size) {
+//                        $page = 1;
+//                    } elseif ($before_begin_count > $size) {
+//                        $page = ceil($before_begin_count / $size);
+//                    }
+//                }else{
+//
+//                }
+//
+//            }
+//        }else{
+//            if ($ob !== 'begin'){
+//                $total_count = TalkList::query()
+//                    ->with([
+//                        'talkInfo'
+//                    ])
+//                    ->whereHas('talkInfo',function ($q){
+//                        $q->where('status','=',1);
+//                    })
+//                    ->count();
+//
+//                $offset = $total_count - $size;
+//                $page = ceil($offset / $size) + 1;
+//            }
+//        }
+
 
         $query = TalkList::query()
             ->with([
@@ -284,7 +353,7 @@ class TalkServers
 
 
         DB::commit();
-        return ['code' => true,'msg'=>'成功'];
+        return ['code' => true, 'msg' => '成功'];
     }
 
     public function finish($params, $admin): array
@@ -306,6 +375,27 @@ class TalkServers
         return ['code' => true, 'msg' => '成功'];
     }
 
+    public function talkUserList($params, $admin): LengthAwarePaginator
+    {
+        return TalkUserStatistics::query()
+            ->select([
+                'user_id', 'msg_count'
+            ])
+            ->with([
+                'userInfo:id,nickname,phone'
+            ])
+            ->when($params['nickname'] ?? '', function ($q) use ($params) {
+                $q->wherehas('userInfo', function ($q) use ($params) {
+                    $q->where('nickname', 'like', '%' . $params['nickname'] . '%');
+                });
+            })
+            ->when($params['phone'] ?? '', function ($q) use ($params) {
+                $q->wherehas('userInfo', function ($q) use ($params) {
+                    $q->where('phone', 'like', '%' . $params['phone'] . '%');
+                });
+            })
+            ->paginate($params['size'] ?? 10);
+    }
 
     public function templateList($params, $admin)
     {
