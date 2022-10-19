@@ -8,6 +8,7 @@ use App\Models\Base;
 use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\PayRecordDetail;
+use App\Models\User;
 use App\Models\Works;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -100,7 +101,7 @@ class MessageType extends Base
 
 
         // 收益通知   组装json
-        if($messageType['pid'] == 12){
+        // if($messageType['pid'] == 12){
             $time = date("Y-m-d H:i:s");
             switch ($action_const){
                 case "LIVE_PROFIT_REWARD":
@@ -130,11 +131,11 @@ class MessageType extends Base
 
                     break;
                 case "REGISTER":
-                    $user = Works::where("id",$relation_data['user_id']??0)->value("nickname");
+                    $user = User::where("id",$relation_data['user_id']??0)->value("nickname");
                     $res['message'] = str_replace("{{user_name}}",$user??"",$res['message']);
                     break;
             }
-        }
+        // }
         return  $res;
 
     }
