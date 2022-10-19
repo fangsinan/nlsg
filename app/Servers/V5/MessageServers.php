@@ -68,7 +68,7 @@ class MessageServers
         }elseif(in_array($Comment->type,[3,4])){
             //获取听书、精品课
             $works = Works::query()->where('id', $Comment->relation_id)
-                ->select(['id', 'title','subtitle', 'cover_img as cover_pic '])->first();
+                ->select(['id', 'title','subtitle', 'cover_img as cover_pic'])->first();
             $items['content'] = $works;
         }
 
@@ -112,7 +112,7 @@ class MessageServers
 //        }elseif(in_array($Comment->type,[3,4])){
 //            //获取听书、精品课
 //            $works = Works::query()->where('id', $Comment->relation_id)
-//                ->select(['id', 'title', 'cover_img as cover_pic ', 'detail_img as details_pic '])->first();
+//                ->select(['id', 'title', 'cover_img as cover_pic', 'detail_img as details_pic '])->first();
 //            $items['content'] = $works;
 //        }
 //
