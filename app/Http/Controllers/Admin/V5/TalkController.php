@@ -35,10 +35,16 @@ class TalkController extends ControllerBackend
         return $this->getRes((new TalkServers())->remarkList($request->input(), $this->user));
     }
 
-    //todo 聊天信息列表
+    //聊天信息列表
     public function talkList(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->talkList($request->input(), $this->user));
+    }
+
+    //发送聊天消息
+    public function talkListCreate(Request $request): JsonResponse
+    {
+        return $this->getRes((new TalkServers())->talkListCreate($request->input(), $this->user));
     }
 
     //todo 解决当前对话

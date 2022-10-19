@@ -8,6 +8,7 @@ use App\Models\Talk;
 use App\Models\TalkList;
 use App\Models\TalkRemark;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TalkServers
@@ -153,7 +154,7 @@ class TalkServers
     }
 
 
-    public function talkList($params, $admin)
+    public function talkList($params, $admin): array
     {
         $user_id = $params['user_id'] ?? 0;
         if (!$user_id) {
@@ -212,11 +213,97 @@ class TalkServers
 
     }
 
-
-    public function finish($params, $admin)
+    public function talkListCreate($params, $admin): array
     {
+        $time_limit = 300;//单位秒
+        $now        = time();
 
-        return [__LINE__];
+        $validator = Validator::make($params,
+            [
+                'user_id' => 'bail|required|exists:nlsg_user,id',
+                'content' => 'bail|required|string|max:250',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        DB::beginTransaction();
+
+        //获取当前talk_id
+        $talk = Talk::query()
+            ->firstOrCreate([
+                'user_id'   => $params['user_id'],
+                'is_finish' => 1
+            ]);
+
+        if (!$talk) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败请重试'];
+        }
+
+        //查询上调时间间隔
+        $last_talk_list = TalkList::query()
+            ->where('user_id', '=', $params['user_id'])
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($last_talk_list->type !== 3 && strtotime($last_talk_list->created_at) <= ($now - $time_limit)) {
+            //添加一条type = 3
+            $res = TalkList::query()
+                ->create([
+                    'talk_id'  => $talk->id,
+                    'type'     => 3,
+                    'user_id'  => $params['user_id'],
+                    'admin_id' => $admin['id'],
+                    'content'  => date('Y-m-d H:i'),
+                    'status'   => 1,
+                ]);
+
+            if (!$res) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败请重试'];
+            }
+        }
+
+        $res = TalkList::query()
+            ->create([
+                'talk_id'  => $talk->id,
+                'type'     => 2,
+                'user_id'  => $params['user_id'],
+                'admin_id' => $admin['id'],
+                'content'  => $params['content'],
+                'status'   => 1,
+            ]);
+
+        if (!$res) {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败请重试'];
+        }
+
+
+        DB::commit();
+        return ['code' => true,'msg'=>'成功'];
+    }
+
+    public function finish($params, $admin): array
+    {
+        $user_id = $params['user_id'] ?? 0;
+        if (!$user_id) {
+            return ['code' => false, 'msg' => '用户信息错误'];
+        }
+
+        Talk::query()
+            ->where('user_id', '=', $user_id)
+            ->where('is_finish', '=', 1)
+            ->update([
+                'is_finish'       => 2,
+                'finish_admin_id' => $admin['id'],
+                'finish_at'       => date('Y-m-d H:i:s'),
+            ]);
+
+        return ['code' => true, 'msg' => '成功'];
     }
 
 

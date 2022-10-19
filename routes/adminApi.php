@@ -446,6 +446,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('talk/remark_create','TalkController@remarkCreate');
         Route::post('talk/remark_list','TalkController@remarkList');
         Route::post('talk/talk_list','TalkController@talkList');
+        Route::post('talk/talk_list_create','TalkController@talkListCreate');
         Route::post('talk/finish','TalkController@finish');
         Route::post('talk/template_list','TalkController@templateList');
         Route::post('talk/template_list_create','TalkController@templateListCreate');
