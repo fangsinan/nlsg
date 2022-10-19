@@ -545,7 +545,7 @@ class MessageController extends Controller
             }
 
             //格式化时间
-            $items['message']['created_at'] = WorkNewDateTime( $items['created_at']);
+            $items['message']['created_at'] = WorkNewDateTime( $items['created_at']).'上新';
             $items['created_at'] =formatDataTime($items['created_at']);
 
         }
