@@ -357,6 +357,7 @@ class MessageController extends Controller
                 ->whereIn('id', $ids_arr)
                 ->whereIn('type', MessageType::get_follow_msg_type())
                 ->where('receive_user', $user_id)
+                ->groupBy('send_user','receive_user')
                 ->get()->toArray();
 
             $user_ids=[];
