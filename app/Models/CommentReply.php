@@ -5,6 +5,7 @@ namespace App\Models;
 
 class CommentReply extends Base
 {
+    const DB_TABLE = 'nlsg_comment_reply';
     protected $table = 'nlsg_comment_reply';
     protected $fillable = ['comment_id','from_uid','to_uid','content','status'];
 

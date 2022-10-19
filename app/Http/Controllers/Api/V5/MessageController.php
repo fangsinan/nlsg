@@ -273,7 +273,7 @@ class MessageController extends Controller
         //获取回复列表
         $reply_list=CommentReply::query()
             ->where('comment_id', $items['comment_id'])
-            ->whereRaw("(to_uid={$user_id} and from_uid={$send_user}) or (to_uid={$send_user} and from_uid={$user_id}) ")
+            ->whereRaw("( (to_uid={$user_id} and from_uid={$send_user}) or (to_uid={$send_user} and from_uid={$user_id}) )")
             ->where('status', 1)
             ->select('id', 'comment_id', 'from_uid', 'to_uid', 'content', 'created_at','reply_pid')
             ->with([
