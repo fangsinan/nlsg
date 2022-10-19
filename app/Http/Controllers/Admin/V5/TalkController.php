@@ -23,13 +23,13 @@ class TalkController extends ControllerBackend
         return $this->getRes((new TalkServers())->changeStatus($request->input(), $this->user));
     }
 
-    //todo 会话备注
+    //备注添加
     public function remarkCreate(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->remarkCreate($request->input(), $this->user));
     }
 
-    //todo 备注列表
+    //备注列表
     public function remarkList(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->remarkList($request->input(), $this->user));

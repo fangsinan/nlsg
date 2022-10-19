@@ -5,7 +5,10 @@ namespace App\Servers\V5;
 
 
 use App\Models\Talk;
+use App\Models\TalkList;
+use App\Models\TalkRemark;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Validator;
 
 class TalkServers
 {
@@ -17,8 +20,8 @@ class TalkServers
             ->with([
                 'userInfo:id,nickname,phone',
                 'adminInfo:id,username,user_remark',
-                'remarkList'=>function($q){
-                    $q->orderBy('id','desc')->limit(1);
+                'remarkList' => function ($q) {
+                    $q->orderBy('id', 'desc')->limit(1);
                 }
             ])
             ->select([
@@ -64,14 +67,14 @@ class TalkServers
             $query->where('is_finish', '=', $is_finish);
         }
 
-        $query->where('status','=',1);
-        $query->orderBy('is_finish')->orderBy('id','desc');
+        $query->where('status', '=', 1);
+        $query->orderBy('is_finish')->orderBy('id', 'desc');
 
         return $query->paginate($params['size'] ?? 10);
     }
 
 
-    public function changeStatus($params, $admin)
+    public function changeStatus($params, $admin): array
     {
 
         $flag = $params['flag'] ?? '';
@@ -103,23 +106,110 @@ class TalkServers
     }
 
 
-    public function remarkCreate($params, $admin)
+    public function remarkCreate($params, $admin): array
     {
+        $params['admin_id'] = $admin['id'] ?? 0;
 
-        return [__LINE__];
+        $validator = Validator::make($params,
+            [
+                'talk_id'  => 'bail|required|exists:nlsg_talk,id',
+                'content'  => 'bail|required|string|max:200',
+                'admin_id' => 'bail|required|exists:nlsg_backend_user,id',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        $res = TalkRemark::query()->create($params);
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败'];
     }
 
     public function remarkList($params, $admin)
     {
+        $validator = Validator::make($params,
+            [
+                'talk_id' => 'bail|required|exists:nlsg_talk,id',
+            ]
+        );
 
-        return [__LINE__];
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        return TalkRemark::query()
+            ->where('talk_id', '=', $params['talk_id'])
+            ->orderBy('id', 'desc')
+            ->select(['id', 'created_at', 'content', 'admin_id'])
+            ->with([
+                'adminInfo:id,username,user_remark'
+            ])
+            ->paginate($params['size'] ?? 10);
     }
 
 
     public function talkList($params, $admin)
     {
+        $user_id = $params['user_id'] ?? 0;
+        if (!$user_id) {
+            return ['code' => false, 'msg' => '用户id错误'];
+        }
+        //如果传了talk_id,则返回本次会话内容.否则从开始返回
+        $page = 1;
+        $size = $params['size'] ?? 10;
 
-        return [__LINE__];
+        $talk_id = $params['talk_id'] ?? 0;
+        if ($talk_id) {
+            $check_talk_id = Talk::query()
+                ->where('id', '=', $talk_id)
+                ->where('status', '=', 1)
+                ->first();
+            if ($check_talk_id) {
+                $begin_id = TalkList::query()
+                    ->where('talk_id', '=', $talk_id)
+                    ->value('id');
+
+                $before_begin_count = TalkList::query()
+                    ->where('user_id', '=', $user_id)
+                    ->where('id', '<', $begin_id)
+                    ->count();
+
+                if ($before_begin_count > 0 && $before_begin_count <= $size) {
+                    $page = 1;
+                } elseif ($before_begin_count > $size) {
+                    $page = ceil($before_begin_count / $size);
+                }
+            }
+        }
+
+        $query = TalkList::query()
+            ->with([
+                'userInfo:id,phone,nickname,headimg',
+                'adminInfo:id,username,user_remark',
+                'talkInfo:id'
+            ])
+            ->limit($size)
+            ->offset(($page - 1) * $size);
+
+        $query->whereHas('talkInfo', function ($q) {
+            $q->where('status', '=', 1);
+        });
+
+        $query->select([
+            'id', 'talk_id', 'type', 'user_id', 'admin_id', 'content', 'created_at', 'status',
+        ]);
+
+        return [
+            'page' => $page,
+            'size' => $size,
+            'data' => $query->get(),
+        ];
+
     }
 
 
