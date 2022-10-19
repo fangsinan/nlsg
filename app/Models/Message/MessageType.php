@@ -5,8 +5,10 @@ namespace App\Models\Message;
 
 
 use App\Models\Base;
+use App\Models\Column;
 use App\Models\Coupon;
 use App\Models\PayRecordDetail;
+use App\Models\Works;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MessageType extends Base
@@ -100,25 +102,38 @@ class MessageType extends Base
         // 收益通知   组装json
         if($messageType['pid'] == 12){
             $time = date("Y-m-d H:i:s");
-            $message = "";
             switch ($action_const){
                 case "LIVE_PROFIT_REWARD":
                     if(empty($relation_data['action_id'])) return[];
                     // 查询收益金额
                     $price = PayRecordDetail::where("id",$relation_data['action_id'])->value('price');
                     $message = ['content'=>'恭喜你,刚刚获得了一笔收益奖励','source'=>'邀请好友-直播','type'=>'现金奖励','amount'=>$price,'time'=>$time];
+                    $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
                     break;
                 case "COUPON_PROFIT_REWARD":
                     if(empty($relation_data['action_id'])) return[];
                     $price = Coupon::where("id",$relation_data['action_id'])->value('price');
                     $message = ['content'=>'恭喜你,刚刚获得了一笔收益奖励','source'=>'邀请好友','type'=>'优惠券','amount'=>$price,'time'=>$time];
+                    $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
                     break;
                 case "VIP_PROFIT_REWARD":
                     $message = ['content'=>'恭喜你,刚刚获得了一笔收益奖励','source'=>'邀请好友','type'=>'360会员邀请','amount'=>'108.00','time'=>$time];
+                    $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
+                    break;
+
+                case "WEEK_REWARD":
+                    // 周奖励
+                    $column = Column::where("id",$relation_data['week_column_id']??0)->value("name");
+                    $works = Works::where("id",$relation_data['week_works_id']??0)->value("title");
+                    $res['message'] = str_replace("{{column_title}}",$column??"",$res['message']);
+                    $res['message'] = str_replace("{{works_title}}",$works??"",$res['message']);
+
+                    break;
+                case "REGISTER":
+                    $user = Works::where("id",$relation_data['user_id']??0)->value("nickname");
+                    $res['message'] = str_replace("{{user_name}}",$user??"",$res['message']);
                     break;
             }
-
-            $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
         }
         return  $res;
 

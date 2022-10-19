@@ -568,6 +568,8 @@ class CampController extends Controller
                             "open_type"   => 3,
                             "relation_id"   => $sub_val['relation_id'],
                             "relation_info_id"   => 0,
+                            "week_column_id"   => $column_id,
+                            "week_works_id"   => $week_ids,
                         ]);
 
                     }
@@ -656,11 +658,12 @@ class CampController extends Controller
                 }
                 // 结营领取证书
                 // 每次领取奖励需要发送消息
-                Message::pushMessage(0,$user_id,"WEEK_REWARD",[
+                Message::pushMessage(0,$user_id,"END_CAMP_REWARD",[
                     "relation_type" => 142,
                     "open_type"   => 3,
                     "relation_id"   => $column_id,
                     "relation_info_id"   => 0,
+                    "week_column_id"   => $column_id,
                 ]);
                 break;
             default :
