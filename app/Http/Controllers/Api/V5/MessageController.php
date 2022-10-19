@@ -273,7 +273,7 @@ class MessageController extends Controller
         //获取回复列表
         $reply_list=CommentReply::query()
             ->where('comment_id', $items['comment_id'])
-            ->whereRaw("(to_uid={$user_id} and from_uid={$send_user}) or (to_uid={$send_user} and from_uid={$user_id}) ")
+            ->whereRaw("( (to_uid={$user_id} and from_uid={$send_user}) or (to_uid={$send_user} and from_uid={$user_id}) )")
             ->where('status', 1)
             ->select('id', 'comment_id', 'from_uid', 'to_uid', 'content', 'created_at','reply_pid')
             ->with([
@@ -357,13 +357,16 @@ class MessageController extends Controller
                 ->whereIn('id', $ids_arr)
                 ->whereIn('type', MessageType::get_follow_msg_type())
                 ->where('receive_user', $user_id)
+                ->groupBy('send_user','receive_user')
                 ->get()->toArray();
 
             $user_ids=[];
             foreach ($follow_lists as &$items) {
                 $user_ids[$items['send_user']['id']]=$items['send_user']['id'];
                 //是不是360vip
+                $items['send_user']['intro']=empty($items['send_user']['intro'])?'该用户比较懒，暂无个人简介呦~':$items['send_user']['intro'];
                 $items['send_user']['is_vip']=VipUser::newVipInfo( $items['send_user']['id']??0)['vip_id'] ?1:0;
+
                 $items['created_at'] = History::DateTime($items['created_at']);
 
                 $is_follow_me=UserFollow::IsFollow( $items['send_user']['id'],$user_id);

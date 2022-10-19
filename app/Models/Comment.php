@@ -8,6 +8,7 @@ use EasyWeChat\Kernel\Messages\ShortVideo;
 
 class Comment extends Base
 {
+    const DB_TABLE = 'nlsg_comment';
     protected $table = 'nlsg_comment';
     protected $fillable = ['user_id', 'pid', 'relation_id', 'content', 'type', 'status', 'info_id'];
 
@@ -66,7 +67,7 @@ class Comment extends Base
                 return $query->where('user_id', $res['user_id']);
             })
 //            ->orderBy($order, 'desc')
-            ->orderBy('is_top', 'desc')            
+            ->orderBy('is_top', 'desc')
             ->orderBy('reply_num', 'desc')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
