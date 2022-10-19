@@ -363,7 +363,9 @@ class MessageController extends Controller
             foreach ($follow_lists as &$items) {
                 $user_ids[$items['send_user']['id']]=$items['send_user']['id'];
                 //是不是360vip
+                $items['send_user']['intro']=empty($items['send_user']['intro'])?'该用户比较懒，暂无个人简介呦~':$items['send_user']['intro'];
                 $items['send_user']['is_vip']=VipUser::newVipInfo( $items['send_user']['id']??0)['vip_id'] ?1:0;
+
                 $items['created_at'] = History::DateTime($items['created_at']);
 
                 $is_follow_me=UserFollow::IsFollow( $items['send_user']['id'],$user_id);
