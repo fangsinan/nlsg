@@ -11,22 +11,28 @@ use Illuminate\Http\Request;
 
 class TalkController extends ControllerBackend
 {
-    //todo 会话列表
+    //会话列表
     public function list(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->list($request->input(), $this->user));
     }
 
-    //todo 会话状态修改
+    //会话状态修改
     public function changeStatus(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->changeStatus($request->input(), $this->user));
     }
 
     //todo 会话备注
-    public function remark(Request $request): JsonResponse
+    public function remarkCreate(Request $request): JsonResponse
     {
-        return $this->getRes((new TalkServers())->remark($request->input(), $this->user));
+        return $this->getRes((new TalkServers())->remarkCreate($request->input(), $this->user));
+    }
+
+    //todo 备注列表
+    public function remarkList(Request $request): JsonResponse
+    {
+        return $this->getRes((new TalkServers())->remarkList($request->input(), $this->user));
     }
 
     //todo 聊天信息列表
@@ -47,11 +53,13 @@ class TalkController extends ControllerBackend
     {
         return $this->getRes((new TalkServers())->templateList($request->input(), $this->user));
     }
+
     //todo 添加快捷回复
     public function templateListCreate(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->templateListCreate($request->input(), $this->user));
     }
+
     //todo 快捷回复状态修改
     public function templateListChangeStatus(Request $request): JsonResponse
     {

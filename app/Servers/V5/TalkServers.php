@@ -17,6 +17,9 @@ class TalkServers
             ->with([
                 'userInfo:id,nickname,phone',
                 'adminInfo:id,username,user_remark',
+                'remarkList'=>function($q){
+                    $q->orderBy('id','desc')->limit(1);
+                }
             ])
             ->select([
                 'id', 'user_id', 'created_at', 'is_finish', 'finish_at', 'finish_admin_id'
@@ -71,11 +74,42 @@ class TalkServers
     public function changeStatus($params, $admin)
     {
 
-        return [__LINE__];
+        $flag = $params['flag'] ?? '';
+        $id   = $params['id'] ?? '';
+        if (is_string($id)) {
+            $id = explode(',', $id);
+            $id = array_filter($id);
+        }
+
+        if (empty($id)) {
+            return ['code' => false, 'msg' => 'id不能为空'];
+        }
+
+        if (!in_array($flag, ['del'])) {
+            return ['code' => false, 'msg' => '操作类型错误'];
+        }
+
+        $res = Talk::query()
+            ->whereIn('id', $id)
+            ->update([
+                'status' => 2,
+            ]);
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败,请重试.'];
     }
 
 
-    public function remark($params, $admin)
+    public function remarkCreate($params, $admin)
+    {
+
+        return [__LINE__];
+    }
+
+    public function remarkList($params, $admin)
     {
 
         return [__LINE__];

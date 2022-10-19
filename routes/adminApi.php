@@ -443,7 +443,8 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
 
         Route::post('talk/list','TalkController@list');
         Route::post('talk/change_status','TalkController@changeStatus');
-        Route::post('talk/remark','TalkController@remark');
+        Route::post('talk/remark_create','TalkController@remarkCreate');
+        Route::post('talk/remark_list','TalkController@remarkList');
         Route::post('talk/talk_list','TalkController@talkList');
         Route::post('talk/finish','TalkController@finish');
         Route::post('talk/template_list','TalkController@templateList');
