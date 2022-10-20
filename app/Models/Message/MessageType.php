@@ -130,6 +130,14 @@ class MessageType extends Base
                     $res['message'] = str_replace("{{works_title}}",$works??"",$res['message']);
 
                     break;
+
+
+                case "END_CAMP_REWARD":
+                    // 结营奖励
+                    $column = Column::where("id",$relation_data['week_column_id']??0)->value("name");
+                    $res['message'] = str_replace("{{column_title}}",$column??"",$res['message']);
+
+                    break;
                 case "REGISTER":
                     $user = User::where("id",$relation_data['user_id']??0)->value("nickname");
                     $res['message'] = str_replace("{{user_name}}",$user??"",$res['message']);
