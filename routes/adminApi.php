@@ -454,6 +454,11 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('talk/template_list_change_status','TalkController@templateListChangeStatus');
 
         //***********帮助留言与反馈部分结束***********
+
+
+        Route::post('sub_check/relation_type_list', 'SubCheckController@relationTypeList');
+        Route::post('sub_check/relation_info_list', 'SubCheckController@relationInfoList');
+        Route::post('sub_check/to_check', 'SubCheckController@toCheck');
     });
 
 
