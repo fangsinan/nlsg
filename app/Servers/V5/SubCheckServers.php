@@ -60,7 +60,7 @@ class SubCheckServers
             return ['code' => false, 'msg' => '参数错误'.__LINE__];
         }
 
-        $phone_list = array_chunk($phone_list,2);
+        $phone_list = array_chunk($phone_list,100);
         //2作品 3直播  6讲座  7训练营
         $not_sub_list = [];
 
