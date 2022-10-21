@@ -5,6 +5,7 @@ namespace App\Servers\V5;
 
 
 use App\Models\Subscribe;
+use App\Models\User;
 use App\Servers\MsgConsoleServers;
 
 class SubCheckServers
@@ -116,5 +117,30 @@ class SubCheckServers
 
     }
 
+    public function toCheckByPhone($params){
+        $phone = $params['phone'] ?? 0;
+        if (!$phone){
+            return ['code'=>false,'msg'=>'账号不能为空'];
+        }
+        $user_id = User::query()->where('phone','=',$phone)->first();
+        if (!$user_id){
+            return ['code'=>false,'msg'=>'账号错误'];
+        }
+
+        //1专栏  2作品 3直播 5线下产品  6讲座  7训练营
+        $query = Subscribe::query()
+            ->where('user_id','=',$user_id->id)
+            ->where('status','=',1)
+            ->where('is_del','=',0);
+
+
+
+        $query->select([
+            'id','type','user_id','relation_id','order_id','start_time','end_time','give','created_at',
+        ]);
+        return $query->get();
+
+
+    }
 
 }
