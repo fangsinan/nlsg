@@ -516,8 +516,8 @@ class MessageController extends Controller
      */
     public function msg_work_new_list(Request $request)
     {
-//        $user_id = $this->user['id'];
-        $user_id=425218;
+        $user_id = $this->user['id'];
+//        $user_id=425218;
         if(empty($user_id)){
             return $this->error(0, '请登录');
         }
