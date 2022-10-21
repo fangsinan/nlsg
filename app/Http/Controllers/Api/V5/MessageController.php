@@ -516,8 +516,8 @@ class MessageController extends Controller
      */
     public function msg_work_new_list(Request $request)
     {
-//        $user_id = $this->user['id'];
-        $user_id=425218;
+        $user_id = $this->user['id'];
+//        $user_id=425218;
         if(empty($user_id)){
             return $this->error(0, '请登录');
         }
@@ -530,6 +530,7 @@ class MessageController extends Controller
             ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
             ->with([
                 'message:id,type,title,message,action_id,relation_type,relation_id,relation_info_id,open_type,url',
+//                'message.relationTypeInfo:id,title,group_name,group_id'
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
@@ -539,6 +540,7 @@ class MessageController extends Controller
         foreach ($lists['data'] as &$items) {
 
             if(in_array($items['type'],[5])) {
+
                 //课程
                 $works = Works::query()->where('id',  $items['message']['relation_id'])
                     ->select(['id', 'title', 'detail_img as cover_img'])->first();
