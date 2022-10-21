@@ -68,7 +68,7 @@ class MessageServers
         }elseif(in_array($Comment->type,[3,4])){
             //获取听书、精品课
             $works = Works::query()->where('id', $Comment->relation_id)
-                ->select(['id', 'title','subtitle', 'cover_img as cover_pic'])->first();
+                ->select(['id', 'title','subtitle', 'detail_img as cover_pic'])->first();
             $items['content'] = $works;
         }
 
