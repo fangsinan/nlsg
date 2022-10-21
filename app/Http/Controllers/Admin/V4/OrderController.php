@@ -86,11 +86,11 @@ class OrderController extends ControllerBackend
             ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
-            ->when($nickname, function ($query) use ($nickname) {
-                $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%' . $nickname . '%');
-                });
-            })
+//            ->when($nickname, function ($query) use ($nickname) {
+//                $query->whereHas('user', function ($query) use ($nickname) {
+//                    $query->where('nickname', 'like', '%' . $nickname . '%');
+//                });
+//            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
                     $query->where('phone', '=', $phone);
@@ -119,11 +119,11 @@ class OrderController extends ControllerBackend
                 $q->where('is_test_pay', '=', 0);
             });
 
-        if (!empty($teacher_name)){
-            $query->whereHas('works.user',function($q)use($teacher_name){
-                $q->where('nickname','like',"%$teacher_name%");
-            });
-        }
+//        if (!empty($teacher_name)){
+//            $query->whereHas('works.user',function($q)use($teacher_name){
+//                $q->where('nickname','like',"%$teacher_name%");
+//            });
+//        }
 
         if (!empty($twitter_phone)){
             $twitter_id = User::query()
@@ -444,11 +444,11 @@ class OrderController extends ControllerBackend
             ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
-            ->when($nickname, function ($query) use ($nickname) {
-                $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%' . $nickname . '%');
-                });
-            })
+//            ->when($nickname, function ($query) use ($nickname) {
+//                $query->whereHas('user', function ($query) use ($nickname) {
+//                    $query->where('nickname', 'like', '%' . $nickname . '%');
+//                });
+//            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
                     $query->where('phone', '=',  $phone);
@@ -476,11 +476,11 @@ class OrderController extends ControllerBackend
                 $q->where('is_test_pay', '=', 0);
             });
 
-        if (!empty($teacher_name)){
-            $query->whereHas('column.user',function($q)use($teacher_name){
-                $q->where('nickname','like',"%$teacher_name%");
-            });
-        }
+//        if (!empty($teacher_name)){
+//            $query->whereHas('column.user',function($q)use($teacher_name){
+//                $q->where('nickname','like',"%$teacher_name%");
+//            });
+//        }
 
         if (!empty($twitter_phone)){
             $twitter_id = User::query()
@@ -734,11 +734,11 @@ class OrderController extends ControllerBackend
             ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
-            ->when($nickname, function ($query) use ($nickname) {
-                $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%' . $nickname . '%');
-                });
-            })
+//            ->when($nickname, function ($query) use ($nickname) {
+//                $query->whereHas('user', function ($query) use ($nickname) {
+//                    $query->where('nickname', 'like', '%' . $nickname . '%');
+//                });
+//            })
             ->when(!is_null($level), function ($query) use ($level) {
                 $query->whereHas('user', function ($query) use ($level) {
                     $query->where('level', $level);
@@ -861,11 +861,11 @@ class OrderController extends ControllerBackend
             ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
-            ->when($nickname, function ($query) use ($nickname) {
-                $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%' . $nickname . '%');
-                });
-            })
+//            ->when($nickname, function ($query) use ($nickname) {
+//                $query->whereHas('user', function ($query) use ($nickname) {
+//                    $query->where('nickname', 'like', '%' . $nickname . '%');
+//                });
+//            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
                     $query->where('phone', 'like', '%' . $phone . '%');
@@ -977,11 +977,11 @@ class OrderController extends ControllerBackend
             ->when(!is_null($reward_type), function ($query) use ($reward_type) {
                 $query->where('reward_type', $reward_type);
             })
-            ->when($nickname, function ($query) use ($nickname) {
-                $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%' . $nickname . '%');
-                });
-            })
+//            ->when($nickname, function ($query) use ($nickname) {
+//                $query->whereHas('user', function ($query) use ($nickname) {
+//                    $query->where('nickname', 'like', '%' . $nickname . '%');
+//                });
+//            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
                     $query->where('phone', 'like', '%' . $phone . '%');
@@ -1096,11 +1096,11 @@ class OrderController extends ControllerBackend
             ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
-            ->when($nickname, function ($query) use ($nickname) {
-                $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%' . $nickname . '%');
-                });
-            })
+//            ->when($nickname, function ($query) use ($nickname) {
+//                $query->whereHas('user', function ($query) use ($nickname) {
+//                    $query->where('nickname', 'like', '%' . $nickname . '%');
+//                });
+//            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
                     $query->where('phone', 'like', '%' . $phone . '%');

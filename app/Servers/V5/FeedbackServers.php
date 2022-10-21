@@ -43,11 +43,11 @@ class FeedbackServers
             $query->where('id', '=', $id);
         }
 
-        if ($nickname) {
-            $query->whereHas('UserInfo', function ($q) use ($nickname) {
-                $q->where('nickname', 'like', "%$nickname%");
-            });
-        }
+//        if ($nickname) {
+//            $query->whereHas('UserInfo', function ($q) use ($nickname) {
+//                $q->where('nickname', 'like', "%$nickname%");
+//            });
+//        }
 
         if ($phone) {
             $query->whereHas('UserInfo', function ($q) use ($phone) {

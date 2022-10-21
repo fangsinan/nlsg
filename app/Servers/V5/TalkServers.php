@@ -39,11 +39,11 @@ class TalkServers
         $finish_end    = $params['finish_end'] ?? '';
         $is_finish     = $params['is_finish'] ?? 0;
 
-        if ($nickname) {
-            $query->whereHas('userInfo', function ($q) use ($nickname) {
-                $q->where('nickname', 'like', '%' . $nickname . '%');
-            });
-        }
+//        if ($nickname) {
+//            $query->whereHas('userInfo', function ($q) use ($nickname) {
+//                $q->where('nickname', 'like', '%' . $nickname . '%');
+//            });
+//        }
 
         if ($phone) {
             $query->whereHas('userInfo', function ($q) use ($phone) {
@@ -384,11 +384,11 @@ class TalkServers
             ->with([
                 'userInfo:id,nickname,phone'
             ])
-            ->when($params['nickname'] ?? '', function ($q) use ($params) {
-                $q->wherehas('userInfo', function ($q) use ($params) {
-                    $q->where('nickname', 'like', '%' . $params['nickname'] . '%');
-                });
-            })
+//            ->when($params['nickname'] ?? '', function ($q) use ($params) {
+//                $q->wherehas('userInfo', function ($q) use ($params) {
+//                    $q->where('nickname', 'like', '%' . $params['nickname'] . '%');
+//                });
+//            })
             ->when($params['phone'] ?? '', function ($q) use ($params) {
                 $q->wherehas('userInfo', function ($q) use ($params) {
                     $q->where('phone', 'like', '%' . $params['phone'] . '%');

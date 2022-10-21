@@ -16,9 +16,9 @@ class TeacherServers
             ->where('id', '>', 1)
             ->where('is_test_pay', '=', 0)
             ->where('is_author', '=', 1)
-            ->when($nickname, function ($q) use ($nickname) {
-                $q->where('nickname', 'like', "$nickname");
-            })
+//            ->when($nickname, function ($q) use ($nickname) {
+//                $q->where('nickname', 'like', "$nickname");
+//            })
             ->select([
                 'id', 'phone', 'nickname', 'headimg', 'status', 'honor', 'intro'
             ])
