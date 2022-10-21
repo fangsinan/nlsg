@@ -116,7 +116,8 @@ class IndexController extends ControllerBackend
             $subscribeNum = Subscribe::where('type', 3)
                 ->where('status', 1)
                 ->count();
-            $watchNum = LiveLogin::distinct('user_id')->count();
+//            $watchNum = LiveLogin::distinct('user_id')->count();
+            $watchNum = 0;
             $orderNum = Order::whereIn('type', $type)
                 ->where('status', 1)
                 ->count();

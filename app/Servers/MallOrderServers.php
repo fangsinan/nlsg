@@ -334,11 +334,11 @@ class MallOrderServers
                 $query->where('phone', 'like', '%' . $params['phone'] . '%');
             });
         }
-        if (!empty($params['nickname'])) {
-            $query->whereHas('userInfo', function (Builder $query) use ($params) {
-                $query->where('nickname', 'like', '%' . $params['nickname'] . '%');
-            });
-        }
+//        if (!empty($params['nickname'])) {
+//            $query->whereHas('userInfo', function (Builder $query) use ($params) {
+//                $query->where('nickname', 'like', '%' . $params['nickname'] . '%');
+//            });
+//        }
 
         //商品名称
         if (!empty($params['goods_name'])) {
@@ -474,11 +474,11 @@ class MallOrderServers
             });
         }
 
-        if (!empty($params['nickname'])) {
-            $query->whereHas('userInfo', function (Builder $query) use ($params) {
-                $query->where('nickname', 'like', '%' . $params['nickname'] . '%');
-            });
-        }
+//        if (!empty($params['nickname'])) {
+//            $query->whereHas('userInfo', function (Builder $query) use ($params) {
+//                $query->where('nickname', 'like', '%' . $params['nickname'] . '%');
+//            });
+//        }
 
         //商品名称
         if (!empty($params['goods_name'])) {

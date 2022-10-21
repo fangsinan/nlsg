@@ -51,4 +51,9 @@ class Talk extends Base
         return $this->hasMany(TalkRemark::class,'talk_id','id');
     }
 
+    public function talkList(): HasMany
+    {
+        return $this->hasMany(TalkList::class,'talk_id','id');
+    }
+
 }

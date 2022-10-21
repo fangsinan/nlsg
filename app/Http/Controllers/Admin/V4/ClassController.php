@@ -69,11 +69,11 @@ class ClassController extends ControllerBackend
             ->when($title, function ($query) use ($title) {
                 $query->where('name', 'like', '%'.$title.'%');
             })
-            ->when($nickname, function ($query) use ($nickname) {
-                $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%'.$nickname.'%');
-                });
-            })
+//            ->when($nickname, function ($query) use ($nickname) {
+//                $query->whereHas('user', function ($query) use ($nickname) {
+//                    $query->where('nickname', 'like', '%'.$nickname.'%');
+//                });
+//            })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
                     Carbon::parse($start)->startOfDay()->toDateTimeString(),
@@ -139,11 +139,11 @@ class ClassController extends ControllerBackend
             ->when($title, function ($query) use ($title) {
                 $query->where('name', 'like', '%'.$title.'%');
             })
-            ->when($nickname, function ($query) use ($nickname) {
-                $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%'.$nickname.'%');
-                });
-            })
+//            ->when($nickname, function ($query) use ($nickname) {
+//                $query->whereHas('user', function ($query) use ($nickname) {
+//                    $query->where('nickname', 'like', '%'.$nickname.'%');
+//                });
+//            })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
                     Carbon::parse($start)->startOfDay()->toDateTimeString(),
@@ -234,11 +234,11 @@ class ClassController extends ControllerBackend
             ->when($title, function ($query) use ($title) {
                 $query->where('title', 'like', '%'.$title.'%');
             })
-            ->when($nickname, function ($query) use ($nickname) {
-                $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%'.$nickname.'%');
-                });
-            })
+//            ->when($nickname, function ($query) use ($nickname) {
+//                $query->whereHas('user', function ($query) use ($nickname) {
+//                    $query->where('nickname', 'like', '%'.$nickname.'%');
+//                });
+//            })
             ->when($category_id, function ($query) use ($category_id) {
                 $query->whereHas('categoryRelation', function ($query) use ($category_id) {
                     $query->where('category_id', $category_id);
@@ -331,11 +331,11 @@ class ClassController extends ControllerBackend
             ->when($title, function ($query) use ($title) {
                 $query->where('title', 'like', '%'.$title.'%');
             })
-            ->when($nickname, function ($query) use ($nickname) {
-                $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%'.$nickname.'%');
-                });
-            })
+//            ->when($nickname, function ($query) use ($nickname) {
+//                $query->whereHas('user', function ($query) use ($nickname) {
+//                    $query->where('nickname', 'like', '%'.$nickname.'%');
+//                });
+//            })
             ->when($category_id, function ($query) use ($category_id) {
                 $query->whereHas('categoryRelation', function ($query) use ($category_id) {
                     $query->where('category_id', $category_id);
@@ -1543,11 +1543,11 @@ class ClassController extends ControllerBackend
             ->when($title, function ($query) use ($title) {
                 $query->where('name', 'like', '%'.$title.'%');
             })
-            ->when($nickname, function ($query) use ($nickname) {
-                $query->whereHas('user', function ($query) use ($nickname) {
-                    $query->where('nickname', 'like', '%'.$nickname.'%');
-                });
-            })
+//            ->when($nickname, function ($query) use ($nickname) {
+//                $query->whereHas('user', function ($query) use ($nickname) {
+//                    $query->where('nickname', 'like', '%'.$nickname.'%');
+//                });
+//            })
             ->when($start && $end, function ($query) use ($start, $end) {
                 $query->whereBetween('created_at', [
                     Carbon::parse($start)->startOfDay()->toDateTimeString(),

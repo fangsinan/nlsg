@@ -656,6 +656,21 @@ class MsgConsoleServers
             ->get();
     }
 
+    public function getLiveListByDate($date = ''){
+        $query = Live::query()
+            ->where('status','=',4)
+            ->where('is_del','=',0);
+
+        if (empty($date)){
+            $query->where('begin_at','>=',date('Y-m-d 00:00:00',strtotime('-2 month')));
+        }else{
+            $query->where('begin_at','>=',$date);
+        }
+
+        return $query->select(['id as relation_id','title'])->get();
+
+    }
+
     public function getCampList()
     {
         return Column::query()

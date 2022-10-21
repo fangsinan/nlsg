@@ -20,7 +20,7 @@ class UserController extends ControllerBackend
     public function index(Request $request)
     {
         $phone = $request->get('phone');
-        $nickname = $request->get('nickname');
+//        $nickname = $request->get('nickname');
         $sex = $request->get('sex');
         $level = $request->get('level');
         $is_author = $request->get('is_author');
@@ -29,9 +29,9 @@ class UserController extends ControllerBackend
         $query = User::when($phone, function ($query) use ($phone) {
                 $query->where('phone', 'like', '%' . $phone . '%');
             })
-            ->when($nickname, function ($query) use ($nickname) {
-               $query->where('nickname', 'like', '%' . $nickname . '%');
-            })
+//            ->when($nickname, function ($query) use ($nickname) {
+//               $query->where('nickname', 'like', '%' . $nickname . '%');
+//            })
             ->when(! is_null($sex), function ($query) use ($sex) {
                 $query->where('sex', $sex);
             })

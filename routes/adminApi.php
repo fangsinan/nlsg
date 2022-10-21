@@ -446,12 +446,19 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('talk/remark_create','TalkController@remarkCreate');
         Route::post('talk/remark_list','TalkController@remarkList');
         Route::post('talk/talk_list','TalkController@talkList');
+        Route::post('talk/talk_list_create','TalkController@talkListCreate');
         Route::post('talk/finish','TalkController@finish');
+        Route::post('talk/talk_user_list','TalkController@talkUserList');
         Route::post('talk/template_list','TalkController@templateList');
         Route::post('talk/template_list_create','TalkController@templateListCreate');
         Route::post('talk/template_list_change_status','TalkController@templateListChangeStatus');
 
         //***********帮助留言与反馈部分结束***********
+
+
+        Route::post('sub_check/relation_type_list', 'SubCheckController@relationTypeList');
+        Route::post('sub_check/relation_info_list', 'SubCheckController@relationInfoList');
+        Route::post('sub_check/to_check', 'SubCheckController@toCheck');
     });
 
 

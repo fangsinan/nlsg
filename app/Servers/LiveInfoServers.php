@@ -1004,17 +1004,17 @@ GROUP BY
 
         //搜索
         //用户昵称,手机 推荐人手机,昵称,flag
-        if (!empty($params['nickname'] ?? '')) {
-            $query->where('u.nickname', 'like', '%' . $params['nickname'] . '%');
-        }
+//        if (!empty($params['nickname'] ?? '')) {
+//            $query->where('u.nickname', 'like', '%' . $params['nickname'] . '%');
+//        }
 
         if (!empty($params['phone'] ?? '')) {
             $query->where('u.phone', 'like', '%' . $params['phone'] . '%');
         }
 
-        if (!empty($params['t_nickname'] ?? '')) {
-            $query->where('lt.nickname', 'like', '%' . $params['t_nickname'] . '%');
-        }
+//        if (!empty($params['t_nickname'] ?? '')) {
+//            $query->where('lt.nickname', 'like', '%' . $params['t_nickname'] . '%');
+//        }
 
         if (!empty($params['t_phone'] ?? '')) {
             $query->where('lt.phone', 'like', '%' . $params['t_phone'] . '%');
