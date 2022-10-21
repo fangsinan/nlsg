@@ -459,6 +459,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('sub_check/relation_type_list', 'SubCheckController@relationTypeList');
         Route::post('sub_check/relation_info_list', 'SubCheckController@relationInfoList');
         Route::post('sub_check/to_check', 'SubCheckController@toCheck');
+        Route::post('sub_check/to_check_by_phone', 'SubCheckController@toCheckByPhone');
     });
 
 

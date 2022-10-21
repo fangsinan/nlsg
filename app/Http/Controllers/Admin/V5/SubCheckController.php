@@ -27,4 +27,9 @@ class SubCheckController extends ControllerBackend
         return $this->getRes((new SubCheckServers())->toCheck($request->input()));
     }
 
+    public function toCheckByPhone(Request $request): JsonResponse
+    {
+        return $this->getRes((new SubCheckServers())->toCheckByPhone($request->input()));
+    }
+
 }
