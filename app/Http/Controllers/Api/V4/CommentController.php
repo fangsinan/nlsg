@@ -218,6 +218,7 @@ class CommentController extends Controller
                 case  5:
                     Wiki::where('id', $input['id'])->increment('comment_num');
                     break;
+                case  2:
                 case  6:
                     Column::where('id', $input['id'])->increment('comment_num');
                     $user_id = Column::where('id', $input['id'])->value('user_id');
