@@ -516,8 +516,8 @@ class MessageController extends Controller
      */
     public function msg_work_new_list(Request $request)
     {
-        $user_id = $this->user['id'];
-//        $user_id=425218;
+//        $user_id = $this->user['id'];
+        $user_id=425218;
         if(empty($user_id)){
             return $this->error(0, '请登录');
         }
@@ -538,10 +538,17 @@ class MessageController extends Controller
 
         foreach ($lists['data'] as &$items) {
 
-            if(in_array($items['type'],[5,6])){
+            if(in_array($items['type'],[5])) {
+                //课程
                 $works = Works::query()->where('id',  $items['message']['relation_id'])
                     ->select(['id', 'title', 'detail_img as cover_img'])->first();
                 $items['message']['cover_pic'] = $works->cover_img??'';//封面
+
+            }elseif(in_array($items['type'],[6])){
+
+                //大咖讲书
+                $items['message']['cover_pic'] ='live/banner.jpg';//封面
+
             }else{
 
                 //获取训练营、专栏、讲座
