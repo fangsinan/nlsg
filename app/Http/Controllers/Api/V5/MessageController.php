@@ -709,6 +709,10 @@ class MessageController extends Controller
      */
     public function get_message_info(Request $request){
         $message_id =$request->query('message_id');
+        $id =$request->query('id');
+        if(!$message_id){
+            $message_id=$id;
+        }
         if(empty($message_id)){
             return $this->error(0, '参数错误');
         }
