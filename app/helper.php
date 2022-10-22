@@ -319,13 +319,21 @@ function dd_db_log(){
 
 function  WorkNewDateTime($param_time = '')
 {
+
     $ptime = strtotime($param_time);
+    $year=date('Y');
+    $pyear=date('Y',$ptime);
+    //跨年
+    if($year !=$pyear){
+        return   date('Y年m月d日 ',$ptime);
+    }
+
     $today=strtotime(date("Y-m-d"));
     $yesterday=$today-86400;
 
     if($ptime > $today){  // 防止提前请求
         return '今日';
-    }elseif ($ptime <=$today && $today>$yesterday){
+    }elseif ($ptime <=$today && $ptime>$yesterday){
         return '昨日';
     }
 

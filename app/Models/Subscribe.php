@@ -355,4 +355,21 @@ class Subscribe extends Base
     public function historyInfo(){
         return $this->hasOne(History::class,'user_id','user_id');
     }
+
+    //关联信息
+    public function subWorksInfo(){
+        return $this->hasOne(Works::class,'id','relation_id');
+    }
+
+    public function subColumnInfo(){
+        return $this->hasOne(Column::class,'id','relation_id');
+    }
+
+    public function subOfflineInfo(){
+        return $this->hasOne(OfflineProducts::class,'id','relation_id');
+    }
+
+    public function subLiveInfo(){
+        return $this->hasOne(Live::class,'id','relation_id');
+    }
 }

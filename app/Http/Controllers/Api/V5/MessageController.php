@@ -556,7 +556,7 @@ class MessageController extends Controller
                 //获取训练营、专栏、讲座
                 $Column = Column::query()->where('id',$items['message']['relation_id'])
                     ->select(['id','title', 'cover_pic', 'details_pic'])->first();
-                $items['message']['cover_pic'] = $Column->cover_pic??'';//封面
+                $items['message']['cover_pic'] = $Column->details_pic??'';//封面
 
             }
 
