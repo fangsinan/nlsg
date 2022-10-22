@@ -321,6 +321,13 @@ function  WorkNewDateTime($param_time = '')
 {
 
     $ptime = strtotime($param_time);
+    $year=date('Y');
+    $pyear=date('Y',$ptime);
+    //跨年
+    if($year !=$pyear){
+        return   date('Y年m月d日 ',$ptime);
+    }
+
     $today=strtotime(date("Y-m-d"));
     $yesterday=$today-86400;
 
