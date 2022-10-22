@@ -62,7 +62,7 @@ class MessageServers
 
             //获取训练营、专栏、讲座
             $Column = Column::query()->where('id', $Comment->relation_id)
-                ->select(['id','title','subtitle', 'cover_pic'])->first();
+                ->select(['id','title','subtitle', 'details_pic as cover_pic'])->first();
             $items['content'] = $Column;
 
         }elseif(in_array($Comment->type,[3,4])){
