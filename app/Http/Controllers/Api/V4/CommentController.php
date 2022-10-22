@@ -213,12 +213,15 @@ class CommentController extends Controller
             switch ($input['type']){
                 case  4:
                     Works::where('id', $input['id'])->increment('comment_num');
+                    $user_id = Works::where('id', $input['id'])->value('user_id');
                     break;
                 case  5:
                     Wiki::where('id', $input['id'])->increment('comment_num');
                     break;
+                case  2:
                 case  6:
                     Column::where('id', $input['id'])->increment('comment_num');
+                    $user_id = Column::where('id', $input['id'])->value('user_id');
                     break;
                 case  7:
                     ShortVideoModel::where('id', $input['id'])->increment('comment_num');

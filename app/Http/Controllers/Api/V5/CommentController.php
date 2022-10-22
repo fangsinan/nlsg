@@ -119,13 +119,14 @@ class CommentController extends Controller
                 case  5:
                     Wiki::where('id', $input['id'])->increment('comment_num');
                     break;
+                case  2:
                 case  6:
                     Column::where('id', $input['id'])->increment('comment_num');
                     $user_id = Column::where('id', $input['id'])->value('user_id');
                     break;
                 case  7:
                     ShortVideoModel::where('id', $input['id'])->increment('comment_num');
-                    $user_id = ShortVideoModel::where('id', $input['id'])->value('user_id');
+                    // $user_id = ShortVideoModel::where('id', $input['id'])->value('user_id');
                     break;
             }
             if ( ! empty($img)) {
