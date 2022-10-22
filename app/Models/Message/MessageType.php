@@ -108,17 +108,17 @@ class MessageType extends Base
                     if(empty($relation_data['action_id'])) return[];
                     // 查询收益金额
                     $price = PayRecordDetail::where("id",$relation_data['action_id'])->value('price');
-                    $message = ['content'=>'恭喜你,刚刚获得了一笔收益奖励','source'=>'邀请好友-直播','type'=>'现金奖励','amount'=>$price,'time'=>$time];
+                    $message = ['content'=>'恭喜你,最新一笔收益已到账','source'=>'邀请好友-直播','type'=>'现金奖励','amount'=>$price,'time'=>$time];
                     $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
                     break;
                 case "COUPON_PROFIT_REWARD":
                     if(empty($relation_data['action_id'])) return[];
                     $price = Coupon::where("id",$relation_data['action_id'])->value('price');
-                    $message = ['content'=>'恭喜你,刚刚获得了一笔收益奖励','source'=>'邀请好友','type'=>'优惠券','amount'=>$price,'time'=>$time];
+                    $message = ['content'=>'恭喜你,最新一笔收益已到账','source'=>'邀请好友','type'=>'优惠券','amount'=>$price,'time'=>$time];
                     $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
                     break;
                 case "VIP_PROFIT_REWARD":
-                    $message = ['content'=>'恭喜你,刚刚获得了一笔收益奖励','source'=>'邀请好友','type'=>'360会员邀请','amount'=>'108.00','time'=>$time];
+                    $message = ['content'=>'恭喜你,最新一笔收益已到账','source'=>'邀请好友','type'=>'360会员邀请','amount'=>'108.00','time'=>$time];
                     $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
                     break;
 
