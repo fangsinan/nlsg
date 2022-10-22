@@ -319,13 +319,14 @@ function dd_db_log(){
 
 function  WorkNewDateTime($param_time = '')
 {
+
     $ptime = strtotime($param_time);
     $today=strtotime(date("Y-m-d"));
     $yesterday=$today-86400;
 
     if($ptime > $today){  // 防止提前请求
         return '今日';
-    }elseif ($ptime <=$today && $today>$yesterday){
+    }elseif ($ptime <=$today && $ptime>$yesterday){
         return '昨日';
     }
 
