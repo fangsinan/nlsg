@@ -28,7 +28,7 @@ class FeedbackServers
         $type        = $params['type'] ?? 0;
 
         $select_array = $id > 0 ? ['*'] : [
-            'id', 'type', 'user_id', 'os_type', 'created_at', 'reply_admin_id'
+            'id', 'type', 'user_id', 'os_type', 'created_at', 'reply_admin_id','content',
         ];
 
         $query = FeedbackNew::query()
