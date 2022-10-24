@@ -72,8 +72,10 @@ class LikeController extends Controller
 //            $from_user = User::where('id', $this->user['id'])->value('nickname');
             //发送通知
 //            Task::send(13, $comment->user_id, $id, 0, '',false,false, 0, $from_user, $comment->type, $comment->relation_id);
-            // 发送消息
-            Like::LikeMsg($id,$comment_type,$this->user['id'],$res->id);
+            if($type == 1) {
+                // 发送消息
+                Like::LikeMsg($id,$comment_type,$this->user['id'],$res->id);
+            }
             return success('操作成功');
         }
         return error(1000, '操作失败');
@@ -119,8 +121,10 @@ class LikeController extends Controller
         if($res){
             //减少喜欢
             Comment::where('id', $id)->decrement('like_num');
-            // 发送消息
-            Like::LikeMsg($id,$comment_type,$this->user['id'],$query_res->id??0,'UNLIKE');
+            if($type == 1) {
+                // 发送消息
+                Like::LikeMsg($id, $comment_type, $this->user['id'], $query_res->id ?? 0, 'UNLIKE');
+            }
             return success('操作成功');
         }
         return error(0,'操作失败');

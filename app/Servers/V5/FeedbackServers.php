@@ -96,6 +96,9 @@ class FeedbackServers
     {
         $flag = $params['flag'] ?? '';
         $id   = $params['id'] ?? '';
+        if (!is_array($id)){
+            $id = (string)$id;
+        }
         if (is_string($id)) {
             $id = explode(',', $id);
             $id = array_filter($id);
@@ -127,6 +130,9 @@ class FeedbackServers
     public function toReply($params, $admin): array
     {
         $id = $params['id'] ?? '';
+        if (!is_array($id)){
+            $id = (string)$id;
+        }
         if (is_string($id)) {
             $id = explode(',', $id);
             $id = array_filter($id);
@@ -246,6 +252,9 @@ class FeedbackServers
     {
         $flag = $params['flag'] ?? '';
         $id   = $params['id'] ?? '';
+        if (!is_array($id)){
+            $id = (string)$id;
+        }
         if (is_string($id)) {
             $id = explode(',', $id);
             $id = array_filter($id);
@@ -324,6 +333,9 @@ class FeedbackServers
     {
         $flag = $params['flag'] ?? '';
         $id   = $params['id'] ?? '';
+        if (!is_array($id)){
+            $id = (string)$id;
+        }
         if (is_string($id)) {
             $id = explode(',', $id);
             $id = array_filter($id);
@@ -477,6 +489,9 @@ class FeedbackServers
     {
         $flag = $params['flag'] ?? '';
         $id   = $params['id'] ?? '';
+        if (!is_array($id)){
+            $id = (string)$id;
+        }
         if (is_string($id)) {
             $id = explode(',', $id);
             $id = array_filter($id);

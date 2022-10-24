@@ -91,7 +91,7 @@ class ReplyController extends Controller
                 Column::where('id', $Video_id)->increment('comment_num');
             }
 
-            if(!empty($add_data['from_uid']) && !empty($add_data['to_uid'])){
+            if(!empty($add_data['from_uid']) && !empty($add_data['to_uid']) && in_array($c_type,[1,2,3,4,6])){
                 Message::pushMessage($add_data['from_uid'],$add_data['to_uid'],'COMMENT_REPLY',["action_id"=>$result->id,]);
             }
 

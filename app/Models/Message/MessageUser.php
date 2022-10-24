@@ -15,7 +15,7 @@ class MessageUser extends Base
 
     protected $fillable = [
         'send_user', 'receive_user', 'message_id', 'status', 'is_del', 'type','is_send',
-        'created_at', 'updated_at', 'read_at', 'del_at', 'group_id',
+        'created_at', 'updated_at', 'read_at', 'del_at', 'group_id','plan_time'
     ];
 
     public function message()
