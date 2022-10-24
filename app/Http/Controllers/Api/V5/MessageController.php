@@ -136,6 +136,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->where('is_send', 3)
             ->orderBy('id','desc')
             ->paginate()->toArray();
 
@@ -342,6 +343,7 @@ class MessageController extends Controller
             ])->groupBy(DB::raw("date_format(created_at,'%Y-%m-%d')"))
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->where('is_send', 3)
             ->orderBy('id','desc')
             ->paginate()->toArray();
 
@@ -427,6 +429,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->where('is_send', 3)
             ->orderBy('id','desc')
             ->paginate()->toArray();
 
@@ -534,6 +537,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->where('is_send', 3)
             ->orderBy('id','desc')
             ->paginate()->toArray();
 
@@ -604,6 +608,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->where('is_send', 3)
             ->orderBy('id','desc')
             ->paginate()->toArray();
 
@@ -656,6 +661,7 @@ class MessageController extends Controller
             ])
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
+            ->where('is_send', 3)
             ->orderBy('id','desc')
             ->paginate()->toArray();
 
