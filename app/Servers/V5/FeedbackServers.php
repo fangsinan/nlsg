@@ -33,7 +33,7 @@ class FeedbackServers
 
         $query = FeedbackNew::query()
             ->with([
-                'UserInfo:id,phone,nickname',
+                'UserInfo:id,phone,nickname,headimg',
                 'FeedbackType:id,name'
             ])
             ->select($select_array)
