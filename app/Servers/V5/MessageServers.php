@@ -16,7 +16,9 @@ class MessageServers
 
     static function clear_msg($user_id,$type=[]){
 
-        $query=MessageUser::query()->where('status',1)->where('receive_user', $user_id);
+        $query=MessageUser::query()->where('status',1)
+            ->where('is_send', 3)
+            ->where('receive_user', $user_id);
         if($type){
             $query->whereIn('type', $type);
         }
@@ -29,6 +31,7 @@ class MessageServers
             ->whereIn('type', $type)
             ->where('status', 1)
             ->where('is_del', 1)
+            ->where('is_send', 3)
             ->where('receive_user', $user_id)->count();
     }
 
@@ -40,6 +43,7 @@ class MessageServers
             ])
             ->whereIn('type', $type_arr)
             ->where('is_del', 1)
+            ->where('is_send', 3)
             ->where('receive_user', $user_id)->orderBy('id','desc')->first();
     }
 
