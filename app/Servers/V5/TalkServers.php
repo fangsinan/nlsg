@@ -81,6 +81,9 @@ class TalkServers
 
         $flag = $params['flag'] ?? '';
         $id   = $params['id'] ?? '';
+        if (!is_array($id)){
+            $id = (string)$id;
+        }
         if (is_string($id)) {
             $id = explode(',', $id);
             $id = array_filter($id);
