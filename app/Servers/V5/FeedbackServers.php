@@ -29,11 +29,12 @@ class FeedbackServers
 
         $select_array = $id > 0 ? ['*'] : [
             'id', 'type', 'user_id', 'os_type', 'created_at', 'reply_admin_id','content',
+            DB::raw('if(reply_admin_id>0,1,0) as is_reply')
         ];
 
         $query = FeedbackNew::query()
             ->with([
-                'UserInfo:id,phone,nickname',
+                'UserInfo:id,phone,nickname,headimg',
                 'FeedbackType:id,name'
             ])
             ->select($select_array)
