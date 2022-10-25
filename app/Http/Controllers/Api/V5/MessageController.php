@@ -530,7 +530,7 @@ class MessageController extends Controller
         MessageServers::clear_msg($user_id,$type_arr);
 
         $lists = MessageUser::query()
-            ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
+            ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at','plan_time'])
             ->with([
                 'message:id,type,title,message,action_id,relation_type,relation_id,relation_info_id,open_type,url',
 //                'message.relationTypeInfo:id,title,group_name,group_id'
@@ -542,6 +542,9 @@ class MessageController extends Controller
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
+            if($items['plan_time'] >$items['created_at']){
+                $items['created_at']=$items['plan_time'];
+            }
 
             if(in_array($items['type'],[5])) {
 
@@ -602,7 +605,7 @@ class MessageController extends Controller
         MessageServers::clear_msg($user_id,$type_arr);
 
         $lists = MessageUser::query()
-            ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at'])
+            ->select(['id', 'send_user', 'type','receive_user', 'message_id', 'status', 'created_at','plan_time'])
             ->with([
                 'message:id,type,title,message,action_id,created_at,relation_type,relation_id,relation_info_id,open_type,url',
             ])
@@ -613,6 +616,11 @@ class MessageController extends Controller
             ->paginate()->toArray();
 
         foreach ($lists['data'] as &$items) {
+
+            if($items['plan_time'] >$items['created_at']){
+                $items['created_at']=$items['plan_time'];
+            }
+
             //格式化时间
             $items['message']['created_at'] = formatDataTime($items['created_at'],2);;
             $items['created_at'] =formatDataTime($items['created_at']);
