@@ -27,9 +27,13 @@ class FeedbackServers
         $os_type     = $params['os_type'] ?? 0;
         $type        = $params['type'] ?? 0;
 
-        $select_array = $id > 0 ? ['*'] : [
-            'id', 'type', 'user_id', 'os_type', 'created_at', 'reply_admin_id','content',
-            DB::raw('if(reply_admin_id>0,1,0) as is_reply')
+//        $select_array = $id > 0 ? ['*'] : [
+//            'id', 'type', 'user_id', 'os_type', 'created_at', 'reply_admin_id','content',
+//            DB::raw('if(reply_admin_id>0,1,0) as is_reply')
+//        ];
+
+        $select_array = [
+            '*', DB::raw('if(reply_admin_id>0,1,0) as is_reply')
         ];
 
         $query = FeedbackNew::query()

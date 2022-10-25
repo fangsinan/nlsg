@@ -145,6 +145,7 @@ class SubCheckServers
         $query->select([
             'id', 'type', 'user_id', 'relation_id', 'order_id', 'start_time', 'end_time', 'give', 'created_at',
         ]);
+
         $list = $query->orderBy('id', 'desc')->get();
 
         foreach ($list as $v) {
@@ -156,27 +157,27 @@ class SubCheckServers
             switch ($v->type) {
                 case 1:
                     $v->type_name      = '专栏';
-                    $v->relation_title = $v->subColumnInfo->title;
+                    $v->relation_title = $v->subColumnInfo->title ?? '--';
                     break;
                 case 2:
                     $v->type_name      = '作品';
-                    $v->relation_title = $v->subWorksInfo->title;
+                    $v->relation_title = $v->subWorksInfo->title ?? '--';
                     break;
                 case 3:
                     $v->type_name      = '直播';
-                    $v->relation_title = $v->subLiveInfo->title;
+                    $v->relation_title = $v->subLiveInfo->title ?? '--';
                     break;
                 case 5:
                     $v->type_name      = '线下产品';
-                    $v->relation_title = $v->subOfflineInfo->title;
+                    $v->relation_title = $v->subOfflineInfo->title ?? '--';
                     break;
                 case 6:
                     $v->type_name      = '讲座';
-                    $v->relation_title = $v->subColumnInfo->title;
+                    $v->relation_title = $v->subColumnInfo->title ?? '--';
                     break;
                 case 7:
                     $v->type_name      = '训练营';
-                    $v->relation_title = $v->subColumnInfo->title;
+                    $v->relation_title = $v->subColumnInfo->title ?? '--';
                     break;
             }
             unset(
