@@ -413,7 +413,7 @@ class LiveConsoleServers
                                     $OnlineUserArr=['live_id' => $live_id, 'user_id' => $user_arr[1], 'live_son_flag'=>$user_arr[3],'online_time_str'=>$online_time_str];
                                     $OnlineUserArrData=json_encode($OnlineUserArr);
                                     $Redis->sAdd ($key_name, $OnlineUserArrData);
-                                    $Redis->sAdd ($es_key_name, $OnlineUserArrData);
+                                    $Redis->rpush($es_key_name, $OnlineUserArrData); //加入es队列等待执行
                                 }
                             }
                         }
