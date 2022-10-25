@@ -36,8 +36,9 @@ class MessageServers
     }
 
     static function get_user_new_msg($type_arr,$user_id){
-        return MessageUser::query()
-            ->select(['id', 'type', 'message_id','created_at'])
+
+        $MessageUser= MessageUser::query()
+            ->select(['id', 'type', 'message_id','created_at','plan_time'])
             ->with([
                 'message:id,type,title,message',
             ])
@@ -45,6 +46,9 @@ class MessageServers
             ->where('is_del', 1)
             ->where('is_send', 3)
             ->where('receive_user', $user_id)->orderBy('id','desc')->first();
+
+
+        return $MessageUser;
     }
 
     static function get_info_by_comment($comment_id,$items){

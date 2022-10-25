@@ -45,10 +45,11 @@ class MessageController extends Controller
     public function msg_type_list(Request $request)
     {
         $user_id = $this->user['id'];
+//                $user_id = 233785;
+
         if(empty($user_id)){
             return $this->error(0, '请登录');
         }
-//        $user_id = 233785;
 
         // 1=系统消息 4=内容上新 9=评论 11=点赞 12=收益 22=关注
         //同步消息
@@ -76,14 +77,23 @@ class MessageController extends Controller
         $type_arr=MessageType::get_work_new_msg_type();
         $work_new=MessageServers::get_user_new_msg($type_arr,$user_id);
         if($work_new){
-            $lists['message'][]=['count'=>MessageServers::get_user_unread_count($type_arr,$user_id),'created_at'=>strtotime($work_new->created_at),'type'=>4,'title'=>$work_new->message->title,'message'=>$work_new->message->message];
+
+            $work_new=$work_new->toArray();
+            if($work_new['plan_time']>$work_new['created_at']){
+                $work_new['created_at']=$work_new['plan_time'];
+            }
+            $lists['message'][]=['count'=>MessageServers::get_user_unread_count($type_arr,$user_id),'created_at'=>strtotime($work_new['created_at']),'type'=>4,'title'=>$work_new['message']['title'],'message'=>$work_new['message']['message']];
         }
 
         //系统消息type=1;
         $type_arr=MessageType::get_system_msg_type();
         $system=MessageServers::get_user_new_msg($type_arr,$user_id);;
         if($system){
-            $lists['message'][]=['count'=>MessageServers::get_user_unread_count($type_arr,$user_id),'created_at'=>strtotime($system->created_at),'type'=>1,'title'=>$system->message->title,'message'=>$system->message->message];
+            $system=$system->toArray();
+            if($system['plan_time']>$system['created_at']){
+                $system['created_at']=$system['plan_time'];
+            }
+            $lists['message'][]=['count'=>MessageServers::get_user_unread_count($type_arr,$user_id),'created_at'=>strtotime($system['created_at']),'type'=>1,'title'=>$system['message']['title'],'message'=>$system['message']['message']];
         }
 
         $message_arr=$lists['message']??[];
