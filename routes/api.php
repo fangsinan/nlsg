@@ -22,12 +22,12 @@ include __DIR__ . '/liveApi.php';
 //});
 
 //通州分局审核
-Route::group(['namespace' => 'Api\V4', 'prefix' => 'hv4'], function () {
+Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
-    Route::get('course/get_works_detail', 'WorksViewController@getWorksDetail');
-    Route::get('course/get_lecture_list', 'WorksViewController@getLectureList');
-    Route::get('course/get_works_index', 'WorksViewController@getWorksIndex');
-    Route::get('course/get_column_list', 'WorksViewController@getColumnList');
+    Route::get('wechat/course/get_works_detail', 'WorksViewController@getWorksDetail');
+    Route::get('wechat/course/get_lecture_list', 'WorksViewController@getLectureList');
+    Route::get('wechat/course/get_works_index', 'WorksViewController@getWorksIndex');
+    Route::get('wechat/course/get_column_list', 'WorksViewController@getColumnList');
 
 });
 

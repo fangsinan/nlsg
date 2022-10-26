@@ -36,7 +36,6 @@ class WorksViewController extends Controller
     private function get_subscribe_num($subscribe_num){
         if($subscribe_num >2000){
             return rand(1000,1500);
-
         }else{
             return  $subscribe_num;
         }
