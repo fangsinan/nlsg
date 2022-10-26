@@ -70,13 +70,13 @@ class MessageServers
 
             //获取训练营、专栏、讲座 details_pic横图  cover_pic竖图
             $Column = Column::query()->where('id', $Comment->relation_id)
-                ->select(['id','title','subtitle', 'details_pic','cover_pic'])->first();
+                ->select(['id','title','subtitle', 'details_pic','cover_pic','user_id'])->first();
             $items['content'] = $Column;
 
         }elseif(in_array($Comment->type,[3,4])){
             //获取听书、精品课 detail_img 横图 cover_img 竖图
             $works = Works::query()->where('id', $Comment->relation_id)
-                ->select(['id', 'title','subtitle', 'detail_img as details_pic','cover_img as cover_pic'])->first();
+                ->select(['id', 'title','subtitle', 'detail_img as details_pic','cover_img as cover_pic','user_id'])->first();
             $items['content'] = $works;
         }
 
