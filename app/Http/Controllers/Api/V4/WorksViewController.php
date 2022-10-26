@@ -131,6 +131,9 @@ class WorksViewController extends Controller
         }
 
         foreach ($list['data'] as &$v) {
+            if($v['subscribe_num'] >2000){
+                $v['subscribe_num']=rand(1000,1500);
+            }
             $user_info = User::find($v['user_id']);
             $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], $sub_type);
             $v['is_new'] = 0;
@@ -233,8 +236,12 @@ class WorksViewController extends Controller
 
         if (empty($column_data)) {
             return $this->error(0, '参数有误：无此信息');
-
         }
+
+        if($column_data['subscribe_num'] >2000){
+            $column_data['subscribe_num']=rand(1000,1500);
+        }
+
 
 //        $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content',
 //            'view_num','price','subscribe_num','is_free','is_end',])
@@ -689,6 +696,9 @@ class WorksViewController extends Controller
         foreach ($worksData['data'] as $key=>&$val){
             $val = (array)$val;
 
+            if($val['subscribe_num'] >2000){
+                $val['subscribe_num']=rand(1000,1500);
+            }
 
             $is_sub = Subscribe::isSubscribe($user_id,$val['id'],2);
             if($hide == 1){
@@ -996,6 +1006,23 @@ class WorksViewController extends Controller
             $first_info_id = WorksInfo::select('id')->where(['pid'=>$works_id,'type'=>2,'status'=>4 ])->orderBy('rank','asc')->first();
             $works_data['teacher_book_first_info_id'] = $first_info_id['id'] ?? 0;
         }
+
+        if(isset($works_data['subscribe_num']) && $works_data['subscribe_num']>2000){
+            $works_data['subscribe_num']=rand(1000,1500);
+        }
+
+        if(isset($column['subscribe_num']) && $column['subscribe_num']>2000){
+            $column['subscribe_num']=rand(1000,1500);
+        }
+
+        if(isset($info['subscribe_num']) && $info['subscribe_num']>2000){
+            $info['subscribe_num']=rand(1000,1500);
+        }
+
+        if(isset($history_data->subscribe_num) && $history_data->subscribe_num >2000){
+            $history_data->subscribe_num =rand(1000,1500);
+        }
+
         $res = [
             'column_info'  => $column,
             'works_data'   => $works_data,

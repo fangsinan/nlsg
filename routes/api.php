@@ -20,6 +20,8 @@ include __DIR__ . '/liveApi.php';
 //    Route::get('a/{param1}', 'ShortLinkController@Jump');
 //
 //});
+
+//通州分局审核
 Route::group(['namespace' => 'Api\V4', 'prefix' => 'hv4'], function () {
 
     Route::get('course/get_works_detail', 'WorksViewController@getWorksDetail');
