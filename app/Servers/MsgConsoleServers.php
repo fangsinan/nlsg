@@ -544,7 +544,7 @@ class MsgConsoleServers
 //                    'data'      => $this->getExplainBookList()
 //                ];
                 $res = [
-                    'have_info' => 1,
+                    'have_info' => 0,
                     'data'      => $this->getExplainBookWorksList()
                 ];
                 break;
