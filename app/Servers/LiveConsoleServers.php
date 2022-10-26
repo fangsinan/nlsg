@@ -395,7 +395,7 @@ class LiveConsoleServers
                 $listRst=$Redis->keys($live_id_key.'*'); //获取多个直播间
                 if(!empty($listRst)){
                     $key_name='11LiveConsole:online_user_list_'.date('YmdHi');
-                    $es_key_name='es:live_online_es_list'; //es扫描队列
+                    $es_key_name='es:live_online_es_list'; //es 扫描队列
                     $now_time=date('Y-m-d H:i:s');
                     $online_time_str=substr($now_time,0,16);
                     $flag=0;
