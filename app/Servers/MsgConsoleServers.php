@@ -334,6 +334,8 @@ class MsgConsoleServers
         $list = MessageRelationType::query()
             ->where('status', '=', 1)
             ->select(['id', 'title', 'group_name', 'group_id'])
+            ->orderBy('sort')
+            ->orderBy('id')
             ->get();
 
         $temp = [];
@@ -537,9 +539,13 @@ class MsgConsoleServers
                 break;
             //大咖讲书
             case '171':
+//                $res = [
+//                    'have_info' => 0,
+//                    'data'      => $this->getExplainBookList()
+//                ];
                 $res = [
                     'have_info' => 0,
-                    'data'      => $this->getExplainBookList()
+                    'data'      => $this->getExplainBookWorksList()
                 ];
                 break;
             case '172':

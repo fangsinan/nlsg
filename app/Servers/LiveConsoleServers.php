@@ -395,6 +395,7 @@ class LiveConsoleServers
                 $listRst=$Redis->keys($live_id_key.'*'); //获取多个直播间
                 if(!empty($listRst)){
                     $key_name='11LiveConsole:online_user_list_'.date('YmdHi');
+                    $es_key_name='es:live_online_es_list'; //es 扫描队列
                     $now_time=date('Y-m-d H:i:s');
                     $online_time_str=substr($now_time,0,16);
                     $flag=0;
@@ -410,7 +411,10 @@ class LiveConsoleServers
                                 foreach ($clients as $k => $v) {
                                     $user_arr = explode (',', $v); //ip,user_id,fd,live_son_flag
                                     $OnlineUserArr=['live_id' => $live_id, 'user_id' => $user_arr[1], 'live_son_flag'=>$user_arr[3],'online_time_str'=>$online_time_str];
-                                    $Redis->sAdd ($key_name, json_encode($OnlineUserArr));
+//                                    $Redis->sAdd ($key_name, json_encode($OnlineUserArr));
+                                    $OnlineUserArrData=json_encode($OnlineUserArr);
+                                    $Redis->sAdd ($key_name, $OnlineUserArrData);
+                                    $Redis->rpush($es_key_name, $OnlineUserArrData); //加入es队列等待执行
                                 }
                             }
                         }
@@ -679,7 +683,7 @@ class LiveConsoleServers
 
         $redisConfig = config('database.redis.default');
         $Redis = new Client($redisConfig);
-        $Redis->select(5);
+        $Redis->select(3);
         $list_name='online_id_list_in';
         $num=$Redis->llen($list_name);
         if($num<=0) {
@@ -735,7 +739,7 @@ class LiveConsoleServers
 
         $redisConfig = config('database.redis.default');
         $Redis = new Client($redisConfig);
-        $Redis->select(5);
+        $Redis->select(3);
         $list_name='online_id_list_in';
 
         $start_time=date("Y-m-d H:i:s",time());
