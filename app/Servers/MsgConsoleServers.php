@@ -539,9 +539,13 @@ class MsgConsoleServers
                 break;
             //大咖讲书
             case '171':
+//                $res = [
+//                    'have_info' => 0,
+//                    'data'      => $this->getExplainBookList()
+//                ];
                 $res = [
-                    'have_info' => 0,
-                    'data'      => $this->getExplainBookList()
+                    'have_info' => 1,
+                    'data'      => $this->getExplainBookWorksList()
                 ];
                 break;
             case '172':
