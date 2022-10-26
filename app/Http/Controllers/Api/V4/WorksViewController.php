@@ -450,6 +450,12 @@ class WorksViewController extends Controller
         }
         $historyData = History::getHistoryData($lecture_id, $history_type, $user_id);
 
+        foreach ($info as &$v){
+            if(isset($v['view_num'])){
+                $v['view_num']=$this->get_subscribe_num($v['view_num']);
+            }
+        }
+
         return $this->success([
             'works_data' => $column_data,
             'lecture_data' => $column_data,
@@ -1124,6 +1130,12 @@ class WorksViewController extends Controller
 
         if(isset($history_data->subscribe_num)){
             $history_data->subscribe_num =$this->get_subscribe_num($history_data->subscribe_num );
+        }
+
+        foreach ($info as &$v){
+            if(isset($v['view_num'])){
+                $v['view_num']=$this->get_subscribe_num($v['view_num']);
+            }
         }
 
         $res = [
