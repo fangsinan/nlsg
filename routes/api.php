@@ -27,6 +27,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('wechat/course/get_lecture_list', 'WorksViewController@getLectureList');
     Route::get('wechat/course/get_works_index', 'WorksViewController@getWorksIndex');
     Route::get('wechat/course/get_column_list', 'WorksViewController@getColumnList');
+    Route::get('wechat/course/get_column_detail', 'WorksViewController@getColumnDetail');
 
 });
 

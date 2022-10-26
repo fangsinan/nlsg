@@ -44,6 +44,101 @@ class WorksViewController extends Controller
     }
 
     /**
+     * @api {get} /api/v4/column/get_column_detail 讲座(训练营)详细信息
+     * @apiName get_column_detail
+     * @apiVersion 1.0.0
+     * @apiGroup Column
+     *
+     * @apiParam {int} column_id  专栏id
+     * @apiParam {int} user_id 用户id  默认0
+     *
+     * @apiSuccess {string} result json
+     * @apiSuccessExample Success-Response:
+     * {
+     * "code": 200,
+     * "msg": "成功",
+     * "data": {
+     * "column_info": {
+     * "id": 1,
+     * "name": "王琨专栏",
+     * "type": 1,
+     * "user_id": 211172,
+     * "message": "",
+     * "original_price": "0.00",
+     * "price": "0.00",
+     * "online_time": 0,
+     * "works_update_time": 0,
+     * "cover_pic": "/wechat/works/video/161627/2017121117503851065.jpg",
+     * "details_pic": "",
+     * "is_end": 0,
+     * "subscribe_num": 0,
+     * "teacher_name": "房爸爸",
+     * "is_sub": 0
+     * }
+     * }
+     * }
+     */
+
+    public function getColumnDetail(Request $request)
+    {
+
+        $column_id = $request->input('column_id', 0);
+        $activity_tag = $request->input('activity_tag', '');
+        $channel_tag = $request->header('channel-tag','');
+
+        $user_id = $this->user['id'] ?? 0;
+        if (empty($column_id)) {
+            return $this->error(0, 'column_id 不能为空');
+        }
+        $field = ['id', 'name', 'title', 'subtitle', 'type', 'column_type', 'user_id', 'message',
+            'original_price', 'price', 'online_time', 'works_update_time', 'index_pic','cover_pic', 'details_pic',
+            'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start','show_info_num','can_h5'];
+        $column = Column::getColumnInfo($column_id, $field, $user_id);
+        if (empty($column)) {
+            return $this->error(0, '专栏不存在不能为空');
+        }
+
+        if ($channel_tag === 'cytx') {
+            $temp_price = ChannelWorksList::getPrice(1, $column_id);
+            if (!empty($temp_price)) {
+                $column['price'] = $temp_price;
+                $column['original_price'] = $temp_price;
+            }
+        }
+
+        //免费试听的章节
+//        $works = Works::select(['id'])->where(['column_id'=>$column_id, 'status' => 4])->first();
+
+        $free_trial = WorksInfo::select(['id'])->where(['column_id' => $column_id, 'type' => 1, 'status' => 4, 'free_trial' => 1])->first();
+        $column['free_trial_id'] = (string)($free_trial['id'] ?? '');
+
+        $column['twitter_price'] = (string)GetPriceTools::Income(1, 2, 0, 1, $column_id);
+//        $column['black_price']   = GetPriceTools::Income(1,3,0,1,$column_id);
+        $column['emperor_price'] = (string)GetPriceTools::Income(1, 4, 0, 1, $column_id);
+        $column['service_price'] = (string)GetPriceTools::Income(1, 5, 0, 1, $column_id);
+
+        if($column['type'] == 3){  //训练营  开营时间
+            $column['online_time'] = date('Y-m-d',strtotime($column['online_time']));
+            $column['info_num'] = $column['show_info_num'];
+        }else if($column['type'] == 4){
+            $column['is_parent'] = 1;
+            // $column['online_time'] = Column::getColumnNewStartTime($column['id']);
+            $column['online_time'] = date('Y-m-d',strtotime($column['online_time']));
+            $column['info_num'] = $column['show_info_num'];
+        }
+
+        $user = User::find($column['user_id']);
+        $column['title'] = $user['honor'] ?? '';
+
+        $column['subscribe_num']=$this->get_subscribe_num($column['subscribe_num']);
+
+        return $this->success([
+            'column_info' => $column,
+        ]);
+    }
+
+
+    /**
      * @api {get} /api/v4/column/get_column_list 专栏-专栏|讲座首页列表
      * @apiName get_column_list
      * @apiVersion 1.0.0
