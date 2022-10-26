@@ -21,7 +21,6 @@ include __DIR__ . '/liveApi.php';
 //
 //});
 
-//通州分局审核
 Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
     Route::get('wechat/course/get_works_detail', 'WorksViewController@getWorksDetail');
