@@ -33,6 +33,15 @@ class WorksViewController extends Controller
         return 'hello world';
     }
 
+    private function get_subscribe_num($subscribe_num){
+        if($subscribe_num >2000){
+            return rand(1000,1500);
+
+        }else{
+            return  $subscribe_num;
+        }
+    }
+
     /**
      * @api {get} /api/v4/column/get_column_list 专栏-专栏|讲座首页列表
      * @apiName get_column_list
@@ -131,9 +140,9 @@ class WorksViewController extends Controller
         }
 
         foreach ($list['data'] as &$v) {
-            if($v['subscribe_num'] >2000){
-                $v['subscribe_num']=rand(1000,1500);
-            }
+
+            $v['subscribe_num']=$this->get_subscribe_num($v['subscribe_num']);
+
             $user_info = User::find($v['user_id']);
             $v['is_sub'] = Subscribe::isSubscribe($uid, $v['id'], $sub_type);
             $v['is_new'] = 0;
@@ -238,9 +247,8 @@ class WorksViewController extends Controller
             return $this->error(0, '参数有误：无此信息');
         }
 
-        if($column_data['subscribe_num'] >2000){
-            $column_data['subscribe_num']=rand(1000,1500);
-        }
+
+        $column_data['subscribe_num']=$this->get_subscribe_num($column_data['subscribe_num']);
 
 
 //        $works_data = Works::select(['id', 'title','subtitle','cover_img','detail_img','content',
@@ -696,9 +704,8 @@ class WorksViewController extends Controller
         foreach ($worksData['data'] as $key=>&$val){
             $val = (array)$val;
 
-            if($val['subscribe_num'] >2000){
-                $val['subscribe_num']=rand(1000,1500);
-            }
+
+            $val['subscribe_num']=$this->get_subscribe_num($val['subscribe_num']);
 
             $is_sub = Subscribe::isSubscribe($user_id,$val['id'],2);
             if($hide == 1){
@@ -1007,20 +1014,20 @@ class WorksViewController extends Controller
             $works_data['teacher_book_first_info_id'] = $first_info_id['id'] ?? 0;
         }
 
-        if(isset($works_data['subscribe_num']) && $works_data['subscribe_num']>2000){
-            $works_data['subscribe_num']=rand(1000,1500);
+        if(isset($works_data['subscribe_num'])){
+            $works_data['subscribe_num']=$this->get_subscribe_num($works_data['subscribe_num']);
         }
 
-        if(isset($column['subscribe_num']) && $column['subscribe_num']>2000){
-            $column['subscribe_num']=rand(1000,1500);
+        if(isset($column['subscribe_num'])){
+            $column['subscribe_num']=$this->get_subscribe_num($column['subscribe_num']);
         }
 
-        if(isset($info['subscribe_num']) && $info['subscribe_num']>2000){
-            $info['subscribe_num']=rand(1000,1500);
+        if(isset($info['subscribe_num'])){
+            $info['subscribe_num']=$this->get_subscribe_num($info['subscribe_num']);
         }
 
-        if(isset($history_data->subscribe_num) && $history_data->subscribe_num >2000){
-            $history_data->subscribe_num =rand(1000,1500);
+        if(isset($history_data->subscribe_num)){
+            $history_data->subscribe_num =$this->get_subscribe_num($history_data->subscribe_num );
         }
 
         $res = [
