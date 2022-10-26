@@ -11,6 +11,7 @@ use App\Models\LiveCheckPhone;
 use App\Models\LiveComment;
 use App\Models\LiveConsole;
 use App\Models\LiveCountDown;
+use App\Models\LiveExtension;
 use App\Models\LiveForbiddenWords;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
@@ -1084,8 +1085,9 @@ class LiveController extends Controller
                 }
 
                 $live_son_flag_num=$list['live_son_flag_count'];
-
-                if($live_son_flag==158291){
+                //唐山推广团队放开
+                $LiveExtensionObj=LiveExtension::query()->where('user_id',$live_son_flag)->first();
+                if(!empty($LiveExtensionObj)){
                     $list['show_wechat_button_status'] = 2; //不显示
                     $list['live_son_flag_status'] = 2; //开启
                     $list['live_son_flag_brush_status'] = 1; //可刷单
