@@ -346,6 +346,8 @@ class MessageController extends Controller
             }else{
                 $comment['is_follow']=UserFollow::IsFollow($user_id, $comment['user']['id']);
             }
+            $comment['from_user']=$comment['user'];
+            $comment['to_user']=[];
 
         }
 
