@@ -253,6 +253,7 @@ class MessageController extends Controller
 
         //获取评论
         $items['comment_id']=$items['message']['action_id'];
+
         if($items['type']==10){
             //获取回复
             $CommentReply = CommentReply::query()
@@ -276,6 +277,7 @@ class MessageController extends Controller
         }else{
             $items['comment']['is_follow']=UserFollow::IsFollow($user_id, $items['comment']['user']['id']);
         }
+
         //主评论是否点赞
         $items['comment']['is_like'] = Like::isLike($items['comment']['id'],1,$user_id,1);
         $items['comment']['like_count'] = Like::like_count($items['comment']['id'],1);
@@ -309,11 +311,46 @@ class MessageController extends Controller
             }else{
                 $reply['is_follow']=UserFollow::IsFollow($user_id, $reply['from_user']['id']);
             }
-
         }
 
         $items['reply_list']=$reply_list;
+
         $items['reply_count']=count($reply_list);
+
+
+
+        //获取评论列表
+        $comment_list=Comment::query()
+            ->where('user_id', $items['comment']['user_id'])
+            ->where('type', $items['comment']['type'])
+            ->where('relation_id', $items['comment']['relation_id'])
+            ->where('info_id', $items['comment']['info_id'])
+            ->where('status', 1)
+            ->with(['user:id,nickname,headimg,is_author'])
+            ->orderBy('id','asc')->get()->toArray();
+
+        foreach ($comment_list as &$comment){
+
+            //是不是360vip
+            $comment['user']['is_vip']=VipUser::newVipInfo($comment['user']['id'])['vip_id'] ?1:0;
+
+            $comment['is_like'] = Like::isLike($comment['id'],1,$user_id,1);
+
+            $comment['created_at']=History::DateTime($comment['created_at']);
+
+            $comment['is_follow']=0; //判断是否关注 0否 1是
+            $comment['is_own']=0;//是否是自己 0否 1是
+
+            if( $comment['user']['id']==$user_id){
+                $comment['is_own']=1;
+            }else{
+                $comment['is_follow']=UserFollow::IsFollow($user_id, $comment['user']['id']);
+            }
+
+        }
+
+        $items['comment_list']=$comment_list;
+        $items['comment_count']=count($comment_list);
 
         return success($items);
 
