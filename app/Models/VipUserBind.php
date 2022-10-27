@@ -48,31 +48,45 @@ class VipUserBind extends Base
         $map=[];
         $data = DB::table('nlsg_vip_user_bind')->where('end_at', '<', $now_date)->whereIn('status',[0,1])
             ->select(['id','parent','son' ])->limit(30000)->get()->toArray();
-        if(!empty($data)){
+        DB::beginTransaction();
+        try {
+            if (!empty($data)) {
 
-            foreach ($data as $key=>$val){
-                $map[]=[
-                    'parent'=>'18512378959', //保护到公司
-                    'son'=>$val->son,
-                    'life'=>2, //有效期
-                    'begin_at'=>$now_date,
-                    'end_at'=>'2030-12-31 23:59:59',
-                    'status'=>1,
-                    'is_manual'=>1, //1 手动绑定 配合小鹅通
-                    'channel'=>2, //'来源渠道 1导入 2平台 3抖音 4直播渠道 5:哈佛订单绑定平台'
-                    'remark'=>'保护过期，自动保护：'.$val->id,
-                    'created_at'=>$now_date,
-                ];
+                foreach ($data as $key => $val) {
+                    if(($key%5000)==0){
+                        DB::table('nlsg_vip_user_bind')->insert($map);
+                        $map=[];
+                    }
+                    $map[] = [
+                        'parent' => '18512378959', //保护到公司
+                        'son' => $val->son,
+                        'life' => 2, //有效期
+                        'begin_at' => $now_date,
+                        'end_at' => '2030-12-31 23:59:59',
+                        'status' => 1,
+                        'is_manual' => 1, //1 手动绑定 配合小鹅通
+                        'channel' => 2, //'来源渠道 1导入 2平台 3抖音 4直播渠道 5:哈佛订单绑定平台'
+                        'remark' => '保护过期，自动保护：' . $val->id,
+                        'created_at' => $now_date,
+                    ];
+                }
+                if(!empty($map)){
+                    DB::table('nlsg_vip_user_bind')->insert($map);
+                }
             }
 
-            DB::table('nlsg_vip_user_bind')->insert($map);
+            $clear_sql = "update  nlsg_vip_user_bind set status = 2 where status in (0,1) and end_at <= SYSDATE()";
+            DB::select($clear_sql);
+
+            $clear_vip_sql = "UPDATE nlsg_vip_user SET `status` = 0,is_default=0 where is_default = 1 AND `status` = 1 AND expire_time < now();";
+            DB::select($clear_vip_sql);
+
+            DB::commit();
+            echo '执行成功';
+        }catch (\Exception $e) {
+            DB::rollBack();
+            var_dump($e->getMessage());
         }
-
-        $clear_sql = "update  nlsg_vip_user_bind set status = 2 where status in (0,1) and end_at <= SYSDATE()";
-        DB::select($clear_sql);
-
-        $clear_vip_sql = "UPDATE nlsg_vip_user SET `status` = 0,is_default=0 where is_default = 1 AND `status` = 1 AND expire_time < now();";
-        DB::select($clear_vip_sql);
 
     }
 
