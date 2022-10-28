@@ -416,7 +416,7 @@ class FeedbackServers
                 'status'     => 'bail|required|in:1,3',
                 'keywords'   => 'bail|required|array|max:5',
                 'keywords.*' => 'bail|distinct|max:20',
-                'qr_code'    => 'bail|string|max:100',
+//                'qr_code'    => 'bail|string|max:100',
             ],
             [
                 'type.exists'         => '类型id错误',
@@ -450,7 +450,7 @@ class FeedbackServers
         $ha->type     = $params['type'];
         $ha->question = $params['question'];
         $ha->answer   = $params['answer'];
-        $ha->qr_code  = $params['qr_code'];
+        $ha->qr_code  = $params['qr_code'] ?? '';
         $ha->status   = $params['status'];
 
         $ha_res = $ha->save();
