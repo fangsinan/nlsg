@@ -534,11 +534,11 @@ class MessageController extends Controller
             if($like['comment_type'] ==1 && $items['type']==14){
                 $items['msg']='点赞了你的评论';
             }elseif ($like['comment_type'] ==1 && $items['type']==15){
-                $items['msg']='取消点赞了你的评论';
+                $items['msg']='取消评论点赞';
             }elseif ($like['comment_type'] ==2 && $items['type']==14){
                 $items['msg']='点赞了你的回复';
             }elseif ($like['comment_type'] ==2 && $items['type']==15){
-                $items['msg']='取消点赞了你的回复';
+                $items['msg']='取消回复点赞';
             }
 
             if($like['comment_type']==1){
