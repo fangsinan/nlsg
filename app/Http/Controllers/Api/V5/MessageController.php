@@ -267,6 +267,10 @@ class MessageController extends Controller
 
         //获取评论关联的课程内容
         $items=MessageServers::get_info_by_comment( $items['comment_id'],$items);
+       //判断是否删除
+        if(empty( $items['comment']['status'])){
+            return $this->error(0, '评论已删除');
+        }
 
 
         //主评论是否关注

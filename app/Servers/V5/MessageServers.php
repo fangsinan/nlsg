@@ -56,7 +56,7 @@ class MessageServers
         //获取评论
         $Comment = Comment::query()
             ->with(['user:id,nickname,headimg,is_author'])
-            ->select('id',  'user_id', 'type','relation_id', 'info_id', 'content')
+            ->select('id',  'user_id', 'type','relation_id', 'info_id', 'content','status')
             ->where('id', $comment_id)
             ->first();
         if (!$Comment) {
