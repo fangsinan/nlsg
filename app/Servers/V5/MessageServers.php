@@ -56,7 +56,7 @@ class MessageServers
         //获取评论
         $Comment = Comment::query()
             ->with(['user:id,nickname,headimg,is_author'])
-            ->select('id',  'user_id', 'type','relation_id', 'info_id', 'content')
+            ->select('id',  'user_id', 'type','relation_id', 'info_id', 'content','status')
             ->where('id', $comment_id)
             ->first();
         if (!$Comment) {
@@ -70,7 +70,7 @@ class MessageServers
 
             //获取训练营、专栏、讲座 details_pic横图  cover_pic竖图
             $Column = Column::query()->where('id', $Comment->relation_id)
-                ->select(['id','title','subtitle', 'details_pic','cover_pic','user_id'])->first();
+                ->select(['id','name as title','subtitle', 'details_pic','cover_pic','user_id'])->first();
             $items['content'] = $Column;
 
         }elseif(in_array($Comment->type,[3,4])){
