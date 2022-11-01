@@ -558,6 +558,7 @@ class IndexController extends ControllerBackend
     		$bgp_id           = $input['bgp_id'] ?? 0;
             $service_type       = $input['service_type']??0;
             $hide_sub_count  = $input['hide_sub_count'] ?? 0;
+            $is_zero = $input['is_zero'] ?? 1;
 
     		$cover_vertical_img = !empty($input['cover_vertical_img']) ? covert_img($input['cover_vertical_img']) : '';
 
@@ -630,6 +631,7 @@ class IndexController extends ControllerBackend
     			'bgp_id'             => $bgp_id,
                 'service_type'=>$service_type,
                 'hide_sub_count'=>$hide_sub_count,
+                'is_zero'=>$is_zero,
     		];
 
     		$lcModel            = new LiveConsole();
@@ -1043,7 +1045,7 @@ class IndexController extends ControllerBackend
     			->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at','service_type',
     				'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test','bgp_id',
     				'steam_end_time', 'steam_begin_time','pre_push_time','classify','valid_time_range','cover_vertical_img',
-                    'hide_sub_count'
+                    'hide_sub_count','is_zero'
     			)
     //            ->with(['livePoster'])
     			->where('id', $id)->first();
