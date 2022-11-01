@@ -1,0 +1,77 @@
+<?php
+
+
+namespace App\Servers\V5;
+
+
+use App\Models\OrderZero;
+
+class ZeroOrderListServers
+{
+    public function list($params)
+    {
+        $query = OrderZero::query()
+            ->with([
+                'user:id,phone,nickname',
+                'twitter:id,phone,nickname',
+                'relationLiveInfo:id,title,cover_img,price,is_zero',
+                'fromLiveInfo:id,title,cover_img,price,is_zero',
+            ]);
+
+        $phone          = $params['phone'] ?? '';
+        $twitter_phone  = $params['twitter_phone'] ?? '';
+        $relation_id    = $params['relation_id'] ?? 0;
+        $live_id        = $params['live_id'] ?? 0;
+        $pay_time_begin = $params['pay_time_begin'] ?? '';
+        $pay_time_end   = $params['pay_time_end'] ?? '';
+        $order_num      = $params['ordernum'] ?? '';
+        $relation_title = $params['relation_title'] ?? '';
+        $live_title     = $params['live_title'] ?? '';
+
+        if ($phone) {
+            $query->whereHas('user', function ($q) use ($phone) {
+                $q->where('phone', 'like', $phone);
+            });
+        }
+        if ($twitter_phone) {
+            $query->whereHas('twitter', function ($q) use ($twitter_phone) {
+                $q->where('phone', 'like', $twitter_phone);
+            });
+        }
+        if ($relation_title) {
+            $query->whereHas('relationLiveInfo', function ($q) use ($relation_title) {
+                $q->where('title', 'like', $relation_title);
+            });
+        }
+        if ($live_title) {
+            $query->whereHas('fromLiveInfo', function ($q) use ($live_title) {
+                $q->where('title', 'like', $live_title);
+            });
+        }
+
+        if ($relation_id) {
+            $query->where('relation_id', '=', $relation_id);
+        }
+        if ($live_id) {
+            $query->where('live_id', '=', $live_id);
+        }
+        if ($pay_time_begin) {
+            $query->where('pay_time', '>=', $pay_time_begin);
+        }
+        if ($pay_time_end) {
+            $query->where('pay_time', '<=', $pay_time_end);
+        }
+        if ($order_num) {
+            $query->where('ordernum', 'like', $order_num);
+        }
+
+
+        $query->select([
+            'id', 'relation_id', 'live_id', 'user_id', 'status', 'pay_time', 'ordernum', 'twitter_id'
+        ]);
+
+        $query->orderBy('id', 'desc');
+
+        return $query->paginate($params['size'] ?? 10);
+    }
+}

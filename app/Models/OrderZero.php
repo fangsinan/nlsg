@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -29,5 +30,15 @@ class OrderZero extends Base
     public function twitter()
     {
         return $this->belongsTo(User::class, 'twitter_id', 'id');
+    }
+
+    public function relationLiveInfo(): HasOne
+    {
+        return $this->hasOne(Live::class,'id','relation_id');
+    }
+
+    public function fromLiveInfo(): HasOne
+    {
+        return $this->hasOne(Live::class,'id','live_id');
     }
 }
