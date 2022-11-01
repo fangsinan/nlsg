@@ -205,6 +205,7 @@ class IndexController extends ControllerBackend
         $status = $request->get('status');
         $start = $request->get('start');
         $end = $request->get('end');
+        $is_zero = $request->get('is_zero',0);
 
         $classify = $request->input('classify','');
 
@@ -222,6 +223,9 @@ class IndexController extends ControllerBackend
                 ]);
             });
 
+        if ($is_zero){
+            $query->where('is_zero','=',$is_zero);
+        }
 
         if (!empty($classify)){
             $query->where('classify','=',$classify);
@@ -257,7 +261,7 @@ class IndexController extends ControllerBackend
             $query->where('id', '>', 51);
         }
         $lists = $query->select('id', 'user_id', 'title', 'price','classify',
-            'order_num', 'status', 'steam_begin_time as begin_at', 'cover_img')
+            'order_num', 'status', 'steam_begin_time as begin_at', 'cover_img','is_zero')
             ->where('is_del', 0)
             ->orderBy('sort', 'asc')
             ->orderBy('id', 'desc')
