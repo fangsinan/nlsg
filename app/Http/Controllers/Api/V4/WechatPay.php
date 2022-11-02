@@ -917,7 +917,7 @@ class WechatPay extends Controller
 
                     //暂时先不启用直接分账
 //                    //调用直播分账
-//                    if ( !empty($twitter_id) && COUPON_PROFIT_REWARD$twitter_id != $user_id ) {
+//                    if ( !empty($twitter_id) && $twitter_id != $user_id ) {
 //                        if( $liveData['profit_sharing'] == 1 && $liveData['twitter_money'] > 0 ){
 //                            self::OrderProfit($transaction_id,$out_trade_no,$liveData['twitter_money'],$twitter_id);
 //                        }
