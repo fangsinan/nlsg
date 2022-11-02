@@ -25,6 +25,7 @@ use App\Models\MallOrder;
 use App\Models\OfflineProducts;
 use App\Models\Order;
 use App\Models\OrderTwitterLog;
+use App\Models\OrderZero;
 use App\Models\PayRecord;
 use App\Models\Qrcodeimg;
 use App\Models\Subscribe;
@@ -1685,6 +1686,22 @@ class LiveController extends Controller
             }else if(!empty($input['live_son_flag'])){
                 $twitter_id = $input['live_son_flag'];
             }
+
+
+            // 0元购 处理
+            $is_sub = OrderZero::checkZeroLive($info_id,$this->user['id'],[
+                "form_liveId"   => $input['form_liveId']??0,
+                "ip"            => $this->getIp($request),
+                "pay_type"      => $input['pay_type']??1,
+                "os_type"       => $input['os_type']??3,
+                "twitter_id"    => $twitter_id,
+            ]);
+
+            if($is_sub == true){
+                return success('0元购订阅成功');
+            }
+
+
 
             $is_flag='';
             if(!empty($input['is_flag'])){
