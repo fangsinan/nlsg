@@ -87,7 +87,7 @@ class VipWorksList extends Base
                 $temp_res['category_id'] = [0];
                 $temp_res['user_id']     = $v['column']['user_id'];
                 $temp_res['view_num']    = $v['column']['view_num'];
-
+                $temp_res_category_id = [];
                 foreach ($v['column']['category_relation'] as $cv) {
                     $temp_category_res         = [];
                     $temp_category_res['id']   = $cv['category_name']['id'];
@@ -99,6 +99,7 @@ class VipWorksList extends Base
                         }
                     }
                 }
+                $temp_res['category_id'] = $temp_res_category_id;
 
             } else if ($v['type'] == 2) {
                 if (empty($v['works'])) {
