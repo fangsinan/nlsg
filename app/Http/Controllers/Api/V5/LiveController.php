@@ -157,11 +157,11 @@ class LiveController extends Controller
 
         $testers = explode(',', ConfigModel::getData(35, 1));
         $user = User::where('id', $uid)->first();
-		
+
 		$day_time=date("Y-m-d",strtotime("-1 day"));
         // 获取用户管理员权限
         // $provilege_liveids = LiveUserPrivilege::where(['user_id'=>$uid,'pri_level'=>1,'is_del'=>0])->pluck("live_id")->toArray();
-        $fills = ['id', 'user_id', 'title', 'describe', 'price','cover_img', 'begin_at', 'type', 'end_at','steam_begin_time','playback_price', 'is_free', 'password', 'order_num','sort'];
+        $fills = ['id', 'user_id', 'title', 'describe', 'price','cover_img', 'begin_at', 'type', 'end_at','steam_begin_time','playback_price', 'is_free', 'password', 'order_num','sort','hide_sub_count'];
         $query = Live::query();
         if (!$uid || ($user && !in_array($user->phone, $testers))) {
             $query->where('is_test', '=', 0);
