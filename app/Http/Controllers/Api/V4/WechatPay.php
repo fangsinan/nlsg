@@ -311,7 +311,7 @@ class WechatPay extends Controller
 
                             if ($ProfitPrice > 0) {
                                 $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
-
+                                $map=[];
                             }
                         }
 
@@ -324,13 +324,13 @@ class WechatPay extends Controller
                             $PrdInfo = PayRecordDetail::where($where)->first('id');
                             if (empty($PrdInfo)) {
                                 $pay_record_flag = 1;
-                                $Sy_Rst = PayRecordDetail::firstOrCreate($map);
+//                                $Sy_Rst = PayRecordDetail::firstOrCreate($map);
                             }
                         } else if (!empty($sales_id) && $vip_order_type == 1) {  //仅开通360  销讲老师表id存在时 执行 销讲老师收益100 代理商收益126  公司134
                             //老师收益
                             $salesData = MeetingSales::where(['id' => $sales_id, 'status' => 1])->first();
                             $sales_map = array('user_id' => $salesData['user_id'], "type" => 11, "ordernum" => $out_trade_no, 'price' => 100, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
-                            $Sales_Rst = PayRecordDetail::firstOrCreate($sales_map);
+//                            $Sales_Rst = PayRecordDetail::firstOrCreate($sales_map);
 
                             //正常是 代理商收益126  公司134
                             $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => 126, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
@@ -351,7 +351,7 @@ class WechatPay extends Controller
                             //代理商收益
                             if ($map) {
                                 $pay_record_flag = 1;
-                                $Sy_Rst = PayRecordDetail::firstOrCreate($map);
+//                                $Sy_Rst = PayRecordDetail::firstOrCreate($map);
                             }
                         }
 
@@ -363,7 +363,7 @@ class WechatPay extends Controller
                         $twitter_top_vip_id = VipUser::where(['user_id' => $twitter_top[0], 'is_default' => 1, 'status' => 1])->first('id');
                         if ($twitter_top_vip_id){
                             $top_map = array('user_id' => $twitter_top[0], "type" => 11, "ordernum" => $out_trade_no, 'price' => 0, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $twitter_top_vip_id->id);
-                            $top_Sy_Rst = PayRecordDetail::firstOrCreate($top_map);
+//                            $top_Sy_Rst = PayRecordDetail::firstOrCreate($top_map);
                         }
                     }
 
