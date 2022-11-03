@@ -315,7 +315,7 @@ class LiveController extends Controller
         $user = User::where('id', $uid)->first();
 
         $day_time=date("Y-m-d",strtotime("-1 day"));
-        $fills = ['id', 'user_id', 'title', 'describe', 'price','cover_img', 'begin_at', 'type', 'end_at','steam_begin_time','playback_price', 'is_free', 'password', 'order_num','sort'];
+        $fills = ['id', 'user_id', 'title', 'describe', 'price','cover_img', 'begin_at', 'type', 'end_at','steam_begin_time','playback_price', 'is_free', 'password', 'order_num','sort','hide_sub_count'];
         $query = Live::query();
         if (!$uid || ($user && !in_array($user->phone, $testers))) {
             $query->where('is_test', '=', 0);
