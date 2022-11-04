@@ -2209,7 +2209,7 @@ class LiveController extends Controller
 
                     }*/
 //                    $Info = OfflineProducts::where(['id'=>$res['push_gid']])->first();
-                    $Info = OfflineProducts::select('id','title as name','price','subtitle','image as img','cover_img as image')->where(['id'=>$res['push_gid']])->first();
+                    $Info = OfflineProducts::select('id','title as name','price','subtitle','image as img','image as image')->where(['id'=>$res['push_gid']])->first();
                     break;
                 case 6:
                     $Info=[
