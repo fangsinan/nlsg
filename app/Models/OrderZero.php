@@ -53,7 +53,7 @@ class OrderZero extends Base
      */
     static function checkZeroLive($liveId, $uid, array $form_data = []): bool
     {
-        $live = self::where(['id'=>$liveId,'is_zero'=>2])->first();
+        $live = Live::where(['id'=>$liveId,'is_zero'=>2])->first();
         if(empty($live)){
             return false;
         }
