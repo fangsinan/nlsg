@@ -85,7 +85,7 @@ class OrderZero extends Base
         ]);
 
 
-        $startTime = strtotime(date('Y-m-d', $time));
+        $startTime = strtotime(date('Y-m-d', time()));
         $endTime = strtotime(date('Y', $startTime) + 1 . '-' . date('m-d', $startTime)) + 86400; //到期日期
         $sub_res = Subscribe::insert([
             'user_id'       => $uid, //会员id
