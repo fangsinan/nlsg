@@ -97,6 +97,7 @@ class OrderZero extends Base
             'end_time'      => date("Y-m-d H:i:s", $endTime),
             'relation_id'   => $liveId,
             'is_zero'       => 2,
+            "twitter_id"    => $form_data['twitter_id']??0,
         ]);
 
         if($order_zero_id && $sub_res){

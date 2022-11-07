@@ -142,6 +142,9 @@ class MessageType extends Base
                     $user = User::where("id",$relation_data['user_id']??0)->value("nickname");
                     $res['message'] = str_replace("{{user_name}}",$user??"",$res['message']);
                     break;
+                case "SYS_USER_SEND_HELP":
+                    $message = ['content'=>$res['message'],'source'=>'留言通知','type'=>'留言通知','amount'=>0,'time'=>$time];
+                    $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
             }
         // }
         return  $res;

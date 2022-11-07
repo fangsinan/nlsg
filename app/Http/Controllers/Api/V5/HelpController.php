@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
 use App\Models\HelpAnswer;
+use App\Models\Message\Message;
 use App\Models\Talk;
 use App\Models\TalkList;
 use Illuminate\Http\Request;
@@ -78,6 +79,8 @@ class HelpController extends Controller
             "user_id"    => $uid,
             "content"    => $message,
         ]);
+        //发送通知
+        Message::pushMessage(0,$uid,'SYS_USER_SEND_HELP',[]);
         return $this->success();
     }
 
