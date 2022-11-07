@@ -1126,6 +1126,10 @@ class OrderController extends ControllerBackend
                 ]);
             });
 
+        $query->whereHas('user',function($q){
+            $q->where('is_test_pay','=',0);
+        });
+
         $direction = $sort == 'asc' ? 'asc' : 'desc';
         $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
             'created_at', 'status')
