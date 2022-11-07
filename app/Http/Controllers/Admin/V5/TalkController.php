@@ -35,12 +35,7 @@ class TalkController extends ControllerBackend
         return $this->getRes((new TalkServers())->remarkList($request->input(), $this->user));
     }
 
-    //todo 获取聊天定位坐标
-    public function getMsgCoordinate(Request $request): JsonResponse{
-
-    }
-
-    //todo 聊天信息列表
+    //聊天信息列表
     public function talkList(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->talkList($request->input(), $this->user));
