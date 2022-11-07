@@ -1085,7 +1085,7 @@ class OrderController extends ControllerBackend
         $sort = $request->get('sort');
         $query = Order::with(
             [
-                'user:id,nickname'
+                'user:id,nickname,phone'
             ])
             ->when(!is_null($status), function ($query) use ($status) {
                 $query->where('status', $status);
