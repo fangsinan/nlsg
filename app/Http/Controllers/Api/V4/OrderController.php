@@ -1160,6 +1160,13 @@ class OrderController extends Controller
             return $this->error(0, '用户id有误');
         }
 
+
+        //限制其下单业务
+        $checkAddOrder = Order::CheckAddOrder($product_id,16,$this->user,$os_type,$live_id);
+        if($checkAddOrder['code'] !== true){
+            return $this->error($checkAddOrder['code'], $checkAddOrder['msg']);
+        }
+
         /*********************** 校验推客身份   *********************/
         //先校验直播预约的tweeter_code
         if ($live_id) {
