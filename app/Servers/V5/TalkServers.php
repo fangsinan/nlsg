@@ -215,7 +215,7 @@ class TalkServers
             }
         }
 
-        $query->select(['id', 'talk_id', 'type', 'admin_id', 'content', 'created_at']);
+        $query->select(['id', 'talk_id', 'type', 'admin_id', 'content', 'created_at', 'image']);
         $query->orderBy('id');
         $query->limit($size)->offset(($page - 1) * $size);
 
@@ -344,7 +344,7 @@ class TalkServers
 
     public function templateList($params, $admin)
     {
-
+        $is_public = (int)($params['is_public'] ?? 1);
         return [__LINE__];
     }
 

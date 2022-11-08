@@ -10,7 +10,7 @@ class TalkList extends Base
     protected $table = 'nlsg_talk_list';
 
     protected $fillable = [
-        'talk_id', 'type','user_id','admin_id','content'
+        'talk_id', 'type','user_id','admin_id','content','image',
     ];
 
 
