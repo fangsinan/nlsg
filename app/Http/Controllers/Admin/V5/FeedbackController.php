@@ -79,4 +79,10 @@ class FeedbackController extends ControllerBackend
         return $this->getRes((new FeedbackServers())->helpChangeStatus($request->input(), $this->user));
     }
 
+    //统计
+    public function statistics(Request $request): JsonResponse{
+        return $this->getRes((new FeedbackServers())->statistics($request->input(), $this->user));
+    }
+
+
 }

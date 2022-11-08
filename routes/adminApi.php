@@ -439,6 +439,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('feedback/help_list','FeedbackController@helpList');
         Route::post('feedback/help_create','FeedbackController@helpCreate');
         Route::post('feedback/help_change_status','FeedbackController@helpChangeStatus');
+        Route::post('feedback/statistics','FeedbackController@statistics');
 
 
         Route::post('talk/list','TalkController@list');
