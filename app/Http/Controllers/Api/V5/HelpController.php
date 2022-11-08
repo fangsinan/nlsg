@@ -7,6 +7,7 @@ use App\Models\HelpAnswer;
 use App\Models\Message\Message;
 use App\Models\Talk;
 use App\Models\TalkList;
+use App\Models\TalkUserStatistics;
 use Illuminate\Http\Request;
 
 class HelpController extends Controller
@@ -81,6 +82,8 @@ class HelpController extends Controller
             "content"    => $message ??'',
             "image"      => $image??'',
         ]);
+        // 统计次数 num
+        TalkUserStatistics::msgCount($uid);
 
         return $this->success();
     }
