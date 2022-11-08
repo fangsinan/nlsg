@@ -235,12 +235,17 @@ class TalkServers
         $validator = Validator::make($params,
             [
                 'user_id' => 'bail|required|exists:nlsg_user,id',
-                'content' => 'bail|required|string|max:250',
+                'content' => 'bail|max:250',
+                'image'   => 'bail|max:200'
             ]
         );
 
         if ($validator->fails()) {
             return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        if (empty($params['content']) && empty($params['image'])) {
+            return ['code' => false, 'msg' => '内容和图片不能同时为空'];
         }
 
         DB::beginTransaction();
@@ -287,7 +292,8 @@ class TalkServers
                 'type'     => 2,
                 'user_id'  => $params['user_id'],
                 'admin_id' => $admin['id'],
-                'content'  => $params['content'],
+                'content'  => $params['content'] ?? '',
+                'image'    => $params['image'] ?? '',
                 'status'   => 1,
             ]);
 
@@ -344,8 +350,45 @@ class TalkServers
 
     public function templateList($params, $admin)
     {
-        $is_public = (int)($params['is_public'] ?? 1);
-        return [__LINE__];
+        $category_id = (int)($params['category_id'] ?? 0);
+        $size        = $params['size'] ?? 10;
+        $sort        = $params['sort'] ?? '';
+
+        if (!$category_id) {
+            return ['code' => false, 'msg' => '分类错误'];
+        }
+
+        $check_category = TalkTemplateCategory::query()
+            ->where('id', '=', $category_id)
+            ->where('status', '!=', 3)
+            ->first();
+
+        if ($check_category->is_public == 2 && $check_category->admin_id != $admin['id']) {
+            return ['code' => false, 'msg' => '私人分类,必须本人操作'];
+        }
+
+        $query = TalkTemplate::query()
+            ->with([
+                'categoryInfo:id'
+            ]);
+
+        $query->where('status', '<>', 3);
+        $query->whereHas('categoryInfo', function ($q) use ($category_id) {
+            $q->where('id', '=', $category_id);
+        });
+
+        switch ($sort) {
+            case 'time_asc':
+                $query->orderBy('id');
+                break;
+            default:
+                $query->orderBy('id', 'desc');
+
+        }
+
+        $query->select(['id', 'category_id', 'content', 'admin_id', 'status', 'created_at']);
+
+        return $query->paginate($size);
     }
 
     public function templateListCreate($params, $admin): array
@@ -390,7 +433,53 @@ class TalkServers
     public function templateListChangeStatus($params, $admin)
     {
 
-        return [__LINE__];
+        $flag = $params['flag'] ?? '';
+        $id   = (int)($params['id'] ?? 0);
+
+        if (empty($id)) {
+            return ['code' => false, 'msg' => 'id不能为空'];
+        }
+
+        if (!in_array($flag, ['del', 'on', 'off'])) {
+            return ['code' => false, 'msg' => '操作类型错误'];
+        }
+
+        $check_id = TalkTemplate::query()
+            ->where('id', '=', $id)
+            ->where('status', '<>', 3)
+            ->first();
+
+        if (empty($check_id)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        $check_category = TalkTemplateCategory::query()
+            ->where('id', '=', $check_id->category_id)
+            ->first();
+
+        if ($check_category->is_public == 2 && $check_category->admin_id != $admin['id']) {
+            return ['code' => false, 'msg' => '私人分类,必须本人操作'];
+        }
+
+        switch ($flag) {
+            case 'on':
+                $check_id->status = 1;
+                break;
+            case 'off':
+                $check_id->status = 2;
+                break;
+            case 'del':
+                $check_id->status = 3;
+                break;
+        }
+
+        $res = $check_id->save();
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败,请重试.'];
     }
 
     public function templateCategoryList($params, $admin)

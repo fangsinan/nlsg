@@ -59,7 +59,7 @@ class TalkController extends ControllerBackend
         return $this->getRes((new TalkServers())->talkUserList($request->input(), $this->user));
     }
 
-    //todo 快捷回复列表(公共,个人)
+    //快捷回复列表(公共,个人)
     public function templateList(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->templateList($request->input(), $this->user));
@@ -71,7 +71,7 @@ class TalkController extends ControllerBackend
         return $this->getRes((new TalkServers())->templateListCreate($request->input(), $this->user));
     }
 
-    //todo 快捷回复状态修改
+    //快捷回复状态修改
     public function templateListChangeStatus(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->templateListChangeStatus($request->input(), $this->user));
