@@ -344,7 +344,7 @@ class TalkServers
 
     public function templateList($params, $admin)
     {
-
+        $is_public = (int)($params['is_public'] ?? 1);
         return [__LINE__];
     }
 
