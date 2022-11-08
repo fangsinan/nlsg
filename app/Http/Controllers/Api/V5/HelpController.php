@@ -64,9 +64,10 @@ class HelpController extends Controller
 
 
         $message = $request->input("message");
+        $image = $request->input("image");
         // $uid = $this->user['id'];
         $uid = $request->input("user_id");
-        if( empty($message) || empty($uid)){
+        if( (empty($image) && empty($message)) || empty($uid)){
             return $this->error(0,'参数错误',[]);
         }
 
@@ -77,10 +78,10 @@ class HelpController extends Controller
             "talk_id"    => $talk_id,
             "type"       => 1,
             "user_id"    => $uid,
-            "content"    => $message,
+            "content"    => $message ??'',
+            "image"      => $image??'',
         ]);
-        //发送通知
-        Message::pushMessage(0,$uid,'SYS_USER_SEND_HELP',[]);
+
         return $this->success();
     }
 
