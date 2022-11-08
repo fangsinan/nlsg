@@ -12,7 +12,6 @@ class TalkTemplate extends Base
         'category_id',
         'content',
         'admin_id',
-        'is_public',
         'status',
     ];
 

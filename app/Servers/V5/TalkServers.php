@@ -348,10 +348,43 @@ class TalkServers
         return [__LINE__];
     }
 
-    public function templateListCreate($params, $admin)
+    public function templateListCreate($params, $admin): array
     {
+        $params['admin_id'] = $admin['id'] ?? 0;
 
-        return [__LINE__];
+        $validator = Validator::make($params,
+            [
+                'content'     => 'bail|required|string|max:200',
+                'status'      => 'bail|required|in:1,2',
+                'admin_id'    => 'bail|required|exists:nlsg_backend_user,id',
+                'category_id' => 'bail|required|numeric',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        $check_category = TalkTemplateCategory::query()
+            ->where('id', '=', $params['category_id'])
+            ->where('status', '<>', 3)
+            ->first();
+
+        if (empty($check_category)) {
+            return ['code' => false, 'msg' => '所选类型错误'];
+        }
+
+        if ($check_category->is_public == 2 && $check_category->admin_id != $admin['id']) {
+            return ['code' => false, 'msg' => '私人分类,必须本人操作'];
+        }
+
+        $res = TalkTemplate::query()->create($params);
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败'];
+
     }
 
     public function templateListChangeStatus($params, $admin)
