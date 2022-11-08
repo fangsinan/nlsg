@@ -31,7 +31,7 @@ class TalkList extends Base
     {
         $list = self::with(
             "user:id,nickname,headimg"
-        )->select("content","user_id",'admin_id','type')
+        )->select("content","user_id",'admin_id','type','image')
             ->where("user_id",$uid)
             ->where("status",1)->get();
         if(empty($list)) return [];
