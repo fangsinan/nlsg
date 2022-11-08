@@ -452,6 +452,9 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('talk/template_list','TalkController@templateList');
         Route::post('talk/template_list_create','TalkController@templateListCreate');
         Route::post('talk/template_list_change_status','TalkController@templateListChangeStatus');
+        Route::post('talk/template_category_list','TalkController@templateCategoryList');
+        Route::post('talk/template_category_list_create','TalkController@templateCategoryListCreate');
+        Route::post('talk/template_category_list_change_status','TalkController@templateCategoryListChangeStatus');
 
         //***********帮助留言与反馈部分结束***********
 

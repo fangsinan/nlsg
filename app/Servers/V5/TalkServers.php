@@ -7,6 +7,8 @@ namespace App\Servers\V5;
 use App\Models\Talk;
 use App\Models\TalkList;
 use App\Models\TalkRemark;
+use App\Models\TalkTemplate;
+use App\Models\TalkTemplateCategory;
 use App\Models\TalkUserStatistics;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -356,5 +358,93 @@ class TalkServers
     {
 
         return [__LINE__];
+    }
+
+    public function templateCategoryList($params, $admin)
+    {
+        $is_public = $params['is_public'] ?? 1;
+        $query     = TalkTemplateCategory::query()->where('status', '<>', 3);
+
+        if ($is_public == 1) {
+            $query->where('is_public', '=', 1);
+        } else {
+            $query->where('is_public', '=', 2)->where('admin_id', '=', $admin['id']);
+        }
+
+        $query->select(['id', 'title', 'admin_id', 'is_public']);
+
+        return $query->get();
+    }
+
+    public function templateCategoryListCreate($params, $admin): array
+    {
+
+        $params['admin_id'] = $admin['id'] ?? 0;
+
+        $validator = Validator::make($params,
+            [
+                'title'     => 'bail|required|string|max:200',
+                'is_public' => 'bail|required|in:1,2',
+                'status'    => 'bail|required|in:1,2',
+                'admin_id'  => 'bail|required|exists:nlsg_backend_user,id',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        $res = TalkTemplateCategory::query()->create($params);
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败'];
+
+    }
+
+    public function templateCategoryListChangeStatus($params, $admin): array
+    {
+
+        $flag = $params['flag'] ?? '';
+        $id   = $params['id'] ?? 0;
+
+        if (empty($id)) {
+            return ['code' => false, 'msg' => 'id不能为空'];
+        }
+
+        if (!in_array($flag, ['del'])) {
+            return ['code' => false, 'msg' => '操作类型错误'];
+        }
+
+        $check = TalkTemplateCategory::query()->where('id', '=', $id)->first();
+        if (empty($check)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        if ($check->is_public == 2 && $check->admin_id != $admin['id']) {
+            return ['code' => false, 'msg' => '私人分类,必须本人操作'];
+        }
+
+        $check_used = TalkTemplate::query()->where('category_id', '=', $id)
+            ->where('status', '<>', 3)
+            ->first();
+
+        if (!empty($check_used)) {
+            return ['code' => false, 'msg' => '该分类下有使用中的内容,无法删除'];
+        }
+
+        $res = TalkTemplateCategory::query()
+            ->where('id', '=', $id)
+            ->update([
+                'status' => 3,
+            ]);
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败,请重试.'];
+
     }
 }
