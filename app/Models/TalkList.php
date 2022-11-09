@@ -31,12 +31,14 @@ class TalkList extends Base
     {
         $list = self::with(
             "user:id,nickname,headimg"
-        )->select("content","user_id",'admin_id','type','image')
+        )->select("content","user_id",'admin_id','type')
             ->where("user_id",$uid)
-            ->where("status",1)->get();
+            ->where("status",1)
+            ->paginate(100)
+            ->toArray();
         if(empty($list)) return [];
 
-        $list = $list->toArray();
+        $list = $list['data'];
 
         foreach($list as &$val){
             //查看客服
