@@ -34,7 +34,7 @@ class TalkList extends Base
         )->select("content","user_id",'admin_id','type')
             ->where("user_id",$uid)
             ->where("status",1)
-            ->paginate(100)
+            ->paginate(5)
             ->toArray();
         if(empty($list)) return [];
 
