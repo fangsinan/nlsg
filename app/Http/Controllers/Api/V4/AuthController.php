@@ -1067,6 +1067,9 @@ class AuthController extends Controller
         if (!$code) {
             return error(400, '验证码不能为空', $sclass);
         }
+        if(!$nickname){
+            return error(400, '昵称不能为空', $sclass);
+        }
 
         $res = Redis::get($phone);
         if (!$res) {
