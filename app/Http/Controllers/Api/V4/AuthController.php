@@ -1052,4 +1052,39 @@ class AuthController extends Controller
         return error(0, 'error');
     }
 
+
+
+    // 0元购 手机号信息统计
+    public function zeroPhoneCollect(Request $request){
+        $phone = strval($request->input('phone'));
+        $code = $request->input('code');
+        $nickname = $request->input('nickname');
+
+        $sclass = new \StdClass();
+        if (!$phone) {
+            return error(400, '手机号不能为空', $sclass);
+        }
+        if (!$code) {
+            return error(400, '验证码不能为空', $sclass);
+        }
+
+        $res = Redis::get($phone);
+        if (!$res) {
+            return error(400, '验证码已过期', $sclass);
+        }
+        if ($code !== $res) {
+            return error(400, '验证码错误', $sclass);
+        }
+        $user = User::where('phone', $phone)->first();
+        if (empty($user)) {
+            User::create([
+                'phone' => $phone,
+                'nickname' => $nickname??substr_replace($phone, '****', 3, 4),
+            ]);
+        }
+
+        Redis::del($phone);
+        return success();
+    }
+
 }
