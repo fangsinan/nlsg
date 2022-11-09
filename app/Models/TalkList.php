@@ -35,7 +35,7 @@ class TalkList extends Base
             ->where("user_id",$uid)
             ->where("status",1)
             ->orderBy('created_at','desc')
-            ->paginate(5)
+            ->paginate(20)
 
             ->toArray();
         if(empty($list)) return [];
