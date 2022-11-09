@@ -114,7 +114,7 @@ class HelpController extends Controller
 
         // $uid = $this->user['id'];
         $uid = $request->input("user_id");
-        TalkList::where(["user_id",$uid,'status'=>1])->update([
+        TalkList::where(["user_id"=>$uid,'status'=>1])->update([
             'status' =>2
         ]);
         return $this->success();
