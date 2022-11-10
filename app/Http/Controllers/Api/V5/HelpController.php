@@ -105,6 +105,12 @@ class HelpController extends Controller
 
             $res = ImClient::curlGet("https://api.weixin.qq.com/wxa/getpaidunionid?access_token=".
                 WechatServers::GetToken()."&openid=oVWHQwYpGa68yhO-NlMCIirxzoFA&transaction_id=4200001597202211038866649894");
+
+            $res= json_decode($res,true);
+            if(!empty($res['errcode']) && $res['errcode'] == "40001"){
+                $res = ImClient::curlGet("https://api.weixin.qq.com/wxa/getpaidunionid?access_token=".
+                    WechatServers::GetToken(true)."&openid=oVWHQwYpGa68yhO-NlMCIirxzoFA&transaction_id=4200001597202211038866649894");
+            }
             dd($res);
         }
         // $uid = $this->user['id'];
