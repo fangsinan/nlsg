@@ -63,7 +63,7 @@ class CommentController extends ControllerBackend
             $user_ids = array_column($userData, 'id');
         }
         if (!empty($phone)){
-            $check_phone = User::where('phone','like',"%$phone%")->pluck('id')->toArray();
+            $check_phone = User::where('phone','like',"$phone%")->pluck('id')->toArray();
             if (!empty($check_phone)){
                 $user_ids = $check_phone;
             }

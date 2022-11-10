@@ -179,7 +179,7 @@ class ImFriendServers
         }
 
 //        $user = User::select("id","nickname","headimg","phone")
-//            ->where('phone', 'like', '%' . $params['phone'] . '%')->limit(30)->get()->toArray();
+//            ->where('phone', 'like',  $params['phone'] . '%')->limit(30)->get()->toArray();
 
 
 
@@ -187,7 +187,7 @@ class ImFriendServers
             ->select("u.id","u.nickname","u.headimg","u.phone")
             ->join('nlsg_im_user as iu',
                 'u.id', '=', 'iu.tag_im_to_account')
-            ->where('phone', 'like', '%' . $params['phone'] . '%')->limit(30)->get()->toArray();
+            ->where('phone', 'like', $params['phone'] . '%')->limit(30)->get()->toArray();
 
         return $user;
     }

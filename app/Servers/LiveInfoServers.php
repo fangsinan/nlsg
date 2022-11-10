@@ -65,7 +65,7 @@ class LiveInfoServers {
         }
         if (!empty($phone)) {
             $query->whereHas('UserInfo',function ($q)use($phone){
-                $q->where('phone','like',"%$phone%");
+                $q->where('phone','like',"$phone%");
             });
         }
         if (!empty($t_user_id)) {
@@ -75,7 +75,7 @@ class LiveInfoServers {
         }
         if (!empty($t_phone)) {
             $query->whereHas('twitterUser',function ($q)use($t_phone){
-                $q->where('phone','like',"%$t_phone%");
+                $q->where('phone','like',"$t_phone%");
             });
         }
         if (!empty($son_flag)) {

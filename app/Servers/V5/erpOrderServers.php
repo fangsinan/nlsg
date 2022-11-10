@@ -98,7 +98,7 @@ class erpOrderServers
         //账号
         $query->when($phone, function ($q, $phone) {
             $q->wherehas('user', function ($q) use ($phone) {
-                $q->where('phone', 'like', "%$phone%");
+                $q->where('phone', 'like', "$phone%");
             });
 //            $q->where('ordernum', 'like', "%$ordernum%");
         });

@@ -66,7 +66,7 @@ class OfflineOrderServers
         //用户账号
         if (!empty($phone)) {
             $query->wherehas('user', function ($q) use ($phone) {
-                $q->where('phone', 'like', '%' . $phone . '%');
+                $q->where('phone', 'like',  $phone . '%');
             });
         }
 

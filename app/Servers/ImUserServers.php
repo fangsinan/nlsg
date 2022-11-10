@@ -22,7 +22,7 @@ class ImUserServers {
         }
 
         if (!empty($params['phone'] ?? '')) {
-            $query->where('phone', 'like', '%' . $params['phone'] . '%');
+            $query->where('phone', 'like',  $params['phone'] . '%');
         }
 
         //性别
@@ -205,7 +205,7 @@ class ImUserServers {
 
         if (!empty($phone)) {
             $query->whereHas('UserInfo', function ($q) use ($phone) {
-                $q->where('phone', 'like', "%$phone%");
+                $q->where('phone', 'like', "$phone%");
             });
         }
 

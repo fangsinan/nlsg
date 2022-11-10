@@ -746,7 +746,7 @@ class OrderController extends ControllerBackend
             })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%' . $phone . '%');
+                    $query->where('phone', 'like', $phone . '%');
                 });
             })
             ->when($title, function ($query) use ($title) {
@@ -868,7 +868,7 @@ class OrderController extends ControllerBackend
 //            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%' . $phone . '%');
+                    $query->where('phone', 'like', $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
@@ -984,7 +984,7 @@ class OrderController extends ControllerBackend
 //            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%' . $phone . '%');
+                    $query->where('phone', 'like', $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
@@ -1103,7 +1103,7 @@ class OrderController extends ControllerBackend
 //            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%' . $phone . '%');
+                    $query->where('phone', 'like', $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
@@ -1230,7 +1230,7 @@ class OrderController extends ControllerBackend
 
         ->when($phone, function ($query) use ($phone) {
             $query->whereHas('user', function ($query) use ($phone) {
-                $query->where('phone', 'like', '%' . $phone . '%');
+                $query->where('phone', 'like', $phone . '%');
             });
         })
         ->when(!is_null($os_type), function ($query) use ($os_type) {

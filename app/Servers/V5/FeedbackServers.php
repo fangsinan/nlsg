@@ -56,7 +56,7 @@ class FeedbackServers
 
         if ($phone) {
             $query->whereHas('UserInfo', function ($q) use ($phone) {
-                $q->where('phone', 'like', "%$phone%");
+                $q->where('phone', 'like', "$phone%");
             });
         }
 

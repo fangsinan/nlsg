@@ -50,7 +50,7 @@ class TalkServers
 
         if ($phone) {
             $query->whereHas('userInfo', function ($q) use ($phone) {
-                $q->where('phone', 'like', '%' . $phone . '%');
+                $q->where('phone', 'like', $phone . '%');
             });
         }
 
@@ -342,7 +342,7 @@ class TalkServers
 //            })
             ->when($params['phone'] ?? '', function ($q) use ($params) {
                 $q->wherehas('userInfo', function ($q) use ($params) {
-                    $q->where('phone', 'like', '%' . $params['phone'] . '%');
+                    $q->where('phone', 'like', $params['phone'] . '%');
                 });
             })
             ->paginate($params['size'] ?? 10);
