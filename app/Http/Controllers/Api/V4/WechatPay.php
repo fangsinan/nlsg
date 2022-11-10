@@ -672,15 +672,15 @@ class WechatPay extends Controller
                 case 26: //套家庭教育内部教材 199
                     $res = $nickname . ':您已支付' . $live_num . '单 套家庭教育内部教材';
                     break;
-                case 27: //家庭教育指导师 2980
-                    $res = $nickname . ':您已支付' . $live_num . '单 家庭教育指导师';
-                    break;
-                case 28: //心理咨询师 3980
-                    $res = $nickname . ':您已支付' . $live_num . '单 心理咨询师';
-                    break;
-                case 29: //教育规划陪跑营 999
-                    $res = $nickname . ':您已支付' . $live_num . '单 教育规划陪跑营';
-                    break;
+				case 27: //家庭教育指导师 2980
+				    $res = $nickname . ':您已支付' . $live_num . '单 家庭教育指导师';
+				    break;
+				case 28: //心理咨询师 3980
+				    $res = $nickname . ':您已支付' . $live_num . '单 心理咨询师';
+				    break;
+				case 29: //教育规划陪跑营 999
+				    $res = $nickname . ':您已支付' . $live_num . '单 教育规划陪跑营';
+				    break;
             }
         } else if ($type == 18) {
             $data = Column::find($relation_id);
