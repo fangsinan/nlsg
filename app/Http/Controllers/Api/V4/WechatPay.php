@@ -934,6 +934,10 @@ class WechatPay extends Controller
                     }
 
 
+                    // 修改用户unionid
+                    User::SetUnionid($user_id,$transaction_id);
+
+
                     return true;
 
                 } else {
