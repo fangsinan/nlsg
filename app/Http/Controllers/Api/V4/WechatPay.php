@@ -308,23 +308,27 @@ class WechatPay extends Controller
                         if ($tk_vip && $supremacy_vip == 1) {   //目前只有360会员有收益
                             $ProfitPrice = GetPriceTools::Income(0, $tk_vip, 0, 5); //360权益30% 钻石权益50%
                             if ($ProfitPrice > 0) {
-                                $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
+                                $map=[];
+                                if($tk_vip==2){//钻石合伙人
+                                    $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
+                                }
                             }
                         }
                         /*****************     开通360   有销讲老师的划分收益【】  ****************/
-                        if (!empty($map) && (empty($sales_id) || $vip_order_type == 2)) {  //收益存在 并且 (销讲老师表id为空 或者 续费) 正常执行收益流程    1开通  2续费
+                        if (!empty($map) && (empty($sales_id) || $vip_order_type == 2)) {  //收益存在 并且 (销讲老师表id为空 或者 续费) 正常执行收益流程  vip_order_type1开通  2续费
                             //防止重复添加收入
                             $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
                             $PrdInfo = PayRecordDetail::where($where)->first('id');
                             if (empty($PrdInfo)) {
                                 $pay_record_flag = 1;
-//                                $Sy_Rst = PayRecordDetail::firstOrCreate($map);
+                                $Sy_Rst = PayRecordDetail::firstOrCreate($map);
                             }
                         } else if (!empty($sales_id) && $vip_order_type == 1) {  //仅开通360  销讲老师表id存在时 执行 销讲老师收益100 代理商收益126  公司134
                             //老师收益
                             $salesData = MeetingSales::where(['id' => $sales_id, 'status' => 1])->first();
                             $sales_map = array('user_id' => $salesData['user_id'], "type" => 11, "ordernum" => $out_trade_no, 'price' => 100, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
 //                            $Sales_Rst = PayRecordDetail::firstOrCreate($sales_map);
+
                             //正常是 代理商收益126  公司134
                             $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => 126, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
                             //if( $salesData['type'] == 2 ){  } //需要查绑定关系   钻石合伙人是126   360是54  没有则只有老师有收益
@@ -340,6 +344,7 @@ class WechatPay extends Controller
                                     $map = [];  // 如果没有绑定  则只有老师有收益
                                     break;
                             }
+
                             //代理商收益
                             if ($map) {
                                 $pay_record_flag = 1;
@@ -355,7 +360,7 @@ class WechatPay extends Controller
                         $twitter_top_vip_id = VipUser::where(['user_id' => $twitter_top[0], 'is_default' => 1, 'status' => 1])->first('id');
                         if ($twitter_top_vip_id){
                             $top_map = array('user_id' => $twitter_top[0], "type" => 11, "ordernum" => $out_trade_no, 'price' => 0, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $twitter_top_vip_id->id);
-//                            $top_Sy_Rst = PayRecordDetail::firstOrCreate($top_map);
+                            $top_Sy_Rst = PayRecordDetail::firstOrCreate($top_map);
                         }
                     }
 
@@ -933,10 +938,8 @@ class WechatPay extends Controller
                         Message::pushMessage(0,$map['user_id'],"LIVE_PROFIT_REWARD",["action_id"=>$Profit_Rst->id,]);
                     }
 
-
                     // 修改用户unionid
                     User::SetUnionid($user_id,$transaction_id);
-
 
                     return true;
 
