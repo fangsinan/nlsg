@@ -304,21 +304,15 @@ class WechatPay extends Controller
                     // 开通续费为360   并且  推客id有 或者  销讲老师id有[推客可能为空]
                     $sales_id = $orderInfo['sales_id']; //销讲老师
                     if ($supremacy_vip == 1 && (!empty($twitter_id) || !empty($sales_id))) { //推客是自己不算 服务商赠送不返利
-                        $tk_vip = VipUser::IsNewVip($twitter_id);
-
+                        $tk_vip = VipUser::IsNewVip($twitter_id); //钻石或者360未过期即可
                         if ($tk_vip && $supremacy_vip == 1) {   //目前只有360会员有收益
-                            $ProfitPrice = GetPriceTools::Income(0, $tk_vip, 0, 5);
-
+                            $ProfitPrice = GetPriceTools::Income(0, $tk_vip, 0, 5); //360权益30% 钻石权益50%
                             if ($ProfitPrice > 0) {
                                 $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
-                                $map=[];
                             }
                         }
-
-
                         /*****************     开通360   有销讲老师的划分收益【】  ****************/
-
-                        if (!empty($map) && (empty($sales_id) || $vip_order_type == 2)) {  //收益存在 并且 (销讲老师表id为空 或者 续费) 正常执行收益流程
+                        if (!empty($map) && (empty($sales_id) || $vip_order_type == 2)) {  //收益存在 并且 (销讲老师表id为空 或者 续费) 正常执行收益流程    1开通  2续费
                             //防止重复添加收入
                             $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
                             $PrdInfo = PayRecordDetail::where($where)->first('id');
@@ -331,7 +325,6 @@ class WechatPay extends Controller
                             $salesData = MeetingSales::where(['id' => $sales_id, 'status' => 1])->first();
                             $sales_map = array('user_id' => $salesData['user_id'], "type" => 11, "ordernum" => $out_trade_no, 'price' => 100, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
 //                            $Sales_Rst = PayRecordDetail::firstOrCreate($sales_map);
-
                             //正常是 代理商收益126  公司134
                             $map = array('user_id' => $twitter_id, "type" => 11, "ordernum" => $out_trade_no, 'price' => 126, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $Userdata['inviter_vip_id']);
                             //if( $salesData['type'] == 2 ){  } //需要查绑定关系   钻石合伙人是126   360是54  没有则只有老师有收益
@@ -347,7 +340,6 @@ class WechatPay extends Controller
                                     $map = [];  // 如果没有绑定  则只有老师有收益
                                     break;
                             }
-
                             //代理商收益
                             if ($map) {
                                 $pay_record_flag = 1;
