@@ -8,6 +8,7 @@ use App\Models\Message\Message;
 use App\Models\Talk;
 use App\Models\TalkList;
 use App\Models\TalkUserStatistics;
+use App\Models\User;
 use App\Servers\V5\WechatServers;
 use Illuminate\Http\Request;
 use Libraries\ImClient;
@@ -99,19 +100,7 @@ class HelpController extends Controller
      */
     function getMessage(Request $request){
 
-$opneid = "oVWHQwXGy1BxUJHQDwNGuoeONXZc";
-        if(!empty($request->input("test"))){
 
-            $res = ImClient::curlGet("https://api.weixin.qq.com/wxa/getpaidunionid?access_token=".
-                WechatServers::GetToken()."&openid=$opneid&transaction_id=4200001609202211107247106391");
-
-            $res= json_decode($res,true);
-            if(!empty($res['errcode']) && $res['errcode'] == "40001"){
-                $res = ImClient::curlGet("https://api.weixin.qq.com/wxa/getpaidunionid?access_token=".
-                    WechatServers::GetToken(true)."&openid=$opneid&transaction_id=4200001609202211107247106391");
-            }
-            dd($res);
-        }
         // $uid = $this->user['id'];
         $uid = $request->input("user_id");
         $list = TalkList::GetListByUserId($uid);
