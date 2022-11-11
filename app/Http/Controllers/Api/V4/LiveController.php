@@ -1697,7 +1697,7 @@ class LiveController extends Controller
             if($live_data['is_zero'] == 2){
                 // 0元购 处理
                 $is_sub = OrderZero::checkZeroLive($info_id,$this->user['id'],[
-                    "form_liveId"   => $input['form_liveId']??0,
+                    "form_liveId"   => $input['from_live_info_id']??0,
                     "ip"            => $this->getIp($request),
                     "pay_type"      => $input['pay_type']??1,
                     "os_type"       => $input['os_type']??3,

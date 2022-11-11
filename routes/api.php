@@ -680,5 +680,8 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::any('help/send_message', 'HelpController@sendMessage');
     Route::any('help/get_message', 'HelpController@getMessage');
     Route::any('help/del_message', 'HelpController@delMessage');
+    //我要提意见
+    Route::any('help/get_feedback_type', 'HelpController@getFeedBackType');
+    Route::any('help/feedback', 'HelpController@feedback');
     /**     5.0 API  END    ***/
 });
