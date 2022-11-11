@@ -90,8 +90,8 @@ class VipWorksList extends Base
                 $temp_res_category_id = [];
                 foreach ($v['column']['category_relation'] as $cv) {
                     $temp_category_res         = [];
-                    $temp_category_res['id']   = $cv['category_name']['id'];
-                    $temp_category_res['name'] = $cv['category_name']['name'];
+                    $temp_category_res['id']   = $cv['category_name']['id']??0;
+                    $temp_category_res['name'] = $cv['category_name']['name']??"";
                     if (!empty($temp_category_res['id']) && !empty($temp_category_res['name'])) {
                         $temp_res_category_id[] = $temp_category_res['id'];
                         if (!in_array($cv['category_name']['id'], array_column($category_res, 'id'))) {
@@ -108,8 +108,8 @@ class VipWorksList extends Base
                 $temp_res_category_id = [];
                 foreach ($v['works']['category_relation'] as $cv) {
                     $temp_category_res         = [];
-                    $temp_category_res['id']   = $cv['category_name']['id'];
-                    $temp_category_res['name'] = $cv['category_name']['name'];
+                    $temp_category_res['id']   = $cv['category_name']['id']??0;
+                    $temp_category_res['name'] = $cv['category_name']['name']??'';
                     if (!empty($temp_category_res['id']) && !empty($temp_category_res['name'])) {
                         $temp_res_category_id[] = $temp_category_res['id'];
                         if (!in_array($cv['category_name']['id'], array_column($category_res, 'id'))) {
