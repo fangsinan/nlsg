@@ -131,9 +131,15 @@ class VipWorksList extends Base
             } else {
                 continue;
             }
+
+
             if (version_compare($version, "5.0.0") >= 0) { //根据uid 分组
                 //最大不超过4个课程  11-11 号调整
-                if(!empty($new_data[$temp_res['user_id']]["list"]) && count($new_data[$temp_res['user_id']]["list"]) < 4){
+                $count = 0;
+                if(!empty($new_data[$temp_res['user_id']])){
+                    $count = count($new_data[$temp_res['user_id']]["list"]);
+                }
+                if($count  < 4){
                     $new_data[$temp_res['user_id']]["user_info"] = User::getTeacherInfo($temp_res['user_id']);;
                     $new_data[$temp_res['user_id']]["list"][] = $temp_res;
                     $new_data[$temp_res['user_id']]["count"]  = count($new_data[$temp_res['user_id']]["list"]);
