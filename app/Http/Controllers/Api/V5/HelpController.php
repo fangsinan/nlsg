@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
+use App\Models\FeedBack;
 use App\Models\HelpAnswer;
-use App\Models\Message\Message;
+use App\Models\FeedbackType;
 use App\Models\Talk;
 use App\Models\TalkList;
 use App\Models\TalkUserStatistics;
@@ -122,6 +123,49 @@ class HelpController extends Controller
             'status' =>2
         ]);
         return $this->success();
+    }
+
+
+
+    /**
+     * getFeedBackType  提意见类型
+     */
+    function getFeedBackType(){
+        $types =  FeedbackType::where(['type'=>1])->get();
+        return $this->success($types);
+    }
+
+
+    /**
+     *  {get} api/v4/user/feedback 我要吐槽
+     * @apiVersion 4.0.0
+     * @apiParam {string} type 10:使用建议 11:内容漏缺 12:购物相关 13:物流配送 14:客服体验 15:节约相关
+     * @apiParam {string} content 内容  不能大于200字
+     * @apiParam {string} pic  图片url(数组格式)
+     * @apiGroup Api
+     */
+    public function feedback(Request $request)
+    {
+        $input = $request->all();
+        if (!$input['content']) {
+            return $this->error(1000, '描述不能为空');
+        }
+        if( !empty($input['pic']) ){
+            $pics  = explode(',', $input['pic']);
+            if (count($pics) > 3) {
+                return $this->error(1000,'图片过多');
+            }
+        }
+        $res = FeedBack::create([
+            'type' => $input['type'],
+            'user_id' => $this->user['id']??0,
+            'content' => $input['content'],
+            'pic' => $input['pic']
+        ]);
+        if ($res) {
+            return $this->success();
+        }
+
     }
 
 
