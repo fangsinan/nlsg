@@ -128,7 +128,7 @@ class HelpController extends Controller
 
 
     /**
-     * getFeedBackType  提意见类型
+     * /api/v5/help/get_feedback_type  提意见类型
      */
     function getFeedBackType(){
         $types =  FeedbackType::where(['type'=>1])->get();

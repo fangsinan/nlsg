@@ -90,8 +90,8 @@ class VipWorksList extends Base
                 $temp_res_category_id = [];
                 foreach ($v['column']['category_relation'] as $cv) {
                     $temp_category_res         = [];
-                    $temp_category_res['id']   = $cv['category_name']['id'];
-                    $temp_category_res['name'] = $cv['category_name']['name'];
+                    $temp_category_res['id']   = $cv['category_name']['id']??0;
+                    $temp_category_res['name'] = $cv['category_name']['name']??"";
                     if (!empty($temp_category_res['id']) && !empty($temp_category_res['name'])) {
                         $temp_res_category_id[] = $temp_category_res['id'];
                         if (!in_array($cv['category_name']['id'], array_column($category_res, 'id'))) {
@@ -108,8 +108,8 @@ class VipWorksList extends Base
                 $temp_res_category_id = [];
                 foreach ($v['works']['category_relation'] as $cv) {
                     $temp_category_res         = [];
-                    $temp_category_res['id']   = $cv['category_name']['id'];
-                    $temp_category_res['name'] = $cv['category_name']['name'];
+                    $temp_category_res['id']   = $cv['category_name']['id']??0;
+                    $temp_category_res['name'] = $cv['category_name']['name']??'';
                     if (!empty($temp_category_res['id']) && !empty($temp_category_res['name'])) {
                         $temp_res_category_id[] = $temp_category_res['id'];
                         if (!in_array($cv['category_name']['id'], array_column($category_res, 'id'))) {
@@ -131,12 +131,19 @@ class VipWorksList extends Base
             } else {
                 continue;
             }
+
+
             if (version_compare($version, "5.0.0") >= 0) { //根据uid 分组
-                $new_data[$temp_res['user_id']]["user_info"] = User::getTeacherInfo($temp_res['user_id']);;
-                $new_data[$temp_res['user_id']]["list"][] = $temp_res;
-                $new_data[$temp_res['user_id']]["count"]  = count($new_data[$temp_res['user_id']]["list"]);
-
-
+                //最大不超过4个课程  11-11 号调整
+                $count = 0;
+                if(!empty($new_data[$temp_res['user_id']])){
+                    $count = count($new_data[$temp_res['user_id']]["list"]);
+                }
+                if($count  < 4){
+                    $new_data[$temp_res['user_id']]["user_info"] = User::getTeacherInfo($temp_res['user_id']);;
+                    $new_data[$temp_res['user_id']]["list"][] = $temp_res;
+                    $new_data[$temp_res['user_id']]["count"]  = count($new_data[$temp_res['user_id']]["list"]);
+                }
             } else {
                 $temp_res['user_info'] = User::getTeacherInfo($temp_res['user_id']);
                 $res[]                 = $temp_res;
