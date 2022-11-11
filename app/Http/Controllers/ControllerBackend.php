@@ -29,6 +29,15 @@ class ControllerBackend extends BaseController
 
     public function __construct(Request $request)
     {
+        if (!\auth('backendApi')->check()){
+            $class = new \stdClass();
+            $class->code = 401;
+            $class->msg  = '没有登录';
+            $class->data = '';
+            echo json_encode($class);
+            exit;
+        }
+
         $this->user = auth('backendApi')->user();
 
         if ($this->user) {
