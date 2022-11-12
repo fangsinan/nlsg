@@ -258,15 +258,19 @@ class WechatServersNew
             'data'=>[
                 "first"=>[
                     "value"=>$hello,
+                    "color"=>"#FF0000"
                 ],
                 "keyword1"=>[ //课程名称
                     "value"=>$title,
+                    "color"=>"#FF0000"
                 ],
                 "keyword2"=>[ //开课时间
                     "value"=>$day,
+                    "color"=>"#FF0000"
                 ],
                 "remark"=>[
                     "value"=>$remarks,
+                    "color"=>"#FF0000"
                 ],
 
             ],
