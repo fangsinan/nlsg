@@ -10,6 +10,7 @@ use App\Models\FeedbackType;
 use App\Models\HelpAnswer;
 use App\Models\HelpAnswerKeywords;
 use App\Models\HelpAnswerKeywordsBind;
+use App\Models\Message\Message;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -172,6 +173,24 @@ class FeedbackServers
             ]);
 
         if ($res) {
+
+            //写入推送部分
+            $fb_list = FeedbackNew::query()
+                ->whereIn('id',$id)
+                ->with('UserInfo:id,phone,nickname')
+                ->select(['id','type','user_id','content','created_at','reply_content','reply_at'])
+                ->get()
+                ->toArray();
+
+            foreach ($fb_list as $fb_v){
+                Message::pushMessage(
+                    0,
+                    $fb_v['user_id'],
+                    'SYS_FEEDBACK_REPLY',
+                    $fb_v
+                );
+            }
+
             return ['code' => true, 'msg' => '成功'];
         }
 
