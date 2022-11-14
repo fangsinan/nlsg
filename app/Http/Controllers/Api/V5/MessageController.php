@@ -676,9 +676,18 @@ class MessageController extends Controller
             //格式化时间
             $items['message']['created_at'] = formatDataTime($items['created_at'],2);;
             $items['created_at'] =formatDataTime($items['created_at']);
-            //如果是反馈回复获取反馈内容
-            if($items['type']==24){
 
+            //如果是反馈回复获取反馈内容
+            if($items['type']==25){
+
+                $msg_arr=json_decode($items['message']['message'],true);
+                $items['message']['message']=[
+                    'content'=>$msg_arr['content']??'',
+                    'reply'=>$msg_arr['reply']??'',
+                    'reply_at'=>$msg_arr['reply_at']??'',
+                    'nickname'=>$msg_arr['nickname']??'',
+                    'created_at'=>$msg_arr['created_at']??'',
+                ];
             }
 
         }
