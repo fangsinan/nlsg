@@ -5,10 +5,11 @@ namespace App\Servers\V5;
 
 
 use App\Models\OrderZero;
+use App\Servers\LiveInfoServers;
 
 class ZeroOrderListServers
 {
-    public function list($params)
+    public function list($params,$this_user = [])
     {
         $query = OrderZero::query()
             ->with([
@@ -17,6 +18,15 @@ class ZeroOrderListServers
                 'relationLiveInfo:id,title,cover_img,price,is_zero',
                 'fromLiveInfo:id,title,cover_img,price,is_zero',
             ]);
+
+
+        if ($this_user['role_id'] !== 1) {
+            $liServers       = new LiveInfoServers();
+            $twitter_id_list = $liServers->twitterIdList($this_user['username']);
+            if ($twitter_id_list !== null) {
+                $query->whereIn('twitter_id', $twitter_id_list);
+            }
+        }
 
         $phone          = $params['phone'] ?? '';
         $twitter_phone  = $params['twitter_phone'] ?? '';

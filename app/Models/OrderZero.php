@@ -53,7 +53,7 @@ class OrderZero extends Base
      */
     static function checkZeroLive($liveId, $uid, array $form_data = []): bool
     {
-        $live = self::where(['id'=>$liveId,'is_zero'=>2])->first();
+        $live = Live::where(['id'=>$liveId,'is_zero'=>2])->first();
         if(empty($live)){
             return false;
         }
@@ -85,7 +85,7 @@ class OrderZero extends Base
         ]);
 
 
-        $startTime = strtotime(date('Y-m-d', $time));
+        $startTime = strtotime(date('Y-m-d', time()));
         $endTime = strtotime(date('Y', $startTime) + 1 . '-' . date('m-d', $startTime)) + 86400; //到期日期
         $sub_res = Subscribe::insert([
             'user_id'       => $uid, //会员id
@@ -97,6 +97,7 @@ class OrderZero extends Base
             'end_time'      => date("Y-m-d H:i:s", $endTime),
             'relation_id'   => $liveId,
             'is_zero'       => 2,
+            "twitter_id"    => $form_data['twitter_id']??0,
         ]);
 
         if($order_zero_id && $sub_res){

@@ -35,12 +35,7 @@ class TalkController extends ControllerBackend
         return $this->getRes((new TalkServers())->remarkList($request->input(), $this->user));
     }
 
-    //todo 获取聊天定位坐标
-    public function getMsgCoordinate(Request $request): JsonResponse{
-
-    }
-
-    //todo 聊天信息列表
+    //聊天信息列表
     public function talkList(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->talkList($request->input(), $this->user));
@@ -64,22 +59,39 @@ class TalkController extends ControllerBackend
         return $this->getRes((new TalkServers())->talkUserList($request->input(), $this->user));
     }
 
-    //todo 快捷回复列表(公共,个人)
+    //快捷回复列表(公共,个人)
     public function templateList(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->templateList($request->input(), $this->user));
     }
 
-    //todo 添加快捷回复
+    //添加快捷回复
     public function templateListCreate(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->templateListCreate($request->input(), $this->user));
     }
 
-    //todo 快捷回复状态修改
+    //快捷回复状态修改
     public function templateListChangeStatus(Request $request): JsonResponse
     {
         return $this->getRes((new TalkServers())->templateListChangeStatus($request->input(), $this->user));
     }
 
+    //快捷回复类型列表(公共,个人)
+    public function templateCategoryList(Request $request): JsonResponse
+    {
+        return $this->getRes((new TalkServers())->templateCategoryList($request->input(), $this->user));
+    }
+
+    //添加快捷回复类型
+    public function templateCategoryListCreate(Request $request): JsonResponse
+    {
+        return $this->getRes((new TalkServers())->templateCategoryListCreate($request->input(), $this->user));
+    }
+
+    //快捷回复类型状态修改
+    public function templateCategoryListChangeStatus(Request $request): JsonResponse
+    {
+        return $this->getRes((new TalkServers())->templateCategoryListChangeStatus($request->input(), $this->user));
+    }
 }

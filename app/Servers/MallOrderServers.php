@@ -331,7 +331,7 @@ class MallOrderServers
         //昵称,账号,
         if (!empty($params['phone'])) {
             $query->whereHas('userInfo', function (Builder $query) use ($params) {
-                $query->where('phone', 'like', '%' . $params['phone'] . '%');
+                $query->where('phone', 'like',  $params['phone'] . '%');
             });
         }
 //        if (!empty($params['nickname'])) {
@@ -470,7 +470,7 @@ class MallOrderServers
         //昵称,账号,
         if (!empty($params['phone'])) {
             $query->whereHas('userInfo', function (Builder $query) use ($params) {
-                $query->where('phone', 'like', '%' . $params['phone'] . '%');
+                $query->where('phone', 'like',  $params['phone'] . '%');
             });
         }
 

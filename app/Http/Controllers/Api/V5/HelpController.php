@@ -3,10 +3,16 @@
 namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
+use App\Models\FeedBack;
 use App\Models\HelpAnswer;
+use App\Models\FeedbackType;
 use App\Models\Talk;
 use App\Models\TalkList;
+use App\Models\TalkUserStatistics;
+use App\Models\User;
+use App\Servers\V5\WechatServers;
 use Illuminate\Http\Request;
+use Libraries\ImClient;
 
 class HelpController extends Controller
 {
@@ -63,9 +69,10 @@ class HelpController extends Controller
 
 
         $message = $request->input("message");
+        $image = $request->input("image");
         // $uid = $this->user['id'];
         $uid = $request->input("user_id");
-        if( empty($message) || empty($uid)){
+        if( (empty($image) && empty($message)) || empty($uid)){
             return $this->error(0,'参数错误',[]);
         }
 
@@ -76,8 +83,12 @@ class HelpController extends Controller
             "talk_id"    => $talk_id,
             "type"       => 1,
             "user_id"    => $uid,
-            "content"    => $message,
+            "content"    => $message ??'',
+            "image"      => $image??'',
         ]);
+        // 统计次数 num
+        TalkUserStatistics::msgCount($uid);
+
         return $this->success();
     }
 
@@ -89,6 +100,7 @@ class HelpController extends Controller
      * {get} /api/v5/help/get_message?user_id=211172
      */
     function getMessage(Request $request){
+
 
         // $uid = $this->user['id'];
         $uid = $request->input("user_id");
@@ -107,10 +119,53 @@ class HelpController extends Controller
 
         // $uid = $this->user['id'];
         $uid = $request->input("user_id");
-        TalkList::where(["user_id",$uid,'status'=>1])->update([
+        TalkList::where(["user_id"=>$uid,'status'=>1])->update([
             'status' =>2
         ]);
         return $this->success();
+    }
+
+
+
+    /**
+     * /api/v5/help/get_feedback_type  提意见类型
+     */
+    function getFeedBackType(){
+        $types =  FeedbackType::where(['type'=>1])->get();
+        return $this->success($types);
+    }
+
+
+    /**
+     *  {get} api/v4/user/feedback 我要吐槽
+     * @apiVersion 4.0.0
+     * @apiParam {string} type 10:使用建议 11:内容漏缺 12:购物相关 13:物流配送 14:客服体验 15:节约相关
+     * @apiParam {string} content 内容  不能大于200字
+     * @apiParam {string} pic  图片url(数组格式)
+     * @apiGroup Api
+     */
+    public function feedback(Request $request)
+    {
+        $input = $request->all();
+        if (!$input['content']) {
+            return $this->error(1000, '描述不能为空');
+        }
+        if( !empty($input['pic']) ){
+            $pics  = explode(',', $input['pic']);
+            if (count($pics) > 3) {
+                return $this->error(1000,'图片过多');
+            }
+        }
+        $res = FeedBack::create([
+            'type' => $input['type'],
+            'user_id' => $this->user['id']??0,
+            'content' => $input['content'],
+            'pic' => $input['pic']
+        ]);
+        if ($res) {
+            return $this->success();
+        }
+
     }
 
 

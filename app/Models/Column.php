@@ -228,14 +228,14 @@ class Column extends Base
 
     // 训练营 历史记录 学习奖励发放  相关
     public function campStudy($camp_id,$user_id,$os_type){
- 
+
         $column_data = Column::select('id','info_column_id','end_time','show_info_num')->find($camp_id);
         if (empty($column_data)) {
             return ['code'=>0,'msg'=> '参数有误：无此信息'];
         }
-        // 训练营 每周开放六节课程 周日不开课  
+        // 训练营 每周开放六节课程 周日不开课
         // 查询训练营目前开放的全部课程 ，没六个章节为一周，查询历史记录表是否完结
-        
+
         // $type = 7;
         // $history_type = 5; //训练营 历史记录type值
         // $getInfo_type = 4; //训练营 info type值
@@ -263,14 +263,14 @@ class Column extends Base
             'relation_type' => 5,
             'is_end'        => 1,
         ])->groupBy('info_id')->pluck('info_id')->toArray();
-        
+
         // 定义周数据
 
         // dd($info_ids);
         //匹配每周数据是否对应  info_ids 每六节课为一周 去除先导片
         // array_pop($work_info_ids);
         $info_ids = array_chunk($work_info_ids,6);
-        
+
         $data = [
             'relation_id'   => $camp_id,
             'user_id'       => $user_id,
@@ -296,7 +296,7 @@ class Column extends Base
             if( $data['week_num'] > $week_count){
                 $data['speed_status'] = 0;  //学习奖励不开放领取
             }
-           
+
             $Reward = ColumnWeekReward::where([
                 'relation_id'   =>$camp_id,
                 'user_id'       =>$user_id,
@@ -316,7 +316,7 @@ class Column extends Base
         $column_banner = (object)[];
         if( !empty($params['version']) && version_compare($params['version'], "5.0.0", '>=') ){  //新版出现
             // 需要针对每个训练营进行一对一管、
-            
+
             $column_banner = DB::table("nlsg_camp_banner")->select("id","column_id","jump_type","obj_id","h5_url", "image", "text")
                             ->where(['column_id'=>$column_id,'is_show'=>1])->first();
             // 如果是360类型  需要单独校验 开通\续费
@@ -355,7 +355,12 @@ class Column extends Base
 
     }
 
-
+    public function categoryRelation()
+    {
+        //一对多
+        return $this->hasMany('App\Models\WorksCategoryRelation', 'work_id', 'id')
+            ->select(['id', 'work_id', 'category_id']);
+    }
 
 
 }

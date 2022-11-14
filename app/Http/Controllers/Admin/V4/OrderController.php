@@ -746,7 +746,7 @@ class OrderController extends ControllerBackend
             })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%' . $phone . '%');
+                    $query->where('phone', 'like', $phone . '%');
                 });
             })
             ->when($title, function ($query) use ($title) {
@@ -868,7 +868,7 @@ class OrderController extends ControllerBackend
 //            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%' . $phone . '%');
+                    $query->where('phone', 'like', $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
@@ -984,7 +984,7 @@ class OrderController extends ControllerBackend
 //            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%' . $phone . '%');
+                    $query->where('phone', 'like', $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
@@ -1085,7 +1085,7 @@ class OrderController extends ControllerBackend
         $sort = $request->get('sort');
         $query = Order::with(
             [
-                'user:id,nickname'
+                'user:id,nickname,phone'
             ])
             ->when(!is_null($status), function ($query) use ($status) {
                 $query->where('status', $status);
@@ -1103,7 +1103,7 @@ class OrderController extends ControllerBackend
 //            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', '%' . $phone . '%');
+                    $query->where('phone', 'like', $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
@@ -1125,6 +1125,10 @@ class OrderController extends ControllerBackend
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
+
+        $query->whereHas('user',function($q){
+            $q->where('is_test_pay','=',0);
+        });
 
         $direction = $sort == 'asc' ? 'asc' : 'desc';
         $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
@@ -1226,7 +1230,7 @@ class OrderController extends ControllerBackend
 
         ->when($phone, function ($query) use ($phone) {
             $query->whereHas('user', function ($query) use ($phone) {
-                $query->where('phone', 'like', '%' . $phone . '%');
+                $query->where('phone', 'like', $phone . '%');
             });
         })
         ->when(!is_null($os_type), function ($query) use ($os_type) {

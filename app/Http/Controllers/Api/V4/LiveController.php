@@ -25,6 +25,7 @@ use App\Models\MallOrder;
 use App\Models\OfflineProducts;
 use App\Models\Order;
 use App\Models\OrderTwitterLog;
+use App\Models\OrderZero;
 use App\Models\PayRecord;
 use App\Models\Qrcodeimg;
 use App\Models\Subscribe;
@@ -314,7 +315,7 @@ class LiveController extends Controller
         $user = User::where('id', $uid)->first();
 
         $day_time=date("Y-m-d",strtotime("-1 day"));
-        $fills = ['id', 'user_id', 'title', 'describe', 'price','cover_img', 'begin_at', 'type', 'end_at','steam_begin_time','playback_price', 'is_free', 'password', 'order_num','sort'];
+        $fills = ['id', 'user_id', 'title', 'describe', 'price','cover_img', 'begin_at', 'type', 'end_at','steam_begin_time','playback_price', 'is_free', 'password', 'order_num','sort','hide_sub_count'];
         $query = Live::query();
         if (!$uid || ($user && !in_array($user->phone, $testers))) {
             $query->where('is_test', '=', 0);
@@ -1690,14 +1691,34 @@ class LiveController extends Controller
             if(!empty($input['is_flag'])){
                 $is_flag=$input['is_flag'];
             }
-            Subscribe::create([
-                'user_id' => $this->user['id'],
-                'type' => 3,
-                'relation_id' => $info_id,
-                'status' => 1,
-                'is_flag' => $is_flag,
-                'twitter_id' => $twitter_id,
-            ]);
+
+
+
+            if($live_data['is_zero'] == 2){
+                // 0元购 处理
+                $is_sub = OrderZero::checkZeroLive($info_id,$this->user['id'],[
+                    "form_liveId"   => $input['from_live_info_id']??0,
+                    "ip"            => $this->getIp($request),
+                    "pay_type"      => $input['pay_type']??1,
+                    "os_type"       => $input['os_type']??3,
+                    "twitter_id"    => $twitter_id,
+                ]);
+            }else{
+
+                Subscribe::create([
+                    'user_id' => $this->user['id'],
+                    'type' => 3,
+                    'relation_id' => $info_id,
+                    'status' => 1,
+                    'is_flag' => $is_flag,
+                    'twitter_id' => $twitter_id,
+                ]);
+            }
+
+
+
+
+
             //按渠道更新预约人数
             LiveStatistics::countsJob($info_id,1,$twitter_id);
 
@@ -2192,7 +2213,7 @@ class LiveController extends Controller
 
                     }*/
 //                    $Info = OfflineProducts::where(['id'=>$res['push_gid']])->first();
-                    $Info = OfflineProducts::select('id','title as name','price','subtitle','image as img','cover_img as image')->where(['id'=>$res['push_gid']])->first();
+                    $Info = OfflineProducts::select('id','title as name','price','subtitle','image as img','image as image')->where(['id'=>$res['push_gid']])->first();
                     break;
                 case 6:
                     $Info=[

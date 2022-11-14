@@ -881,10 +881,10 @@ class ClassController extends ControllerBackend
     {
         $input = $request->all();
         $work_id = $request->get('pid');
-        $work = Works::where('id', $work_id)->first();
-        if ( ! $work) {
-            return error(1000, '作品不存在');
-        }
+//        $work = Works::where('id', $work_id)->first();
+//        if ( ! $work) {
+//            return error(1000, '作品不存在');
+//        }
 
         $content = $input['content'] ?? ''; //文稿
         $timing_online = $input['online_type'] ?? 0; //是否自动上架  1自动 0手动

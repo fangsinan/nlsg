@@ -27,7 +27,7 @@ class UserController extends ControllerBackend
         $start = $request->get('start');
         $end = $request->get('end');
         $query = User::when($phone, function ($query) use ($phone) {
-                $query->where('phone', 'like', '%' . $phone . '%');
+                $query->where('phone', 'like',  $phone . '%');
             })
 //            ->when($nickname, function ($query) use ($nickname) {
 //               $query->where('nickname', 'like', '%' . $nickname . '%');

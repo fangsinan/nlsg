@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Servers\V5\WechatServers;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
+use Libraries\ImClient;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Medz\Laravel\Notifications\JPush\Sender as JPushSender;
 use Illuminate\Support\Facades\DB;
@@ -398,4 +400,38 @@ class User extends Authenticatable implements JWTSubject
             ]);
     }
 
+    /**
+     * SetUnionid  通过uid 的openid 和 transaction_id  获取unionid
+     *
+     * @param $uid  '用户id'
+     * @param $transaction_id '订单号'
+     */
+    public static function SetUnionid($uid,$transaction_id){
+
+        $user = User::where("id",$uid)->first();
+        if(!empty($user['unionid'])){  //存在unionid   不处理
+            return ;
+        }
+        if(empty($user['wxopenid'])){  //openid 不存在  不处理
+            return ;
+        }
+
+        //获取unionid
+        $openId = $user['wxopenid'];
+        $res = ImClient::curlGet("https://api.weixin.qq.com/wxa/getpaidunionid?access_token=".
+            WechatServers::GetToken()."&openid=$openId&transaction_id=".$transaction_id);
+        $res= json_decode($res,true);
+        if(!empty($res['errcode']) && $res['errcode'] == "40001"){  // token失效 重试
+            $res = ImClient::curlGet("https://api.weixin.qq.com/wxa/getpaidunionid?access_token=".
+                WechatServers::GetToken(true)."&openid=$openId&transaction_id=".$transaction_id);
+            $res= json_decode($res,true);
+        }
+
+        //更新unionid
+        if(!empty($res['unionid'])){
+            // 修改unioid
+            User::where("id",$uid)->update(['unionid'=>$res['unionid']]);
+        }
+        return;
+    }
 }

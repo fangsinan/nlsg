@@ -13,6 +13,6 @@ use Illuminate\Http\Request;
 class OrderController extends ControllerBackend
 {
     public function zeroOrderList(Request $request): JsonResponse {
-        return $this->getRes((new ZeroOrderListServers())->list($request->input()));
+        return $this->getRes((new ZeroOrderListServers())->list($request->input(),$this->user));
     }
 }

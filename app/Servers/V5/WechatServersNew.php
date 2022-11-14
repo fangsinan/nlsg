@@ -239,46 +239,38 @@ class WechatServersNew
 
     //模板配置
     public  static function sendBespeakClass($Url,$open_id){
-        /*您好，您已预约成功
-        直播名称：如何让孩子更加高效学习
-        主讲人：教育专家 张三
-        开始时间：2017年8月1日 20:00
-        请留言直播课程开始时间，以免错过课程*/
+        /*你好，以下课程将在15分钟后开始
+        课程：英语4级
+        参加人：王小二
+        若因故无法参加，请及时联系老师*/
         //周三早7点  &tweeter_code=211370
-        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_id=712&live_info_id=712&time=1666078396244&inviter=211370';
-        $hello='你好，今晚有免费直播课程，提高孩子学习力~';
-        $title='让孩子主动学习的“6个秘密”';
-        $day='2022年10月19日 19:30';
-        $didian='能量时光直播';
-        $tel_phone='咨询客服老师';
-        $remarks="※针对主动学习，父母和孩子如何“使劲”？
-※真正拉开孩子成绩的原因是什么，如何提升？
-※孩子写作业，父母正确的陪伴方式是什么？
-点击下面详情按钮，免费预约直播课学习~";
+        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=718&time=1666870472&inviter=211370';
+        $hello='你好，教育电视台公益讲座周六上午8:12开始~';
+        $title='中小学家庭教育讲座”';
+        $day='中小学家长';
+        $remarks="点击下面详情按钮，手机观看电视转播~";
 
         $data=[
             'touser'=>$open_id,
-            'template_id'=>'k5x13zz5ndvUmc5Cu_U8qXP1K3LptaWRug3IirzxCyA',
+            'template_id'=>'rnW94TX13Zep-l6wsaQ22V4ygWS6oYwagRFMFuFd91I',
             'url'=>$hrefurl, #抖音直播不需要跳转
             'topcolor'=>"#FF0000",
             'data'=>[
                 "first"=>[
                     "value"=>$hello,
+                    "color"=>"#FF0000"
                 ],
                 "keyword1"=>[ //课程名称
                     "value"=>$title,
+                    "color"=>"#FF0000"
                 ],
                 "keyword2"=>[ //开课时间
                     "value"=>$day,
-                ],
-                "keyword3"=>[ //开课地点
-                    "value"=>$didian,
-                ],
-                "keyword4"=>[ //联系方式
-                    "value"=>$tel_phone,
+                    "color"=>"#FF0000"
                 ],
                 "remark"=>[
                     "value"=>$remarks,
+                    "color"=>"#FF0000"
                 ],
 
             ],

@@ -319,7 +319,7 @@ class Order extends Base
         //用户账号
         if (!empty($params['phone'] ?? '')) {
             $phone = $params['phone'];
-            $temp_id_list = User::where('phone','like',"%$phone%")->pluck('id')->toArray();
+            $temp_id_list = User::where('phone','like',"$phone%")->pluck('id')->toArray();
             $query->whereIn('user_id',$temp_id_list);
         }
 
@@ -401,7 +401,7 @@ class Order extends Base
         //推荐用户账号
         if (!empty($params['t_phone'] ?? '')) {
             $phone = $params['t_phone'];
-            $temp_id_list = User::where('phone','like',"%$phone%")->pluck('id')->toArray();
+            $temp_id_list = User::where('phone','like',"$phone%")->pluck('id')->toArray();
             $query->whereHas('pay_record_detail',function($q) use($temp_id_list){
                 $q->whereIn('user_id',$temp_id_list);
             });
@@ -537,14 +537,14 @@ class Order extends Base
         //推荐用户账号
         if (!empty($params['t_phone'] ?? '')) {
             $t_phone = $params['t_phone'];
-            $temp_id_list = User::where('phone','like',"%$t_phone%")->pluck('id')->toArray();
+            $temp_id_list = User::where('phone','like',"$t_phone%")->pluck('id')->toArray();
             $lu_list_query->whereIn('l.user_id',$temp_id_list);
         }
 
         //源直播间推荐用户账号
         if (!empty($params['t_live_phone'] ?? '')) {
             $t_live_phone = $params['t_live_phone'];
-            $temp_id_list = User::where('phone','like',"%$t_live_phone%")->pluck('id')->toArray();
+            $temp_id_list = User::where('phone','like',"$t_live_phone%")->pluck('id')->toArray();
             $lu_list_query->whereIn('u2.id',$temp_id_list);
         }
 
@@ -612,7 +612,7 @@ class Order extends Base
         //用户账号
         if (!empty($params['phone'] ?? '')) {
             $phone = $params['phone'];
-            $temp_id_list = User::where('phone','like',"%$phone%")->pluck('id')->toArray();
+            $temp_id_list = User::where('phone','like',"$phone%")->pluck('id')->toArray();
             $query->whereIn('user_id',$temp_id_list);
         }
 
@@ -828,7 +828,7 @@ class Order extends Base
                 });
             }else{
                 $where_user_id = User::query()
-                    ->where('phone','like',"%$phone%")
+                    ->where('phone','like',"$phone%")
                     ->pluck('id')
                     ->toArray();
                 $query->whereIn('user_id',$where_user_id);
@@ -878,14 +878,14 @@ class Order extends Base
         if (!empty($params['t_phone'] ?? '')) {
             $t_phone = $params['t_phone'];
             $query->whereHas('twitter', function ($q) use ($t_phone) {
-                $q->where('phone', 'like', "%$t_phone%");
+                $q->where('phone', 'like', "$t_phone%");
             });
         }
         //源推荐账户  sub表的twitter
 //        if (!empty($params['t_live_phone'] ?? '')) {
 //            $t_live_phone = $params['t_live_phone'];
 //            $query->whereHas('twitter', function ($q) use ($t_live_phone) {
-//                $q->where('phone', 'like', "%$t_live_phone%");
+//                $q->where('phone', 'like', "$t_live_phone%");
 //            });
 //        }
         if (($params['excel_flag'] ?? 0)) {
@@ -1019,7 +1019,7 @@ class Order extends Base
 
 
         //  虚拟用户校验的类型
-        if( isset($order_type) && in_array($order_type,[10, 14]) ){
+        if( isset($order_type) && in_array($order_type,[10, 14, 16]) ){
             if($os_type ==3 && (empty($phone) || substr($phone,0,1) == 2) ){
                 return ['code'=>4000, 'msg'=>'请修改手机号'];
             }

@@ -10,7 +10,7 @@ class TalkList extends Base
     protected $table = 'nlsg_talk_list';
 
     protected $fillable = [
-        'talk_id', 'type','user_id','admin_id','content'
+        'talk_id', 'type','user_id','admin_id','content','image',
     ];
 
 
@@ -31,12 +31,16 @@ class TalkList extends Base
     {
         $list = self::with(
             "user:id,nickname,headimg"
-        )->select("content","user_id",'admin_id','type')
+        )->select("content","user_id",'admin_id','type','image','created_at')
             ->where("user_id",$uid)
-            ->where("status",1)->get();
-        if(empty($list)) return [];
+            ->where("status",1)
+            ->orderBy('created_at','desc')
+            ->paginate(20)
 
-        $list = $list->toArray();
+            ->toArray();
+        if(empty($list)) return [];
+        // 翻转数组
+        $list = array_reverse($list['data']);
 
         foreach($list as &$val){
             //查看客服

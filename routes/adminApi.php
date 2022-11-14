@@ -439,6 +439,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('feedback/help_list','FeedbackController@helpList');
         Route::post('feedback/help_create','FeedbackController@helpCreate');
         Route::post('feedback/help_change_status','FeedbackController@helpChangeStatus');
+        Route::post('feedback/statistics','FeedbackController@statistics');
 
 
         Route::post('talk/list','TalkController@list');
@@ -452,6 +453,9 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('talk/template_list','TalkController@templateList');
         Route::post('talk/template_list_create','TalkController@templateListCreate');
         Route::post('talk/template_list_change_status','TalkController@templateListChangeStatus');
+        Route::post('talk/template_category_list','TalkController@templateCategoryList');
+        Route::post('talk/template_category_list_create','TalkController@templateCategoryListCreate');
+        Route::post('talk/template_category_list_change_status','TalkController@templateCategoryListChangeStatus');
 
         //***********帮助留言与反馈部分结束***********
 

@@ -10,6 +10,7 @@ use App\Models\FeedbackType;
 use App\Models\HelpAnswer;
 use App\Models\HelpAnswerKeywords;
 use App\Models\HelpAnswerKeywordsBind;
+use App\Models\Message\Message;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -56,7 +57,7 @@ class FeedbackServers
 
         if ($phone) {
             $query->whereHas('UserInfo', function ($q) use ($phone) {
-                $q->where('phone', 'like', "%$phone%");
+                $q->where('phone', 'like', "$phone%");
             });
         }
 
@@ -100,7 +101,7 @@ class FeedbackServers
     {
         $flag = $params['flag'] ?? '';
         $id   = $params['id'] ?? '';
-        if (!is_array($id)){
+        if (!is_array($id)) {
             $id = (string)$id;
         }
         if (is_string($id)) {
@@ -134,7 +135,7 @@ class FeedbackServers
     public function toReply($params, $admin): array
     {
         $id = $params['id'] ?? '';
-        if (!is_array($id)){
+        if (!is_array($id)) {
             $id = (string)$id;
         }
         if (is_string($id)) {
@@ -172,6 +173,24 @@ class FeedbackServers
             ]);
 
         if ($res) {
+
+            //写入推送部分
+            $fb_list = FeedbackNew::query()
+                ->whereIn('id',$id)
+                ->with('UserInfo:id,phone,nickname')
+                ->select(['id','type','user_id','content','created_at','reply_content','reply_at'])
+                ->get()
+                ->toArray();
+
+            foreach ($fb_list as $fb_v){
+                Message::pushMessage(
+                    0,
+                    $fb_v['user_id'],
+                    'SYS_FEEDBACK_REPLY',
+                    $fb_v
+                );
+            }
+
             return ['code' => true, 'msg' => '成功'];
         }
 
@@ -256,7 +275,7 @@ class FeedbackServers
     {
         $flag = $params['flag'] ?? '';
         $id   = $params['id'] ?? '';
-        if (!is_array($id)){
+        if (!is_array($id)) {
             $id = (string)$id;
         }
         if (is_string($id)) {
@@ -337,7 +356,7 @@ class FeedbackServers
     {
         $flag = $params['flag'] ?? '';
         $id   = $params['id'] ?? '';
-        if (!is_array($id)){
+        if (!is_array($id)) {
             $id = (string)$id;
         }
         if (is_string($id)) {
@@ -416,7 +435,7 @@ class FeedbackServers
                 'status'     => 'bail|required|in:1,3',
                 'keywords'   => 'bail|required|array|max:5',
                 'keywords.*' => 'bail|distinct|max:20',
-//                'qr_code'    => 'bail|string|max:100',
+                //                'qr_code'    => 'bail|string|max:100',
             ],
             [
                 'type.exists'         => '类型id错误',
@@ -493,7 +512,7 @@ class FeedbackServers
     {
         $flag = $params['flag'] ?? '';
         $id   = $params['id'] ?? '';
-        if (!is_array($id)){
+        if (!is_array($id)) {
             $id = (string)$id;
         }
         if (is_string($id)) {
@@ -522,5 +541,108 @@ class FeedbackServers
         return ['code' => false, 'msg' => '失败,请重试.'];
     }
 
+    public function statistics($params, $admin): array
+    {
+        $flag = (int)($params['flag'] ?? 1);
+        switch ($flag) {
+            case 1:
+                $res = $this->statisticsF1();
+                break;
+            case 2:
+                $res = $this->statisticsF2();
+                break;
+            case 3:
+                $res = $this->statisticsF3($params['begin'] ?? '', $params['end'] ?? '');
+                break;
+            default:
+                $res = [];
+        }
+
+        return $res;
+    }
+
+
+    private function statisticsF1(): array
+    {
+        $today = date('Y-m-d');
+        return [
+            'total'    => FeedbackNew::query()->count(),
+            'reply'    => FeedbackNew::query()->where('reply_admin_id', '>', 0)->count(),
+            'no_reply' => FeedbackNew::query()->where('reply_admin_id', '=', 0)->where('status', '=', 1)->count(),
+            'today'    => FeedbackNew::query()
+                ->whereBetween('created_at', [
+                    $today . ' 00:00:00', $today . ' 23:59:59'
+                ])->where('status', '=', 1)->count(),
+        ];
+    }
+
+    private function statisticsF2(): array
+    {
+        $res = FeedbackType::query()
+            ->where('type', '=', 1)
+            ->select(['id', 'type', 'name'])
+            ->withCount('feedbackList as value')
+            ->get();
+
+        if ($res->isEmpty()) {
+            return [];
+        }
+
+        return $res->toArray();
+    }
+
+    private function statisticsF3($begin = '', $end = ''): array
+    {
+        if ($begin) {
+            $begin = date('Y-m-d', strtotime($begin));
+        } else {
+            $begin = date('Y-m-d', strtotime('-7 days'));
+        }
+
+        if ($end) {
+            $end = date('Y-m-d', strtotime($end));
+        } else {
+            $end = date('Y-m-d');
+        }
+
+        $end = min(date('Y-m-d'), $end);
+
+        $day_list = [];
+
+        $while_flag = 0;
+        while (true) {
+            $day_list[] = date('Y-m-d', strtotime($begin . " + $while_flag days"));
+            $while_flag++;
+            if (end($day_list) >= $end) {
+                break;
+            }
+        }
+
+        $count_query = FeedbackNew::query()
+            ->whereBetween('created_at', [$begin . ' 00:00:00', $end . ' 23:59:59'])
+            ->groupByRaw('left(created_at,10)')
+            ->select([
+                DB::raw('left(created_at,10) as day'),
+                DB::raw('count(*) as counts')
+            ])
+            ->get();
+
+        $count_list = [];
+
+        foreach ($day_list as $dl_k => $dl_v) {
+            $count_list[$dl_k] = 0;
+            foreach ($count_query as $cq_k => $cq_v) {
+                if ($dl_v === $cq_v->day) {
+                    $count_list[$dl_k] = $cq_v->counts;
+                    unset($count_query[$cq_k]);
+                }
+            }
+        }
+
+        return [
+            'day_list'   => $day_list,
+            'count_list' => $count_list,
+        ];
+    }
 
 }

@@ -7,7 +7,10 @@ namespace App\Servers\V5;
 use App\Models\Talk;
 use App\Models\TalkList;
 use App\Models\TalkRemark;
+use App\Models\TalkTemplate;
+use App\Models\TalkTemplateCategory;
 use App\Models\TalkUserStatistics;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -47,7 +50,7 @@ class TalkServers
 
         if ($phone) {
             $query->whereHas('userInfo', function ($q) use ($phone) {
-                $q->where('phone', 'like', '%' . $phone . '%');
+                $q->where('phone', 'like', $phone . '%');
             });
         }
 
@@ -81,7 +84,7 @@ class TalkServers
 
         $flag = $params['flag'] ?? '';
         $id   = $params['id'] ?? '';
-        if (!is_array($id)){
+        if (!is_array($id)) {
             $id = (string)$id;
         }
         if (is_string($id)) {
@@ -164,125 +167,64 @@ class TalkServers
         if (!$user_id) {
             return ['code' => false, 'msg' => '用户id错误'];
         }
-
-        $flag    = $params['flag'] ?? 'begin';
-        $talk_id = $params['talk_id'] ?? 0;
-        $page    = $params['page'] ?? 0;//如果是0 表示可以根据返回的page替换
-
-        //如果传了talk_id,则返回本次会话内容.否则从开始返回
-        $size = $params['size'] ?? 10;
-        $page = 1;
-
-        if ($talk_id) {
-            $check_talk_id = Talk::query()
-                ->where('id', '=', $talk_id)
-                ->where('user_id', '=', $user_id)
-                ->where('status', '=', 1)
-                ->first();
-            if (!$check_talk_id) {
-                return ['code' => false, 'msg' => '会话id错误'];
-            }
+        $user_info = User::query()->where('id', '=', $user_id)
+            ->select(['id', 'phone', 'nickname', 'headimg'])
+            ->first();
+        if (!$user_info) {
+            return ['code' => false, 'msg' => '用户id错误'];
         }
 
-        if ($page) {
-            return [
-                'page' => $page,
-                'size' => $size,
-                'list' => TalkList::query()
-                    ->with([
-                        'userInfo:id,phone,nickname,headimg',
-                        'adminInfo:id,username,user_remark',
-                        'talkInfo:id'
-                    ])
-                    ->whereHas('talkInfo', function ($q) {
-                        $q->where('status', '=', 1);
-                    })->select([
-                        'id', 'talk_id', 'type', 'user_id', 'admin_id', 'content', 'created_at', 'status',
-                    ])
-                    ->limit($size)
-                    ->offset(($page - 1) * $size)
-                    ->get(),
-            ];
-        } else {
-
-        }
-
-        //指定会话
-        //读出会话的第一条id,计算这条id所在那个page的第一条
-        //末尾,读取末尾倒数size条是在那个page的第一条
-
-        //不指定会话
-        //第一条
-        //末尾,读取末尾倒数size在那个page的第一条
-
-
-//        $talk_id = $params['talk_id'] ?? 0;
-//        if ($talk_id) {
-//            $check_talk_id = Talk::query()
-//                ->where('id', '=', $talk_id)
-//                ->where('status', '=', 1)
-//                ->first();
-//            if ($check_talk_id) {
-//                if ($ob === 'begin'){
-//                    $begin_id = TalkList::query()
-//                        ->where('talk_id', '=', $talk_id)
-//                        ->value('id');
-//
-//                    $before_begin_count = TalkList::query()
-//                        ->where('user_id', '=', $user_id)
-//                        ->where('id', '<', $begin_id)
-//                        ->count();
-//
-//                    if ($before_begin_count > 0 && $before_begin_count <= $size) {
-//                        $page = 1;
-//                    } elseif ($before_begin_count > $size) {
-//                        $page = ceil($before_begin_count / $size);
-//                    }
-//                }else{
-//
-//                }
-//
-//            }
-//        }else{
-//            if ($ob !== 'begin'){
-//                $total_count = TalkList::query()
-//                    ->with([
-//                        'talkInfo'
-//                    ])
-//                    ->whereHas('talkInfo',function ($q){
-//                        $q->where('status','=',1);
-//                    })
-//                    ->count();
-//
-//                $offset = $total_count - $size;
-//                $page = ceil($offset / $size) + 1;
-//            }
-//        }
-
+        $flag    = $params['flag'] ?? 'begin';//begin第一条  end最后一条
+        $talk_id = (int)($params['talk_id'] ?? 0); //如果传了talk_id,则返回本次会话内容.否则从开始返回
+        $page    = (int)($params['page'] ?? 0);//如果是0 表示可以根据返回的page替换
+        $size    = $params['size'] ?? 10;
 
         $query = TalkList::query()
             ->with([
-                'userInfo:id,phone,nickname,headimg',
-                'adminInfo:id,username,user_remark',
-                'talkInfo:id'
+                'talkInfo:id,status',
+                'adminInfo:id,username,user_remark'
             ])
-            ->limit($size)
-            ->offset(($page - 1) * $size);
+            ->where('user_id', '=', $user_id)
+            ->whereHas('talkInfo', function ($q) {
+                $q->where('status', '=', 1);
+            });
 
-        $query->whereHas('talkInfo', function ($q) {
-            $q->where('status', '=', 1);
-        });
+        if ($page < 1) {
+            if ($talk_id) {
+                if ($flag === 'begin') {
+                    $begin_limit = $query
+                        ->whereHas('talkInfo', function ($q) use ($talk_id) {
+                            $q->where('id', '<', $talk_id);
+                        })
+                        ->count();
+                } else {
+                    $begin_limit = $query
+                        ->whereHas('talkInfo', function ($q) use ($talk_id) {
+                            $q->where('id', '<=', $talk_id);
+                        })
+                        ->count();
+                }
+                $page = ceil($begin_limit / $size);
+            } else {
+                if ($flag === 'begin') {
+                    $page = 1;
+                } else {
+                    $begin_limit = $query->count();
+                    $page        = ceil($begin_limit / $size);
+                }
+            }
+        }
 
-        $query->select([
-            'id', 'talk_id', 'type', 'user_id', 'admin_id', 'content', 'created_at', 'status',
-        ]);
+        $query->select(['id', 'talk_id', 'type', 'admin_id', 'content', 'created_at', 'image']);
+        $query->orderBy('id');
+        $query->limit($size)->offset(($page - 1) * $size);
 
         return [
-            'page' => $page,
-            'size' => $size,
-            'data' => $query->get(),
+            'user_info' => $user_info,
+            'page'      => $page,
+            'size'      => $size,
+            'list'      => $query->get(),
         ];
-
     }
 
     public function talkListCreate($params, $admin): array
@@ -293,12 +235,17 @@ class TalkServers
         $validator = Validator::make($params,
             [
                 'user_id' => 'bail|required|exists:nlsg_user,id',
-                'content' => 'bail|required|string|max:250',
+                'content' => 'bail|max:250',
+                'image'   => 'bail|max:200'
             ]
         );
 
         if ($validator->fails()) {
             return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        if (empty($params['content']) && empty($params['image'])) {
+            return ['code' => false, 'msg' => '内容和图片不能同时为空'];
         }
 
         DB::beginTransaction();
@@ -345,7 +292,8 @@ class TalkServers
                 'type'     => 2,
                 'user_id'  => $params['user_id'],
                 'admin_id' => $admin['id'],
-                'content'  => $params['content'],
+                'content'  => $params['content'] ?? '',
+                'image'    => $params['image'] ?? '',
                 'status'   => 1,
             ]);
 
@@ -394,7 +342,7 @@ class TalkServers
 //            })
             ->when($params['phone'] ?? '', function ($q) use ($params) {
                 $q->wherehas('userInfo', function ($q) use ($params) {
-                    $q->where('phone', 'like', '%' . $params['phone'] . '%');
+                    $q->where('phone', 'like', $params['phone'] . '%');
                 });
             })
             ->paginate($params['size'] ?? 10);
@@ -402,19 +350,223 @@ class TalkServers
 
     public function templateList($params, $admin)
     {
+        $category_id = (int)($params['category_id'] ?? 0);
+        $size        = $params['size'] ?? 10;
+        $sort        = $params['sort'] ?? '';
 
-        return [__LINE__];
+        if (!$category_id) {
+            return ['code' => false, 'msg' => '分类错误'];
+        }
+
+        $check_category = TalkTemplateCategory::query()
+            ->where('id', '=', $category_id)
+            ->where('status', '!=', 3)
+            ->first();
+
+        if ($check_category->is_public == 2 && $check_category->admin_id != $admin['id']) {
+            return ['code' => false, 'msg' => '私人分类,必须本人操作'];
+        }
+
+        $query = TalkTemplate::query()
+            ->with([
+                'categoryInfo:id'
+            ]);
+
+        $query->where('status', '<>', 3);
+        $query->whereHas('categoryInfo', function ($q) use ($category_id) {
+            $q->where('id', '=', $category_id);
+        });
+
+        switch ($sort) {
+            case 'time_asc':
+                $query->orderBy('id');
+                break;
+            default:
+                $query->orderBy('id', 'desc');
+
+        }
+
+        $query->select(['id', 'category_id', 'content', 'admin_id', 'status', 'created_at']);
+
+        return $query->paginate($size);
     }
 
-    public function templateListCreate($params, $admin)
+    public function templateListCreate($params, $admin): array
     {
+        $params['admin_id'] = $admin['id'] ?? 0;
 
-        return [__LINE__];
+        $validator = Validator::make($params,
+            [
+                'content'     => 'bail|required|string|max:200',
+                'status'      => 'bail|required|in:1,2',
+                'admin_id'    => 'bail|required|exists:nlsg_backend_user,id',
+                'category_id' => 'bail|required|numeric',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        $check_category = TalkTemplateCategory::query()
+            ->where('id', '=', $params['category_id'])
+            ->where('status', '<>', 3)
+            ->first();
+
+        if (empty($check_category)) {
+            return ['code' => false, 'msg' => '所选类型错误'];
+        }
+
+        if ($check_category->is_public == 2 && $check_category->admin_id != $admin['id']) {
+            return ['code' => false, 'msg' => '私人分类,必须本人操作'];
+        }
+
+        $res = TalkTemplate::query()->create($params);
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败'];
+
     }
 
     public function templateListChangeStatus($params, $admin)
     {
 
-        return [__LINE__];
+        $flag = $params['flag'] ?? '';
+        $id   = (int)($params['id'] ?? 0);
+
+        if (empty($id)) {
+            return ['code' => false, 'msg' => 'id不能为空'];
+        }
+
+        if (!in_array($flag, ['del', 'on', 'off'])) {
+            return ['code' => false, 'msg' => '操作类型错误'];
+        }
+
+        $check_id = TalkTemplate::query()
+            ->where('id', '=', $id)
+            ->where('status', '<>', 3)
+            ->first();
+
+        if (empty($check_id)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        $check_category = TalkTemplateCategory::query()
+            ->where('id', '=', $check_id->category_id)
+            ->first();
+
+        if ($check_category->is_public == 2 && $check_category->admin_id != $admin['id']) {
+            return ['code' => false, 'msg' => '私人分类,必须本人操作'];
+        }
+
+        switch ($flag) {
+            case 'on':
+                $check_id->status = 1;
+                break;
+            case 'off':
+                $check_id->status = 2;
+                break;
+            case 'del':
+                $check_id->status = 3;
+                break;
+        }
+
+        $res = $check_id->save();
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败,请重试.'];
+    }
+
+    public function templateCategoryList($params, $admin)
+    {
+        $is_public = $params['is_public'] ?? 1;
+        $query     = TalkTemplateCategory::query()->where('status', '<>', 3);
+
+        if ($is_public == 1) {
+            $query->where('is_public', '=', 1);
+        } else {
+            $query->where('is_public', '=', 2)->where('admin_id', '=', $admin['id']);
+        }
+
+        $query->select(['id', 'title', 'admin_id', 'is_public']);
+
+        return $query->get();
+    }
+
+    public function templateCategoryListCreate($params, $admin): array
+    {
+
+        $params['admin_id'] = $admin['id'] ?? 0;
+
+        $validator = Validator::make($params,
+            [
+                'title'     => 'bail|required|string|max:200',
+                'is_public' => 'bail|required|in:1,2',
+                'status'    => 'bail|required|in:1,2',
+                'admin_id'  => 'bail|required|exists:nlsg_backend_user,id',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        $res = TalkTemplateCategory::query()->create($params);
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败'];
+
+    }
+
+    public function templateCategoryListChangeStatus($params, $admin): array
+    {
+
+        $flag = $params['flag'] ?? '';
+        $id   = $params['id'] ?? 0;
+
+        if (empty($id)) {
+            return ['code' => false, 'msg' => 'id不能为空'];
+        }
+
+        if (!in_array($flag, ['del'])) {
+            return ['code' => false, 'msg' => '操作类型错误'];
+        }
+
+        $check = TalkTemplateCategory::query()->where('id', '=', $id)->first();
+        if (empty($check)) {
+            return ['code' => false, 'msg' => 'id错误'];
+        }
+
+        if ($check->is_public == 2 && $check->admin_id != $admin['id']) {
+            return ['code' => false, 'msg' => '私人分类,必须本人操作'];
+        }
+
+        $check_used = TalkTemplate::query()->where('category_id', '=', $id)
+            ->where('status', '<>', 3)
+            ->first();
+
+        if (!empty($check_used)) {
+            return ['code' => false, 'msg' => '该分类下有使用中的内容,无法删除'];
+        }
+
+        $res = TalkTemplateCategory::query()
+            ->where('id', '=', $id)
+            ->update([
+                'status' => 3,
+            ]);
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败,请重试.'];
+
     }
 }

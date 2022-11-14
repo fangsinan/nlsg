@@ -99,7 +99,6 @@ class MessageType extends Base
         }
         $res = $res->toArray();
 
-
         // 收益通知   组装json
         // if($messageType['pid'] == 12){
             $time = date("Y-m-d H:i:s");
@@ -141,6 +140,21 @@ class MessageType extends Base
                 case "REGISTER":
                     $user = User::where("id",$relation_data['user_id']??0)->value("nickname");
                     $res['message'] = str_replace("{{user_name}}",$user??"",$res['message']);
+                    break;
+                case "SYS_USER_SEND_HELP":
+                    $message = ['content'=>$res['message'],'source'=>'留言通知','type'=>'留言通知','amount'=>0,'time'=>$time];
+                    $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
+                    break;
+                case 'SYS_FEEDBACK_REPLY':
+                    $message = [
+                        'nickname'=>$relation_data['user_info']['nickname'],
+                        'user_id'=>$relation_data['user_id'],
+                        'created_at'=>$relation_data['created_at'],
+                        'content'=>$relation_data['content'],
+                        'reply'=>$relation_data['reply_content'],
+                        'reply_at'=>$relation_data['reply_at'],
+                    ];
+                    $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
                     break;
             }
         // }

@@ -65,7 +65,7 @@ class LiveInfoServers {
         }
         if (!empty($phone)) {
             $query->whereHas('UserInfo',function ($q)use($phone){
-                $q->where('phone','like',"%$phone%");
+                $q->where('phone','like',"$phone%");
             });
         }
         if (!empty($t_user_id)) {
@@ -75,7 +75,7 @@ class LiveInfoServers {
         }
         if (!empty($t_phone)) {
             $query->whereHas('twitterUser',function ($q)use($t_phone){
-                $q->where('phone','like',"%$t_phone%");
+                $q->where('phone','like',"$t_phone%");
             });
         }
         if (!empty($son_flag)) {
@@ -243,7 +243,7 @@ class LiveInfoServers {
 //        if ($check_live_id->user_id != 161904) {
 //            return ['code' => false, 'msg' => '不是王琨的直播间'];
 //        }
-        if (!in_array($check_live_id->user_id, [161904, 185689,167861,214932], true)) {
+        if (!in_array($check_live_id->user_id, [161904, 185689,167861,214932,172661], true)) {
             return ['code' => false, 'msg' => '直播间归属错误'];
         }
 
