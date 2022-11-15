@@ -235,8 +235,8 @@ class TalkServers
         $validator = Validator::make($params,
             [
                 'user_id' => 'bail|required|exists:nlsg_user,id',
-                'content' => 'bail|max:250',
-                'image'   => 'bail|max:200'
+                'content' => 'bail|max:500',
+                'image'   => 'bail|max:225'
             ]
         );
 
