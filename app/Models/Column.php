@@ -363,4 +363,28 @@ class Column extends Base
     }
 
 
+
+    public static function ColumnBind($live_id=0,$user_id=0){
+        $remark = "";
+        if(!empty($live_id)){
+            $remark = "-直播间：".$live_id;
+        }
+        // 购买2980 查询是否有绑定  如果存在则延长为永久  不存在则不处理
+        $AdminInfo = User::find($user_id);
+        // $twitter_data = User::find($twitter_id);
+        $check_bind = VipUserBind::getBindParent($AdminInfo['phone']);
+        //没有绑定记录,则绑定
+        // if (($check_bind > 0) && strlen($twitter_data['phone']) === 11 && strlen($AdminInfo['phone']) === 11) {
+        if (($check_bind > 0) &&  strlen($AdminInfo['phone']) === 11) {
+            DB::table('nlsg_vip_user_bind')->where([
+                'son' => $AdminInfo['phone'],
+                'status' => 1,
+            ])->update([
+                'life' => 1,
+                'remark' => "购买2980，修改为永久.".$remark
+            ]);
+        }
+    }
+
+
 }

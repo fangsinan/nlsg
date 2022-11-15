@@ -518,6 +518,9 @@ class WechatPay extends Controller
                             //$vip_res = PayRecordDetail::firstOrCreate($map);
                         }
                     }
+                } else if ($orderInfo['relation_id'] == 7 && $orderInfo['type'] == 14 ) {
+                    Column::ColumnBind($live_id,$user_id);
+
                 }
                 // 添加订阅记录
                 OfflineProducts::where(['id' => $orderInfo['relation_id']])->increment('subscribe_num');
@@ -813,7 +816,7 @@ class WechatPay extends Controller
 
                 //写入关系保护
                 if($total_fee==1){
-                    $bind_end=date('Y-m-d 23:59:59', strtotime('+1 months'));
+                    $bind_end=date('Y-m-d 23:59:59', strtotime('+3 months'));
                 }else{
                     $bind_end=date('Y-m-d 23:59:59', strtotime('+1 years'));
                 }
@@ -1470,6 +1473,11 @@ class WechatPay extends Controller
                 $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
+
+                // 处理关系保护   30天指挥父母
+                if ( $orderInfo['relation_id'] == '638' ) {
+                    Column::ColumnBind($orderInfo['live_id'],$user_id);
+                }
 
                 if ($orderRst && $couponRst && $phoneRst && $recordRst && $subscribeRst && $shareSyRst && $Sy_Rst) {
                     DB::commit();
