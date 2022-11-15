@@ -209,27 +209,27 @@ class GetPriceTools extends Base
             ->get();
 
         $goods_level_price_off = 0;
-
+        //2022-11-15 关闭黑钻等购买特价和收益
         foreach ($sku_price as $v) {
-            if ($v->level_price_off === 0) {
-                $v->level_3 = self::PriceCalc('*', $v->price, $this->level_3_off);
-                $v->level_4 = self::PriceCalc('*', $v->price, $this->level_4_off);
-                $v->level_5 = self::PriceCalc('*', $v->price, $this->level_5_off);
-            } else {
+//            if ($v->level_price_off === 0) {
+//                $v->level_3 = self::PriceCalc('*', $v->price, $this->level_3_off);
+//                $v->level_4 = self::PriceCalc('*', $v->price, $this->level_4_off);
+//                $v->level_5 = self::PriceCalc('*', $v->price, $this->level_5_off);
+//            } else {
                 $goods_level_price_off = 1;
                 $v->level_3 = $v->level_4 = $v->level_5 = $v->price;
-            }
+//            }
 
             $v->twitter_money = $this->getTwitterMoneyBySku($v);
         }
 
-        if ($goods_level_price_off === 0){
-            $res->level_3 = self::PriceCalc('*', $res->price, $this->level_3_off);
-            $res->level_4 = self::PriceCalc('*', $res->price, $this->level_4_off);
-            $res->level_5 = self::PriceCalc('*', $res->price, $this->level_5_off);
-        }else{
+//        if ($goods_level_price_off === 0){
+//            $res->level_3 = self::PriceCalc('*', $res->price, $this->level_3_off);
+//            $res->level_4 = self::PriceCalc('*', $res->price, $this->level_4_off);
+//            $res->level_5 = self::PriceCalc('*', $res->price, $this->level_5_off);
+//        }else{
             $res->level_3 = $res->level_4 = $res->level_5 = $res->price;
-        }
+//        }
 
         $res->sku_price_list = $sku_price;
         return $res;
@@ -238,6 +238,7 @@ class GetPriceTools extends Base
     //计算返利金额
     protected function getTwitterMoneyBySku($data): array
     {
+        //2022-11-15 关闭黑钻等购买特价和收益
         return [
             't_money'        => 0,
             't_money_black'  => 0,
