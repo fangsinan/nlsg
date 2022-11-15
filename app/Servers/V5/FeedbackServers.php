@@ -176,13 +176,15 @@ class FeedbackServers
 
             //写入推送部分
             $fb_list = FeedbackNew::query()
-                ->whereIn('id',$id)
+                ->whereIn('id', $id)
                 ->with('UserInfo:id,phone,nickname')
-                ->select(['id','type','user_id','content','created_at','reply_content','reply_at'])
+                ->select(['id', 'type', 'user_id', 'content', 'created_at', 'reply_content', 'reply_at'])
                 ->get()
                 ->toArray();
 
-            foreach ($fb_list as $fb_v){
+            foreach ($fb_list as $fb_v) {
+                $fb_v['open_type']     = 3;
+                $fb_v['relation_type'] = 181;
                 Message::pushMessage(
                     0,
                     $fb_v['user_id'],
