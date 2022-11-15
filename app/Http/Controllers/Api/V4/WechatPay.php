@@ -1474,9 +1474,9 @@ class WechatPay extends Controller
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
 
-                // 处理关系保护
-                if ($orderInfo['pay_price'] == '2980' ) {
-                    Column::ColumnBind($live_id,$user_id);
+                // 处理关系保护   30天指挥父母
+                if ( $orderInfo['relation_id'] == '638' ) {
+                    Column::ColumnBind($orderInfo['live_id'],$user_id);
                 }
 
                 if ($orderRst && $couponRst && $phoneRst && $recordRst && $subscribeRst && $shareSyRst && $Sy_Rst) {

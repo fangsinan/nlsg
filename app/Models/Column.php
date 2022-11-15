@@ -364,7 +364,7 @@ class Column extends Base
 
 
 
-    public static function ColumnBind($live_id,$user_id){
+    public static function ColumnBind($live_id=0,$user_id=0){
         $remark = "";
         if(!empty($live_id)){
             $remark = "-直播间：".$live_id;
