@@ -519,25 +519,8 @@ class WechatPay extends Controller
                         }
                     }
                 } else if ($orderInfo['relation_id'] == 7 && $orderInfo['type'] == 14 ) {
-                    $remark = "";
-                    if(!empty($live_id)){
-                        $remark = "-直播间：".$live_id;
-                    }
-                    // 购买2980 查询是否有绑定  如果存在则延长为永久  不存在则不处理
-                    $AdminInfo = User::find($user_id);
-                    // $twitter_data = User::find($twitter_id);
-                    $check_bind = VipUserBind::getBindParent($AdminInfo['phone']);
-                    //没有绑定记录,则绑定
-                    // if (($check_bind > 0) && strlen($twitter_data['phone']) === 11 && strlen($AdminInfo['phone']) === 11) {
-                    if (($check_bind > 0) &&  strlen($AdminInfo['phone']) === 11) {
-                        DB::table('nlsg_vip_user_bind')->where([
-                            'son' => $AdminInfo['phone'],
-                            'status' => 1,
-                        ])->update([
-                            'life' => 1,
-                            'remark' => "购买2980，修改为永久.".$remark
-                        ]);
-                    }
+                    Column::ColumnBind($live_id,$user_id);
+
                 }
                 // 添加订阅记录
                 OfflineProducts::where(['id' => $orderInfo['relation_id']])->increment('subscribe_num');
@@ -1490,6 +1473,11 @@ class WechatPay extends Controller
                 $user_id = empty($orderInfo['service_id']) ? $user_id : $orderInfo['service_id'];
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
+
+                // 处理关系保护
+                if ($orderInfo['pay_price'] == '2980' ) {
+                    Column::ColumnBind($live_id,$user_id);
+                }
 
                 if ($orderRst && $couponRst && $phoneRst && $recordRst && $subscribeRst && $shareSyRst && $Sy_Rst) {
                     DB::commit();
