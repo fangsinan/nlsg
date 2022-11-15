@@ -813,7 +813,7 @@ class WechatPay extends Controller
 
                 //写入关系保护
                 if($total_fee==1){
-                    $bind_end=date('Y-m-d 23:59:59', strtotime('+1 months'));
+                    $bind_end=date('Y-m-d 23:59:59', strtotime('+3 months'));
                 }else{
                     $bind_end=date('Y-m-d 23:59:59', strtotime('+1 years'));
                 }
