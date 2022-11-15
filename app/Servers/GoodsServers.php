@@ -180,10 +180,10 @@ class GoodsServers
 
         $edit_sku_id_arr = [];
         foreach ($params['sku_list'] as $v) {
-            if (empty($v['erp_goods_code'])) {
+            if (empty($v['erp_goods_no'])) {
                 return ['code' => false, 'msg' => '货品编号不能为空'];
             }
-            if (empty($v['erp_enterprise_code'])) {
+            if (empty($v['erp_spec_no'])) {
                 return ['code' => false, 'msg' => '商家编码不能为空'];
             }
 
@@ -248,8 +248,8 @@ class GoodsServers
                 $sku->status = $v['status'];
                 $sku->weight = $v['weight'];
                 $sku->volume = $v['volume'];
-                $sku->erp_spec_no = $v['erp_enterprise_code'] ?? '';
-                $sku->erp_goods_no = $v['erp_goods_code'] ?? '';
+                $sku->erp_spec_no = $v['erp_spec_no'] ?? '';
+                $sku->erp_goods_no = $v['erp_goods_no'] ?? '';
                 $edit_sku_res = $sku->save();
 
                 if (!$edit_sku_res) {
