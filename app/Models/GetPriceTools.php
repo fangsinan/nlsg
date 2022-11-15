@@ -8,9 +8,9 @@ use Illuminate\Support\Facades\Cache;
 class GetPriceTools extends Base
 {
 
-    public $level_3_off = 0.9;
-    public $level_4_off = 0.85;
-    public $level_5_off = 0.65;
+    public $level_3_off = 1;
+    public $level_4_off = 1;
+    public $level_5_off = 1;
 
     public function goodsList($list, $user_level, $user_id, $is_staff, $hide = 0)
     {
