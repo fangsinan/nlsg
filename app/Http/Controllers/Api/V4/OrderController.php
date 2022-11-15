@@ -1162,7 +1162,7 @@ class OrderController extends Controller
 
 
         //限制其下单业务
-        $checkAddOrder = Order::CheckAddOrder($product_id,16,$this->user,$os_type,$live_id);
+        $checkAddOrder = Order::CheckAddOrder($level,16,$this->user,$os_type,$live_id);
         if($checkAddOrder['code'] !== true){
             return $this->error($checkAddOrder['code'], $checkAddOrder['msg']);
         }
