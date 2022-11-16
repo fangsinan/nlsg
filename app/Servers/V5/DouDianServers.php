@@ -951,7 +951,10 @@ class DouDianServers
                 'orderList.productInfo:id,product_type,product_id'
             ])
             ->whereHas('orderList.productInfo', function ($query) use ($search_product_type) {
-                $query->whereIn('product_type', $search_product_type);
+                $query->where(function($q)use($search_product_type){
+                    $q->whereIn('product_type',$search_product_type)
+                        ->where('to_decrypt','=',2);
+                });
             })
             ->whereNotIn('order_status', [1, 4])
             ->where('decrypt_step', '<>', 9)
