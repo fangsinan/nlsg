@@ -681,7 +681,7 @@ class MessageController extends Controller
             if($items['type']==25){
 
                 $msg_arr=json_decode($items['message']['message'],true);
-                $items['message']['message']=[
+                $items['message']['help_reply']=[
                     'content'=>$msg_arr['content']??'',
                     'reply'=>$msg_arr['reply']??'',
                     'reply_at'=>$msg_arr['reply_at']??'',
