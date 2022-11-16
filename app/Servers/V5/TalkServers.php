@@ -398,34 +398,51 @@ class TalkServers
 
         if ($is_public === 0) {
             //如果是0,就只返回条数
-            $public_cid_list = TalkTemplateCategory::query()
-                ->where('is_public', '=', 1)
-                ->where('status', '=', 1)
-                ->pluck('id');
-
-            $private_cid_list = TalkTemplateCategory::query()
-                ->where('is_public', '=', 2)
-                ->where('status', '=', 1)
-                ->where('admin_id', '=', $admin['id'])
-                ->pluck('id');
-
-            $res['public_total']  = 0;
-            $res['private_total'] = 0;
-
-            if (!empty($public_cid_list)) {
-                $res['public_total'] = TalkTemplate::query()
-                    ->whereIn('category_id', $public_cid_list)
+            return [
+                'public_total'  => TalkTemplate::query()
+                    ->with(['categoryInfo'])
                     ->where('status', '=', 1)
-                    ->count();
-            }
-
-            if (!empty($private_cid_list)) {
-                $res['private_total'] = TalkTemplate::query()
-                    ->whereIn('category_id', $private_cid_list)
+                    ->whereHas('categoryInfo', function ($q) {
+                        $q->where('is_public', '=', 1)->where('status', '=', 1);
+                    })->count(),
+                'private_total' => TalkTemplate::query()
+                    ->with(['categoryInfo'])
                     ->where('status', '=', 1)
-                    ->count();
-            }
-            return $res;
+                    ->whereHas('categoryInfo', function ($q) use ($admin) {
+                        $q->where('is_public', '=', 2)
+                            ->where('admin_id', '=', $admin['id'])
+                            ->where('status', '=', 1);
+                    })->count(),
+            ];
+            
+//            $public_cid_list = TalkTemplateCategory::query()
+//                ->where('is_public', '=', 1)
+//                ->where('status', '=', 1)
+//                ->pluck('id');
+//
+//            $private_cid_list = TalkTemplateCategory::query()
+//                ->where('is_public', '=', 2)
+//                ->where('status', '=', 1)
+//                ->where('admin_id', '=', $admin['id'])
+//                ->pluck('id');
+//
+//            $res['public_total']  = 0;
+//            $res['private_total'] = 0;
+//
+//            if (!empty($public_cid_list)) {
+//                $res['public_total'] = TalkTemplate::query()
+//                    ->whereIn('category_id', $public_cid_list)
+//                    ->where('status', '=', 1)
+//                    ->count();
+//            }
+//
+//            if (!empty($private_cid_list)) {
+//                $res['private_total'] = TalkTemplate::query()
+//                    ->whereIn('category_id', $private_cid_list)
+//                    ->where('status', '=', 1)
+//                    ->count();
+//            }
+//            return $res;
         }
 
         $query = TalkTemplateCategory::query()
