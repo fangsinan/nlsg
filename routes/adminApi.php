@@ -451,6 +451,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('talk/finish','TalkController@finish');
         Route::post('talk/talk_user_list','TalkController@talkUserList');
         Route::post('talk/template_list','TalkController@templateList');
+        Route::post('talk/template_list_all','TalkController@templateListAll');
         Route::post('talk/template_list_create','TalkController@templateListCreate');
         Route::post('talk/template_list_change_status','TalkController@templateListChangeStatus');
         Route::post('talk/template_category_list','TalkController@templateCategoryList');
