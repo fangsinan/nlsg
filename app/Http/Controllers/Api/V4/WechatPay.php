@@ -518,9 +518,6 @@ class WechatPay extends Controller
                             //$vip_res = PayRecordDetail::firstOrCreate($map);
                         }
                     }
-                } else if ($orderInfo['relation_id'] == 7 && $orderInfo['type'] == 14 ) {
-                    Column::ColumnBind($live_id,$user_id);
-
                 }
                 // 添加订阅记录
                 OfflineProducts::where(['id' => $orderInfo['relation_id']])->increment('subscribe_num');
@@ -532,9 +529,14 @@ class WechatPay extends Controller
                     $AdminInfo = User::find($user_id);
                     self::LiveRedis(14, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
 //                    Task::send(6, $user_id, $orderInfo['relation_id']);
+
+                    if ($orderInfo['relation_id'] == 7 && $orderInfo['type'] == 14 ) {
+                        Column::ColumnBind($live_id,$user_id);
+                    }
+
                     if ($orderInfo['relation_id'] == 5){
                         //加群
-                        self::joinImGroup($orderInfo['relation_id'],$user_id,$orderInfo['type']);
+//                        self::joinImGroup($orderInfo['relation_id'],$user_id,$orderInfo['type']);
 
                     }
                     // 内容刷单记录
