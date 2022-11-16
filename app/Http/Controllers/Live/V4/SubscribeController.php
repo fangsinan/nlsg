@@ -271,6 +271,9 @@ class SubscribeController extends ControllerBackend {
         if (!empty($phoneUser)) {
             $query->where('sub.user_id', $phoneUser['id']);
         }
+        if (!empty($phone) && empty($phoneUser)){
+            $query->where('sub.user_id','=',0);
+        }
 
         if ($this->user['role_id'] === 13 && $this->user['live_role_button'] === 2) {
             $query->where('sub.order_id', '>', 0);
