@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
+use App\Models\WorksInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Libraries\ImClient;
@@ -90,30 +91,39 @@ class UploadController extends ControllerBackend
         $secretKey = config('env.TENCENT_SECRETKEY');
         foreach($video_ids as $video_id){
             //加密
+            $rand   = rand (100, 10000000); //9031868223070871051
+            $time   = time ();
             $data_key = [
                 'Action' => 'ModifyMediaInfo',
                 'Version' => '2018-07-17',
-                'fileId' => $video_id,
-                'ClassId' => '855797',
+                'Language' => "zh-CN",
+                'FileId' => $video_id,
+                'ClassId' => '855797', // 待删除
+                'Region' => "",
+                'SecretId' => config('env.TENCENT_SECRETID'),
+                'Timestamp' => $time,
+                'Nonce' => $rand,
+                // 'SignatureMethod' => 'HmacSHA256',
             ];
+
+
             ksort ($data_key); //排序
             // 计算签名
-            $srcStr    = "POST".$uri."/v2/index.php?" . http_build_query ($data_key);
+            $srcStr    = "GET".$uri."/?" . http_build_query ($data_key);
             $signature = base64_encode (hash_hmac ('sha256', $srcStr, $secretKey, true)); //SHA1  sha256
+            $signature = base64_encode(hash_hmac("sha1", $srcStr, $secretKey, true));
             $data_key['Signature'] = $signature;
             ksort ($data_key); //排序
-
             //拉取转码成功信息
-            $url = "https://vod.api.qcloud.com/v2/index.php"; //?Action=PullEvent&COMMON_PARAMS
-            $info = ImClient::curlPost ($url, $data_key);  //post
-            if(!empty($info['Response']) ){
-                DB::table('nlsg_log_info')->insert([
-                    'url'           =>  'editVideoClassId:'.$request->fullUrl(),
-                    'parameter'     =>  $info['Response'],
-                    'user_id'       =>  $this->user['id'] ?? 0,
-                    'created_at'    =>  date('Y-m-d H:i:s', time())
-                ]);
-            }
+            $url = "https://vod.tencentcloudapi.com/?".http_build_query ($data_key); //?Action=PullEvent&COMMON_PARAMS
+            $info = ImClient::curlGet ($url);  //post
+            // $info = json_decode($info,true);
+            DB::table('nlsg_log_info')->insert([
+                'url'           =>  'editVideoClassId:'.$request->fullUrl(),
+                'parameter'     =>  $info,
+                'user_id'       =>  $this->user['id'] ?? 0,
+                'created_at'    =>  date('Y-m-d H:i:s', time())
+            ]);
         }
         return success();
     }
