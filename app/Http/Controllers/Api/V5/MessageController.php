@@ -686,10 +686,10 @@ class MessageController extends Controller
                     'reply'=>$msg_arr['reply']??'',
                     'reply_at'=>$msg_arr['reply_at']??'',
                     'nickname'=>$msg_arr['nickname']??'',
-                    'created_at'=>date('Y年m月d日H:i',strtotime($msg_arr['reply_at'])),
+                    'created_at'=>date('Y年m月d日H:i',strtotime($msg_arr['created_at'])),
                 ];
                 $items['message']['title']='您的反馈已收到回复';
-                $items['message']['message']='亲爱的'.$msg_arr['nickname'].":您于".date('Y年m月d日H:i',strtotime($msg_arr['reply_at']))."提交的反馈，我们已经收到。";
+                $items['message']['message']='亲爱的'.$msg_arr['nickname'].":您于".date('Y年m月d日H:i',strtotime($msg_arr['created_at']))."提交的反馈，我们已经收到。";
             }
 
         }
