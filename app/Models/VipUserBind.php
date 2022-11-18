@@ -46,7 +46,7 @@ class VipUserBind extends Base
     {
         $now_date=date('Y-m-d H:i:s',time());
         $map=[];
-        $data = DB::table('nlsg_vip_user_bind')->where('end_at', '<', $now_date)->whereIn('status',[0,1])->where('life','=',2)
+        $data = DB::table('nlsg_vip_user_bind')->where('end_at', '<', $now_date)->whereIn('status',[0,1])->where('life','=',2) //时效性
             ->select(['id','parent','son' ])->limit(30000)->get()->toArray();
         DB::beginTransaction();
         try {
@@ -78,7 +78,7 @@ class VipUserBind extends Base
             $clear_sql = "update  nlsg_vip_user_bind set status = 2 where status in (0,1) and end_at <= SYSDATE() and life=2";
             DB::select($clear_sql);
 
-            $clear_vip_sql = "UPDATE nlsg_vip_user SET `status` = 0,is_default=0 where is_default = 1 AND `status` = 1 AND expire_time < now() and life=2;";
+            $clear_vip_sql = "UPDATE nlsg_vip_user SET `status` = 0,is_default=0 where is_default = 1 AND `status` = 1 AND expire_time < now();";
             DB::select($clear_vip_sql);
 
             DB::commit();

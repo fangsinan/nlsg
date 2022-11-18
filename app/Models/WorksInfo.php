@@ -17,7 +17,7 @@ class WorksInfo extends Base
     // $type  1 单课程  2 多课程  3讲座 4训练营
     public function getInfo($works_id, $is_sub = 0, $user_id = 0, $type = 1, $order = 'asc', $page_per_page = 50, $page = 0, $size = 0,$column_data = [],$os_type=1,$version='5.0.0')
     {
-        
+
         $is_free = $column_data['is_free']??0;
         $where = ['status' => 4];
         if ($type == 1) {
@@ -184,7 +184,7 @@ class WorksInfo extends Base
             default :$his_type=0;   break;
         }
 
-       
+
         if($type == 1 || $type == 6 || $type == 7){
 
             $column_id = $params['column_id'] ?? 0;
@@ -201,7 +201,7 @@ class WorksInfo extends Base
                 $get_info_id = $column_id;
             }
             $getBanner_id = $column_id;
-            
+
         }else{
             if (empty($works_id) || empty($works_info_id)) {
                 return ['code' => false, 'msg' => '课程id不存在'];
@@ -308,7 +308,7 @@ class WorksInfo extends Base
             ->select(['title','subtitle', 'subscribe_num', 'w.user_id', 'w.id','w.content', 'w.price', 'w.original_price', 'w.is_pay', 'w.type', 'w.is_free', 'w.status','w.cover_img','w.comment_num','w.collection_num','w.is_audio_book',
                 DB::raw('if(s.id > 0,1,0) as is_sub')])
             ->first();
-     
+
             $sub_type = 2;
         }
 //        if($user['level'] > 2){
@@ -321,7 +321,7 @@ class WorksInfo extends Base
         //     $sub_type = 8;
         // }
         $works_info->is_sub = Subscribe::isSubscribe($user['id'],$works_info->id,$sub_type);
-        
+
         //是否关注作者
         $follow = UserFollow::where(['from_uid'=>$user['id'],'to_uid'=>$works_info->user_id])->first();
         $works_info->is_follow = $follow ? 1 :0;
@@ -408,8 +408,10 @@ class WorksInfo extends Base
      */
     public static function  covertVideo()
     {
-        $SecretId  = "AKIDrcCpIdlpgLo4A4LMj7MPFtKfolWeNHnC";
-        $SECRET_KEY= "MWXLwKVXMzPcrwrcDcrulPsAF7nIpCNM";
+        // $SecretId  = "AKIDrcCpIdlpgLo4A4LMj7MPFtKfolWeNHnC";
+        // $SECRET_KEY= "MWXLwKVXMzPcrwrcDcrulPsAF7nIpCNM";
+        $SecretId=config('env.TENCENT_SECRETID');
+        $SECRET_KEY=config('env.TENCENT_SECRETKEY');
         $ids = WorksInfo::select('id','title','type','video_id','url','callback_url1','callback_url2','callback_url3')
                 ->where('video_adopt', 0)
                 ->where('video_id','!=', '')
@@ -520,8 +522,9 @@ class WorksInfo extends Base
      */
     public static function  editVideo($ids=[])
     {
-        $SecretId  = "AKIDrcCpIdlpgLo4A4LMj7MPFtKfolWeNHnC";
-        $SECRET_KEY= "MWXLwKVXMzPcrwrcDcrulPsAF7nIpCNM";
+        //新账号
+        $SecretId=config('env.TENCENT_SECRETID');
+        $SECRET_KEY=config('env.TENCENT_SECRETKEY');
         $res = [];
         $msg = 'fail';
 
@@ -686,7 +689,7 @@ class WorksInfo extends Base
         }
         $id = Lists::select('id')->where(['type'=>10])->first();
         $is_data = ListsWork::select('id')->where([
-                'type'      => 1,    
+                'type'      => 1,
                 'lists_id'  => $id['id']??0,
                 'works_id'  => $works_id,
                 'state'     => 1,
@@ -709,7 +712,7 @@ class WorksInfo extends Base
                 'callback_url3', 'view_num', 'duration', 'free_trial','rank','share_img','like_num','old_share_img'
             ])->where($where)->whereIn("id",$infoIds)
             ->orderByRaw('FIELD(id,'.implode(',', $infoIds).')')->get()->toArray();
-    
+
             foreach ($works_data as $key => $val) {
                 //训练营H5  不返回视频地址
                 if($input_type == 140 && $os_type == 3){
@@ -737,7 +740,7 @@ class WorksInfo extends Base
                 $works_data[$key]['time_leng'] = (string)0;
                 $works_data[$key]['time_number'] = (string)0;
                 $works_data[$key]['time_is_end'] = 0;
-    
+
                 if ($user_id) {
                     //训练营共用章节id
                     if( in_array($input_type ,[130,140])){
@@ -756,7 +759,7 @@ class WorksInfo extends Base
                         'info_id' => $val['id'],
                         'user_id' => $user_id,
                     ])->orderBy('updated_at', 'desc')->first();
-                    
+
                     if ($his_data) {
                         $works_data[$key]['time_leng'] = $his_data->time_leng;
                         $works_data[$key]['time_number'] = $his_data->time_number;
@@ -768,7 +771,7 @@ class WorksInfo extends Base
                     }
                 }
             }
-    
+
             return $works_data;
         }
 }

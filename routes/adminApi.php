@@ -319,6 +319,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('im_doc/test', 'ImDocController@test');
 
     Route::post('upload/file', 'UploadController@file');//上传视频/音频
+    Route::get('upload/edit', 'UploadController@editVideoClassId');//上传视频/音频
 
     Route::get('task/index','TaskController@index');
     Route::post('task/send','TaskController@send');
