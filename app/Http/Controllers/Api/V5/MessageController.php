@@ -647,6 +647,7 @@ class MessageController extends Controller
     {
 
         $user_id = $this->user['id'];
+        $user_id = 168934;
         if(empty($user_id)){
             return $this->error(0, '请登录');
         }
@@ -688,6 +689,8 @@ class MessageController extends Controller
                     'nickname'=>$msg_arr['nickname']??'',
                     'created_at'=>$msg_arr['created_at']??'',
                 ];
+                $items['message']['title']='您的反馈已收到回复';
+                $items['message']['message']='亲爱的'.$msg_arr['nickname'].":您于".date('Y年m月d日H:i',strtotime($msg_arr['reply_at']))."提交的反馈，我们已经收到。";
             }
 
         }
