@@ -219,11 +219,23 @@ class TalkServers
         $query->orderBy('id');
         $query->limit($size)->offset(($page - 1) * $size);
 
+        $has_not_finish = Talk::query()
+            ->where('user_id', '=', $user_id)
+            ->where('status', '=', 1)
+            ->where('is_finish', '=', 1)
+            ->first();
+
+        $not_finish = 0;
+        if ($has_not_finish) {
+            $not_finish = 1;
+        }
+
         return [
-            'user_info' => $user_info,
-            'page'      => $page,
-            'size'      => $size,
-            'list'      => $query->get(),
+            'user_info'  => $user_info,
+            'not_finish' => $not_finish,
+            'page'       => $page,
+            'size'       => $size,
+            'list'       => $query->get(),
         ];
     }
 
@@ -414,7 +426,7 @@ class TalkServers
                             ->where('status', '=', 1);
                     })->count(),
             ];
-            
+
 //            $public_cid_list = TalkTemplateCategory::query()
 //                ->where('is_public', '=', 1)
 //                ->where('status', '=', 1)
