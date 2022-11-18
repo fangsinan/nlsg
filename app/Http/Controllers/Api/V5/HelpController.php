@@ -3,16 +3,13 @@
 namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
-use App\Models\FeedBack;
-use App\Models\HelpAnswer;
+use App\Models\FeedbackNew;
 use App\Models\FeedbackType;
+use App\Models\HelpAnswer;
 use App\Models\Talk;
 use App\Models\TalkList;
 use App\Models\TalkUserStatistics;
-use App\Models\User;
-use App\Servers\V5\WechatServers;
 use Illuminate\Http\Request;
-use Libraries\ImClient;
 
 class HelpController extends Controller
 {
@@ -152,16 +149,25 @@ class HelpController extends Controller
         }
         if( !empty($input['pic']) ){
             $pics  = explode(',', $input['pic']);
-            if (count($pics) > 3) {
+            if (count($pics) > 9) {
                 return $this->error(1000,'图片过多');
             }
         }
-        $res = FeedBack::create([
-            'type' => $input['type'],
-            'user_id' => $this->user['id']??0,
-            'content' => $input['content'],
-            'pic' => $input['pic']
-        ]);
+//        $res = FeedBack::create([
+//            'type' => $input['type'],
+//            'user_id' => $this->user['id']??0,
+//            'content' => $input['content'],
+//            'pic' => $input['pic']
+//        ]);
+
+        $res = FeedbackNew::query()
+            ->create([
+                'type'    => $input['type'],
+                'user_id' => $this->user['id'],
+                'os_type' => $input['os_type'],
+                'content' => $input['content'],
+                'picture' => $input['pic']
+            ]);
         if ($res) {
             return $this->success();
         }
