@@ -120,14 +120,17 @@ class LiveInfo extends Model
             return ['code'=>0,'msg'=>'源播放地址不存在','data'=>[]];
         }
         //老版
-        $SecretId="AKIDrcCpIdlpgLo4A4LMj7MPFtKfolWeNHnC";
-        $SECRET_KEY="MWXLwKVXMzPcrwrcDcrulPsAF7nIpCNM";
+        // $SecretId="AKIDrcCpIdlpgLo4A4LMj7MPFtKfolWeNHnC";
+        // $SECRET_KEY="MWXLwKVXMzPcrwrcDcrulPsAF7nIpCNM";
 
 
         //新版
         //$appId="1308168117";
-        $SecretId="AKIDYv1qOfeMqCI8h03oTs0tWtymKcdNr40g";
-        $SECRET_KEY="RghRu61f17ycz5uSjkV0EBsIRJyOZsug";
+        // $SecretId="AKIDYv1qOfeMqCI8h03oTs0tWtymKcdNr40g";
+        // $SECRET_KEY="RghRu61f17ycz5uSjkV0EBsIRJyOZsug";
+
+        $SecretId=config('env.TENCENT_SECRETID');
+        $SECRET_KEY=config('env.TENCENT_SECRETKEY');
 
 
         //加密

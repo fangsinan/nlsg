@@ -65,6 +65,11 @@ class TalkController extends ControllerBackend
         return $this->getRes((new TalkServers())->templateList($request->input(), $this->user));
     }
 
+    public function templateListAll(Request $request): JsonResponse
+    {
+        return $this->getRes((new TalkServers())->templateListAll($request->input(), $this->user));
+    }
+
     //添加快捷回复
     public function templateListCreate(Request $request): JsonResponse
     {

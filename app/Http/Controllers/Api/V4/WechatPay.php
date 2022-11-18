@@ -518,9 +518,6 @@ class WechatPay extends Controller
                             //$vip_res = PayRecordDetail::firstOrCreate($map);
                         }
                     }
-                } else if ($orderInfo['relation_id'] == 7 && $orderInfo['type'] == 14 ) {
-                    Column::ColumnBind($live_id,$user_id);
-
                 }
                 // 添加订阅记录
                 OfflineProducts::where(['id' => $orderInfo['relation_id']])->increment('subscribe_num');
@@ -532,9 +529,14 @@ class WechatPay extends Controller
                     $AdminInfo = User::find($user_id);
                     self::LiveRedis(14, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
 //                    Task::send(6, $user_id, $orderInfo['relation_id']);
+
+                    if ($orderInfo['relation_id'] == 7 && $orderInfo['type'] == 14 ) {
+                        Column::ColumnBind($live_id,$user_id);
+                    }
+
                     if ($orderInfo['relation_id'] == 5){
                         //加群
-                        self::joinImGroup($orderInfo['relation_id'],$user_id,$orderInfo['type']);
+//                        self::joinImGroup($orderInfo['relation_id'],$user_id,$orderInfo['type']);
 
                     }
                     // 内容刷单记录
@@ -1474,22 +1476,21 @@ class WechatPay extends Controller
                 $userRst = WechatPay::UserBalance($pay_type, $user_id, $orderInfo['price']);
 
 
-                // 处理关系保护   30天指挥父母
-                if ( $orderInfo['relation_id'] == '638' ) {
-                    Column::ColumnBind($orderInfo['live_id'],$user_id);
-                }
-
                 if ($orderRst && $couponRst && $phoneRst && $recordRst && $subscribeRst && $shareSyRst && $Sy_Rst) {
                     DB::commit();
                     $live_id = $orderInfo['live_id'];
                     self::LiveRedis(18, $orderInfo['relation_id'], $AdminInfo['nickname'], $live_id, $orderId, $orderInfo['live_num']);
-                    //发送通知、
 
-                    if ($orderInfo['type'] == 18) {
-                        //  加入社群
-                        self::joinImGroup($orderInfo['relation_id'],$user_id);
+                    // 处理关系保护   30天智慧父母
+                    if ( $orderInfo['relation_id'] == '638' ) {
+                        Column::ColumnBind($orderInfo['live_id'],$user_id);
                     }
 
+                    //发送通知、
+                    if ($orderInfo['type'] == 18) {
+                        //  加入社群
+//                        self::joinImGroup($orderInfo['relation_id'],$user_id);
+                    }
 
 //                    Task::send($send_type, $user_id, $orderInfo['relation_id']);
 //                    if($pay_record_flag == 1){

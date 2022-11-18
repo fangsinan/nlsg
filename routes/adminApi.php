@@ -319,6 +319,7 @@ Route::group(['namespace' => 'Admin\V4', 'prefix' => 'admin_v4'], function () {
     Route::get('im_doc/test', 'ImDocController@test');
 
     Route::post('upload/file', 'UploadController@file');//上传视频/音频
+    Route::get('upload/edit', 'UploadController@editVideoClassId');//上传视频/音频
 
     Route::get('task/index','TaskController@index');
     Route::post('task/send','TaskController@send');
@@ -451,6 +452,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('talk/finish','TalkController@finish');
         Route::post('talk/talk_user_list','TalkController@talkUserList');
         Route::post('talk/template_list','TalkController@templateList');
+        Route::post('talk/template_list_all','TalkController@templateListAll');
         Route::post('talk/template_list_create','TalkController@templateListCreate');
         Route::post('talk/template_list_change_status','TalkController@templateListChangeStatus');
         Route::post('talk/template_category_list','TalkController@templateCategoryList');

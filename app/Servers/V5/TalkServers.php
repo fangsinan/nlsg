@@ -391,6 +391,83 @@ class TalkServers
         return $query->paginate($size);
     }
 
+    public function templateListAll($params, $admin)
+    {
+        $is_public = (int)($params['is_public'] ?? 0);
+        $keywords  = $params['keywords'] ?? '';
+
+        if ($is_public === 0) {
+            //如果是0,就只返回条数
+            return [
+                'public_total'  => TalkTemplate::query()
+                    ->with(['categoryInfo'])
+                    ->where('status', '=', 1)
+                    ->whereHas('categoryInfo', function ($q) {
+                        $q->where('is_public', '=', 1)->where('status', '=', 1);
+                    })->count(),
+                'private_total' => TalkTemplate::query()
+                    ->with(['categoryInfo'])
+                    ->where('status', '=', 1)
+                    ->whereHas('categoryInfo', function ($q) use ($admin) {
+                        $q->where('is_public', '=', 2)
+                            ->where('admin_id', '=', $admin['id'])
+                            ->where('status', '=', 1);
+                    })->count(),
+            ];
+            
+//            $public_cid_list = TalkTemplateCategory::query()
+//                ->where('is_public', '=', 1)
+//                ->where('status', '=', 1)
+//                ->pluck('id');
+//
+//            $private_cid_list = TalkTemplateCategory::query()
+//                ->where('is_public', '=', 2)
+//                ->where('status', '=', 1)
+//                ->where('admin_id', '=', $admin['id'])
+//                ->pluck('id');
+//
+//            $res['public_total']  = 0;
+//            $res['private_total'] = 0;
+//
+//            if (!empty($public_cid_list)) {
+//                $res['public_total'] = TalkTemplate::query()
+//                    ->whereIn('category_id', $public_cid_list)
+//                    ->where('status', '=', 1)
+//                    ->count();
+//            }
+//
+//            if (!empty($private_cid_list)) {
+//                $res['private_total'] = TalkTemplate::query()
+//                    ->whereIn('category_id', $private_cid_list)
+//                    ->where('status', '=', 1)
+//                    ->count();
+//            }
+//            return $res;
+        }
+
+        $query = TalkTemplateCategory::query()
+            ->where('is_public', '=', $is_public)
+            ->where('status', '=', 1)
+            ->select(['id', 'title', 'is_public']);
+
+        if ($is_public === 2) {
+            $query->where('admin_id', '=', $admin['id']);
+        }
+
+        $query->with([
+            'ListInfo' => function ($q) use ($keywords) {
+                $q->where('status', '=', 1)->select(['id', 'category_id', 'content']);
+                if ($keywords) {
+                    $q->where('content', 'like', "%$keywords%");
+                }
+            }
+        ]);
+
+        return $query->get();
+
+
+    }
+
     public function templateListCreate($params, $admin): array
     {
         $params['admin_id'] = $admin['id'] ?? 0;
