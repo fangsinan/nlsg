@@ -8,4 +8,35 @@ class LivePayCheck extends Base
     static $table_name = 'nlsg_live_pay_check';
     protected $fillable = ['live_id', 'teacher_id', 'user_id', 'order_id', 'ordernum'];
 
+    /**
+     * @param int $user_id 用户id
+     * @param int $teacher_id 直播的老师id
+     * @return int
+     */
+    public static function checkByUid(int $user_id = 0, int $teacher_id = 0): int
+    {
+        if (!$user_id || !$teacher_id) {
+            return 0;
+        }
+
+        $now = date('Y-m-d H:i:s');
+
+        $check = self::query()
+            ->where('teacher_id', '=', $teacher_id)
+            ->where('user_id', '=', $user_id)
+            ->where('begin_at', '<=', $now)
+            ->where(function ($q) use ($now) {
+                $q->where('protect_end_time', '>=', $now)
+                    ->orWhereNull('protect_end_time');
+            })
+            ->select('id')
+            ->first();
+
+        if ($check) {
+            return 1;
+        }
+
+        return 0;
+    }
+
 }

@@ -15,6 +15,7 @@ use App\Models\LiveExtension;
 use App\Models\LiveForbiddenWords;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
+use App\Models\LivePayCheck;
 use App\Models\LivePlayback;
 use App\Models\LiveSonFlagPoster;
 use App\Models\LiveStatistics;
@@ -829,7 +830,7 @@ class LiveController extends Controller
         }
         $list = LiveInfo::with([
             'user:id,nickname,headimg,intro,honor',
-            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num,classify',
+            'live:id,title,price,user_id,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num,classify',
             'live.livePoster'=>function($q){
                 $q->where('status','=',1);
             }
@@ -892,6 +893,7 @@ class LiveController extends Controller
             $list['level'] = 0;
             $list['welcome'] = '欢迎来到直播间，能量时光倡导绿色健康直播，不提倡未成年人进行打赏。直播内容和评论内容严禁包含政治、低俗、色情等内容。';
             $list['nick_name'] = $this->user['nickname'] ?? '';
+            $list['is_live_pay_check'] = LivePayCheck::checkByUid($userId ?? 0,$list['live']['user_id'] ?? 0);
 
             if ($list->user_id == $userId) {
                 $list['is_password'] = 0;
@@ -1013,7 +1015,7 @@ class LiveController extends Controller
         }
         $list = LiveInfo::with([
             'user:id,nickname,headimg,intro,honor',
-            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num,classify',
+            'live:id,title,price,cover_img,user_id,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num,classify',
             'live.livePoster'=>function($q){
                 $q->where('status','=',1);
             }
@@ -1062,7 +1064,7 @@ class LiveController extends Controller
             $list['level'] = 0;
             $list['welcome'] = '欢迎来到直播间，能量时光倡导绿色健康直播，不提倡未成年人进行打赏。直播内容和评论内容严禁包含政治、低俗、色情等内容。';
             $list['nick_name'] = $this->user['nickname'] ?? '';
-
+            $list['is_live_pay_check'] = LivePayCheck::checkByUid($userId ?? 0,$list['live']['user_id'] ?? 0);
             if ($list->user_id == $userId) {
                 $list['is_password'] = 0;
             } elseif ($is_admin) {
@@ -1166,7 +1168,7 @@ class LiveController extends Controller
         }
         $list = LiveInfo::with([
             'user:id,nickname,headimg,intro,honor',
-            'live:id,title,price,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num,classify,welcome',
+            'live:id,title,price,user_id,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num,classify,welcome',
             'live.livePoster'=>function($q){
                 $q->where('status','=',1);
             }
@@ -1228,7 +1230,7 @@ class LiveController extends Controller
             $list['level'] = 0;
             $list['welcome'] = '欢迎来到直播间，能量时光倡导绿色健康直播，不提倡未成年人进行打赏。直播内容和评论内容严禁包含政治、低俗、色情等内容。';
             $list['nick_name'] = $this->user['nickname'] ?? '';
-
+            $list['is_live_pay_check'] = LivePayCheck::checkByUid($userId ?? 0,$list['live']['user_id'] ?? 0);
             if ($list->user_id == $userId) {
                 $list['is_password'] = 0;
             } elseif ($is_admin) {
