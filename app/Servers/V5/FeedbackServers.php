@@ -149,7 +149,7 @@ class FeedbackServers
             ->count();
 
         if (!$check_count || $id_count !== $check_count) {
-            return ['code' => false, 'msg' => '选中数据有误,请核查.'];
+            return ['code' => false, 'msg' => '批量回复中不得包含已回复状态.'];
         }
 
         $res = FeedbackNew::query()
