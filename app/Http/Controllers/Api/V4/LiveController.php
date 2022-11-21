@@ -2195,15 +2195,15 @@ class LiveController extends Controller
                 case 1:
                 case 7:
                 case 11:
-                    $Info = Column::select('id','name','price','subtitle','details_pic as img','user_id')->where(['id'=>$res['push_gid'],'status'=>1])->first();
+                    $Info = Column::select('id','name','price','subtitle','details_pic as img','user_id','details_pic as image')->where(['id'=>$res['push_gid'],'status'=>1])->first();
                     break;
 
                 case 2:
                 case 8:
-                    $Info = Works::select('id','title as name','price','subtitle','details_pic as img','user_id')->where(['id'=>$res['push_gid'],'status'=>4])->first();
+                    $Info = Works::select('id','title as name','price','subtitle','details_pic as img','user_id','details_pic as image')->where(['id'=>$res['push_gid'],'status'=>4])->first();
                     break;
                 case 3:
-                    $Info = MallGoods::select('id','name','price','subtitle','picture as img')->where(['id'=>$res['push_gid'],'status'=>2])->first();
+                    $Info = MallGoods::select('id','name','price','subtitle','picture as img','picture as image')->where(['id'=>$res['push_gid'],'status'=>2])->first();
                     break;
                 case 4:
                     /*$H=date('H');
