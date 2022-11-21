@@ -239,38 +239,34 @@ class WechatServersNew
 
     //模板配置
     public  static function sendBespeakClass($Url,$open_id){
-        /*你好，以下课程将在15分钟后开始
-        课程：英语4级
-        参加人：王小二
-        若因故无法参加，请及时联系老师*/
-        //周三早7点  &tweeter_code=211370
-        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=718&time=1666870472&inviter=211370';
-        $hello='你好，教育电视台公益讲座周六上午8:12开始~';
-        $title='中小学家庭教育讲座”';
+
+        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=749&time=1669023081250&inviter=211370';
+        $hello='你好，王琨老师全新内容、本人直播今晚19:30开始~';
+        $title='王琨老师直播：教你培养孩子好习惯的N个小秘诀”';
         $day='中小学家长';
-        $remarks="点击下面详情按钮，手机观看电视转播~";
+        $remarks="点击下面详情按钮，免费学习~";
 
         $data=[
             'touser'=>$open_id,
-            'template_id'=>'rnW94TX13Zep-l6wsaQ22V4ygWS6oYwagRFMFuFd91I',
+            'template_id'=>'OSUiWEQWgh4IFjKgi4MDu9TNX_FGT6P2wkzwNvzZ4XU',
             'url'=>$hrefurl, #抖音直播不需要跳转
             'topcolor'=>"#FF0000",
             'data'=>[
                 "first"=>[
                     "value"=>$hello,
-                    "color"=>"#FF0000"
+                    "color"=>"#FF0000",
                 ],
                 "keyword1"=>[ //课程名称
                     "value"=>$title,
-                    "color"=>"#FF0000"
+                    "color"=>"#FF0000",
                 ],
                 "keyword2"=>[ //开课时间
                     "value"=>$day,
-                    "color"=>"#FF0000"
+                    "color"=>"#FF0000",
                 ],
                 "remark"=>[
                     "value"=>$remarks,
-                    "color"=>"#FF0000"
+                    "color"=>"#FF0000",
                 ],
 
             ],
