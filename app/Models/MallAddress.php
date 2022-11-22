@@ -35,145 +35,145 @@ class MallAddress extends Base
 
 
     public function create($params, $user_id) {
-    		$province = $params['province'] ?? 0;
-    		$city     = $params['city'] ?? 0;
-    		$area     = $params['area'] ?? 0;
-    		$details  = $params['details'] ?? '';
-    		$name     = $params['name'] ?? '';
-    		$phone    = $params['phone'] ?? '';
-    
-    
-    		if (substr($city, -2) !== '00' && empty($area)) {
-    			$area = $city;
-    			$city = $province;
-    		}
-    
-    
-    		if (empty($province) || empty($city) ||
-    			empty($details) || empty($name) ||
-    			empty($phone)) {
-    			return ['code' => false, 'msg' => '参数错误'];
-    		}
-    
-    		if (
-    			substr($province, 0, 2) !== substr($city, 0, 2)
-    			||
-    			substr($province, 0, 2) !== substr($area, 0, 2)
-    		) {
-    			return ['code' => false, 'msg' => '地址格式错误,请重新选择'];
-    		}
-    
-    		//判断字符串内是否有'省'
-    		if (strpos(mb_substr($details, 0, 5), '省') !== false) {
-    			return ['code' => false, 'msg' => '详细地址请勿包含省市区'];
-    		}
-    
-    		if (strlen($phone) > 11) {
-    			return ['code' => false, 'msg' => '手机号格式错误'];
-    		}
-    
-    		if (!empty(($params['id'] ?? 0))) {
-    			$address = self::where('user_id', '=', $user_id)
-    				->find($params['id']);
-    			if (!$address) {
-    				return ['code' => false, 'msg' => 'id错误'];
-    			}
-    		} else {
-    			$address = new self();
-    		}
-    
-    		DB::beginTransaction();
-    
-    		if (($params['is_default'] ?? 0) == 1) {
-    			if (!empty($params['id'] ?? 0)) {
-    				$update_res = self::where('user_id', '=', $user_id)
-    					->where('id', '<>', $params['id'])
-    					->where('is_default', '=', 1)
-    					->update(['is_default' => 0]);
-    			} else {
-    				$update_res = self::where('user_id', '=', $user_id)
-    					->where('is_default', '=', 1)
-    					->update(['is_default' => 0]);
-    			}
-    
-    			if ($update_res === false) {
-    				DB::rollBack();
-    				return ['code' => false, 'msg' => '失败'];
-    			}
-    		}
-    
-    		$address->name       = $name;
-    		$address->phone      = $phone;
-    		$address->details    = $details;
-    		$address->is_default = $params['is_default'] ?? 0;
-    		$address->is_del     = 0;
-    		$address->province   = $province;
-    		$address->city       = $city;
-    		$address->area       = $area;
-    		$address->user_id    = $user_id;
-    		$res                 = $address->save();
-    
-    		if ($res) {
-    			DB::commit();
-    
-    			//查询是否有erp推送订单没有更正地址
-    			$order_id_list = Order::query()
-    				->where('user_id', '=', $user_id)
-    				->where('type', '=', 14)
-    				->whereIn('relation_id', [6, 7, 8, 10, 12,30])
-    				->where('status', '=', 1)
-    				->where('textbook_id', '<>', 0)
-    				->where('address_id', '=', 0)
-    				->pluck('id')
-    				->toArray();
-    
-    			if (!empty($order_id_list)) {
-    //                $erp_order_list = [];
-    				foreach ($order_id_list as $order_id) {
-    //                    $erp_order_list[] = [
-    //                        'order_id' => $order_id,
-    //                        'flag'     => 1,
-    //                    ];
-    					OrderErpList::query()
-    						->firstOrCreate([
-    							'order_id' => $order_id,
-    							'flag'=>1
-    						]);
-    				}
-    //                OrderErpList::query()->insert($erp_order_list);
-    
-    				Order::query()
-    					->whereIn('id', $order_id_list)
-    					->update(['address_id' => $address->id]);
-    			}
-				
-				//如果订单没有返回物流单号表示还未发货,如果修改需要重新推送
-				$order_id_list = Order::query()
-					->where('user_id', '=', $user_id)
-					->where('type', '=', 14)
-					->whereIn('relation_id', [6, 7, 8, 10, 12,30])
-					->where('status', '=', 1)
-					->where('textbook_id', '<>', 0)
-					->where('express_info_id', '=', 0)
-					->where('address_id', '=', $address->id)
-					->pluck('id')
-					->toArray();
-				if (!empty($order_id_list)){
-					foreach ($order_id_list as $order_id) {
-						OrderErpList::query()
-							->firstOrCreate([
-								'order_id' => $order_id,
-								'flag'=>1
-							]);
-					}
-				}
-    
-    			return ['code' => true, 'msg' => '成功', 'address_id' => $address->id];
-    		} else {
-    			DB::rollBack();
-    			return ['code' => false, 'msg' => '失败'];
-    		}
-    	}
+        $province = $params['province'] ?? 0;
+        $city     = $params['city'] ?? 0;
+        $area     = $params['area'] ?? 0;
+        $details  = $params['details'] ?? '';
+        $name     = $params['name'] ?? '';
+        $phone    = $params['phone'] ?? '';
+
+
+        if (substr($city, -2) !== '00' && empty($area)) {
+            $area = $city;
+            $city = $province;
+        }
+
+
+        if (empty($province) || empty($city) ||
+            empty($details) || empty($name) ||
+            empty($phone)) {
+            return ['code' => false, 'msg' => '参数错误'];
+        }
+
+        if (
+            substr($province, 0, 2) !== substr($city, 0, 2)
+            ||
+            substr($province, 0, 2) !== substr($area, 0, 2)
+        ) {
+            return ['code' => false, 'msg' => '地址格式错误,请重新选择'];
+        }
+
+        //判断字符串内是否有'省'
+        if (strpos(mb_substr($details, 0, 5), '省') !== false) {
+            return ['code' => false, 'msg' => '详细地址请勿包含省市区'];
+        }
+
+        if (strlen($phone) > 11) {
+            return ['code' => false, 'msg' => '手机号格式错误'];
+        }
+
+        if (!empty(($params['id'] ?? 0))) {
+            $address = self::where('user_id', '=', $user_id)
+                ->find($params['id']);
+            if (!$address) {
+                return ['code' => false, 'msg' => 'id错误'];
+            }
+        } else {
+            $address = new self();
+        }
+
+        DB::beginTransaction();
+
+        if (($params['is_default'] ?? 0) == 1) {
+            if (!empty($params['id'] ?? 0)) {
+                $update_res = self::where('user_id', '=', $user_id)
+                    ->where('id', '<>', $params['id'])
+                    ->where('is_default', '=', 1)
+                    ->update(['is_default' => 0]);
+            } else {
+                $update_res = self::where('user_id', '=', $user_id)
+                    ->where('is_default', '=', 1)
+                    ->update(['is_default' => 0]);
+            }
+
+            if ($update_res === false) {
+                DB::rollBack();
+                return ['code' => false, 'msg' => '失败'];
+            }
+        }
+
+        $address->name       = $name;
+        $address->phone      = $phone;
+        $address->details    = $details;
+        $address->is_default = $params['is_default'] ?? 0;
+        $address->is_del     = 0;
+        $address->province   = $province;
+        $address->city       = $city;
+        $address->area       = $area;
+        $address->user_id    = $user_id;
+        $res                 = $address->save();
+
+        if ($res) {
+            DB::commit();
+
+            //查询是否有erp推送订单没有更正地址
+            $order_id_list = Order::query()
+                ->where('user_id', '=', $user_id)
+                ->where('type', '=', 14)
+                ->where('status', '=', 1)
+                ->where('textbook_id', '<>', 0)
+                ->where('address_id', '=', 0)
+                ->pluck('id')
+                ->toArray();
+
+            if (!empty($order_id_list)) {
+//                $erp_order_list = [];
+                foreach ($order_id_list as $order_id) {
+//                    $erp_order_list[] = [
+//                        'order_id' => $order_id,
+//                        'flag'     => 1,
+//                    ];
+                    OrderErpList::query()
+                        ->firstOrCreate([
+                            'order_id' => $order_id,
+                            'flag'=>1
+                        ]);
+                }
+//                OrderErpList::query()->insert($erp_order_list);
+
+                Order::query()
+                    ->whereIn('id', $order_id_list)
+                    ->update(['address_id' => $address->id]);
+            }
+
+
+            //如果订单没有返回物流单号表示还未发货,如果修改需要重新推送
+            $order_id_list = Order::query()
+                ->where('user_id', '=', $user_id)
+                ->where('type', '=', 14)
+                ->where('status', '=', 1)
+                ->where('textbook_id', '<>', 0)
+                ->where('express_info_id', '=', 0)
+                ->where('address_id', '=', $address->id)
+                ->pluck('id')
+                ->toArray();
+            if (!empty($order_id_list)){
+                foreach ($order_id_list as $order_id) {
+                    OrderErpList::query()
+                        ->firstOrCreate([
+                            'order_id' => $order_id,
+                            'flag'=>1
+                        ]);
+                }
+            }
+
+
+            return ['code' => true, 'msg' => '成功', 'address_id' => $address->id];
+        } else {
+            DB::rollBack();
+            return ['code' => false, 'msg' => '失败'];
+        }
+    }
 
     public static function getNameById($id) {
         $res = Area::find($id);
