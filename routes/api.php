@@ -658,6 +658,7 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
     Route::any('live/list', 'LiveController@getLiveLists');
     Route::any('live/live_push_qrcode', 'LiveController@livePushQrcode');
     Route::any('live/sell_short_state', 'LiveController@SellShortState');
+    Route::any('live/get_zero_id', 'LiveController@getZeroActivityLiveId');
 
     //线下课
     Route::get('offline/info', 'OfflineController@getOfflineInfo');
