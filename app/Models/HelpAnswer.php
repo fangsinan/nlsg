@@ -32,9 +32,8 @@ class HelpAnswer extends Base
             $operator = "=";
         }else{
             $operator = "like";
-            $question = "%".$question."%";
         }
-
+        // (new Base())->getSqlBegin();
         // $list = self::where("question",$operator,$question)->where("status",1)->get();
         $lists = self::query()->with([
             'keywordsBind:id,help_answer_id,keywords_id',
@@ -42,12 +41,17 @@ class HelpAnswer extends Base
         ])->where("status",1)
 
             ->where(function ($query) use($operator,$question) {
-                $query->where("question",$operator,$question)
-                    ->orWhereHas('keywordsBind.keywords', function ( $query) use ($question){
+                if($operator == "like"){
+                    $query->where("question",$operator,"%".$question."%");
+                }else{
+                    $query->where("question",$operator,$question);
+                }
+                $query->orWhereHas('keywordsBind.keywords', function ( $query) use ($question){
                         $query->where('keywords',$question);
                     });
             })
             ->paginate(10)->toArray();
+        // (new Base())->getSql();
         $list = $lists['data'];
         if(empty($list)) return $res;
 
