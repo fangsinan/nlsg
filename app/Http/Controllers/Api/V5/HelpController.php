@@ -46,7 +46,7 @@ class HelpController extends Controller
                 "answer"    =>  $val['answer'],
             ];
         }
-        if(empty($message)) $no_answer = "很抱歉，暂未识别出您的问题，您可以选择留言，客服看到后会及时为您解答";
+        if(empty($message)) $no_answer = "很抱歉，暂未识别出您的问题，您可以选择留言，客服看到后会及时为您解答 点击留言";
         $returns[] =[
             "qr_code"=>"",
             "no_answer" => $no_answer??"",
