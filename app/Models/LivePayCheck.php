@@ -39,4 +39,18 @@ class LivePayCheck extends Base
         return 0;
     }
 
+    public function livePayCheckToSub(int $user_id = 0,int $live_id = 0){
+        if (!$user_id || !$live_id) {
+            return ['code'=>false,'msg'=>'参数错误'];
+        }
+
+        $check_live = Live::query()->where('id','=',$live_id)->select(['id','user_id'])->first();
+
+        if (!$check_live){
+            return ['code'=>false,'msg'=>'直播错误'];
+        }
+
+
+    }
+
 }
