@@ -28,7 +28,7 @@ class erpOrderServers
 //            ->where('type', '=', 14)
 //            ->whereIn('relation_id', $search_relation_id)
             ->whereRaw('((
-                type = 14 and relation_id in (7, 8, 10)
+                type = 14 and relation_id in (7, 8, 10,30)
             ) or (
                 type = 18 and pay_price = 2980
             ))')
