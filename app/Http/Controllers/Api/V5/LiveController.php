@@ -515,4 +515,15 @@ class LiveController extends Controller
     }
     
 
+    /**
+     * getZeroActivity 获取0元购宣传活动页面
+     *
+     * @param Request $request
+     *
+     * @return mixed|string 直播id
+     */
+    public function getZeroActivityLiveId(Request $request){
+        $res= Live::where("zero_poster_show",1)->value('id');
+        return success($res??0);
+    }
 }
