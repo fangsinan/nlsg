@@ -50,7 +50,7 @@ class HelpAnswer extends Base
                         $query->where('keywords',$question);
                     });
             })
-            ->paginate(10)->toArray();
+            ->paginate(100)->toArray();
         // (new Base())->getSql();
         $list = $lists['data'];
         if(empty($list)) return $res;
