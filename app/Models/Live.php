@@ -251,7 +251,7 @@ class Live extends Base
     public static function delOldZeroPosterShow($live_id = 0){
         $query = self::query()->where('zero_poster_show','=',1);
 
-        if ($live_id){
+        if ($live_id > 0){
             $query->where('id','<>',$live_id);
         }
 
