@@ -22,6 +22,7 @@ class HelpAnswer extends Base
      */
     public static function GetAnswersByQuestion($question): array
     {
+
         $is_show_qr = 0;
         $res = ['list'=>[], 'is_show_qr'=>$is_show_qr,];
         if(empty($question)) return $res;
@@ -33,13 +34,48 @@ class HelpAnswer extends Base
             $operator = "like";
             $question = "%".$question."%";
         }
-        $list = self::where("question",$operator,$question)->where("status",1)->get();
+
+        // $list = self::where("question",$operator,$question)->where("status",1)->get();
+        $lists = self::query()->with([
+            'keywordsBind:id,help_answer_id,keywords_id',
+            'keywordsBind.keywords:id,keywords'
+        ])->where("status",1)
+
+            ->where(function ($query) use($operator,$question) {
+                $query->where("question",$operator,$question)
+                    ->orWhereHas('keywordsBind.keywords', function ( $query) use ($question){
+                        $query->where('keywords',$question);
+                    });
+            })
+            ->paginate(10)->toArray();
+        $list = $lists['data'];
         if(empty($list)) return $res;
 
         return [
-            "list"      => $list->toArray(),
+            "list"      => $list,
             "is_show_qr"=> $is_show_qr,
         ];
+
+
+
+        // $is_show_qr = 0;
+        // $res = ['list'=>[], 'is_show_qr'=>$is_show_qr,];
+        // if(empty($question)) return $res;
+        //
+        // if($question=="微信客服"){
+        //     $is_show_qr = 1;   //只有微信客服才显示二维码
+        //     $operator = "=";
+        // }else{
+        //     $operator = "like";
+        //     $question = "%".$question."%";
+        // }
+        // $list = self::where("question",$operator,$question)->where("status",1)->get();
+        // if(empty($list)) return $res;
+        //
+        // return [
+        //     "list"      => $list->toArray(),
+        //     "is_show_qr"=> $is_show_qr,
+        // ];
     }
 
 
