@@ -563,6 +563,7 @@ class IndexController extends ControllerBackend
             $service_type       = $input['service_type']??0;
             $hide_sub_count  = $input['hide_sub_count'] ?? 0;
             $is_zero = $input['is_zero'] ?? 1;
+            $zero_poster_show = $input['zero_poster_show'] ?? 0;
 
     		$cover_vertical_img = !empty($input['cover_vertical_img']) ? covert_img($input['cover_vertical_img']) : '';
 
@@ -636,6 +637,7 @@ class IndexController extends ControllerBackend
                 'service_type'=>$service_type,
                 'hide_sub_count'=>$hide_sub_count,
                 'is_zero'=>$is_zero,
+                'zero_poster_show'=>$zero_poster_show,
     		];
 
     		$lcModel            = new LiveConsole();
@@ -654,6 +656,9 @@ class IndexController extends ControllerBackend
     		$live_info_data['back_video_url'] = $back_video_url;
 
     		if (!empty($input['id'])) {
+    		    if (!$zero_poster_show){
+    		        Live::delOldZeroPosterShow($input['id']);
+                }
     			Live::query()->where('id', $input['id'])->update($data);
     			$info_first   = LiveInfo::query()
     				->select('id', 'task_id', 'begin_at', 'end_at', 'push_end_time')
@@ -673,6 +678,9 @@ class IndexController extends ControllerBackend
     			$live_info_data['live_pid'] = $input['id'];
     			LiveInfo::where('id', '=', $live_info_id)->update($live_info_data);
     		} else {
+                if (!$zero_poster_show){
+                    Live::delOldZeroPosterShow();
+                }
     			$Live_res = Live::create($data);
 
     			$live_info_data['live_pid'] = $Live_res->id;
@@ -1049,7 +1057,7 @@ class IndexController extends ControllerBackend
     			->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at','service_type',
     				'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test','bgp_id',
     				'steam_end_time', 'steam_begin_time','pre_push_time','classify','valid_time_range','cover_vertical_img',
-                    'hide_sub_count','is_zero'
+                    'hide_sub_count','is_zero','zero_poster_show'
     			)
     //            ->with(['livePoster'])
     			->where('id', $id)->first();
