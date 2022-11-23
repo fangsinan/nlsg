@@ -219,6 +219,10 @@ class FeedbackServers
             $query->where('created_at', '<=', $created_end);
         }
 
+        $query->orderBy('status')
+            ->orderBy('updated_at')
+            ->orderBy('id','desc');
+
         return $query->paginate($params['size'] ?? 10);
     }
 
