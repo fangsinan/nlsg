@@ -76,11 +76,11 @@ class FeedbackServers
         $res = $query->orderBy('id', 'desc')
             ->paginate($params['size'] ?? 10);
 
-        if ($id) {
+//        if ($id) {
             foreach ($res as $v) {
                 $v->picture = explode(',', $v->picture);
             }
-        }
+//        }
 
         return $res;
     }
