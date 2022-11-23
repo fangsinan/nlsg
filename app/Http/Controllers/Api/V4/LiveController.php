@@ -1708,6 +1708,7 @@ class LiveController extends Controller
                 //  0元购下单 三个月观看期限
                 $bind_end=date('Y-m-d 23:59:59', strtotime('+3 months'));
                 $order['is_zero'] = 2;// 0元购订单
+                $live_data['begin_at'] = date($live_data['begin_at'],strtotime('+3 months'));
                 WechatPay::PayTeacherLives($this->user['id'],$live_data,$order,$bind_end);
             }else{
 

@@ -102,7 +102,7 @@ class OrderZero extends Base
 
         if($order_zero_id && $sub_res){
             DB::commit();
-            return OrderZero::first($order_zero_id);
+            return OrderZero::where(id,$order_zero_id)->first();
         }else{
             DB::rollBack();
             return [];
