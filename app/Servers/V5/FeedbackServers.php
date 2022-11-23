@@ -77,9 +77,9 @@ class FeedbackServers
             ->paginate($params['size'] ?? 10);
 
 //        if ($id) {
-            foreach ($res as $v) {
-                $v->picture = explode(',', $v->picture);
-            }
+        foreach ($res as $v) {
+            $v->picture = explode(',', $v->picture);
+        }
 //        }
 
         return $res;
@@ -373,15 +373,15 @@ class FeedbackServers
 
             $type_list = FeedbackType::query()
                 ->whereIn('id', $id)
-                ->where('type','=',2)
+                ->where('type', '=', 2)
                 ->pluck('id')
                 ->toArray();
 
-            if ($type_list){
+            if ($type_list) {
                 HelpAnswer::query()
-                    ->whereIn('type',$type_list)
-                    ->whereIn('status',[1,3])
-                    ->update(['status'=>2]);
+                    ->whereIn('type', $type_list)
+                    ->whereIn('status', [1, 3])
+                    ->update(['status' => 2]);
             }
 
 
@@ -450,6 +450,7 @@ class FeedbackServers
                 'keywords.*.size'     => '关键字最多允许20个字',
                 'question.max'        => '最多允许20个字',
                 'answer.max'          => '最多允许200个字',
+                'keywords.required'   => '未输入关键词',
             ]
         );
 
