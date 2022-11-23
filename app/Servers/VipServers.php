@@ -18,6 +18,7 @@ class VipServers
     public function list($params, $admin_id) {
         $size  = $params['size'] ?? 10;
         $query = VipUser::query()
+            ->where('status','=','1')
             ->orderBy('created_at', 'asc')
             ->groupBy('user_id')
             ->select(['id', 'id as vip_id', 'user_id', 'nickname', 'username']);
