@@ -41,12 +41,17 @@ class TalkServers
         $finish_begin  = $params['finish_begin'] ?? '';
         $finish_end    = $params['finish_end'] ?? '';
         $is_finish     = $params['is_finish'] ?? 0;
+        $user_id       = $params['user_id'] ?? 0;
 
 //        if ($nickname) {
 //            $query->whereHas('userInfo', function ($q) use ($nickname) {
 //                $q->where('nickname', 'like', '%' . $nickname . '%');
 //            });
 //        }
+
+        if ($user_id) {
+            $query->where('user_id', '=', $user_id);
+        }
 
         if ($phone) {
             $query->whereHas('userInfo', function ($q) use ($phone) {
