@@ -2335,10 +2335,10 @@ class LiveController extends Controller
         return success($res);
     }
 
-    //todo 基础库的用户添加sub表
+    //基础库的用户添加sub表
     public function livePayCheckToSub(Request $request){
         $res = (new LivePayCheck())->livePayCheckToSub($this->user['id'] ?? 0,$request->input('live_id',0));
-        return $this->getRes($request);
+        return $this->getRes($res);
     }
 
 }

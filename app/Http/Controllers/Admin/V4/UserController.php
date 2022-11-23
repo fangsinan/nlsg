@@ -11,6 +11,7 @@ use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use JPush;
 use App\Models\Task;
 
@@ -26,8 +27,9 @@ class UserController extends ControllerBackend
         $is_author = $request->get('is_author');
         $start = $request->get('start');
         $end = $request->get('end');
-        $query = User::when($phone, function ($query) use ($phone) {
-                $query->where('phone', 'like',  $phone . '%');
+        $query = User::query()->where('phone','like','1%')->where('ref', '=', '0')->where('is_robot', '=', '0')
+            ->when($phone, function ($query) use ($phone) {
+                $query->where('phone', 'like', $phone . '%');
             })
 //            ->when($nickname, function ($query) use ($nickname) {
 //               $query->where('nickname', 'like', '%' . $nickname . '%');

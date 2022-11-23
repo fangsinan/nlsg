@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
-use App\Models\CacheTools;
 use App\Models\Column;
 use App\Models\Comment;
 use App\Models\Live;
@@ -13,8 +12,9 @@ use App\Models\Wiki;
 use App\Models\Works;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use App\Models\CacheTools;
 
 class OrderController extends ControllerBackend
 {
@@ -51,148 +51,158 @@ class OrderController extends ControllerBackend
      * }
      */
     public function list(Request $request, $flag = 1)
-    {
-        $phone = $request->get('phone');
-        $nickname = $request->get('nickname');
-        $ordernum = $request->get('ordernum');
-        $title = $request->get('title');
-        $start = $request->get('start');
-        $end = $request->get('end');
-        $status = $request->get('status');
-        $level = $request->get('level');
-        $pay_type = $request->get('pay_type');
-        $os_type = $request->get('os_type');
-        $sort = $request->get('sort');
-        $activity_tag = $request->get('activity_tag', '');
-        $is_shill = (int)($request->get('is_shill', -1));
-        $page = $request->input('page', 1);
-        $size = $request->input('size', 10);
-        $teacher_name = $request->input('teacher_name','');
-        $twitter_phone = $request->input('twitter_phone','');
+	{
+		$phone = $request->get('phone');
+		$nickname = $request->get('nickname');
+		$ordernum = $request->get('ordernum');
+		$title = $request->get('title');
+		$start = $request->get('start');
+		$end = $request->get('end');
+		$status = $request->get('status');
+		$level = $request->get('level');
+		$pay_type = $request->get('pay_type');
+		$os_type = $request->get('os_type');
+		$sort = $request->get('sort');
+		$activity_tag = $request->get('activity_tag', '');
+		$is_shill = (int)($request->get('is_shill', -1));
+		$page = $request->input('page', 1);
+		$size = $request->input('size', 10);
+		$teacher_name = $request->input('teacher_name','');
+		$twitter_phone = $request->input('twitter_phone','');
 
-        $query = Order::with(
-            [
-                'user:id,nickname,phone',
-                'works:id,title,user_id',
-                'works.user:id,nickname,phone',
-                'twitter:id,nickname,phone',
-            ])
-            ->when(!is_null($status), function ($query) use ($status) {
-                $query->where('status', $status);
-            })
-            ->when(!is_null($pay_type), function ($query) use ($pay_type) {
-                $query->where('pay_type', $pay_type);
-            })
-            ->when(!is_null($os_type), function ($query) use ($os_type) {
-                $query->where('os_type', $os_type);
-            })
-//            ->when($nickname, function ($query) use ($nickname) {
-//                $query->whereHas('user', function ($query) use ($nickname) {
-//                    $query->where('nickname', 'like', '%' . $nickname . '%');
-//                });
-//            })
-            ->when($phone, function ($query) use ($phone) {
-                $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', '=', $phone);
-                });
-            })
-            ->when($level, function ($query) use ($level) {
-                $query->whereHas('user', function ($query) use ($level) {
-                    $query->where('level', 'like', '%' . $level . '%');
-                });
-            })
-            ->when($title, function ($query) use ($title) {
-                $query->whereHas('works', function ($query) use ($title) {
-                    $query->where('title', 'like', '%' . $title . '%');
-                });
-            })
-            ->when($ordernum, function ($query) use ($ordernum) {
-                $query->where('ordernum', 'like', '%' . $ordernum . '%');
-            })
-            ->when($start && $end, function ($query) use ($start, $end) {
-                $query->whereBetween('created_at', [
-                    Carbon::parse($start)->startOfDay()->toDateTimeString(),
-                    Carbon::parse($end)->endOfDay()->toDateTimeString(),
-                ]);
-            })
-            ->whereHas('user', function ($q) {
-                $q->where('is_test_pay', '=', 0);
-            });
+		$query = Order::with(
+			[
+				'user:id,nickname,phone',
+				'works:id,title,user_id',
+				'works.user:id,nickname,phone',
+				'twitter:id,nickname,phone',
+			])
+			->when(!is_null($status), function ($query) use ($status) {
+				$query->where('status', $status);
+			})
+			->when(!is_null($pay_type), function ($query) use ($pay_type) {
+				$query->where('pay_type', $pay_type);
+			})
+			->when(!is_null($os_type), function ($query) use ($os_type) {
+				$query->where('os_type', $os_type);
+			})
+			->when($nickname, function ($query) use ($nickname) {
+				$query->whereHas('user', function ($query) use ($nickname) {
+					$query->where('nickname', 'like', '%' . $nickname . '%');
+				});
+			})
+			->when($phone, function ($query) use ($phone) {
+				$query->whereHas('user', function ($query) use ($phone) {
+					$query->where('phone', '=', $phone);
+				});
+			})
+			->when($level, function ($query) use ($level) {
+				$query->whereHas('user', function ($query) use ($level) {
+					$query->where('level', 'like', '%' . $level . '%');
+				});
+			})
+			->when($title, function ($query) use ($title) {
+				$query->whereHas('works', function ($query) use ($title) {
+					$query->where('title', 'like', '%' . $title . '%');
+				});
+			})
+			->when($ordernum, function ($query) use ($ordernum) {
+				$query->where('ordernum', 'like', '%' . $ordernum . '%');
+			})
+			->when($start && $end, function ($query) use ($start, $end) {
+				$query->whereBetween('created_at', [
+					Carbon::parse($start)->startOfDay()->toDateTimeString(),
+					Carbon::parse($end)->endOfDay()->toDateTimeString(),
+				]);
+			})
+			->whereHas('user', function ($q) {
+				$q->where('is_test_pay', '=', 0);
+			});
 
-//        if (!empty($teacher_name)){
-//            $query->whereHas('works.user',function($q)use($teacher_name){
-//                $q->where('nickname','like',"%$teacher_name%");
-//            });
-//        }
+		if (!empty($teacher_name)){
+			$query->whereHas('works.user',function($q)use($teacher_name){
+				$q->where('nickname','like',"%$teacher_name%");
+			});
+		}
 
-        if (!empty($twitter_phone)){
-            $twitter_id = User::query()
-                ->where('phone','=',$twitter_phone)
-                ->pluck('id');
-            if (empty($twitter_id)){
-                $query->where('id','=',0);
-            }else{
-                $query->whereIn('twitter_id',$twitter_id);
-            }
-        }
+		if (!empty($twitter_phone)){
+			$twitter_id = User::query()
+				->where('phone','=',$twitter_phone)
+				->pluck('id');
+			if (empty($twitter_id)){
+				$query->where('id','=',0);
+			}else{
+				$query->whereIn('twitter_id',$twitter_id);
+			}
+		}
 
-        if ($activity_tag === 'cytx_on') {
-            $query->where('activity_tag', '=', 'cytx');
-        }
-        if ($activity_tag === 'cytx_off') {
+        $admin_id=$this->user['id'];
+        if(in_array($admin_id,[228])){
             $query->where('activity_tag', '<>', 'cytx');
-        }
-        if ($is_shill === 0) {
-            $query->where('is_shill', '=', 0);
-        }
-        if ($is_shill === 1) {
-            $query->where('is_shill', '=', 1);
-        }
-
-        $direction = $sort === 'asc' ? 'asc' : 'desc';
-        $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price',
-            'os_type', 'pay_type', 'created_at', 'status', 'activity_tag', 'is_shill','twitter_id')
-            ->where('type', 9)->orderBy('id', $direction);
-
-        if ($flag === 1) {
-            $lists = $query
-                ->paginate($size)
-                ->toArray();
-        } else {
-            $lists = $query->limit($size)->offset(($page - 1) * $size)->get();
-            if ($lists->isEmpty()) {
-                return [];
+        }else {
+            if ($activity_tag === 'cytx_on') {
+                $query->where('activity_tag', '=', 'cytx');
             }
-            return $lists->toArray();
-
+            if ($activity_tag === 'cytx_off') {
+                $query->where('activity_tag', '<>', 'cytx');
+            }
         }
 
-        $cache_key_name = 'order_list_works_rank_list';
-        $expire_num = CacheTools::getExpire('channel_works_list');
-        $rank = Cache::get($cache_key_name);
-        if (empty($rank)) {
-            $rank = Order::with('works:id,title,cover_img')
-                ->select([
-                    DB::raw('count(*) as total'),
-                    'user_id',
-                    'relation_id'
-                ])
-                ->where('type', 9)
-                ->where('status', 1)
-                ->orderBy('total', 'desc')
-                ->groupBy('relation_id')
-                ->limit(10)
-                ->get();
-            Cache::put($cache_key_name, $rank, $expire_num);
+		if ($is_shill === 0) {
+			$query->where('is_shill', '=', 0);
+		}
+		if ($is_shill === 1) {
+			$query->where('is_shill', '=', 1);
+		}
+
+		$direction = $sort === 'asc' ? 'asc' : 'desc';
+		$query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price',
+			'os_type', 'pay_type', 'created_at', 'status', 'activity_tag', 'is_shill','twitter_id')
+			->where('type', 9)->orderBy('id', $direction);
+
+		if ($flag === 1) {
+			$lists = $query
+				->paginate($size)
+				->toArray();
+		} else {
+			$lists = $query->limit($size)->offset(($page - 1) * $size)->get();
+			if ($lists->isEmpty()) {
+				return [];
+			}
+			return $lists->toArray();
+
+		}
+
+        if(!in_array($admin_id,[228])) {
+            $cache_key_name = 'order_list_works_rank_list';
+            $expire_num = CacheTools::getExpire('channel_works_list');
+            $rank = Cache::get($cache_key_name);
+            if (empty($rank)) {
+                $rank = Order::with('works:id,title,cover_img')
+                    ->select([
+                        DB::raw('count(*) as total'),
+                        'user_id',
+                        'relation_id'
+                    ])
+                    ->where('type', 9)
+                    ->where('status', 1)
+                    ->orderBy('total', 'desc')
+                    ->groupBy('relation_id')
+                    ->limit(10)
+                    ->get();
+                Cache::put($cache_key_name, $rank, $expire_num);
+            }
+        }else{
+            $rank=[];
         }
 
-        $data = [
-            'lists' => $lists,
-            'rank' => $rank
-        ];
-        return success($data);
+		$data = [
+			'lists' => $lists,
+			'rank' => $rank
+		];
+		return success($data);
 
-    }
+	}
 
     public function listExcel(Request $request)
     {
@@ -404,154 +414,164 @@ class OrderController extends ControllerBackend
     }
 
     public function colList(Request $request,$flag = 1)
-    {
-        $phone = $request->get('phone');
-        $nickname = $request->get('nickname');
-        $ordernum = $request->get('ordernum');
-        $title = $request->get('title');
-        $start = $request->get('start');
-        $end = $request->get('end');
-        $status = $request->get('status');
-        $level = $request->get('level');
-        $pay_type = $request->get('pay_type');
-        $os_type = $request->get('os_type');
-        $sort = $request->get('sort');
-        $activity_tag = $request->get('activity_tag', '');
-        $is_shill = (int)($request->get('is_shill', -1));
-        $page = $request->input('page', 1);
-        $size = $request->input('size', 10);
-        $teacher_name = $request->input('teacher_name','');
-        $twitter_phone = $request->input('twitter_phone','');
+	{
+		$phone = $request->get('phone');
+		$nickname = $request->get('nickname');
+		$ordernum = $request->get('ordernum');
+		$title = $request->get('title');
+		$start = $request->get('start');
+		$end = $request->get('end');
+		$status = $request->get('status');
+		$level = $request->get('level');
+		$pay_type = $request->get('pay_type');
+		$os_type = $request->get('os_type');
+		$sort = $request->get('sort');
+		$activity_tag = $request->get('activity_tag', '');
+		$is_shill = (int)($request->get('is_shill', -1));
+		$page = $request->input('page', 1);
+		$size = $request->input('size', 10);
+		$teacher_name = $request->input('teacher_name','');
+		$twitter_phone = $request->input('twitter_phone','');
 
-        $query = Order::with(
-            [
-                'user:id,nickname,phone',
-                'column' => function ($q) {
-                    $q->select(['id', 'name as title', 'name', 'cover_pic as cover_img','user_id']);
-                },
-                'column.user:id,nickname,phone',
-                'twitter:id,nickname,phone',
-            ])
-            ->whereHas('column', function ($q) {
-                $q->where('type', '=', 2);
-            })
-            ->when(!is_null($status), function ($query) use ($status) {
-                $query->where('status', $status);
-            })
-            ->when(!is_null($pay_type), function ($query) use ($pay_type) {
-                $query->where('pay_type', $pay_type);
-            })
-            ->when(!is_null($os_type), function ($query) use ($os_type) {
-                $query->where('os_type', $os_type);
-            })
-//            ->when($nickname, function ($query) use ($nickname) {
-//                $query->whereHas('user', function ($query) use ($nickname) {
-//                    $query->where('nickname', 'like', '%' . $nickname . '%');
-//                });
-//            })
-            ->when($phone, function ($query) use ($phone) {
-                $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', '=',  $phone);
-                });
-            })
-            ->when($level, function ($query) use ($level) {
-                $query->whereHas('user', function ($query) use ($level) {
-                    $query->where('level', 'like', '%' . $level . '%');
-                });
-            })
-            ->when($title, function ($query) use ($title) {
-                $query->whereHas('column', function ($query) use ($title) {
-                    $query->where('name', 'like', '%' . $title . '%');
-                });
-            })
-            ->when($ordernum, function ($query) use ($ordernum) {
-                $query->where('ordernum', 'like', '%' . $ordernum . '%');
-            })
-            ->when($start && $end, function ($query) use ($start, $end) {
-                $query->whereBetween('created_at', [
-                    Carbon::parse($start)->startOfDay()->toDateTimeString(),
-                    Carbon::parse($end)->endOfDay()->toDateTimeString(),
-                ]);
-            })  ->whereHas('user', function ($q) {
-                $q->where('is_test_pay', '=', 0);
-            });
+		$query = Order::with(
+			[
+				'user:id,nickname,phone',
+				'column' => function ($q) {
+					$q->select(['id', 'name as title', 'name', 'cover_pic as cover_img','user_id']);
+				},
+				'column.user:id,nickname,phone',
+				'twitter:id,nickname,phone',
+			])
+			->whereHas('column', function ($q) {
+				$q->where('type', '=', 2);
+			})
+			->when(!is_null($status), function ($query) use ($status) {
+				$query->where('status', $status);
+			})
+			->when(!is_null($pay_type), function ($query) use ($pay_type) {
+				$query->where('pay_type', $pay_type);
+			})
+			->when(!is_null($os_type), function ($query) use ($os_type) {
+				$query->where('os_type', $os_type);
+			})
+			->when($nickname, function ($query) use ($nickname) {
+				$query->whereHas('user', function ($query) use ($nickname) {
+					$query->where('nickname', 'like', '%' . $nickname . '%');
+				});
+			})
+			->when($phone, function ($query) use ($phone) {
+				$query->whereHas('user', function ($query) use ($phone) {
+					$query->where('phone', '=',  $phone);
+				});
+			})
+			->when($level, function ($query) use ($level) {
+				$query->whereHas('user', function ($query) use ($level) {
+					$query->where('level', 'like', '%' . $level . '%');
+				});
+			})
+			->when($title, function ($query) use ($title) {
+				$query->whereHas('column', function ($query) use ($title) {
+					$query->where('name', 'like', '%' . $title . '%');
+				});
+			})
+			->when($ordernum, function ($query) use ($ordernum) {
+				$query->where('ordernum', 'like', '%' . $ordernum . '%');
+			})
+			->when($start && $end, function ($query) use ($start, $end) {
+				$query->whereBetween('created_at', [
+					Carbon::parse($start)->startOfDay()->toDateTimeString(),
+					Carbon::parse($end)->endOfDay()->toDateTimeString(),
+				]);
+			})  ->whereHas('user', function ($q) {
+				$q->where('is_test_pay', '=', 0);
+			});
 
-//        if (!empty($teacher_name)){
-//            $query->whereHas('column.user',function($q)use($teacher_name){
-//                $q->where('nickname','like',"%$teacher_name%");
-//            });
-//        }
+		if (!empty($teacher_name)){
+			$query->whereHas('column.user',function($q)use($teacher_name){
+				$q->where('nickname','like',"%$teacher_name%");
+			});
+		}
 
-        if (!empty($twitter_phone)){
-            $twitter_id = User::query()
-                ->where('phone','=',$twitter_phone)
-                ->pluck('id');
-            if (empty($twitter_id)){
-                $query->where('id','=',0);
-            }else{
-                $query->whereIn('twitter_id',$twitter_id);
-            }
-        }
+		if (!empty($twitter_phone)){
+			$twitter_id = User::query()
+				->where('phone','=',$twitter_phone)
+				->pluck('id');
+			if (empty($twitter_id)){
+				$query->where('id','=',0);
+			}else{
+				$query->whereIn('twitter_id',$twitter_id);
+			}
+		}
 
-        if ($activity_tag === 'cytx_on') {
-            $query->where('activity_tag', '=', 'cytx');
-        }
-        if ($activity_tag === 'cytx_off') {
+        $admin_id=$this->user['id'];
+        if(in_array($admin_id,[228])){
             $query->where('activity_tag', '<>', 'cytx');
-        }
-        if ($is_shill === 0) {
-            $query->where('is_shill', '=', 0);
-        }
-        if ($is_shill === 1) {
-            $query->where('is_shill', '=', 1);
-        }
-
-        $direction = $sort === 'asc' ? 'asc' : 'desc';
-        $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
-            'created_at', 'status', 'activity_tag','is_shill','twitter_id')
-            ->where('type', 15)
-            ->orderBy('id', $direction);
-
-        if ($flag === 1) {
-            $lists = $query
-                ->paginate($size)
-                ->toArray();
-        } else {
-            $lists = $query->limit($size)->offset(($page - 1) * $size)->get();
-            if ($lists->isEmpty()) {
-                return [];
+        }else {
+            if ($activity_tag === 'cytx_on') {
+                $query->where('activity_tag', '=', 'cytx');
             }
-            return $lists->toArray();
+            if ($activity_tag === 'cytx_off') {
+                $query->where('activity_tag', '<>', 'cytx');
+            }
         }
 
-        $cache_key_name = 'col_list_col_rank_list';
-        $expire_num = CacheTools::getExpire('channel_works_list');
-        $rank = Cache::get($cache_key_name);
-        if (empty($rank)) {
-            $rank = Order::with(['column' => function ($q) {
-                $q->select(['id', 'name as title', 'name', 'cover_pic as cover_img']);
-            }])->whereHas('column', function ($q) {
-                $q->where('type', '=', 2);
-            })->select([
-                DB::raw('count(*) as total'),
-                'user_id',
-                'relation_id'
-            ])->where('type', 15)
-                ->where('status', 1)
-                ->orderBy('total', 'desc')
-                ->groupBy('relation_id')
-                ->limit(10)
-                ->get();
-            Cache::put($cache_key_name, $rank, $expire_num);
+		if ($is_shill === 0) {
+			$query->where('is_shill', '=', 0);
+		}
+		if ($is_shill === 1) {
+			$query->where('is_shill', '=', 1);
+		}
+
+		$direction = $sort === 'asc' ? 'asc' : 'desc';
+		$query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
+			'created_at', 'status', 'activity_tag','is_shill','twitter_id')
+			->where('type', 15)
+			->orderBy('id', $direction);
+
+		if ($flag === 1) {
+			$lists = $query
+				->paginate($size)
+				->toArray();
+		} else {
+			$lists = $query->limit($size)->offset(($page - 1) * $size)->get();
+			if ($lists->isEmpty()) {
+				return [];
+			}
+			return $lists->toArray();
+		}
+
+        if(!in_array($admin_id,[228])) {
+            $cache_key_name = 'col_list_col_rank_list';
+            $expire_num = CacheTools::getExpire('channel_works_list');
+            $rank = Cache::get($cache_key_name);
+            if (empty($rank)) {
+                $rank = Order::with(['column' => function ($q) {
+                    $q->select(['id', 'name as title', 'name', 'cover_pic as cover_img']);
+                }])->whereHas('column', function ($q) {
+                    $q->where('type', '=', 2);
+                })->select([
+                    DB::raw('count(*) as total'),
+                    'user_id',
+                    'relation_id'
+                ])->where('type', 15)
+                    ->where('status', 1)
+                    ->orderBy('total', 'desc')
+                    ->groupBy('relation_id')
+                    ->limit(10)
+                    ->get();
+                Cache::put($cache_key_name, $rank, $expire_num);
+            }
+        }else{
+            $rank=[];
         }
 
-        $data = [
-            'lists' => $lists,
-            'rank' => $rank
-        ];
-        return success($data);
+		$data = [
+			'lists' => $lists,
+			'rank' => $rank
+		];
+		return success($data);
 
-    }
+	}
 
     /**
      * @api {get} api/admin_v4/order/statistic 订单统计
@@ -580,22 +600,32 @@ class OrderController extends ControllerBackend
      */
     public function getOrderStatistic(Request $request)
     {
+        $admin_id=$this->user['id'];
         $type = $request->get('type') ?? 1;
         $list = Order::select([
             DB::raw('sum(pay_price) as price'),
             DB::raw('count(id) as total')
         ])
             ->where('status', 1)
-            ->where('type', $type)
-            ->groupBy('type')
+            ->where('is_shill', 0)
+            ->where('type', $type);
+
+        if(in_array($admin_id,[228])){
+            $list=$list->where('activity_tag', '<>', 'cytx');
+        }
+        $list=$list->groupBy('type')
             ->first();
         $today = Order::select([
             DB::raw('sum(pay_price) as price'),
             DB::raw('count(id) as total')
         ])
             ->where('status', 1)
-            ->where('type', $type)
-            ->where('created_at', '>=', Carbon::today())
+            ->where('is_shill', 0)
+            ->where('type', $type);
+        if(in_array($admin_id,[228])){
+            $today=$today->where('activity_tag', '<>', 'cytx');
+        }
+        $today=$today->where('created_at', '>=', Carbon::today())
             ->groupBy('type')
             ->first();
         $data = [
@@ -734,11 +764,11 @@ class OrderController extends ControllerBackend
             ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
-//            ->when($nickname, function ($query) use ($nickname) {
-//                $query->whereHas('user', function ($query) use ($nickname) {
-//                    $query->where('nickname', 'like', '%' . $nickname . '%');
-//                });
-//            })
+            ->when($nickname, function ($query) use ($nickname) {
+                $query->whereHas('user', function ($query) use ($nickname) {
+                    $query->where('nickname', 'like', '%' . $nickname . '%');
+                });
+            })
             ->when(!is_null($level), function ($query) use ($level) {
                 $query->whereHas('user', function ($query) use ($level) {
                     $query->where('level', $level);
@@ -746,7 +776,7 @@ class OrderController extends ControllerBackend
             })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', $phone . '%');
+                    $query->where('phone', 'like', '%' . $phone . '%');
                 });
             })
             ->when($title, function ($query) use ($title) {
@@ -861,14 +891,14 @@ class OrderController extends ControllerBackend
             ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
-//            ->when($nickname, function ($query) use ($nickname) {
-//                $query->whereHas('user', function ($query) use ($nickname) {
-//                    $query->where('nickname', 'like', '%' . $nickname . '%');
-//                });
-//            })
+            ->when($nickname, function ($query) use ($nickname) {
+                $query->whereHas('user', function ($query) use ($nickname) {
+                    $query->where('nickname', 'like', '%' . $nickname . '%');
+                });
+            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', $phone . '%');
+                    $query->where('phone', 'like', '%' . $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
@@ -977,14 +1007,14 @@ class OrderController extends ControllerBackend
             ->when(!is_null($reward_type), function ($query) use ($reward_type) {
                 $query->where('reward_type', $reward_type);
             })
-//            ->when($nickname, function ($query) use ($nickname) {
-//                $query->whereHas('user', function ($query) use ($nickname) {
-//                    $query->where('nickname', 'like', '%' . $nickname . '%');
-//                });
-//            })
+            ->when($nickname, function ($query) use ($nickname) {
+                $query->whereHas('user', function ($query) use ($nickname) {
+                    $query->where('nickname', 'like', '%' . $nickname . '%');
+                });
+            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', $phone . '%');
+                    $query->where('phone', 'like', '%' . $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
@@ -1096,14 +1126,14 @@ class OrderController extends ControllerBackend
             ->when(!is_null($os_type), function ($query) use ($os_type) {
                 $query->where('os_type', $os_type);
             })
-//            ->when($nickname, function ($query) use ($nickname) {
-//                $query->whereHas('user', function ($query) use ($nickname) {
-//                    $query->where('nickname', 'like', '%' . $nickname . '%');
-//                });
-//            })
+            ->when($nickname, function ($query) use ($nickname) {
+                $query->whereHas('user', function ($query) use ($nickname) {
+                    $query->where('nickname', 'like', '%' . $nickname . '%');
+                });
+            })
             ->when($phone, function ($query) use ($phone) {
                 $query->whereHas('user', function ($query) use ($phone) {
-                    $query->where('phone', 'like', $phone . '%');
+                    $query->where('phone', 'like', '%' . $phone . '%');
                 });
             })
             ->when($level, function ($query) use ($level) {
@@ -1126,9 +1156,9 @@ class OrderController extends ControllerBackend
                 ]);
             });
 
-        $query->whereHas('user',function($q){
-            $q->where('is_test_pay','=',0);
-        });
+		$query->whereHas('user',function($q){
+		    $q->where('is_test_pay','=',0);
+		});
 
         $direction = $sort == 'asc' ? 'asc' : 'desc';
         $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
@@ -1230,7 +1260,7 @@ class OrderController extends ControllerBackend
 
         ->when($phone, function ($query) use ($phone) {
             $query->whereHas('user', function ($query) use ($phone) {
-                $query->where('phone', 'like', $phone . '%');
+                $query->where('phone', 'like', '%' . $phone . '%');
             });
         })
         ->when(!is_null($os_type), function ($query) use ($os_type) {
