@@ -474,6 +474,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::any('live/live_comment_his', 'LiveController@liveCommentHis');
         Route::any('live/live_push_one', 'LiveController@livePushOne');
         Route::any('live/get_qr_code', 'LiveController@GetQrCode');
+        Route::any('live/lpc_to_sub', 'LiveController@livePayCheckToSub');
 
 
 
