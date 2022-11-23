@@ -24,7 +24,7 @@ use Predis\Client;
 
 class LiveController extends Controller
 {
-    
+
     /**
      * @api {get} api/v4/live/index  直播首页
      * @apiVersion 4.0.0
@@ -142,7 +142,7 @@ class LiveController extends Controller
     }
 
     /**
-     *  api/v4/live/lists  直播更多列表 
+     *  api/v4/live/lists  直播更多列表
      * @apiVersion 4.0.0
      * @apiName  lists
      * @apiGroup 直播
@@ -170,7 +170,7 @@ class LiveController extends Controller
             $query->whereIn('is_test', [0, 1]);
             $is_test = 1;
         }
-    
+
         $query->with('user:id,nickname')
             ->select($fills)
 			->where('begin_at','>', $day_time)
@@ -178,7 +178,7 @@ class LiveController extends Controller
             ->where('is_finish', 0)
             ->where('is_del', 0);
 
-            // 不查询测试直播的情况下 
+            // 不查询测试直播的情况下
             // 需要查询当前用户是否管理员  单独查询管理员的
             if($is_test == 0 && !empty($this->user['phone'])){
                 $query->unionAll(Live::select($fills)
@@ -324,7 +324,7 @@ class LiveController extends Controller
 		if( isset($list['user']['intro']) ){
 			$list['user']['intro'] = ''; //  直播间不显示讲师简介  3月24日需求
 		}
-				
+
         //初始化人气值
         $redisConfig = config('database.redis.default');
         $redis = new Client($redisConfig);
@@ -381,7 +381,7 @@ class LiveController extends Controller
                     $list['live_son_flag_count'] =  $key_num;
                 }else{
                     $list['live_son_flag_count']= LiveLogin::query()->where(['live_id'=>$list->live_pid,'live_son_flag'=>$live_son_flag])->count();
-                  
+
 
                     $redis->setex($key,3600*5,$list['live_son_flag_count']);
                 }
@@ -454,15 +454,15 @@ class LiveController extends Controller
      * {get} api/v5/live/live_push_qrcode 直播推送二维码上传
      */
     public function livePushQrcode(Request $request)
-    { 
+    {
         $user_id    = $this->user['id'] ?? 0;
         $qr_image  = $request->input('qr_image',0);
         $os_type = $request->input('os_type',0);
-        
+
         $validator = Validator::make($request->all(), [
             'qr_image' => 'required',
         ]);
-        
+
         if ($validator->fails()) {
             return $this->error(0,$validator->messages()->first(),0);
         }
@@ -471,23 +471,23 @@ class LiveController extends Controller
             'qr_url' => $qr_image,
         ])->id;
         return success($id);
-        
+
     }
     /**
      * {get} api/v5/live/sell_short_state 修改权限
      */
     public function SellShortState(Request $request)
-    { 
-        
+    {
+
         $user_id    = $this->user['id'] ?? 0;
         $pushid  = $request->input('id',0);
         $is_sell_short  = $request->input('is_sell_short',0);
-        
+
         $validator = Validator::make($request->all(), [
             'id' => 'required|numeric',
             'is_sell_short' => 'required|numeric',
         ]);
-        
+
         if ($validator->fails()) {
             return $this->error(0,$validator->messages()->first(),'');
         }
@@ -505,15 +505,15 @@ class LiveController extends Controller
         ])->update([
             'is_sell_short' => $is_sell_short ?? 0,
         ]);
-        
+
         //删除缓存
         $cache_live_name = 'live_push_works_'.$pushData['live_id'];
         Cache::delete($cache_live_name);
-        
+
         return success('');
-        
+
     }
-    
+
 
     /**
      * getZeroActivity 获取0元购宣传活动页面
@@ -523,7 +523,15 @@ class LiveController extends Controller
      * @return mixed|string 直播id
      */
     public function getZeroActivityLiveId(Request $request){
-        $res= Live::where("zero_poster_show",1)->value('id');
-        return success($res??0);
+        $user_id    = $this->user['id'] ?? 0;
+        $id= Live::where("zero_poster_show",1)->value('id');
+        $is_sub = 0;
+        if($id > 0){
+            $is_sub = Subscribe::isSubscribe($user_id,$id,3);
+        }
+        return success([
+            'id' => $id,
+            'is_sub' => $is_sub,
+        ]);
     }
 }
