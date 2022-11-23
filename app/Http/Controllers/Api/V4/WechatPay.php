@@ -981,6 +981,7 @@ class WechatPay extends Controller
             'user_id' =>$user_id,
             'order_id' =>$order['id'],
             'ordernum' =>$order['ordernum'],
+            'is_zero' =>$order['is_zero']??1,
         ]);
         return ;
     }

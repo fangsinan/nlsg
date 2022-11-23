@@ -49,9 +49,9 @@ class OrderZero extends Base
      * @param $uid
      * @param array $form_data
      *
-     * @return bool
+     * @return array|bool
      */
-    static function checkZeroLive($liveId, $uid, array $form_data = []): bool
+    static function checkZeroLive($liveId, $uid, array $form_data = [])
     {
         $live = Live::where(['id'=>$liveId,'is_zero'=>2])->first();
         if(empty($live)){
@@ -102,10 +102,10 @@ class OrderZero extends Base
 
         if($order_zero_id && $sub_res){
             DB::commit();
-            return true;
+            return OrderZero::first($order_zero_id);
         }else{
             DB::rollBack();
-            return false;
+            return [];
         }
     }
 }

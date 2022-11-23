@@ -1698,13 +1698,17 @@ class LiveController extends Controller
 
             if($live_data['is_zero'] == 2){
                 // 0元购 处理
-                $is_sub = OrderZero::checkZeroLive($info_id,$this->user['id'],[
+                $order = OrderZero::checkZeroLive($info_id,$this->user['id'],[
                     "form_liveId"   => $input['from_live_info_id']??0,
                     "ip"            => $this->getIp($request),
                     "pay_type"      => $input['pay_type']??1,
                     "os_type"       => $input['os_type']??3,
                     "twitter_id"    => $twitter_id,
                 ]);
+                //  0元购下单 三个月观看期限
+                $bind_end=date('Y-m-d 23:59:59', strtotime('+3 months'));
+                $order['is_zero'] = 2;// 0元购订单
+                WechatPay::PayTeacherLives($this->user['id'],$live_data,$order,$bind_end);
             }else{
 
                 Subscribe::create([
