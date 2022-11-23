@@ -370,6 +370,21 @@ class FeedbackServers
             ]);
 
         if ($res) {
+
+            $type_list = FeedbackType::query()
+                ->whereIn('id', $id)
+                ->where('type','=',2)
+                ->pluck('id')
+                ->toArray();
+
+            if ($type_list){
+                HelpAnswer::query()
+                    ->whereIn('type',$type_list)
+                    ->whereIn('status',[1,3])
+                    ->update(['status'=>2]);
+            }
+
+
             return ['code' => true, 'msg' => '成功'];
         }
 
