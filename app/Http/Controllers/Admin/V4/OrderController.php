@@ -136,8 +136,8 @@ class OrderController extends ControllerBackend
 			}
 		}
 
-        $admin_id=$this->user['id'];
-        if(in_array($admin_id,[228])){
+        $role_id=$this->user['role_id'];
+        if(in_array($role_id,[28])){
             $query->where('activity_tag', '<>', 'cytx');
         }else {
             if ($activity_tag === 'cytx_on') {
@@ -173,28 +173,28 @@ class OrderController extends ControllerBackend
 
 		}
 
-        if(!in_array($admin_id,[228])) {
-            $cache_key_name = 'order_list_works_rank_list';
-            $expire_num = CacheTools::getExpire('channel_works_list');
-            $rank = Cache::get($cache_key_name);
-            if (empty($rank)) {
-                $rank = Order::with('works:id,title,cover_img')
-                    ->select([
-                        DB::raw('count(*) as total'),
-                        'user_id',
-                        'relation_id'
-                    ])
-                    ->where('type', 9)
-                    ->where('status', 1)
-                    ->orderBy('total', 'desc')
-                    ->groupBy('relation_id')
-                    ->limit(10)
-                    ->get();
-                Cache::put($cache_key_name, $rank, $expire_num);
-            }
-        }else{
+//        if(!in_array($admin_id,[228])) {
+//            $cache_key_name = 'order_list_works_rank_list';
+//            $expire_num = CacheTools::getExpire('channel_works_list');
+//            $rank = Cache::get($cache_key_name);
+//            if (empty($rank)) {
+//                $rank = Order::with('works:id,title,cover_img')
+//                    ->select([
+//                        DB::raw('count(*) as total'),
+//                        'user_id',
+//                        'relation_id'
+//                    ])
+//                    ->where('type', 9)
+//                    ->where('status', 1)
+//                    ->orderBy('total', 'desc')
+//                    ->groupBy('relation_id')
+//                    ->limit(10)
+//                    ->get();
+//                Cache::put($cache_key_name, $rank, $expire_num);
+//            }
+//        }else{
             $rank=[];
-        }
+//        }
 
 		$data = [
 			'lists' => $lists,
@@ -503,8 +503,8 @@ class OrderController extends ControllerBackend
 			}
 		}
 
-        $admin_id=$this->user['id'];
-        if(in_array($admin_id,[228])){
+        $role_id=$this->user['role_id'];
+        if(in_array($role_id,[28])){
             $query->where('activity_tag', '<>', 'cytx');
         }else {
             if ($activity_tag === 'cytx_on') {
@@ -540,30 +540,30 @@ class OrderController extends ControllerBackend
 			return $lists->toArray();
 		}
 
-        if(!in_array($admin_id,[228])) {
-            $cache_key_name = 'col_list_col_rank_list';
-            $expire_num = CacheTools::getExpire('channel_works_list');
-            $rank = Cache::get($cache_key_name);
-            if (empty($rank)) {
-                $rank = Order::with(['column' => function ($q) {
-                    $q->select(['id', 'name as title', 'name', 'cover_pic as cover_img']);
-                }])->whereHas('column', function ($q) {
-                    $q->where('type', '=', 2);
-                })->select([
-                    DB::raw('count(*) as total'),
-                    'user_id',
-                    'relation_id'
-                ])->where('type', 15)
-                    ->where('status', 1)
-                    ->orderBy('total', 'desc')
-                    ->groupBy('relation_id')
-                    ->limit(10)
-                    ->get();
-                Cache::put($cache_key_name, $rank, $expire_num);
-            }
-        }else{
+//        if(!in_array($admin_id,[228])) {
+//            $cache_key_name = 'col_list_col_rank_list';
+//            $expire_num = CacheTools::getExpire('channel_works_list');
+//            $rank = Cache::get($cache_key_name);
+//            if (empty($rank)) {
+//                $rank = Order::with(['column' => function ($q) {
+//                    $q->select(['id', 'name as title', 'name', 'cover_pic as cover_img']);
+//                }])->whereHas('column', function ($q) {
+//                    $q->where('type', '=', 2);
+//                })->select([
+//                    DB::raw('count(*) as total'),
+//                    'user_id',
+//                    'relation_id'
+//                ])->where('type', 15)
+//                    ->where('status', 1)
+//                    ->orderBy('total', 'desc')
+//                    ->groupBy('relation_id')
+//                    ->limit(10)
+//                    ->get();
+//                Cache::put($cache_key_name, $rank, $expire_num);
+//            }
+//        }else{
             $rank=[];
-        }
+//        }
 
 		$data = [
 			'lists' => $lists,
@@ -600,7 +600,7 @@ class OrderController extends ControllerBackend
      */
     public function getOrderStatistic(Request $request)
     {
-        $admin_id=$this->user['id'];
+        $role_id=$this->user['role_id'];
         $type = $request->get('type') ?? 1;
         $list = Order::select([
             DB::raw('sum(pay_price) as price'),
@@ -610,7 +610,7 @@ class OrderController extends ControllerBackend
             ->where('is_shill', 0)
             ->where('type', $type);
 
-        if(in_array($admin_id,[228])){
+        if(in_array($role_id,[28])){
             $list=$list->where('activity_tag', '<>', 'cytx');
         }
         $list=$list->groupBy('type')
@@ -622,7 +622,7 @@ class OrderController extends ControllerBackend
             ->where('status', 1)
             ->where('is_shill', 0)
             ->where('type', $type);
-        if(in_array($admin_id,[228])){
+        if(in_array($role_id,[28])){
             $today=$today->where('activity_tag', '<>', 'cytx');
         }
         $today=$today->where('created_at', '>=', Carbon::today())
