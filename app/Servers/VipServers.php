@@ -15,11 +15,14 @@ use Illuminate\Support\Facades\DB;
 
 class VipServers
 {
-    public function list($params, $admin_id) {
+    public function list($params, $role_id) {
         $size  = $params['size'] ?? 10;
         $query = VipUser::query()
-            ->where('status','=','1')
-            ->orderBy('created_at', 'asc')
+            ->where('status','=','1');
+        if($role_id==28){
+            $query=$query->where('created_at','>','2022-01-01');
+        }
+        $query=$query->orderBy('created_at', 'asc')
             ->groupBy('user_id')
             ->select(['id', 'id as vip_id', 'user_id', 'nickname', 'username']);
 
