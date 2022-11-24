@@ -410,6 +410,7 @@ class FeedbackServers
         $question    = $params['question'] ?? '';
         $answer      = $params['answer'] ?? '';
         $keywords_id = $params['keywords_id'] ?? 0;
+        $sort        = $params['sort'] ?? '';
 
         if ($type) {
             $query->where('type', '=', $type);
@@ -427,6 +428,14 @@ class FeedbackServers
             $query->whereHas('keywordsBind', function ($q) use ($keywords_id) {
                 $q->where('keywords_id', '=', $keywords_id);
             });
+        }
+
+        switch ($sort) {
+            case 'time_asc':
+                $query->orderBy('id');
+                break;
+            default:
+                $query->orderBy('id', 'desc');
         }
 
         $query->select([
