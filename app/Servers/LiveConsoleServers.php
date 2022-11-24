@@ -475,7 +475,7 @@ class LiveConsoleServers
 //            ->where('created_at', '>', '2015-09-01')->where('created_at', '<', '2021-12-01')
 //            ->where('created_at', '>', $day_time)
             ->where('id', '>', $RedisUserId)
-            ->where('phone','like' , "1%")->where('ref',0)->where('province','')
+            ->where('phone','like' , "1%")->where('ref',0)->where('status',1)->where('is_robot',0)->where('province','')->whereRaw(DB::raw('length(phone) =11'))
             ->orderBy('id','asc')->limit(300)
             ;
 //        echo $query->toSql().PHP_EOL;

@@ -27,7 +27,7 @@ class UserController extends ControllerBackend
         $is_author = $request->get('is_author');
         $start = $request->get('start');
         $end = $request->get('end');
-        $query = User::query()->where('phone','like','1%')->where('ref', '=', '0')->where('is_robot', '=', '0')
+        $query = User::query()->where('phone','like','1%')->where('ref', '=', '0')->where('is_robot', '=', '0')->whereRaw(DB::raw('length(phone) =11'))
             ->when($phone, function ($query) use ($phone) {
                 $query->where('phone', 'like', $phone . '%');
             })
@@ -50,7 +50,7 @@ class UserController extends ControllerBackend
                 ]);
             });
 
-        $lists = $query->select('id', 'nickname', 'phone', 'sex', 'level', 'province', 'city')
+        $lists = $query->select('id', 'nickname', 'phone', 'sex', 'level', 'province', 'city','created_at')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();

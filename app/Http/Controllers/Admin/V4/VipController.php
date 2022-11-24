@@ -32,7 +32,7 @@ class VipController extends ControllerBackend
      */
     public function list(Request $request): JsonResponse {
         $servers = new VipServers();
-        $data    = $servers->list($request->input(), $this->user['id'] ?? 0);
+        $data    = $servers->list($request->input(), $this->user['role_id'] ?? 0);
         return $this->getRes($data);
     }
 
