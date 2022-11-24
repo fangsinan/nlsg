@@ -1165,7 +1165,7 @@ class OrderController extends Controller
         if($checkAddOrder['code'] !== true){
             return $this->error($checkAddOrder['code'], $checkAddOrder['msg']);
         }
-        
+
         /*********************** 校验推客身份   *********************/
         //先校验直播预约的tweeter_code
         if ($live_id) {
