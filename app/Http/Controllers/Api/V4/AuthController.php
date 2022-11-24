@@ -1080,6 +1080,11 @@ class AuthController extends Controller
             return error(400, '验证码错误', $sclass);
         }
 
+        $user = User::where('phone', $phone)->first();
+        if(!empty($user)){
+            return error(0,'手机号已经存在',[]);
+        }
+
         $user = User::where('id', $user_id)->first();
         if (!empty($user)) {
             User::where('id', $user->id)->update(['phone' => $phone,
