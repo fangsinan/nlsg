@@ -1059,6 +1059,7 @@ class AuthController extends Controller
         $phone = strval($request->input('phone'));
         $code = $request->input('code');
         $nickname = $request->input('nickname');
+        $user_id = $request->input('user_id');
 
         $sclass = new \StdClass();
         if (!$phone) {
@@ -1078,14 +1079,13 @@ class AuthController extends Controller
         if ($code !== $res) {
             return error(400, '验证码错误', $sclass);
         }
-        $user = User::where('phone', $phone)->first();
-        if (empty($user)) {
-            User::create([
-                'phone' => $phone,
-                'nickname' => $nickname??substr_replace($phone, '****', 3, 4),
+
+        $user = User::where('id', $user_id)->first();
+        if (!empty($user)) {
+            User::where('id', $user->id)->update(['phone' => $phone,
+                'nickname' => $nickname,
             ]);
         }
-
         Redis::del($phone);
         return success();
     }
