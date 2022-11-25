@@ -469,7 +469,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
 
 
         Route::post('order/zero_order_list', 'OrderController@zeroOrderList');
-        Route::post('order/zero_order_list_excel', 'OrderController@zeroOrderListExcel');
+        Route::get('order/zero_order_list_excel', 'OrderController@zeroOrderListExcel');
     });
 
 
