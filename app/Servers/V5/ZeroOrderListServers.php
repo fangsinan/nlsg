@@ -43,6 +43,10 @@ class ZeroOrderListServers
         $live_title     = $params['live_title'] ?? '';
         $page           = $params['page'] ?? 1;
         $size           = $params['size'] ?? 10;
+        
+        $query->whereHas('user',function($q){
+            $q->where('is_test_pay','=',0);
+        });
 
         if ($phone) {
             $query->whereHas('user', function ($q) use ($phone) {
