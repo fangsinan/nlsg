@@ -43,9 +43,9 @@ class ZeroOrderListServers
         $live_title     = $params['live_title'] ?? '';
         $page           = $params['page'] ?? 1;
         $size           = $params['size'] ?? 10;
-        
-        $query->whereHas('user',function($q){
-            $q->where('is_test_pay','=',0);
+
+        $query->whereHas('user', function ($q) {
+            $q->where('is_test_pay', '=', 0);
         });
 
         if ($phone) {
@@ -87,7 +87,7 @@ class ZeroOrderListServers
 
 
         $query->select([
-            'id', 'relation_id', 'live_id', 'user_id', 'status', 'pay_time', 'ordernum', 'twitter_id','is_wechat'
+            'id', 'relation_id', 'live_id', 'user_id', 'status', 'pay_time', 'ordernum', 'twitter_id', 'is_wechat'
         ]);
 
         $query->orderBy('id', 'desc');

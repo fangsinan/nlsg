@@ -56,11 +56,11 @@ class OrderController extends ControllerBackend
 
             foreach ($temp_data as $v) {
                 $temp_put_data                   = [];
-                $temp_put_data['ordernum']       = $v['ordernum'] ?? '-';
-                $temp_put_data['nickname']       = $v['user']['nickname'] ?? '-';
-                $temp_put_data['phone']          = $v['user']['phone'] ?? '-';
-                $temp_put_data['t_nickname']     = $v['twitter']['nickname'] ?? '-';
-                $temp_put_data['t_phone']        = $v['twitter']['phone'] ?? '-';
+                $temp_put_data['ordernum']       = ($v['ordernum'] ?? '-')."\t";
+                $temp_put_data['nickname']       = ($v['user']['nickname'] ?? '-')."\t";
+                $temp_put_data['phone']          = ($v['user']['phone'] ?? '-')."\t";
+                $temp_put_data['t_nickname']     = ($v['twitter']['nickname'] ?? '-')."\t";
+                $temp_put_data['t_phone']        = ($v['twitter']['phone'] ?? '-')."\t";
                 $temp_put_data['pay_time']       = $v['pay_time'] ?? '-';
                 $temp_put_data['relation_title'] = $v['relation_live_info']['title'] ?? '-';
                 $temp_put_data['live_title']     = $v['from_live_info']['title'] ?? '-';
