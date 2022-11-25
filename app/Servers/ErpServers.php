@@ -413,7 +413,6 @@ class ErpServers
     public function pushRunForOrder($order_id_list = []): bool
     {
         $while_flag = true;
-
         while ($while_flag) {
 
             $list_query = OrderErpList::query()
@@ -499,8 +498,8 @@ class ErpServers
 
                 $temp_order_list['spec_no']        = strval($v->orderInfo->textbookInfo->erp_sku);//平台货品SKU唯一码，对应ERP商家编码，goods_no和spec_no不能同时为空
                 $temp_order_list['goods_name']     = strval($v->orderInfo->textbookInfo->title);//商品名称
-//                $temp_order_list['price']          = $v->orderInfo->textbookInfo->price;
-                $temp_order_list['price']          = $v->orderInfo->pay_price;
+                $temp_order_list['price']          = $v->orderInfo->textbookInfo->price;
+//                $temp_order_list['price']          = $v->orderInfo->pay_price;
                 $temp_order_list['spec_name']      = strval($v->orderInfo->textbookInfo->sub_title);
                 $temp_order_list['num']            = max($v->orderInfo->live_num, 1);
                 $temp_order_list['adjust_amount']  = '0'; //手工调整;特别注意:正的表示加价;负的表示减价
