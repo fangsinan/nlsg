@@ -12,7 +12,7 @@ class ErpOrderController extends ControllerBackend
 
     //虚拟订单需要发货的列表
     public function erpOrderList(Request $request): JsonResponse {
-        return $this->getRes((new erpOrderServers())->list($request->input()));
+        return $this->getRes((new erpOrderServers())->list($request->input(),0,$this->user['role_id']));
     }
 
 
@@ -21,7 +21,7 @@ class ErpOrderController extends ControllerBackend
     }
 
     public function addRefundOrder(Request $request): JsonResponse {
-        return $this->getRes((new erpOrderServers())->addRefundOrder($request->input(), $this->user['id'] ?? 0));
+        return $this->getRes((new erpOrderServers())->addRefundOrder($request->input(),$this->user['id'] ?? 0));
     }
 
     public function erpOrderListExcel(Request $request) {
