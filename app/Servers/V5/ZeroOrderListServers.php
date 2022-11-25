@@ -9,7 +9,7 @@ use App\Servers\LiveInfoServers;
 
 class ZeroOrderListServers
 {
-    public function list($params,$this_user = [])
+    public function list($params, $this_user = [], $is_excel = 0)
     {
         $query = OrderZero::query()
             ->with([
@@ -26,6 +26,10 @@ class ZeroOrderListServers
             if ($twitter_id_list !== null) {
                 $query->whereIn('twitter_id', $twitter_id_list);
             }
+
+            $query->where(function ($q) {
+                $q->where('is_show', '=', 2)->orWhere('is_wechat', '=', 2);
+            });
         }
 
         $phone          = $params['phone'] ?? '';
@@ -37,6 +41,8 @@ class ZeroOrderListServers
         $order_num      = $params['ordernum'] ?? '';
         $relation_title = $params['relation_title'] ?? '';
         $live_title     = $params['live_title'] ?? '';
+        $page           = $params['page'] ?? 1;
+        $size           = $params['size'] ?? 10;
 
         if ($phone) {
             $query->whereHas('user', function ($q) use ($phone) {
@@ -77,11 +83,15 @@ class ZeroOrderListServers
 
 
         $query->select([
-            'id', 'relation_id', 'live_id', 'user_id', 'status', 'pay_time', 'ordernum', 'twitter_id'
+            'id', 'relation_id', 'live_id', 'user_id', 'status', 'pay_time', 'ordernum', 'twitter_id','is_wechat'
         ]);
 
         $query->orderBy('id', 'desc');
 
-        return $query->paginate($params['size'] ?? 10);
+        if ($is_excel) {
+            return $query->offset(($page - 1) * $size)->limit($size)->get();
+        }
+
+        return $query->paginate($size);
     }
 }
