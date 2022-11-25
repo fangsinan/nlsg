@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class erpOrderServers
 {
-    public function list($params, $is_excel = 0) {
+    public function list($params, $is_excel = 0,$role_id=0) {
         $search_relation_id = [7, 8, 10];
         $size               = $params['size'] ?? 10;
         $ordernum           = $params['ordernum'] ?? '';
@@ -23,16 +23,19 @@ class erpOrderServers
         $order_info_flag    = $params['order_info_flag'] ?? '';
 
         $erp_push_order_flag = (int)ConfigModel::getData(56, 1);//0全部 1正常 2只测试
-
-        $query = Order::query()
+        if(in_array($role_id,[28])){
+            $query = Order::query()->where('type','=',14)->where('relation_id','=',30);
+        }else {
+            $query = Order::query()
 //            ->where('type', '=', 14)
 //            ->whereIn('relation_id', $search_relation_id)
-            ->whereRaw('((
+                ->whereRaw('((
                 type = 14 and relation_id in (7, 8, 10,30)
             ) or (
                 type = 18 and pay_price = 2980
-            ))')
-            ->where('status', '=', 1)
+            ))');
+        }
+        $query=$query->where('status', '=', 1)
             ->where('textbook_id', '>', 0)
             ->select([
                 'id', 'ordernum', 'type', 'live_num', 'live_id', 'user_id', 'status',
