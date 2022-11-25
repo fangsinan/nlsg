@@ -478,7 +478,7 @@ class ErpServers
                 );
                 $temp_trade_list['buyer_message']    = '';
                 $temp_trade_list['post_amount']      = 0;
-                $temp_trade_list['paid']             = $v->orderInfo->textbookInfo->price;
+                $temp_trade_list['paid']             = $v->orderInfo->pay_price;
                 $temp_trade_list['delivery_term']    = 1;
                 $temp_trade_list['cod_amount']       = 0;
                 $temp_trade_list['ext_cod_fee']      = 0;
