@@ -1710,6 +1710,7 @@ class LiveController extends Controller
                 $order['is_zero'] = 2;// 0元购订单
                 $live_data['begin_at'] = date($live_data['begin_at'],strtotime('+3 months'));
                 WechatPay::PayTeacherLives($this->user['id'],$live_data,$order,$bind_end);
+                WechatPay::LiveRedis(11, "0元购直播间", $user['nickname']);
             }else{
 
                 Subscribe::create([
