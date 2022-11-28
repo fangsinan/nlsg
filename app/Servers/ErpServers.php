@@ -5,6 +5,7 @@ namespace App\Servers;
 
 use App\Models\ExpressCompany;
 use App\Models\ExpressInfo;
+use App\Models\GetPriceTools;
 use App\Models\MallAddress;
 use App\Models\MallErpList;
 use App\Models\MallOrder;
@@ -137,7 +138,7 @@ class ErpServers
 
         DB::table('wwwww')->insert([
             'vv' => json_encode($res),
-            't'  => json_encode($trade_list),
+            't' => json_encode($trade_list),
         ]);
 
         if ($res['code'] != true) {
@@ -288,7 +289,7 @@ class ErpServers
 
                             $history['list'] = [
                                 [
-                                    'time'   => $now_date,
+                                    'time' => $now_date,
                                     'status' => '商家发货'
                                 ]
                             ];
@@ -477,7 +478,6 @@ class ErpServers
                 );
                 $temp_trade_list['buyer_message']    = '';
                 $temp_trade_list['post_amount']      = 0;
-                $temp_trade_list['paid']             = $v->orderInfo->pay_price;
                 $temp_trade_list['delivery_term']    = 1;
                 $temp_trade_list['cod_amount']       = 0;
                 $temp_trade_list['ext_cod_fee']      = 0;
@@ -490,21 +490,21 @@ class ErpServers
                     $temp_order_list['status'] = 80;//子订单状态
                 }
 
-
                 $temp_order_list['refund_status'] = 0;//0是无退款
 
-                $temp_order_list['goods_id'] = $v->orderInfo->textbook_id;//平台货品id
-                $temp_order_list['spec_id']  = $v->orderInfo->textbook_id;//平台规格id
-
+                $temp_order_list['goods_id']       = $v->orderInfo->textbook_id;//平台货品id
+                $temp_order_list['spec_id']        = $v->orderInfo->textbook_id;//平台规格id
                 $temp_order_list['spec_no']        = strval($v->orderInfo->textbookInfo->erp_sku);//平台货品SKU唯一码，对应ERP商家编码，goods_no和spec_no不能同时为空
                 $temp_order_list['goods_name']     = strval($v->orderInfo->textbookInfo->title);//商品名称
                 $temp_order_list['price']          = $v->orderInfo->textbookInfo->price;
-//                $temp_order_list['price']          = $v->orderInfo->pay_price;
                 $temp_order_list['spec_name']      = strval($v->orderInfo->textbookInfo->sub_title);
                 $temp_order_list['num']            = max($v->orderInfo->live_num, 1);
                 $temp_order_list['adjust_amount']  = '0'; //手工调整;特别注意:正的表示加价;负的表示减价
                 $temp_order_list['discount']       = 0; //子订单折扣
                 $temp_order_list['share_discount'] = '0';
+                $temp_trade_list['paid']           = GetPriceTools::PriceCalc(
+                    '*', $temp_order_list['price'], $temp_order_list['num']
+                );
 
                 $temp_trade_list['order_list'][] = $temp_order_list;
                 $trade_list[]                    = $temp_trade_list;
@@ -639,7 +639,7 @@ class ErpServers
                 $history['logo']          = '';
                 $history['list']          = [
                     [
-                        'time'   => $now_date,
+                        'time' => $now_date,
                         'status' => '商家发货'
                     ]
                 ];
