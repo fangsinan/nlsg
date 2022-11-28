@@ -284,7 +284,7 @@ class TalkServers
             ->orderBy('id', 'desc')
             ->first();
 
-        if ($last_talk_list->type !== 3 && $last_talk_list->created_at >= $add_type_3_line) {
+        if ($last_talk_list->type !== 3 && $last_talk_list->created_at <= $add_type_3_line) {
             //添加一条type = 3
             $res = TalkList::query()
                 ->create([
