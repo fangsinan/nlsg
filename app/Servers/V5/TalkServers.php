@@ -374,6 +374,7 @@ class TalkServers
         $category_id = (int)($params['category_id'] ?? 0);
         $size        = $params['size'] ?? 10;
         $sort        = $params['sort'] ?? '';
+        $content     = $params['content'] ?? '';
 
         if (!$category_id) {
             return ['code' => false, 'msg' => '分类错误'];
@@ -397,6 +398,10 @@ class TalkServers
         $query->whereHas('categoryInfo', function ($q) use ($category_id) {
             $q->where('id', '=', $category_id);
         });
+
+        if ($content) {
+            $query->where('content', 'like', '%' . $content . '%');
+        }
 
         switch ($sort) {
             case 'time_asc':
