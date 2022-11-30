@@ -21,17 +21,17 @@ class TalkServers
     public function list($params, $admin): LengthAwarePaginator
     {
         $query = Talk::query()
-                     ->where('status', '=', 1)
-                     ->with([
-                                'userInfo:id,nickname,phone',
-                                'adminInfo:id,username,user_remark',
-                                'remarkList' => function ($q) {
-                                    $q->orderBy('id', 'desc')->limit(1);
-                                }
-                            ])
-                     ->select([
-                                  'id', 'user_id', 'created_at', 'is_finish', 'finish_at', 'finish_admin_id'
-                              ]);
+            ->where('status', '=', 1)
+            ->with([
+                'userInfo:id,nickname,phone',
+                'adminInfo:id,username,user_remark',
+                'remarkList' => function ($q) {
+                    $q->orderBy('id', 'desc')->limit(1);
+                }
+            ])
+            ->select([
+                'id', 'user_id', 'created_at', 'is_finish', 'finish_at', 'finish_admin_id'
+            ]);
 
         //昵称,账号,留言时间,解决时间,状态
         $nickname      = $params['nickname'] ?? '';
@@ -106,10 +106,10 @@ class TalkServers
         }
 
         $res = Talk::query()
-                   ->whereIn('id', $id)
-                   ->update([
-                                'status' => 2,
-                            ]);
+            ->whereIn('id', $id)
+            ->update([
+                'status' => 2,
+            ]);
 
         if ($res) {
             return ['code' => true, 'msg' => '成功'];
@@ -124,11 +124,11 @@ class TalkServers
         $params['admin_id'] = $admin['id'] ?? 0;
 
         $validator = Validator::make($params,
-                                     [
-                                         'talk_id'  => 'bail|required|exists:nlsg_talk,id',
-                                         'content'  => 'bail|required|string|max:200',
-                                         'admin_id' => 'bail|required|exists:nlsg_backend_user,id',
-                                     ]
+            [
+                'talk_id'  => 'bail|required|exists:nlsg_talk,id',
+                'content'  => 'bail|required|string|max:200',
+                'admin_id' => 'bail|required|exists:nlsg_backend_user,id',
+            ]
         );
 
         if ($validator->fails()) {
@@ -146,9 +146,9 @@ class TalkServers
     public function remarkList($params, $admin)
     {
         $validator = Validator::make($params,
-                                     [
-                                         'talk_id' => 'bail|required|exists:nlsg_talk,id',
-                                     ]
+            [
+                'talk_id' => 'bail|required|exists:nlsg_talk,id',
+            ]
         );
 
         if ($validator->fails()) {
@@ -156,13 +156,13 @@ class TalkServers
         }
 
         return TalkRemark::query()
-                         ->where('talk_id', '=', $params['talk_id'])
-                         ->orderBy('id', 'desc')
-                         ->select(['id', 'created_at', 'content', 'admin_id'])
-                         ->with([
-                                    'adminInfo:id,username,user_remark'
-                                ])
-                         ->paginate($params['size'] ?? 10);
+            ->where('talk_id', '=', $params['talk_id'])
+            ->orderBy('id', 'desc')
+            ->select(['id', 'created_at', 'content', 'admin_id'])
+            ->with([
+                'adminInfo:id,username,user_remark'
+            ])
+            ->paginate($params['size'] ?? 10);
     }
 
 
@@ -173,8 +173,8 @@ class TalkServers
             return ['code' => false, 'msg' => '用户id错误'];
         }
         $user_info = User::query()->where('id', '=', $user_id)
-                         ->select(['id', 'phone', 'nickname', 'headimg'])
-                         ->first();
+            ->select(['id', 'phone', 'nickname', 'headimg'])
+            ->first();
         if (!$user_info) {
             return ['code' => false, 'msg' => '用户id错误'];
         }
@@ -185,14 +185,17 @@ class TalkServers
         $size    = $params['size'] ?? 10;
 
         $query = TalkList::query()
-                         ->with([
-                                    'talkInfo:id,status',
-                                    'adminInfo:id,username,user_remark'
-                                ])
-                         ->where('user_id', '=', $user_id)
-                         ->whereHas('talkInfo', function ($q) {
-                             $q->where('status', '=', 1);
-                         });
+            ->with([
+                'talkInfo:id,status',
+                'adminInfo:id,username,user_remark'
+            ])
+            ->where('user_id', '=', $user_id)
+            ->whereHas('talkInfo', function ($q) {
+                $q->where('status', '=', 1);
+            });
+
+        $total      = $query->count();
+        $total_page = ceil($total / $size);
 
         if ($page < 1) {
             if ($talk_id) {
@@ -220,18 +223,15 @@ class TalkServers
             }
         }
 
-        $total      = $query->count();
-        $total_page = ceil($total / $size);
-
         $query->select(['id', 'talk_id', 'type', 'admin_id', 'content', 'created_at', 'image']);
         $query->orderBy('id');
         $query->limit($size)->offset(($page - 1) * $size);
 
         $has_not_finish = Talk::query()
-                              ->where('user_id', '=', $user_id)
-                              ->where('status', '=', 1)
-                              ->where('is_finish', '=', 1)
-                              ->first();
+            ->where('user_id', '=', $user_id)
+            ->where('status', '=', 1)
+            ->where('is_finish', '=', 1)
+            ->first();
 
         $not_finish = 0;
         if ($has_not_finish) {
@@ -254,11 +254,11 @@ class TalkServers
         $add_type_3_line = date('Y-m-d H:i:s', strtotime('-5 minute'));
 
         $validator = Validator::make($params,
-                                     [
-                                         'user_id' => 'bail|required|exists:nlsg_user,id',
-                                         'content' => 'bail|max:500',
-                                         'image'   => 'bail|max:225'
-                                     ]
+            [
+                'user_id' => 'bail|required|exists:nlsg_user,id',
+                'content' => 'bail|max:500',
+                'image'   => 'bail|max:225'
+            ]
         );
 
         if ($validator->fails()) {
@@ -273,10 +273,10 @@ class TalkServers
 
         //获取当前talk_id
         $talk = Talk::query()
-                    ->firstOrCreate([
-                                        'user_id'   => $params['user_id'],
-                                        'is_finish' => 1
-                                    ]);
+            ->firstOrCreate([
+                'user_id'   => $params['user_id'],
+                'is_finish' => 1
+            ]);
 
         if (!$talk) {
             DB::rollBack();
@@ -285,21 +285,21 @@ class TalkServers
 
         //查询上调时间间隔
         $last_talk_list = TalkList::query()
-                                  ->where('user_id', '=', $params['user_id'])
-                                  ->orderBy('id', 'desc')
-                                  ->first();
+            ->where('user_id', '=', $params['user_id'])
+            ->orderBy('id', 'desc')
+            ->first();
 
         if ($last_talk_list->type !== 3 && $last_talk_list->created_at <= $add_type_3_line) {
             //添加一条type = 3
             $res = TalkList::query()
-                           ->create([
-                                        'talk_id'  => $talk->id,
-                                        'type'     => 3,
-                                        'user_id'  => $params['user_id'],
-                                        'admin_id' => $admin['id'],
-                                        'content'  => date('Y-m-d H:i'),
-                                        'status'   => 1,
-                                    ]);
+                ->create([
+                    'talk_id'  => $talk->id,
+                    'type'     => 3,
+                    'user_id'  => $params['user_id'],
+                    'admin_id' => $admin['id'],
+                    'content'  => date('Y-m-d H:i'),
+                    'status'   => 1,
+                ]);
 
             if (!$res) {
                 DB::rollBack();
@@ -308,15 +308,15 @@ class TalkServers
         }
 
         $res = TalkList::query()
-                       ->create([
-                                    'talk_id'  => $talk->id,
-                                    'type'     => 2,
-                                    'user_id'  => $params['user_id'],
-                                    'admin_id' => $admin['id'],
-                                    'content'  => $params['content'] ?? '',
-                                    'image'    => $params['image'] ?? '',
-                                    'status'   => 1,
-                                ]);
+            ->create([
+                'talk_id'  => $talk->id,
+                'type'     => 2,
+                'user_id'  => $params['user_id'],
+                'admin_id' => $admin['id'],
+                'content'  => $params['content'] ?? '',
+                'image'    => $params['image'] ?? '',
+                'status'   => 1,
+            ]);
 
         if (!$res) {
             DB::rollBack();
@@ -339,10 +339,10 @@ class TalkServers
             ->where('user_id', '=', $user_id)
             ->where('is_finish', '=', 1)
             ->update([
-                         'is_finish'       => 2,
-                         'finish_admin_id' => $admin['id'],
-                         'finish_at'       => date('Y-m-d H:i:s'),
-                     ]);
+                'is_finish'       => 2,
+                'finish_admin_id' => $admin['id'],
+                'finish_at'       => date('Y-m-d H:i:s'),
+            ]);
 
         return ['code' => true, 'msg' => '成功'];
     }
@@ -350,23 +350,23 @@ class TalkServers
     public function talkUserList($params, $admin): LengthAwarePaginator
     {
         return TalkUserStatistics::query()
-                                 ->select([
-                                              'user_id', 'msg_count'
-                                          ])
-                                 ->with([
-                                            'userInfo:id,nickname,phone'
-                                        ])
+            ->select([
+                'user_id', 'msg_count'
+            ])
+            ->with([
+                'userInfo:id,nickname,phone'
+            ])
 //            ->when($params['nickname'] ?? '', function ($q) use ($params) {
 //                $q->wherehas('userInfo', function ($q) use ($params) {
 //                    $q->where('nickname', 'like', '%' . $params['nickname'] . '%');
 //                });
 //            })
-                                 ->when($params['phone'] ?? '', function ($q) use ($params) {
+            ->when($params['phone'] ?? '', function ($q) use ($params) {
                 $q->wherehas('userInfo', function ($q) use ($params) {
                     $q->where('phone', 'like', $params['phone'] . '%');
                 });
             })
-                                 ->paginate($params['size'] ?? 10);
+            ->paginate($params['size'] ?? 10);
     }
 
     public function templateList($params, $admin)
@@ -380,18 +380,18 @@ class TalkServers
         }
 
         $check_category = TalkTemplateCategory::query()
-                                              ->where('id', '=', $category_id)
-                                              ->where('status', '!=', 3)
-                                              ->first();
+            ->where('id', '=', $category_id)
+            ->where('status', '!=', 3)
+            ->first();
 
         if ($check_category->is_public == 2 && $check_category->admin_id != $admin['id']) {
             return ['code' => false, 'msg' => '私人分类,必须本人操作'];
         }
 
         $query = TalkTemplate::query()
-                             ->with([
-                                        'categoryInfo:id'
-                                    ]);
+            ->with([
+                'categoryInfo:id'
+            ]);
 
         $query->where('status', '<>', 3);
         $query->whereHas('categoryInfo', function ($q) use ($category_id) {
@@ -421,19 +421,19 @@ class TalkServers
             //如果是0,就只返回条数
             return [
                 'public_total'  => TalkTemplate::query()
-                                               ->with(['categoryInfo'])
-                                               ->where('status', '=', 1)
-                                               ->whereHas('categoryInfo', function ($q) {
-                                                   $q->where('is_public', '=', 1)->where('status', '=', 1);
-                                               })->count(),
+                    ->with(['categoryInfo'])
+                    ->where('status', '=', 1)
+                    ->whereHas('categoryInfo', function ($q) {
+                        $q->where('is_public', '=', 1)->where('status', '=', 1);
+                    })->count(),
                 'private_total' => TalkTemplate::query()
-                                               ->with(['categoryInfo'])
-                                               ->where('status', '=', 1)
-                                               ->whereHas('categoryInfo', function ($q) use ($admin) {
-                                                   $q->where('is_public', '=', 2)
-                                                     ->where('admin_id', '=', $admin['id'])
-                                                     ->where('status', '=', 1);
-                                               })->count(),
+                    ->with(['categoryInfo'])
+                    ->where('status', '=', 1)
+                    ->whereHas('categoryInfo', function ($q) use ($admin) {
+                        $q->where('is_public', '=', 2)
+                            ->where('admin_id', '=', $admin['id'])
+                            ->where('status', '=', 1);
+                    })->count(),
             ];
 
 //            $public_cid_list = TalkTemplateCategory::query()
@@ -467,22 +467,22 @@ class TalkServers
         }
 
         $query = TalkTemplateCategory::query()
-                                     ->where('is_public', '=', $is_public)
-                                     ->where('status', '=', 1)
-                                     ->select(['id', 'title', 'is_public']);
+            ->where('is_public', '=', $is_public)
+            ->where('status', '=', 1)
+            ->select(['id', 'title', 'is_public']);
 
         if ($is_public === 2) {
             $query->where('admin_id', '=', $admin['id']);
         }
 
         $query->with([
-                         'ListInfo' => function ($q) use ($keywords) {
-                             $q->where('status', '=', 1)->select(['id', 'category_id', 'content']);
-                             if ($keywords) {
-                                 $q->where('content', 'like', "%$keywords%");
-                             }
-                         }
-                     ]);
+            'ListInfo' => function ($q) use ($keywords) {
+                $q->where('status', '=', 1)->select(['id', 'category_id', 'content']);
+                if ($keywords) {
+                    $q->where('content', 'like', "%$keywords%");
+                }
+            }
+        ]);
 
         return $query->get();
 
@@ -494,12 +494,12 @@ class TalkServers
         $params['admin_id'] = $admin['id'] ?? 0;
 
         $validator = Validator::make($params,
-                                     [
-                                         'content'     => 'bail|required|string|max:200',
-                                         'status'      => 'bail|required|in:1,2',
-                                         'admin_id'    => 'bail|required|exists:nlsg_backend_user,id',
-                                         'category_id' => 'bail|required|numeric',
-                                     ]
+            [
+                'content'     => 'bail|required|string|max:200',
+                'status'      => 'bail|required|in:1,2',
+                'admin_id'    => 'bail|required|exists:nlsg_backend_user,id',
+                'category_id' => 'bail|required|numeric',
+            ]
         );
 
         if ($validator->fails()) {
@@ -507,9 +507,9 @@ class TalkServers
         }
 
         $check_category = TalkTemplateCategory::query()
-                                              ->where('id', '=', $params['category_id'])
-                                              ->where('status', '<>', 3)
-                                              ->first();
+            ->where('id', '=', $params['category_id'])
+            ->where('status', '<>', 3)
+            ->first();
 
         if (empty($check_category)) {
             return ['code' => false, 'msg' => '所选类型错误'];
@@ -543,17 +543,17 @@ class TalkServers
         }
 
         $check_id = TalkTemplate::query()
-                                ->where('id', '=', $id)
-                                ->where('status', '<>', 3)
-                                ->first();
+            ->where('id', '=', $id)
+            ->where('status', '<>', 3)
+            ->first();
 
         if (empty($check_id)) {
             return ['code' => false, 'msg' => 'id错误'];
         }
 
         $check_category = TalkTemplateCategory::query()
-                                              ->where('id', '=', $check_id->category_id)
-                                              ->first();
+            ->where('id', '=', $check_id->category_id)
+            ->first();
 
         if ($check_category->is_public == 2 && $check_category->admin_id != $admin['id']) {
             return ['code' => false, 'msg' => '私人分类,必须本人操作'];
@@ -602,12 +602,12 @@ class TalkServers
         $params['admin_id'] = $admin['id'] ?? 0;
 
         $validator = Validator::make($params,
-                                     [
-                                         'title'     => 'bail|required|string|max:200',
-                                         'is_public' => 'bail|required|in:1,2',
-                                         'status'    => 'bail|required|in:1,2',
-                                         'admin_id'  => 'bail|required|exists:nlsg_backend_user,id',
-                                     ]
+            [
+                'title'     => 'bail|required|string|max:200',
+                'is_public' => 'bail|required|in:1,2',
+                'status'    => 'bail|required|in:1,2',
+                'admin_id'  => 'bail|required|exists:nlsg_backend_user,id',
+            ]
         );
 
         if ($validator->fails()) {
@@ -647,18 +647,18 @@ class TalkServers
         }
 
         $check_used = TalkTemplate::query()->where('category_id', '=', $id)
-                                  ->where('status', '<>', 3)
-                                  ->first();
+            ->where('status', '<>', 3)
+            ->first();
 
         if (!empty($check_used)) {
             return ['code' => false, 'msg' => '该分类下有使用中的内容,无法删除'];
         }
 
         $res = TalkTemplateCategory::query()
-                                   ->where('id', '=', $id)
-                                   ->update([
-                                                'status' => 3,
-                                            ]);
+            ->where('id', '=', $id)
+            ->update([
+                'status' => 3,
+            ]);
 
         if ($res) {
             return ['code' => true, 'msg' => '成功'];
