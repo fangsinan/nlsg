@@ -10,7 +10,6 @@ class BackendUserToken
 {
     const KeyPre = 'AdminToken:';
     const TokenLife = 300;
-    const ErrTokenLife = 86400;
 
     public static function setToken(int $admin_id, string $token)
     {
@@ -27,7 +26,7 @@ class BackendUserToken
 
     public static function getToken(int $admin_id)
     {
-        if (!$admin_id){
+        if (!$admin_id) {
             return '';
         }
         return Cache::get(self::KeyPre . $admin_id);
@@ -35,14 +34,16 @@ class BackendUserToken
 
     public static function errLockSet(int $admin_id)
     {
+        $err_token_life = strtotime(date('Y-m-d 00:01:00', strtotime('+1 days'))) - time();
+
         $key_name = 'AdminLoginErr:' . date('Ymd') . '_' . $admin_id;
 
         $get = Cache::get($key_name);
 
         if ($get) {
             Cache::increment($key_name);
-        }else{
-            Cache::put($key_name, 1, self::ErrTokenLife);
+        } else {
+            Cache::put($key_name, 1, $err_token_life);
         }
 
     }
