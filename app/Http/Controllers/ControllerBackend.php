@@ -41,7 +41,12 @@ class ControllerBackend extends BaseController
         $url_2 = array_slice($url_2, -2);
         $url_2 = '/' . trim(implode('/', $url_2), '/');
 
-        if ($url_2 !== '/auth/login' || $url_2 !== '/auth/captcha') {
+        $url_array = [
+            '/auth/login',
+            '/auth/captcha',
+        ];
+
+        if (!in_array($url_2,$url_array)) {
             $cache_token = BackendUserToken::getToken($this->user['id']);
             if ($cache_token) {
                 $header_token = $request->header('authorization');
