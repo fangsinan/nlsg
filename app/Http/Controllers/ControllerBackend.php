@@ -44,10 +44,9 @@ class ControllerBackend extends BaseController
         $url_array = [
             '/auth/login',
             '/auth/captcha',
-            '/live_sub/live_select',
         ];
 
-        if (!in_array($url_2,$url_array)) {
+        if (false && !in_array($url_2,$url_array)) {
             $cache_token = BackendUserToken::getToken($this->user['id']);
             if ($cache_token) {
                 $header_token = $request->header('authorization');
