@@ -344,7 +344,7 @@ class SubscribeController extends ControllerBackend {
             } else {
                 $t_val['order'] = [
                     "id"         => $t_val['order_id'],
-                    "ordernum"   => $t_val['order_ordernum'],
+                    "ordernum"   => $t_val['order_ordernum'] ?? '-',
                     "pay_price"  => $t_val['order_pay_price'],
                     "pay_time"   => $t_val['order_pay_time'],
                     "twitter_id" => $t_val['order_twitter_id'],
