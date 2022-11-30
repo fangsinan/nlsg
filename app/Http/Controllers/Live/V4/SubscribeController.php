@@ -343,14 +343,14 @@ class SubscribeController extends ControllerBackend {
                 $t_val['order'] = [];
             } else {
                 $t_val['order'] = [
-                    "id"         => $t_val['order_id'],
+                    "id"         => $t_val['order_id'] ?? 0,
                     "ordernum"   => $t_val['order_ordernum'] ?? '-',
-                    "pay_price"  => $t_val['order_pay_price'],
-                    "pay_time"   => $t_val['order_pay_time'],
-                    "twitter_id" => $t_val['order_twitter_id'],
-                    "pay_type"   => $t_val['order_pay_type'],
-                    "os_type"    => $t_val['order_os_type'],
-                    "created_at" => $t_val['order_created_at'],
+                    "pay_price"  => $t_val['order_pay_price'] ?? 0,
+                    "pay_time"   => $t_val['order_pay_time'] ?? '-',
+                    "twitter_id" => $t_val['order_twitter_id'] ?? 0,
+                    "pay_type"   => $t_val['order_pay_type'] ?? 0,
+                    "os_type"    => $t_val['order_os_type'] ?? '-',
+                    "created_at" => $t_val['order_created_at'] ?? '-',
                 ];
             }
 
