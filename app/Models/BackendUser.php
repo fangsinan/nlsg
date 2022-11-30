@@ -4,6 +4,7 @@
 namespace App\Models;
 
 
+use App\Servers\V5\BackendUserToken;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -33,6 +34,11 @@ class BackendUser extends Authenticatable implements JWTSubject
         $re_password = strval($params['re_pwd'] ?? '');
 
         if (!empty($password) && $password === $re_password) {
+            $passwordCheck = BackendUserToken::passwordCheck($password);
+            if ($passwordCheck['code'] === false){
+                return $passwordCheck;
+            }
+
             $n_pwd = bcrypt($password);
             $res = self::whereId($user['id'])->update(['password' => $n_pwd]);
             if ($res === false) {
@@ -108,6 +114,10 @@ class BackendUser extends Authenticatable implements JWTSubject
                 $password = strval($params['pwd'] ?? '');
                 $re_password = strval($params['re_pwd'] ?? '');
                 if (!empty($password) && $password === $re_password) {
+                    $passwordCheck = BackendUserToken::passwordCheck($password);
+                    if ($passwordCheck['code'] === false){
+                        return $passwordCheck;
+                    }
                     $check->password = bcrypt($password);
                 } else {
                     return ['code' => false, 'msg' => '密码不一致'];

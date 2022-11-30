@@ -6,9 +6,12 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Models\BackendUser;
+use App\Models\CacheTools;
 use App\Models\Node;
 use App\Models\User;
+use App\Servers\V5\BackendUserToken;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Mews\Captcha\Captcha;
 
@@ -71,6 +74,9 @@ class AuthController extends ControllerBackend
 
         if (Hash::check($password, $check_user->password)) {
             $token = auth('backendApi')->login($check_user);
+            //存入redis
+            BackendUserToken::setToken($check_user->id,$token);
+
             $data = [
                 'id' => $check_user->id,
                 'nickname' => $check_user->username,
@@ -84,6 +90,13 @@ class AuthController extends ControllerBackend
                 'app_user_id' => $userInfo->id,
             ];
             return $this->getRes($data);
+        }else{
+            //查看当天错误次数
+            BackendUserToken::errLockSet($check_user->id);
+            $err_count = BackendUserToken::errLockCheck($check_user->id);
+            if ($err_count >= 5){
+                return $this->getRes(['code' => false, 'msg' => '重试次数过多,请明天再来.']);
+            }
         }
         return $this->getRes(['code' => false, 'msg' => '账号或密码错误']);
     }
