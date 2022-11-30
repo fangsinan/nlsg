@@ -220,7 +220,8 @@ class TalkServers
             }
         }
 
-        $total = $query->count();
+        $total      = $query->count();
+        $total_page = $total / $size;
 
         $query->select(['id', 'talk_id', 'type', 'admin_id', 'content', 'created_at', 'image']);
         $query->orderBy('id');
@@ -241,6 +242,7 @@ class TalkServers
             'user_info'  => $user_info,
             'not_finish' => $not_finish,
             'total'      => $total,
+            'total_page' => $total_page,
             'page'       => $page,
             'size'       => $size,
             'list'       => $query->get(),
