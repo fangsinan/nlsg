@@ -210,7 +210,7 @@ class Live extends Base
         $res = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'user_id', 'price', 'created_at')
             ->where('status', 4)
             ->where('is_del', 0);
-        if(!in_array($user_id,[158291])){
+        if(!in_array($user_id,[158291,211370])){
             $res=$res->where('is_test', 0);
         }
         $res=$res->where('begin_at', '>=',date('Y-m-d ', time()))
