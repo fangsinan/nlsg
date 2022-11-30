@@ -221,7 +221,7 @@ class TalkServers
         }
 
         $total      = $query->count();
-        $total_page = (int)($total / $size);
+        $total_page = ceil($total / $size);
 
         $query->select(['id', 'talk_id', 'type', 'admin_id', 'content', 'created_at', 'image']);
         $query->orderBy('id');
