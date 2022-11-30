@@ -27,6 +27,9 @@ class BackendUserToken
 
     public static function getToken(int $admin_id)
     {
+        if (!$admin_id){
+            return '';
+        }
         return Cache::get(self::KeyPre . $admin_id);
     }
 

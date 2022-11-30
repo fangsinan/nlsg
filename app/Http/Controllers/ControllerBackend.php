@@ -46,11 +46,11 @@ class ControllerBackend extends BaseController
             '/auth/captcha',
         ];
 
-        if (!in_array($url_2,$url_array) && $this->user) {
-            $cache_token = BackendUserToken::getToken($this->user['id']);
+        if (!in_array($url_2,$url_array)) {
+            $cache_token = BackendUserToken::getToken($this->user['id'] ?? 0);
             if ($cache_token) {
                 $header_token = $request->header('authorization');
-                $header_token = str_replace('Bearer ', '', $header_token);
+                $header_token = trim(str_replace('Bearer ', '', $header_token));
 
                 if ($cache_token !== $header_token) {
                     $class       = new \stdClass();
