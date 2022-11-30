@@ -2294,7 +2294,7 @@ class LiveController extends Controller
         $relation_id = $request->input('relation_id')??0;
         $order_id = $request->input('order_id')??0;
         $is_wechat = $request->input('is_wechat')??0;
-        $user_id = $request->input('user_id')??0;
+        $user_id = $this->user['id']??0;
         if($relation_type == 3){
 
             // 绑定默认客服不弹二维码
