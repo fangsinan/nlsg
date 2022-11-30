@@ -7,10 +7,10 @@ class Live extends Base
     protected $table = 'nlsg_live';
 
     protected $fillable = ['user_id', 'cover_img', 'title', 'describe', 'price', 'twitter_money', 'begin_at',
-        'end_at', 'helper','is_free','content','need_virtual','need_virtual_num','steam_end_time','bgp_id',
-                           'steam_begin_time','classify','valid_time_range','cover_vertical_img',
-                           'is_test','pre_push_time','service_type','hide_sub_count','is_zero',
-                           'zero_poster_show',
+                        'end_at', 'helper','is_free','content','need_virtual','need_virtual_num','steam_end_time','bgp_id',
+                        'steam_begin_time','classify','valid_time_range','cover_vertical_img',
+                        'is_test','pre_push_time','service_type','hide_sub_count','is_zero',
+                        'zero_poster_show',
     ];
     public function getIndexLive($ids)
     {
@@ -248,15 +248,14 @@ class Live extends Base
         return ['res' => $res, 'count' => $res->count()];
     }
 
-    public static function delOldZeroPosterShow($live_id = 0){
-        $query = self::query()->where('zero_poster_show','=',1);
+	public static function delOldZeroPosterShow($live_id = 0){
+		$query = self::query()->where('zero_poster_show','=',1);
 
-        if ($live_id > 0){
-            $query->where('id','<>',$live_id);
-        }
+		if ($live_id > 0){
+			$query->where('id','<>',$live_id);
+		}
 
-        $query->update(['zero_poster_show'=>0]);
-        return true;
-    }
-
+		$query->update(['zero_poster_show'=>0]);
+		return true;
+	}
 }
