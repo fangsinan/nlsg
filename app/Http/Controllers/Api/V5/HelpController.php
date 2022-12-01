@@ -72,9 +72,21 @@ class HelpController extends Controller
         if( (empty($image) && empty($message)) || empty($uid)){
             return $this->error(0,'参数错误',[]);
         }
-
         //处理会话id
         $talk_id = Talk::getTalkId($uid);
+
+        $list = TalkList::where("user_id",$uid)->orderBy("id",'desc')->first();
+        $add_type_3_line = date('Y-m-d H:i:s', strtotime('-5 minute'));
+
+        if(!empty($list) && $list->type!==3 && $list->created_at <= $add_type_3_line ){
+            TalkList::insert([
+                "talk_id"    => $talk_id,
+                "type"       => 3,
+                "user_id"    => $uid,
+                "content"    => date('Y-m-d H:i'),
+            ]);
+        }
+
 
         TalkList::insert([
             "talk_id"    => $talk_id,
