@@ -9,11 +9,16 @@ use Illuminate\Support\Facades\Cache;
 class BackendUserToken
 {
     const KeyPre = 'AdminToken:';
-    const TokenLife = 120;
+    const TokenLife = 300;//正式半小时
 
     public static function setToken(int $admin_id, string $token)
     {
         Cache::put(self::KeyPre . $admin_id, $token, self::TokenLife);
+    }
+
+    public static function delToken(int $admin)
+    {
+        Cache::forget(self::KeyPre . $admin);
     }
 
     public static function refreshToken(int $admin_id)

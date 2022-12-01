@@ -72,6 +72,12 @@ class AuthController extends ControllerBackend
             return $this->getRes(['code' => false, 'msg' => '账号或密码错误']);
         }
 
+        $err_count = BackendUserToken::errLockCheck($check_user->id);
+        if ($err_count >= 5){
+            BackendUserToken::delToken($check_user->id);
+            return $this->getRes(['code' => false, 'msg' => '重试次数过多,请明天再来.']);
+        }
+
         if (Hash::check($password, $check_user->password)) {
             $token = auth('backendApi')->login($check_user);
             //存入redis
@@ -93,10 +99,6 @@ class AuthController extends ControllerBackend
         }else{
             //查看当天错误次数
             BackendUserToken::errLockSet($check_user->id);
-            $err_count = BackendUserToken::errLockCheck($check_user->id);
-            if ($err_count >= 5){
-                return $this->getRes(['code' => false, 'msg' => '重试次数过多,请明天再来.']);
-            }
         }
         return $this->getRes(['code' => false, 'msg' => '账号或密码错误']);
     }
