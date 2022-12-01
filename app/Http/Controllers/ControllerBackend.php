@@ -39,8 +39,7 @@ class ControllerBackend extends BaseController
         $url_2      = explode('/', $route->uri);
         $url_2      = array_slice($url_2, -2);
         $url_2      = '/' . trim(implode('/', $url_2), '/');
-
-        $url_array = [
+        $url_array  = [
             '/auth/login',
             '/auth/captcha',
         ];
@@ -78,21 +77,17 @@ class ControllerBackend extends BaseController
             $this->user            = $this->user->toArray();
             $this->user['user_id'] = User::query()->where('phone', '=', $this->user['username'])->value('id');
 
-//            $url = substr($route->uri, 12);
-
-            //临时添加,解决直播后台和普通后台域名前缀长度不一致问题
-
-            BackendUserAuthLog::query()
-                ->insertOrIgnore(
-                    [
-                        'admin_id'     => $this->user['user_id'],
-                        'log_time_str' => date('Y-m-d H:i'),
-                        'ip'           => $this->getIp($request),
-                        'uri'          => $url_2,
-                        'host'         => $request->getHost(),
-                        'input'        => json_encode(array_filter($request->input(), 'strlen')),
-                    ]
-                );
+            $log_data = [
+                'admin_id' => $this->user['user_id'],
+                'ip'       => $this->getIp($request),
+                'uri'      => $url_2,
+                'host'     => $request->getHost(),
+            ];
+            $input    = array_filter($request->input());
+            if ($input) {
+                $log_data['input'] = json_encode($input);
+            }
+            BackendUserAuthLog::query()->insert($log_data);
 
             if (1 === $this->user['role_id']) {
                 return true;
