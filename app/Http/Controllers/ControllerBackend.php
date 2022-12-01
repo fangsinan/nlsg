@@ -107,14 +107,6 @@ class ControllerBackend extends BaseController
                 echo json_encode($class);
                 exit;
             }
-        } else {
-            http_response_code(401);
-            $class       = new \stdClass();
-            $class->code = 401;
-            $class->msg  = '登录已过期,请重试.';
-            $class->data = '';
-            echo json_encode($class);
-            exit;
         }
     }
 
