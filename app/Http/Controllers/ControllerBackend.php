@@ -53,6 +53,7 @@ class ControllerBackend extends BaseController
 
                 if ($cache_token !== $header_token) {
                     http_response_code(200);
+                    header('Access-Control-Allow-Origin: *');
                     header('Content-Type:application/json; charset=utf-8');
                     $class       = new \stdClass();
                     $class->code = 401;
@@ -65,6 +66,7 @@ class ControllerBackend extends BaseController
                 BackendUserToken::refreshToken($this->user['id'] ?? 0);
             } else {
                 http_response_code(200);
+                header('Access-Control-Allow-Origin: *');
                 header('Content-Type:application/json; charset=utf-8');
                 $class       = new \stdClass();
                 $class->code = 401;
@@ -103,6 +105,7 @@ class ControllerBackend extends BaseController
 
             if (!in_array($url_2, $pass_url) && !in_array($url_2, $roleAuthNodeMap)) {
                 http_response_code(200);
+                header('Access-Control-Allow-Origin: *');
                 header('Content-Type:application/json; charset=utf-8');
                 $class       = new \stdClass();
                 $class->code = 1000;
@@ -114,6 +117,7 @@ class ControllerBackend extends BaseController
         } else {
             if (!in_array($url_2, $url_array)) {
                 http_response_code(200);
+                header('Access-Control-Allow-Origin: *');
                 header('Content-Type:application/json; charset=utf-8');
                 $class       = new \stdClass();
                 $class->code = 401;
