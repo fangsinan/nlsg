@@ -9,9 +9,9 @@ class BackendUserAuthLog extends Base
     protected $fillable = [
         'admin_id',
         'ip',
-        'log_time_str',
-        'created_at',
-        'updated_at',
+        'uri',
+        'host',
+        'input',
     ];
 
 }
