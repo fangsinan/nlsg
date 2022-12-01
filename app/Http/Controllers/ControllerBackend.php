@@ -54,6 +54,7 @@ class ControllerBackend extends BaseController
                 $header_token = trim(str_replace('Bearer ', '', $header_token));
 
                 if ($cache_token !== $header_token) {
+                    http_response_code(401);
                     $class       = new \stdClass();
                     $class->code = 401;
                     $class->msg  = '登录已过期,请重试.';
@@ -63,8 +64,8 @@ class ControllerBackend extends BaseController
                 }
 
                 BackendUserToken::refreshToken($this->user['id'] ?? 0);
-
             } else {
+                http_response_code(401);
                 $class       = new \stdClass();
                 $class->code = 401;
                 $class->msg  = '登录已过期,请重试.';
@@ -72,6 +73,7 @@ class ControllerBackend extends BaseController
                 echo json_encode($class);
                 exit;
             }
+            echo 'haha';
         }
 
         if ($this->user) {
