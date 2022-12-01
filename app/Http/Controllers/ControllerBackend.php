@@ -46,8 +46,9 @@ class ControllerBackend extends BaseController
             '/auth/captcha',
         ];
 
-        if (!in_array($url_2,$url_array)) {
+        if (!in_array($url_2, $url_array)) {
             $cache_token = BackendUserToken::getToken($this->user['id'] ?? 0);
+
             if ($cache_token) {
                 $header_token = $request->header('authorization');
                 $header_token = trim(str_replace('Bearer ', '', $header_token));
@@ -60,8 +61,17 @@ class ControllerBackend extends BaseController
                     echo json_encode($class);
                     exit;
                 }
+
+                BackendUserToken::refreshToken($this->user['id'] ?? 0);
+
+            } else {
+                $class       = new \stdClass();
+                $class->code = 401;
+                $class->msg  = '登录已过期,请重试.';
+                $class->data = '';
+                echo json_encode($class);
+                exit;
             }
-            BackendUserToken::refreshToken($this->user['id'] ?? 0);
         }
 
         if ($this->user) {
