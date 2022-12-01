@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Cache;
 class BackendUserToken
 {
     const KeyPre = 'AdminToken:';
-    const TokenLife = 86400;//正式半小时
+    const TokenLife = 300;//正式半小时
 
     public static function setToken(int $admin_id, string $token)
     {
