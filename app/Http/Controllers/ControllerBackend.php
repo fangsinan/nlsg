@@ -100,6 +100,7 @@ class ControllerBackend extends BaseController
             $pass_url = explode(',', $pass_url);
 
             if (!in_array($url_2, $pass_url) && !in_array($url_2, $roleAuthNodeMap)) {
+                http_response_code(401);
                 $class       = new \stdClass();
                 $class->code = 1000;
                 $class->msg  = '没有权限';
