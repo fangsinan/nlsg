@@ -25,6 +25,20 @@ class ControllerBackend extends BaseController
     protected $show_ps = true;
     public $user;
 
+
+    public function Err401()
+    {
+        http_response_code(401);
+        header('Access-Control-Allow-Origin: *');
+        header('Content-Type:application/json; charset=utf-8');
+        $class       = new \stdClass();
+        $class->code = 401;
+        $class->msg  = '登录已过期,请重试.';
+        $class->data = '';
+        echo json_encode($class);
+        exit;
+    }
+
     public function __construct(Request $request)
     {
 
@@ -52,28 +66,12 @@ class ControllerBackend extends BaseController
                 $header_token = trim(str_replace('Bearer ', '', $header_token));
 
                 if ($cache_token !== $header_token) {
-                    http_response_code(401);
-                    header('Access-Control-Allow-Origin: *');
-                    header('Content-Type:application/json; charset=utf-8');
-                    $class       = new \stdClass();
-                    $class->code = 401;
-                    $class->msg  = '登录已过期,请重试.'.__LINE__;
-                    $class->data = '';
-                    echo json_encode($class);
-                    exit;
+                    $this->Err401();
                 }
 
                 BackendUserToken::refreshToken($this->user['id'] ?? 0);
             } else {
-                http_response_code(401);
-                header('Access-Control-Allow-Origin: *');
-                header('Content-Type:application/json; charset=utf-8');
-                $class       = new \stdClass();
-                $class->code = 401;
-                $class->msg  = '登录已过期,请重试.'.__LINE__;
-                $class->data = '';
-                echo json_encode($class);
-                exit;
+                $this->Err401();
             }
         }
 
@@ -104,27 +102,11 @@ class ControllerBackend extends BaseController
             $pass_url = explode(',', $pass_url);
 
             if (!in_array($url_2, $pass_url) && !in_array($url_2, $roleAuthNodeMap)) {
-                http_response_code(401);
-                header('Access-Control-Allow-Origin: *');
-                header('Content-Type:application/json; charset=utf-8');
-                $class       = new \stdClass();
-                $class->code = 1000;
-                $class->msg  = '没有权限';
-                $class->data = '';
-                echo json_encode($class);
-                exit;
+                $this->Err401();
             }
         } else {
             if (!in_array($url_2, $url_array)) {
-                http_response_code(401);
-                header('Access-Control-Allow-Origin: *');
-                header('Content-Type:application/json; charset=utf-8');
-                $class       = new \stdClass();
-                $class->code = 401;
-                $class->msg  = '登录已过期,请重试.'.__LINE__;
-                $class->data = '';
-                echo json_encode($class);
-                exit;
+                $this->Err401();
             }
         }
     }
