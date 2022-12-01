@@ -13,6 +13,7 @@ class UploadController extends ControllerBackend
 {
 
 
+
     public function file(Request $request)
     {
         $type = $request->get('type') ?? 'video';
@@ -21,12 +22,12 @@ class UploadController extends ControllerBackend
         } elseif ($type == 'audio') {
             $data = $this->upload(934427, 0);
         } elseif ($type == 'short_video') {
-            $data = $this->upload(867416, 0);
+            $data = $this->upload(855795, 0);
         }
         return success($data);
     }
 
-    public function upload($classId = 320586, $isTranscode = 1)
+    public function upload($classId = 934426, $isTranscode = 1)
     {
 
         $toQColudIsTest = config('env.toQColudIsTest');
