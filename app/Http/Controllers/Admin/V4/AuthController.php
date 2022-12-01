@@ -6,12 +6,10 @@ namespace App\Http\Controllers\Admin\V4;
 
 use App\Http\Controllers\ControllerBackend;
 use App\Models\BackendUser;
-use App\Models\CacheTools;
 use App\Models\Node;
 use App\Models\User;
 use App\Servers\V5\BackendUserToken;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Mews\Captcha\Captcha;
 
@@ -31,8 +29,8 @@ class AuthController extends ControllerBackend
      */
     public function captcha(Captcha $captcha)
     {
-        $time_out = time() + Config('captcha.flat.expire');
-        $data = $captcha->create('flat', true);
+        $time_out       = time() + Config('captcha.flat.expire');
+        $data           = $captcha->create('flat', true);
         $data['expire'] = $time_out;
         return $this->getRes($data);
     }
@@ -54,26 +52,26 @@ class AuthController extends ControllerBackend
     {
         $username = $request->input('username', '');
         $password = $request->input('password', '');
-        $captcha = $request->input('captcha', '');
-        $key = $request->input('key', '');
+        $captcha  = $request->input('captcha', '');
+        $key      = $request->input('key', '');
 
         if (empty($username) || empty($password) || empty($captcha) || empty($key)) {
             return $this->getRes(['code' => false, 'msg' => '参数错误']);
         }
 
         $captcha_res = captcha_api_check($captcha, $key, 'flat');
-        if ($captcha !== 'nlsg_2021' &&$captcha_res === false) {
+        if ($captcha !== 'nlsg_2021' && $captcha_res === false) {
             return $this->getRes(['code' => false, 'msg' => '验证码错误']);
         }
 
         $check_user = BackendUser::where('username', '=', $username)->first();
-        $userInfo = User::where('phone', '=', $username)->first();
+        $userInfo   = User::where('phone', '=', $username)->first();
         if (empty($check_user)) {
             return $this->getRes(['code' => false, 'msg' => '账号或密码错误']);
         }
 
         $err_count = BackendUserToken::errLockCheck($check_user->id);
-        if ($err_count >= 5){
+        if ($err_count >= 5) {
             BackendUserToken::delToken($check_user->id);
             return $this->getRes(['code' => false, 'msg' => '重试次数过多,请明天再来.']);
         }
@@ -81,22 +79,22 @@ class AuthController extends ControllerBackend
         if (Hash::check($password, $check_user->password)) {
             $token = auth('backendApi')->login($check_user);
             //存入redis
-            BackendUserToken::setToken($check_user->id,$token);
+            BackendUserToken::setToken($check_user->id, $token);
 
             $data = [
-                'id' => $check_user->id,
-                'nickname' => $check_user->username,
-                'live_role' => $check_user->live_role,
-                'token' => $token,
-                'role' => $check_user->role_id,
-                'role_id' => $check_user->role_id,
-                'menu_tree' => Node::getMenuTree($check_user->role_id),
-                'app_uid' => User::where('phone', '=', $username)->value('id'),
+                'id'               => $check_user->id,
+                'nickname'         => $check_user->username,
+                'live_role'        => $check_user->live_role,
+                'token'            => $token,
+                'role'             => $check_user->role_id,
+                'role_id'          => $check_user->role_id,
+                'menu_tree'        => Node::getMenuTree($check_user->role_id),
+                'app_uid'          => User::query()->where('phone', '=', $username)->value('id'),
                 'live_role_button' => $check_user->live_role_button,
-                'app_user_id' => $userInfo->id,
+                'app_user_id'      => $userInfo->id,
             ];
             return $this->getRes($data);
-        }else{
+        } else {
             //查看当天错误次数
             BackendUserToken::errLockSet($check_user->id);
         }
@@ -106,19 +104,20 @@ class AuthController extends ControllerBackend
     public function changePassword(Request $request)
     {
         $model = new BackendUser();
-        $data = $model->changePwd($this->user, $request->input());
+        $data  = $model->changePwd($this->user, $request->input());
         return $this->getRes($data);
     }
 
     //仅供内部技术人员测试使用
-    public function getToken(Request $request){
+    public function getToken(Request $request)
+    {
 
         $username = $request->input('username', '');
-        if(!in_array($username,[18810355387])){
+        if (!in_array($username, [18810355387])) {
             return $this->getRes(['fail' => '非法请求',]);
         }
         $check_user = BackendUser::where('username', '=', $username)->first();
-        $token = auth('backendApi')->login($check_user);
+        $token      = auth('backendApi')->login($check_user);
         return $this->getRes(['token' => $token,]);
 
     }
