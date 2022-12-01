@@ -53,14 +53,14 @@ class UploadController extends ControllerBackend
         }
         $arg_list['classId'] = $classId;//分类, 默认视频
 
-        if ($classId == 320586 || $classId == 867416) {
+        if ($classId == 855798 || $classId == 934426) {
             //音频不转码
             //            $arg_list['procedure'] = 'QCVB_SimpleProcessFile({30},0,10,10)';
             $arg_list['procedure'] = 'rwl_ptzm';
             $arg_list['isWatermark'] = 1;
         }
 
-        if ($classId == 459377) {
+        if ($classId == 934427) {
             $arg_list['procedure'] = 'rwl_audio';
         }
         // 计算签名
