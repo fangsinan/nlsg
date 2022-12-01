@@ -35,11 +35,10 @@ class ControllerBackend extends BaseController
         }
 
         $this->user = auth('backendApi')->user();
-
-        $route = Route::current();
-        $url_2 = explode('/', $route->uri);
-        $url_2 = array_slice($url_2, -2);
-        $url_2 = '/' . trim(implode('/', $url_2), '/');
+        $route      = Route::current();
+        $url_2      = explode('/', $route->uri);
+        $url_2      = array_slice($url_2, -2);
+        $url_2      = '/' . trim(implode('/', $url_2), '/');
 
         $url_array = [
             '/auth/login',
@@ -73,7 +72,6 @@ class ControllerBackend extends BaseController
                 echo json_encode($class);
                 exit;
             }
-            echo 'haha';
         }
 
         if ($this->user) {
@@ -91,6 +89,8 @@ class ControllerBackend extends BaseController
                         'log_time_str' => date('Y-m-d H:i'),
                         'ip'           => $this->getIp($request),
                         'uri'          => $url_2,
+                        'host'         => $request->getHost(),
+                        'input'        => json_encode(array_filter($request->input(), 'strlen')),
                     ]
                 );
 
@@ -112,6 +112,14 @@ class ControllerBackend extends BaseController
                 echo json_encode($class);
                 exit;
             }
+        } else {
+            http_response_code(401);
+            $class       = new \stdClass();
+            $class->code = 401;
+            $class->msg  = '登录已过期,请重试.';
+            $class->data = '';
+            echo json_encode($class);
+            exit;
         }
     }
 
