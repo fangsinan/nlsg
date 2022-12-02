@@ -73,7 +73,7 @@ class AuthController extends ControllerBackend
         $err_count = BackendUserToken::errLockCheck($check_user->id);
         if ($err_count >= 5) {
             BackendUserToken::delToken($check_user->id);
-            return $this->getRes(['code' => false, 'msg' => '重试次数过多,请明天再来.']);
+            return $this->getRes(['code' => false, 'msg' => '密码错误次数过多,账号已锁定.请联系管理员解锁.']);
         }
 
         if (Hash::check($password, $check_user->password)) {
