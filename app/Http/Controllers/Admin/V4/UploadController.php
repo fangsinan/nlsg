@@ -22,7 +22,7 @@ class UploadController extends ControllerBackend
         } elseif ($type == 'audio') {
             $data = $this->upload(934427, 0);
         } elseif ($type == 'short_video') {
-            $data = $this->upload(855795, 0);
+            $data = $this->upload(935935, 0);
         }
         return success($data);
     }
@@ -53,9 +53,9 @@ class UploadController extends ControllerBackend
         }
         $arg_list['classId'] = $classId;//分类, 默认视频
 
-        if ($classId == 855798 || $classId == 934426) {
+        if ($classId == 855798 || $classId == 934426 || $classId == 935935) {
             //音频不转码
-            //            $arg_list['procedure'] = 'QCVB_SimpleProcessFile({30},0,10,10)';
+            //   $arg_list['procedure'] = 'QCVB_SimpleProcessFile({30},0,10,10)';
             $arg_list['procedure'] = 'rwl_ptzm';
             $arg_list['isWatermark'] = 1;
         }
