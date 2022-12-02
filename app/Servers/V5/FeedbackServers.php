@@ -220,7 +220,7 @@ class FeedbackServers
         }
 
         $query->orderByRaw('`status` asc,case when status = 1 then updated_at  end DESC,
-        case when status = 2 then created_at  end ASC,id DESC');
+        case when status = 2 then created_at  end DESC,id DESC');
 
         return $query->paginate($params['size'] ?? 10);
     }
