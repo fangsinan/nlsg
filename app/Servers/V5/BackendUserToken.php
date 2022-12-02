@@ -4,21 +4,29 @@
 namespace App\Servers\V5;
 
 
-use Illuminate\Support\Facades\Cache;
+use Predis\Client;
 
 class BackendUserToken
 {
     const KeyPre = 'AdminToken:';
     const TokenLife = 1800;//正式半小时
 
+    public static function getClient(): Client
+    {
+        $redisConfig = config('database.redis.default');
+        $redis       = new Client($redisConfig);
+        $redis->select(8);
+        return $redis;
+    }
+
     public static function setToken(int $admin_id, string $token)
     {
-        Cache::put(self::KeyPre . $admin_id, $token, self::TokenLife);
+        self::getClient()->setex(self::KeyPre . $admin_id, self::TokenLife, $token);
     }
 
     public static function delToken(int $admin)
     {
-        Cache::forget(self::KeyPre . $admin);
+        self::getClient()->del([self::KeyPre . $admin]);
     }
 
     public static function refreshToken(int $admin_id)
@@ -34,7 +42,7 @@ class BackendUserToken
         if (!$admin_id) {
             return '';
         }
-        return Cache::get(self::KeyPre . $admin_id);
+        return self::getClient()->get(self::KeyPre . $admin_id);
     }
 
     public static function errLockSet(int $admin_id)
@@ -43,12 +51,14 @@ class BackendUserToken
 
         $key_name = 'AdminLoginErr:' . date('Ymd') . '_' . $admin_id;
 
-        $get = Cache::get($key_name);
+        $client = self::getClient();
+
+        $get = $client->get($key_name);
 
         if ($get) {
-            Cache::increment($key_name);
+            $client->incr($key_name);
         } else {
-            Cache::put($key_name, 1, $err_token_life);
+            $client->setex($key_name, $err_token_life, 1);
         }
 
     }
@@ -56,12 +66,13 @@ class BackendUserToken
     public static function errLockCheck(int $admin_id)
     {
         $key_name = 'AdminLoginErr:' . date('Ymd') . '_' . $admin_id;
-        return Cache::get($key_name);
+        return self::getClient()->get($key_name);
     }
 
-    public static function errLockClean(int $admin_id){
+    public static function errLockClean(int $admin_id)
+    {
         $key_name = 'AdminLoginErr:' . date('Ymd') . '_' . $admin_id;
-        Cache::forget($key_name);
+        self::getClient()->del([$key_name]);
     }
 
     public static function passwordCheck(string $pwd): array
