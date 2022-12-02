@@ -220,7 +220,7 @@ class FeedbackServers
         }
 
         $query->orderBy('status')
-            ->orderBy('updated_at')
+            ->orderBy('updated_at','desc')
             ->orderBy('id','desc');
 
         return $query->paginate($params['size'] ?? 10);
