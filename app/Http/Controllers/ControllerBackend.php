@@ -80,7 +80,7 @@ class ControllerBackend extends BaseController
             $this->user['user_id'] = User::query()->where('phone', '=', $this->user['username'])->value('id');
 
             $log_data = [
-                'admin_id' => $this->user['user_id'],
+                'admin_id' => $this->user['id'],
                 'ip'       => $this->getIp($request),
                 'uri'      => $url_2,
                 'host'     => $request->getHost(),

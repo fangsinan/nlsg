@@ -59,6 +59,11 @@ class BackendUserToken
         return Cache::get($key_name);
     }
 
+    public static function errLockClean(int $admin_id){
+        $key_name = 'AdminLoginErr:' . date('Ymd') . '_' . $admin_id;
+        Cache::forget($key_name);
+    }
+
     public static function passwordCheck(string $pwd): array
     {
         if (strlen($pwd) < 9) {

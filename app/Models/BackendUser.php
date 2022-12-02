@@ -179,6 +179,9 @@ class BackendUser extends Authenticatable implements JWTSubject
                 }
                 $check->live_role = $live_role_id;
                 break;
+            case 'del_err_lock':
+                BackendUserToken::errLockClean($id);
+                return ['code' => true, 'msg' => '成功'];
             default:
                 return ['code' => false, 'msg' => '修改类型错误'];
         }
