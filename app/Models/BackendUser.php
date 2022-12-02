@@ -79,7 +79,7 @@ class BackendUser extends Authenticatable implements JWTSubject
         $list = $query->paginate($size)->toArray();
 
         foreach ($list['data'] as &$v) {
-            $v['admin_err_lock'] = BackendUserToken::errLockCheck($v['id']);
+            $v['admin_err_lock'] = BackendUserToken::errLockCheck($v['id']) ?? 0;
             if ($v['live_role'] == 21) {
                 $v['live_role_bind'] = DB::table('nlsg_backend_live_role')
                     ->where('son', '=', $v['username'])
