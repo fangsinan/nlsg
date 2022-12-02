@@ -194,7 +194,7 @@ class FeedbackServers
 
         $query = FeedbackReplyTemplate::query()
             ->where('status', '<>', 3)
-            ->select(['id', 'title', 'content', 'status', 'created_at']);
+            ->select(['id', 'title', 'content', 'status', 'created_at','updated_at']);
 
         if ($id) {
             $query->where('id', '=', $id);
@@ -219,9 +219,8 @@ class FeedbackServers
             $query->where('created_at', '<=', $created_end);
         }
 
-        $query->orderBy('status')
-            ->orderBy('updated_at','desc')
-            ->orderBy('id','desc');
+        $query->orderByRaw('`status` asc,case when status = 1 then updated_at  end DESC,
+        case when status = 2 then created_at  end ASC,id DESC');
 
         return $query->paginate($params['size'] ?? 10);
     }
