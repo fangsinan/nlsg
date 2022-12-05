@@ -26,14 +26,20 @@ class ControllerBackend extends BaseController
     public $user;
 
 
-    public function Err401($line = 0)
+    public function Err401($line = 0,$code = 401)
     {
         http_response_code(401);
         header('Access-Control-Allow-Origin: *');
         header('Content-Type:application/json; charset=utf-8');
         $class       = new \stdClass();
-        $class->code = 401;
-        $class->msg  = '登录已过期,请重试.'.$line;
+        $class->code = $code;
+
+        if ($code == 403){
+            $class->msg  = '权限不足,请联系管理员.';
+        }else{
+            $class->msg  = '登录已过期,请重试.'.$line;
+        }
+
         $class->data = '';
         echo json_encode($class);
         exit;
@@ -102,7 +108,7 @@ class ControllerBackend extends BaseController
             $pass_url = explode(',', $pass_url);
 
             if (!in_array($url_2, $pass_url) && !in_array($url_2, $roleAuthNodeMap)) {
-                $this->Err401(__LINE__);
+                $this->Err401(__LINE__,403);
             }
         } else {
             if (!in_array($url_2, $url_array)) {
