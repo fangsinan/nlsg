@@ -28,7 +28,7 @@ class ControllerBackend extends BaseController
 
     public function Err401($line = 0,$code = 401)
     {
-        http_response_code(401);
+        http_response_code($code);
         header('Access-Control-Allow-Origin: *');
         header('Content-Type:application/json; charset=utf-8');
         $class       = new \stdClass();
