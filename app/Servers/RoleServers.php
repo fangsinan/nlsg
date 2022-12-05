@@ -14,7 +14,7 @@ class RoleServers
     public function nodeList($params, $admin_id)
     {
         $nodeModel = new Node();
-        $list = $nodeModel->getList();
+        $list      = $nodeModel->getList();
 
         //如果指定用户id或者角色id
         $user_id = $params['user_id'] ?? 0;
@@ -95,18 +95,18 @@ class RoleServers
 
     public function roleCreate($params, $admin_id)
     {
-        $id = $params['id'] ?? 0;
-        $name = $params['name'] ?? '';
+        $id     = $params['id'] ?? 0;
+        $name   = $params['name'] ?? '';
         $status = $params['status'] ?? 1;
 
-        if (empty($name) || !in_array($status,[1,2])){
-            return ['code'=>false,'msg'=>'参数错误'];
+        if (empty($name) || !in_array($status, [1, 2])) {
+            return ['code' => false, 'msg' => '参数错误'];
         }
 
         if ($id) {
-            $check = Role::where('id','=',$id)->first();
+            $check = Role::where('id', '=', $id)->first();
             if ($check) {
-                $check->name = $name;
+                $check->name   = $name;
                 $check->status = $status;
 
                 $res = $check->save();
@@ -114,10 +114,10 @@ class RoleServers
                 return ['code' => false, 'msg' => '角色不存在'];
             }
         } else {
-            $rm = new Role();
-            $rm->name = $name;
+            $rm         = new Role();
+            $rm->name   = $name;
             $rm->status = $status;
-            $res = $rm->save();
+            $res        = $rm->save();
         }
 
         if ($res) {
@@ -129,7 +129,7 @@ class RoleServers
 
     public function nodeListCreate($params, $admin_id)
     {
-        $id = $params['id'] ?? 0;
+        $id   = $params['id'] ?? 0;
         $name = $params['name'] ?? '';
         $path = $params['path'] ?? '#';
 
@@ -169,7 +169,7 @@ class RoleServers
         } else {
             //目录下面能添加目录和api
             //接口下方不得添加目录
-            $pid = $params['pid'] ?? 0;
+            $pid     = $params['pid'] ?? 0;
             $is_menu = $params['is_menu'] ?? 0;
 
             if ($is_menu == 1 && $pid == 0) {
@@ -189,12 +189,12 @@ class RoleServers
                 }
             }
 
-            $tmpModel = new Node();
-            $tmpModel->pid = $pid;
-            $tmpModel->name = $name;
-            $tmpModel->path = $path;
+            $tmpModel          = new Node();
+            $tmpModel->pid     = $pid;
+            $tmpModel->name    = $name;
+            $tmpModel->path    = $path;
             $tmpModel->is_menu = $is_menu;
-            $res = $tmpModel->save();
+            $res               = $tmpModel->save();
             if ($res) {
                 return ['code' => true, 'msg' => '成功'];
             } else {
@@ -208,7 +208,7 @@ class RoleServers
     public function nodeListStatus($params, $admin_id)
     {
         $flag = $params['flag'] ?? '';
-        $id = $params['id'] ?? 0;
+        $id   = $params['id'] ?? 0;
         if (empty($id)) {
             return ['code' => false, 'msg' => 'id错误'];
         }
@@ -220,7 +220,7 @@ class RoleServers
         switch ($flag) {
             case 'del':
                 $check->status = 0;
-                $res = $check->save();
+                $res           = $check->save();
                 if ($res) {
                     return ['code' => true, 'msg' => '成功'];
                 } else {
@@ -318,8 +318,23 @@ class RoleServers
             $node_id = explode(',', $node_id);
         }
 
+        //最多3层
+        $node_p1 = Node::query()
+            ->whereIn('id', $node_id)
+            ->where('status','=',1)
+            ->pluck('pid')
+            ->toArray();
+
+        $node_p2 = Node::query()
+            ->whereIn('id', $node_p1)
+            ->where('status','=',1)
+            ->pluck('pid')
+            ->toArray();
+
+        $node_id = array_unique(array_merge($node_id, $node_p1, $node_p2));
+
         //已有的
-        $already_node = RoleNode::where('role_id', '=', $role_id)->pluck('node_id')->toArray();
+        $already_node = RoleNode::query()->where('role_id', '=', $role_id)->pluck('node_id')->toArray();
 
         //需要添加的
         $add_node = array_diff($node_id, $already_node);
@@ -332,10 +347,10 @@ class RoleServers
         if (!empty($add_node)) {
             $add_data = [];
             foreach ($add_node as $v) {
-                $tmp = [];
+                $tmp            = [];
                 $tmp['role_id'] = $role_id;
                 $tmp['node_id'] = $v;
-                $add_data[] = $tmp;
+                $add_data[]     = $tmp;
             }
             $res_add = DB::table('nlsg_role_node')->insert($add_data);
             if (!$res_add) {
@@ -345,7 +360,8 @@ class RoleServers
         }
 
         if (!empty($del_node)) {
-            $res_del = RoleNode::where('role_id', '=', $role_id)
+            $res_del = RoleNode::query()
+                ->where('role_id', '=', $role_id)
                 ->whereIn('node_id', $del_node)
                 ->delete();
             if (!$res_del) {
