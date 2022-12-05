@@ -113,17 +113,19 @@ class IndexController extends ControllerBackend
                 ->where('created_at', '>=', '2021-05-12 00:00:00')
                 ->sum('pay_price');
         } else {
-            $subscribeNum = Subscribe::where('type', 3)
-                ->where('status', 1)
-                ->count();
+//            $subscribeNum = Subscribe::where('type', 3)
+//                ->where('status', 1)
+//                ->count();
 //            $watchNum = LiveLogin::distinct('user_id')->count();
-            $watchNum = 0;
-            $orderNum = Order::whereIn('type', $type)
-                ->where('status', 1)
-                ->count();
-            $orderIncome = Order::whereIn('type', $type)
-                ->where('status', 1)
-                ->sum('pay_price');
+//            $watchNum = 0;
+//            $orderNum = Order::whereIn('type', $type)
+//                ->where('status', 1)
+//                ->count();
+//            $orderIncome = Order::whereIn('type', $type)
+//                ->where('status', 1)
+//                ->sum('pay_price');
+
+            $subscribeNum = $watchNum = $orderNum = $orderIncome = 0;
         }
 
         $data = [
