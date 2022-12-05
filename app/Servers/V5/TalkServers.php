@@ -402,14 +402,17 @@ class TalkServers
         if ($content) {
             $query->where('content', 'like', '%' . $content . '%');
         }
-
+        
         switch ($sort) {
             case 'time_asc':
                 $query->orderBy('id');
                 break;
+            case 'time_desc':
+                $query->orderBy('id','desc');
+                break;
             default:
-                $query->orderBy('id', 'desc');
-
+                $query->orderByRaw('`status`,CASE when `status` = 1 then updated_at END DESC,
+        case when `status` = 2 then created_at END DESC,id DESC');
         }
 
         $query->select(['id', 'category_id', 'content', 'admin_id', 'status', 'created_at']);
