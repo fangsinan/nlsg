@@ -966,7 +966,8 @@ class WorksInfo extends Base
     public static function UrlKey($url): string
     {
         // $url = "https://vod.cloud.nlsgapp.com/c520858evodtranscq1308168117/1fbf6003243791576631773968/v.f30.mp4";
-
+        $url = str_replace("http://1308168117.vod2.myqcloud.com/",
+            "https://vod.cloud.nlsgapp.com/",$url);
         $key ="z0GECzqW2hU8Y7XVvBIh";
         $Dir = str_replace(basename($url),'',parse_url($url,PHP_URL_PATH));
         $time = time()+3600;
@@ -975,7 +976,6 @@ class WorksInfo extends Base
         $us= rand(100000,999999);
         $sign = md5($key . $Dir . $t  . $rlimit . $us );
         $query = http_build_query([
-            "Dir" => $Dir,
             "t" => $t,
             "rlimit" => $rlimit,
             "us" => $us,
