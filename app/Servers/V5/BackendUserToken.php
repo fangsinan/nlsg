@@ -4,6 +4,7 @@
 namespace App\Servers\V5;
 
 
+use App\Models\BackendUser;
 use Predis\Client;
 
 class BackendUserToken
@@ -21,7 +22,17 @@ class BackendUserToken
 
     public static function setToken(int $admin_id, string $token)
     {
-        self::getClient()->setex(self::KeyPre . $admin_id, self::TokenLife, $token);
+        $check_admin = BackendUser::query()->where('id', '=', $admin_id)->select(['id', 'long_token'])->first();
+        if ($check_admin->long_token > 0) {
+            $token_life = ($check_admin->long_token > 7 ? 7 : $check_admin->long_token) * 86400;
+        } else {
+            $token_life = self::TokenLife;
+        }
+        self::getClient()->setex(
+            self::KeyPre . $admin_id,
+            $token_life,
+            $token
+        );
     }
 
     public static function delToken(int $admin)
