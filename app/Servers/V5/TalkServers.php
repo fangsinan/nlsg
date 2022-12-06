@@ -344,6 +344,12 @@ class TalkServers
                 'finish_at'       => date('Y-m-d H:i:s'),
             ]);
 
+        TalkUserStatistics::query()
+            ->where('user_id', '=', $user_id)
+            ->update([
+                'is_finish' => 2
+            ]);
+
         return ['code' => true, 'msg' => '成功'];
     }
 
@@ -356,16 +362,14 @@ class TalkServers
             ->with([
                 'userInfo:id,nickname,phone'
             ])
-//            ->when($params['nickname'] ?? '', function ($q) use ($params) {
-//                $q->wherehas('userInfo', function ($q) use ($params) {
-//                    $q->where('nickname', 'like', '%' . $params['nickname'] . '%');
-//                });
-//            })
             ->when($params['phone'] ?? '', function ($q) use ($params) {
                 $q->wherehas('userInfo', function ($q) use ($params) {
                     $q->where('phone', 'like', $params['phone'] . '%');
                 });
             })
+            ->orderBy('is_finish')
+            ->orderBy('updated_at', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate($params['size'] ?? 10);
     }
 
@@ -402,13 +406,13 @@ class TalkServers
         if ($content) {
             $query->where('content', 'like', '%' . $content . '%');
         }
-        
+
         switch ($sort) {
             case 'time_asc':
                 $query->orderBy('id');
                 break;
             case 'time_desc':
-                $query->orderBy('id','desc');
+                $query->orderBy('id', 'desc');
                 break;
             default:
                 $query->orderByRaw('`status`,CASE when `status` = 1 then updated_at END DESC,
