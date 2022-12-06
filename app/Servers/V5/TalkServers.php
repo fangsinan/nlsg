@@ -357,7 +357,7 @@ class TalkServers
     {
         return TalkUserStatistics::query()
             ->select([
-                'user_id', 'msg_count'
+                'user_id', 'msg_count','updated_at','is_finish'
             ])
             ->with([
                 'userInfo:id,nickname,phone'
