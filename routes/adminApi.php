@@ -382,8 +382,8 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
 
 
 
-        Route::get('teacher/list', 'TeacherController@list');
-        Route::get('teacher/info', 'TeacherController@info');
+        Route::post('teacher/list', 'TeacherController@list');
+        Route::post('teacher/info', 'TeacherController@info');
         Route::post('teacher/create', 'TeacherController@create');
 
 
