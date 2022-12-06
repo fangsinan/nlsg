@@ -11,7 +11,7 @@ class TalkUserStatistics extends Base
     protected $table = 'nlsg_talk_user_statistics';
 
     protected $fillable = [
-        'user_id', 'msg_count'
+        'user_id', 'msg_count','is_finish'
     ];
 
     static public function msgCount(int $user_id, $flag = '+')
