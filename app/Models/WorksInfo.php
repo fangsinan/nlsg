@@ -976,7 +976,6 @@ class WorksInfo extends Base
         $us= rand(100000,999999);
         $sign = md5($key . $Dir . $t  . $rlimit . $us );
         $query = http_build_query([
-            "Dir" => $Dir,
             "t" => $t,
             "rlimit" => $rlimit,
             "us" => $us,
