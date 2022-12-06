@@ -111,15 +111,19 @@ class WorksInfo extends Base
     static function GetWorksUrl($WorkArr)
     {
         if (!empty($WorkArr['callback_url3'])) {
-            return $WorkArr['callback_url3'];
+
+            return self::UrlKey($WorkArr['callback_url3']);
         }
         if (!empty($WorkArr['callback_url2'])) {
-            return $WorkArr['callback_url2'];
+            // return $WorkArr['callback_url2'];
+            return self::UrlKey($WorkArr['callback_url2']);
         }
         if (!empty($WorkArr['callback_url1'])) {
-            return $WorkArr['callback_url1'];
+            // return $WorkArr['callback_url1'];
+            return self::UrlKey($WorkArr['callback_url1']);
         }
-        return $WorkArr['url'];
+        return self::UrlKey($WorkArr['url']);
+        // return $WorkArr['url'];
     }
 
     public function three2one($works, $is_show_url)
@@ -977,7 +981,6 @@ class WorksInfo extends Base
             "us" => $us,
             "sign" => $sign,
         ]);
-
         return $url.'?'.$query;
     }
 }
