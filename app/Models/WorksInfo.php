@@ -47,25 +47,19 @@ class WorksInfo extends Base
         //$works_data = $works_data_size['data'];
         foreach ($works_data as $key => $val) {
             //训练营H5  不返回视频地址
-            if($type == 4 && $os_type == 3){
-                unset($works_data[$key]['callback_url3']);
-                unset($works_data[$key]['callback_url2']);
-                unset($works_data[$key]['callback_url1']);
-            }else{
+            if($type !== 4 && $os_type !== 3){
                 //处理url  关注或试听
                 $works_data[$key]['href_url'] = '';
                 if ($is_sub == 1 || $val['free_trial'] == 1 || $is_free == 1) {
-                    //$works_data[$key]['href_url'] = $works_data[$key]['url'];
                     $works_data[$key]['href_url'] = self::GetWorksUrl($val);
-
-                } else {
-                    unset($works_data[$key]['callback_url3']);
-                    unset($works_data[$key]['callback_url2']);
-                    unset($works_data[$key]['callback_url1']);
                 }
             }
 
             unset($works_data[$key]['url']);
+            unset($works_data[$key]['callback_url3']);
+            unset($works_data[$key]['callback_url2']);
+            unset($works_data[$key]['callback_url1']);
+
 
             //类型是训练营 根据版本号 获取新旧训练营图 5.4.3
             if ($type == 4 && version_compare($version, '5.0.4', '<')) {
