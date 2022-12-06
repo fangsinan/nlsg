@@ -321,17 +321,24 @@ class RoleServers
         //最多3层
         $node_p1 = Node::query()
             ->whereIn('id', $node_id)
-            ->where('status','=',1)
+            ->where('status', '=', 1)
             ->pluck('pid')
             ->toArray();
 
         $node_p2 = Node::query()
             ->whereIn('id', $node_p1)
-            ->where('status','=',1)
+            ->where('status', '=', 1)
             ->pluck('pid')
             ->toArray();
 
-        $node_id = array_unique(array_merge($node_id, $node_p1, $node_p2));
+        //基础数据接口
+        $base_api = Node::query()
+            ->where('pid', '=', 321)
+            ->where('status', '=', 1)
+            ->pluck('id')
+            ->toArray();
+
+        $node_id = array_unique(array_merge($node_id, $node_p1, $node_p2, $base_api));
 
         //已有的
         $already_node = RoleNode::query()->where('role_id', '=', $role_id)->pluck('node_id')->toArray();
