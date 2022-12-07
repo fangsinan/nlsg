@@ -1373,6 +1373,12 @@ class UserController extends Controller
         }
         $res = User::where('id', $this->user['id'])->update(['phone' => $phone]);
 
+        $original = User::where('id', $this->user['id'])->value("phone");
+        DB::table('nlsg_user_phone_history')->insert([
+            "user_id"   => $this->user['id'],
+            "phone"     => $original,
+        ]);
+
         VipUser::where('user_id', $this->user['id'])->update(['username' => $phone]);
 
         if ($res) {
