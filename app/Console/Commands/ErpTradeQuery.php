@@ -38,7 +38,8 @@ class ErpTradeQuery extends Command
      */
     public function handle()
     {
-        $s = new ErpServers();
-        $s->tradeQuery();
+        dd(__LINE__);
+//        $s = new ErpServers();
+//        $s->tradeQuery();
     }
 }
