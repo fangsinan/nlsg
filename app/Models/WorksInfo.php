@@ -106,17 +106,17 @@ class WorksInfo extends Base
     {
         if (!empty($WorkArr['callback_url3'])) {
 
-            return self::UrlKey($WorkArr['callback_url3']);
+            return self::UrlKey($WorkArr['callback_url3'],$WorkArr['duration']);
         }
         if (!empty($WorkArr['callback_url2'])) {
             // return $WorkArr['callback_url2'];
-            return self::UrlKey($WorkArr['callback_url2']);
+            return self::UrlKey($WorkArr['callback_url2'],$WorkArr['duration']);
         }
         if (!empty($WorkArr['callback_url1'])) {
             // return $WorkArr['callback_url1'];
-            return self::UrlKey($WorkArr['callback_url1']);
+            return self::UrlKey($WorkArr['callback_url1'],$WorkArr['duration']);
         }
-        return self::UrlKey($WorkArr['url']);
+        return self::UrlKey($WorkArr['url'],$WorkArr['duration']);
         // return $WorkArr['url'];
     }
 
@@ -786,13 +786,13 @@ class WorksInfo extends Base
     {
         $SecretId=config('env.TENCENT_SECRETID');
         $SECRET_KEY=config('env.TENCENT_SECRETKEY');
-        $ids = DB::table("nlsg_works_info_pro")->select("*")
-            ->where('id', ">",7592)
+        $ids = DB::table("nlsg_short_video")->select("*")
             ->where('video_adopt', 0)
             ->where('video_id','!=', '')
             ->limit(100)
             ->pluck('video_id')
             ->toArray();
+
 
         if ($ids){
             foreach ($ids as $v) {
@@ -855,6 +855,7 @@ class WorksInfo extends Base
 
                         }
                         $map['url'] = $info['basicInfo']['sourceVideoUrl'];
+                        $map['cover_img'] = $info['basicInfo']['coverUrl'];
                         if ( (!empty($map) && ( !empty($map['url']) || !empty($map['callback_url1']) || !empty($map['callback_url2']) || !empty($map['callback_url3']))) || $type==2) {
                             $map['video_adopt'] = 1;
 
@@ -878,7 +879,7 @@ class WorksInfo extends Base
 
                             $map['size']=round($info['basicInfo']['size']/(1024*1024), 2);  //大小
 
-                            DB::table("nlsg_works_info_pro")->select("*")
+                            DB::table("nlsg_short_video")->select("*")
                                 ->where('video_id','=', $video_id)
                                 ->update($map);
                             echo 'OK';
@@ -901,12 +902,13 @@ class WorksInfo extends Base
     public static function  short_video()
     {
         $uri = 'vod.tencentcloudapi.com';
-        $secretKey = "RghRu61f17ycz5uSjkV0EBsIRJyOZsug";
-        $SecretId="AKIDYv1qOfeMqCI8h03oTs0tWtymKcdNr40g";
+        $SecretId=config('env.TENCENT_SECRETID');
+        $SECRET_KEY=config('env.TENCENT_SECRETKEY');
 
         $videos = DB::table("nlsg_short_video")->select("*")
             ->where('task_id','=', '')
-            ->limit(1)->get()->toArray();
+            ->limit(100)->get()->toArray();
+
         foreach($videos as $v){
             //加密
             $rand   = rand (100, 10000000); //9031868223070871051
@@ -933,7 +935,7 @@ class WorksInfo extends Base
             }
             $signStr = substr($signStr, 0, -1);
 
-            $signature = base64_encode(hash_hmac("sha1", $signStr, "RghRu61f17ycz5uSjkV0EBsIRJyOZsug", true));
+            $signature = base64_encode(hash_hmac("sha1", $signStr, $SECRET_KEY, true));
             $data_key['Signature'] = $signature;
 
             //拉取转码成功信息
@@ -941,7 +943,7 @@ class WorksInfo extends Base
             $info = ImClient::curlGet ($url);  //post
             $info = json_decode($info, true);
 
-            dump($info);
+            dump($v->id);
             if ( !empty($info) ) {
                 DB::table("nlsg_short_video")->Where("id",$v->id)
                     ->update([ "task_id" => $info['Response']['TaskId'], ]);
@@ -953,18 +955,21 @@ class WorksInfo extends Base
     /**
      * UrlKey 防盗链
      *
-     * @param $url
+     * @param string $url
+     * @param string $duration
      *
      * @return string
      */
-    public static function UrlKey($url): string
+    public static function UrlKey(string $url, string $duration="60:00"): string
     {
-        // $url = "https://vod.cloud.nlsgapp.com/c520858evodtranscq1308168117/1fbf6003243791576631773968/v.f30.mp4";
+        $ex_times = explode(":",$duration);
+        $time_v = $ex_times[0]*60 + $ex_times[1];
+
         $url = str_replace("http://1308168117.vod2.myqcloud.com/",
             "https://vod.cloud.nlsgapp.com/",$url);
         $key ="z0GECzqW2hU8Y7XVvBIh";
         $Dir = str_replace(basename($url),'',parse_url($url,PHP_URL_PATH));
-        $time = time()+3600;
+        $time = time()+$time_v;
         $t =dechex($time);
         $rlimit= 5;
         $us= rand(100000,999999);
