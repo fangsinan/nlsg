@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use App\Models\ConfigModel;
 use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -63,6 +64,7 @@ class Command extends SymfonyCommand
      */
     public function __construct()
     {
+        ConfigModel::crontabJobStatus();
         // We will go ahead and set the name, description, and parameters on console
         // commands just to make things a little easier on the developer. This is
         // so they don't have to all be manually specified in the constructors.

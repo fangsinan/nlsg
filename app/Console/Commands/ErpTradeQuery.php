@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\ConfigModel;
 use App\Servers\ErpServers;
 use Illuminate\Console\Command;
 
@@ -38,8 +39,7 @@ class ErpTradeQuery extends Command
      */
     public function handle()
     {
-        dd(__LINE__);
-//        $s = new ErpServers();
-//        $s->tradeQuery();
+        $s = new ErpServers();
+        $s->tradeQuery();
     }
 }
