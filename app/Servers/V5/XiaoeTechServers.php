@@ -104,11 +104,17 @@ class XiaoeTechServers
             }
         }
 
+        if(empty($baseUser->headimg)){
+            $avatar=config('env.IMAGES_URL').'/image/202009/13f952e04c720a550193e5655534be86.jpg';
+        }else{
+            $avatar=config('env.IMAGES_URL').$baseUser->headimg;
+        }
+
         $paratms=[
             'access_token'=>$this->access_token,
             'data'=>[
                 'phone'=>$phone,
-                'avatar'=>config('env.IMAGES_URL').$baseUser->headimg,
+                'avatar'=>$avatar,
                 'nickname'=>$baseUser->nickname,
             ],
         ];
@@ -119,9 +125,14 @@ class XiaoeTechServers
             return false;
         }
 
-        var_dump($res);die;
+        if(empty($res['body']['data']['user_id'])){
+            return false;
+        }
 
+        return $res['body']['data'];
     }
+
+
     /**
      * 获取推广员列表
      */
@@ -243,6 +254,47 @@ class XiaoeTechServers
         } while ($return_list);
     }
 
+    /**
+     * 新增推广员
+     */
+    public function distributor_member_add($phone){
+
+        $res=$this->user_register($phone);
+        if(!checkRes($res)){
+            return $res;
+        }
+
+        $user_id=$res['user_id']??'';
+        if(!$user_id){
+            return '客户不存在';
+        }
+
+        $XeDistributor=XeDistributor::query()->where('xe_user_id',$user_id)->first();
+        if($XeDistributor){
+            return '合伙人已存在';
+        }
+
+        $paratms=[
+            'access_token'=>$this->access_token,
+            'user_id'=>$user_id,
+        ];
+
+        $res=self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.add/1.0.0',$paratms);
+        if($res['body']['code']!=0){
+            $this->err_msg=$res['body']['msg'];
+            return false;
+        }
+
+        $XeDistributor = new XeDistributor();
+        $XeDistributor->xe_user_id=$user_id;
+        $XeDistributor->level=1;
+        $XeDistributor->group_id=0;
+        $XeDistributor->group_name='合伙人';
+        $XeDistributor->save();
+
+        return true;
+
+    }
     /**
      * 发送get请求
      * @param
