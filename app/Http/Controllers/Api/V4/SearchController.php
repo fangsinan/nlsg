@@ -444,7 +444,7 @@ class SearchController extends Controller
             //线下门票
             $res['products'] = OfflineProducts::search($keywords);
             $res['vip']['res'][] = ['id'=>1,'type' => 6, 'text'=>'幸福360会员','img'=>'/nlsg/works/20210105102849884378.png','price'=>360.00];
-            $res['live'] = Live::search($keywords);
+            $res['live'] = Live::search($keywords,$user_id);
             $res['live_urls'] = LiveUrl::search($keywords);
             $res['camps'] = Column::search($keywords,3);
         }

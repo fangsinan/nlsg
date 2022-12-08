@@ -125,8 +125,8 @@ class TalkServers
 
         $validator = Validator::make($params,
             [
-                'talk_id' => 'bail|required|exists:nlsg_talk,id',
-                'content' => 'bail|required|string|max:200',
+                'talk_id'  => 'bail|required|exists:nlsg_talk,id',
+                'content'  => 'bail|required|string|max:200',
                 'admin_id' => 'bail|required|exists:nlsg_backend_user,id',
             ]
         );
@@ -194,6 +194,9 @@ class TalkServers
                 $q->where('status', '=', 1);
             });
 
+        $total      = $query->count();
+        $total_page = ceil($total / $size);
+
         if ($page < 1) {
             if ($talk_id) {
                 if ($flag === 'begin') {
@@ -236,11 +239,13 @@ class TalkServers
         }
 
         return [
-            'user_info' => $user_info,
+            'user_info'  => $user_info,
             'not_finish' => $not_finish,
-            'page' => $page,
-            'size' => $size,
-            'list' => $query->get(),
+            'total'      => $total,
+            'total_page' => $total_page,
+            'page'       => $page,
+            'size'       => $size,
+            'list'       => $query->get(),
         ];
     }
 
@@ -252,7 +257,7 @@ class TalkServers
             [
                 'user_id' => 'bail|required|exists:nlsg_user,id',
                 'content' => 'bail|max:500',
-                'image' => 'bail|max:225'
+                'image'   => 'bail|max:225'
             ]
         );
 
@@ -269,7 +274,7 @@ class TalkServers
         //获取当前talk_id
         $talk = Talk::query()
             ->firstOrCreate([
-                'user_id' => $params['user_id'],
+                'user_id'   => $params['user_id'],
                 'is_finish' => 1
             ]);
 
@@ -288,12 +293,12 @@ class TalkServers
             //添加一条type = 3
             $res = TalkList::query()
                 ->create([
-                    'talk_id' => $talk->id,
-                    'type' => 3,
-                    'user_id' => $params['user_id'],
+                    'talk_id'  => $talk->id,
+                    'type'     => 3,
+                    'user_id'  => $params['user_id'],
                     'admin_id' => $admin['id'],
-                    'content' => date('Y-m-d H:i'),
-                    'status' => 1,
+                    'content'  => date('Y-m-d H:i'),
+                    'status'   => 1,
                 ]);
 
             if (!$res) {
@@ -304,13 +309,13 @@ class TalkServers
 
         $res = TalkList::query()
             ->create([
-                'talk_id' => $talk->id,
-                'type' => 2,
-                'user_id' => $params['user_id'],
+                'talk_id'  => $talk->id,
+                'type'     => 2,
+                'user_id'  => $params['user_id'],
                 'admin_id' => $admin['id'],
-                'content' => $params['content'] ?? '',
-                'image' => $params['image'] ?? '',
-                'status' => 1,
+                'content'  => $params['content'] ?? '',
+                'image'    => $params['image'] ?? '',
+                'status'   => 1,
             ]);
 
         if (!$res) {
@@ -334,9 +339,15 @@ class TalkServers
             ->where('user_id', '=', $user_id)
             ->where('is_finish', '=', 1)
             ->update([
-                'is_finish' => 2,
+                'is_finish'       => 2,
                 'finish_admin_id' => $admin['id'],
-                'finish_at' => date('Y-m-d H:i:s'),
+                'finish_at'       => date('Y-m-d H:i:s'),
+            ]);
+
+        TalkUserStatistics::query()
+            ->where('user_id', '=', $user_id)
+            ->update([
+                'is_finish' => 2
             ]);
 
         return ['code' => true, 'msg' => '成功'];
@@ -346,21 +357,19 @@ class TalkServers
     {
         return TalkUserStatistics::query()
             ->select([
-                'user_id', 'msg_count'
+                'user_id', 'msg_count','updated_at','is_finish'
             ])
             ->with([
                 'userInfo:id,nickname,phone'
             ])
-//            ->when($params['nickname'] ?? '', function ($q) use ($params) {
-//                $q->wherehas('userInfo', function ($q) use ($params) {
-//                    $q->where('nickname', 'like', '%' . $params['nickname'] . '%');
-//                });
-//            })
             ->when($params['phone'] ?? '', function ($q) use ($params) {
                 $q->wherehas('userInfo', function ($q) use ($params) {
                     $q->where('phone', 'like', $params['phone'] . '%');
                 });
             })
+            ->orderBy('is_finish')
+            ->orderBy('updated_at', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate($params['size'] ?? 10);
     }
 
@@ -369,6 +378,7 @@ class TalkServers
         $category_id = (int)($params['category_id'] ?? 0);
         $size        = $params['size'] ?? 10;
         $sort        = $params['sort'] ?? '';
+        $content     = $params['content'] ?? '';
 
         if (!$category_id) {
             return ['code' => false, 'msg' => '分类错误'];
@@ -393,13 +403,20 @@ class TalkServers
             $q->where('id', '=', $category_id);
         });
 
+        if ($content) {
+            $query->where('content', 'like', '%' . $content . '%');
+        }
+
         switch ($sort) {
             case 'time_asc':
                 $query->orderBy('id');
                 break;
-            default:
+            case 'time_desc':
                 $query->orderBy('id', 'desc');
-
+                break;
+            default:
+                $query->orderByRaw('`status`,CASE when `status` = 1 then updated_at END DESC,
+        case when `status` = 2 then created_at END DESC,id DESC');
         }
 
         $query->select(['id', 'category_id', 'content', 'admin_id', 'status', 'created_at']);
@@ -415,7 +432,7 @@ class TalkServers
         if ($is_public === 0) {
             //如果是0,就只返回条数
             return [
-                'public_total' => TalkTemplate::query()
+                'public_total'  => TalkTemplate::query()
                     ->with(['categoryInfo'])
                     ->where('status', '=', 1)
                     ->whereHas('categoryInfo', function ($q) {
@@ -490,9 +507,9 @@ class TalkServers
 
         $validator = Validator::make($params,
             [
-                'content' => 'bail|required|string|max:200',
-                'status' => 'bail|required|in:1,2',
-                'admin_id' => 'bail|required|exists:nlsg_backend_user,id',
+                'content'     => 'bail|required|string|max:200',
+                'status'      => 'bail|required|in:1,2',
+                'admin_id'    => 'bail|required|exists:nlsg_backend_user,id',
                 'category_id' => 'bail|required|numeric',
             ]
         );
@@ -598,10 +615,10 @@ class TalkServers
 
         $validator = Validator::make($params,
             [
-                'title' => 'bail|required|string|max:200',
+                'title'     => 'bail|required|string|max:200',
                 'is_public' => 'bail|required|in:1,2',
-                'status' => 'bail|required|in:1,2',
-                'admin_id' => 'bail|required|exists:nlsg_backend_user,id',
+                'status'    => 'bail|required|in:1,2',
+                'admin_id'  => 'bail|required|exists:nlsg_backend_user,id',
             ]
         );
 

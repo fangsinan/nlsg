@@ -2,35 +2,30 @@
 
 
 namespace App\Http\Middleware;
-use App\Models\BackendUser;
-use Closure;
 
-use Illuminate\Support\Facades\Route;
+use Closure;
 use JWTAuth;
-use Exception;
-use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
 
 class JwtBackendMiddleware
 {
     public function handle($request, Closure $next)
     {
 
-        $token = $request->header('authorization');
-        $url_token = $request->input('token','');
-        if (empty($token) && !empty($url_token)){
-            $request->headers->set('Authorization', 'Bearer ' .$url_token);
+        $token     = $request->header('authorization');
+        $url_token = $request->input('token', '');
+        if (empty($token) && !empty($url_token)) {
+            $request->headers->set('Authorization', 'Bearer ' . $url_token);
         }
 
-        if (auth('backendApi')->check()){
+        if (auth('backendApi')->check()) {
             //$route= Route::current();
             //$route->uri; 当前路由
             //$route->controller->user; 当前用户信息
 
             return $next($request);
-        }else{
-            return response()->json(['msg' => '没有登录','code'=> 401]);
+        } else {
+            return response()->json(['msg' => '没有登录', 'code' => 401]);
         }
-
 
 
 //        dd(auth('backendApi')->user());

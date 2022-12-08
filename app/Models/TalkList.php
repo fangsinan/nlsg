@@ -34,7 +34,7 @@ class TalkList extends Base
         )->select("content","user_id",'admin_id','type','image','created_at')
             ->where("user_id",$uid)
             ->where("status",1)
-            ->orderBy('created_at','desc')
+            ->orderBy('id','desc')
             ->paginate(20)
 
             ->toArray();

@@ -21,6 +21,7 @@ class erpOrderServers
         $send_status        = (int)($params['send_status'] ?? 0);  //1没发货 2发货了
         $shill_status       = (int)($params['shill_status'] ?? 0); //1没退款  2退款中 3退款完毕
         $order_info_flag    = $params['order_info_flag'] ?? '';
+        $ob = $params['ob'] ?? 'id_desc';
 
         $erp_push_order_flag = (int)ConfigModel::getData(56, 1);//0全部 1正常 2只测试
         if(in_array($role_id,[28])){
@@ -155,7 +156,11 @@ class erpOrderServers
             $query->whereBetween('created_at', [$created_at[0], $created_at[1]]);
         }
 
-        $query->orderBy('id', 'desc');
+        if ($ob === 'id_asc'){
+            $query->orderBy('id');
+        }else{
+            $query->orderBy('id', 'desc');
+        }
 
         if ($is_excel === 1) {
             $page = $params['page'] ?? 1;

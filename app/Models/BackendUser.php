@@ -4,6 +4,7 @@
 namespace App\Models;
 
 
+use App\Servers\V5\BackendUserToken;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -33,6 +34,11 @@ class BackendUser extends Authenticatable implements JWTSubject
         $re_password = strval($params['re_pwd'] ?? '');
 
         if (!empty($password) && $password === $re_password) {
+            $passwordCheck = BackendUserToken::passwordCheck($password);
+            if ($passwordCheck['code'] === false){
+                return $passwordCheck;
+            }
+
             $n_pwd = bcrypt($password);
             $res = self::whereId($user['id'])->update(['password' => $n_pwd]);
             if ($res === false) {
@@ -73,6 +79,7 @@ class BackendUser extends Authenticatable implements JWTSubject
         $list = $query->paginate($size)->toArray();
 
         foreach ($list['data'] as &$v) {
+            $v['admin_err_lock'] = BackendUserToken::errLockCheck($v['id']) ?? 0;
             if ($v['live_role'] == 21) {
                 $v['live_role_bind'] = DB::table('nlsg_backend_live_role')
                     ->where('son', '=', $v['username'])
@@ -108,6 +115,10 @@ class BackendUser extends Authenticatable implements JWTSubject
                 $password = strval($params['pwd'] ?? '');
                 $re_password = strval($params['re_pwd'] ?? '');
                 if (!empty($password) && $password === $re_password) {
+                    $passwordCheck = BackendUserToken::passwordCheck($password);
+                    if ($passwordCheck['code'] === false){
+                        return $passwordCheck;
+                    }
                     $check->password = bcrypt($password);
                 } else {
                     return ['code' => false, 'msg' => '密码不一致'];
@@ -169,6 +180,9 @@ class BackendUser extends Authenticatable implements JWTSubject
                 }
                 $check->live_role = $live_role_id;
                 break;
+            case 'del_err_lock':
+                BackendUserToken::errLockClean($id);
+                return ['code' => true, 'msg' => '成功'];
             default:
                 return ['code' => false, 'msg' => '修改类型错误'];
         }

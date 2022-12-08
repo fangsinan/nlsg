@@ -4,6 +4,7 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\DB;
+use Libraries\ImClient;
 
 class WorksInfo extends Base
 {
@@ -46,25 +47,19 @@ class WorksInfo extends Base
         //$works_data = $works_data_size['data'];
         foreach ($works_data as $key => $val) {
             //训练营H5  不返回视频地址
-            if($type == 4 && $os_type == 3){
-                unset($works_data[$key]['callback_url3']);
-                unset($works_data[$key]['callback_url2']);
-                unset($works_data[$key]['callback_url1']);
-            }else{
+            if($type !== 4 && $os_type !== 3){
                 //处理url  关注或试听
                 $works_data[$key]['href_url'] = '';
                 if ($is_sub == 1 || $val['free_trial'] == 1 || $is_free == 1) {
-                    //$works_data[$key]['href_url'] = $works_data[$key]['url'];
                     $works_data[$key]['href_url'] = self::GetWorksUrl($val);
-
-                } else {
-                    unset($works_data[$key]['callback_url3']);
-                    unset($works_data[$key]['callback_url2']);
-                    unset($works_data[$key]['callback_url1']);
                 }
             }
 
             unset($works_data[$key]['url']);
+            unset($works_data[$key]['callback_url3']);
+            unset($works_data[$key]['callback_url2']);
+            unset($works_data[$key]['callback_url1']);
+
 
             //类型是训练营 根据版本号 获取新旧训练营图 5.4.3
             if ($type == 4 && version_compare($version, '5.0.4', '<')) {
@@ -110,15 +105,19 @@ class WorksInfo extends Base
     static function GetWorksUrl($WorkArr)
     {
         if (!empty($WorkArr['callback_url3'])) {
-            return $WorkArr['callback_url3'];
+
+            return self::UrlKey($WorkArr['callback_url3'],$WorkArr['duration']);
         }
         if (!empty($WorkArr['callback_url2'])) {
-            return $WorkArr['callback_url2'];
+            // return $WorkArr['callback_url2'];
+            return self::UrlKey($WorkArr['callback_url2'],$WorkArr['duration']);
         }
         if (!empty($WorkArr['callback_url1'])) {
-            return $WorkArr['callback_url1'];
+            // return $WorkArr['callback_url1'];
+            return self::UrlKey($WorkArr['callback_url1'],$WorkArr['duration']);
         }
-        return $WorkArr['url'];
+        return self::UrlKey($WorkArr['url'],$WorkArr['duration']);
+        // return $WorkArr['url'];
     }
 
     public function three2one($works, $is_show_url)
@@ -774,4 +773,213 @@ class WorksInfo extends Base
 
             return $works_data;
         }
+
+
+
+
+
+
+    /**
+     * 转换音视频
+     */
+    public static function  covertVideo1()
+    {
+        $SecretId=config('env.TENCENT_SECRETID');
+        $SECRET_KEY=config('env.TENCENT_SECRETKEY');
+        $ids = DB::table("nlsg_short_video")->select("*")
+            ->where('video_adopt', 0)
+            ->where('video_id','!=', '')
+            ->limit(100)
+            ->pluck('video_id')
+            ->toArray();
+
+
+        if ($ids){
+            foreach ($ids as $v) {
+
+                $video_id = $v;
+                //加密
+                $rand   = rand (100, 10000000); //9031868223070871051
+                $time   = time ();
+                $Region = "gz";
+                $Region = "ap-guangzhou";
+                $data_key = [
+                    'Action' => 'GetVideoInfo',
+                    'fileId' => $video_id,
+                    'infoFilter.0' => 'basicInfo',
+                    'infoFilter.1' => 'transcodeInfo',
+                    'Region' => $Region,
+                    'SecretId' => $SecretId,
+                    'Timestamp' => $time,
+                    'Nonce' => $rand,
+                    'SignatureMethod' => 'HmacSHA256',
+                ];
+                ksort ($data_key); //排序
+                // 计算签名
+                $srcStr    = "POSTvod.api.qcloud.com/v2/index.php?" . http_build_query ($data_key);
+                $signature = base64_encode (hash_hmac ('sha256', $srcStr, $SECRET_KEY, true)); //SHA1  sha256
+                $data_key['Signature'] = $signature;
+                ksort ($data_key); //排序
+
+                //拉取转码成功信息
+                $url = "https://vod.api.qcloud.com/v2/index.php"; //?Action=PullEvent&COMMON_PARAMS
+                $info = self::curlPost ($url, $data_key);  //post
+                if ( !empty($info) ) {
+                    $info = json_decode ($info, true);
+
+                    if ( isset($info['code']) && isset($info['codeDesc']) && $info['code'] == 0 && $info['codeDesc'] == 'Success' ) {
+                        $map = [];
+                        //获取所有视频参数
+
+                        foreach($info['transcodeInfo']['transcodeList'] as $k=>$v){
+                            //音频
+                            if(isset($info['transcodeInfo']['transcodeList'][0]['container']) &&
+                                stristr($info['transcodeInfo']['transcodeList'][0]['url'],".mp3")){
+                                $type=2;
+                            }else{
+                                if (stristr ($v['url'], ".f10.mp4") ) {
+                                    $map['callback_url1'] = $v['url'];
+                                    $map['attribute_url1'] = $v['width']."#".$v['height'];
+                                } elseif (stristr ($v['url'], ".f20.mp4") ) {
+                                    $map['callback_url2'] = $v['url'];
+                                    $map['attribute_url2'] = $v['width']."#".$v['height'];
+                                } elseif (stristr ($v['url'], ".f30.mp4") ) {
+                                    $map['callback_url3'] = $v['url'];
+                                    $map['attribute_url3'] = $v['width']."#".$v['height'];
+                                }else{
+                                    $map['attribute_url'] = $v['width']."#".$v['height']; //原视频
+                                    //                                   $map['url'] = $v['url']; //原视频
+                                }
+                                $type=1;
+                            }
+
+                        }
+                        $map['url'] = $info['basicInfo']['sourceVideoUrl'];
+                        $map['cover_img'] = $info['basicInfo']['coverUrl'];
+                        if ( (!empty($map) && ( !empty($map['url']) || !empty($map['callback_url1']) || !empty($map['callback_url2']) || !empty($map['callback_url3']))) || $type==2) {
+                            $map['video_adopt'] = 1;
+
+
+                            $seconds = $v['duration'];
+                            $second = $seconds % 60;
+                            $minit = floor($seconds / 60);
+
+                            $m_num=mb_strlen($minit, 'utf-8');
+                            $s_num=mb_strlen($second, 'utf-8');
+                            if($m_num==1){
+                                $minit='0'.$minit;
+                            }
+                            if($s_num==1){
+                                $second='0'.$second;
+                            }
+
+                            $map['duration'] = $minit . ':' . $second;
+
+                            gmstrftime("%H:%M:%S",$time); //转换视频时间
+
+                            $map['size']=round($info['basicInfo']['size']/(1024*1024), 2);  //大小
+
+                            DB::table("nlsg_short_video")->select("*")
+                                ->where('video_id','=', $video_id)
+                                ->update($map);
+                            echo 'OK';
+                        }
+
+                    } else {
+                        echo 'fail1';
+                    }
+
+                } else {
+                    echo 'fail2';
+                }
+            }
+        }
+    }
+
+    /**
+     * 短视频
+     */
+    public static function  short_video()
+    {
+        $uri = 'vod.tencentcloudapi.com';
+        $SecretId=config('env.TENCENT_SECRETID');
+        $SECRET_KEY=config('env.TENCENT_SECRETKEY');
+
+        $videos = DB::table("nlsg_short_video")->select("*")
+            ->where('task_id','=', '')
+            ->limit(100)->get()->toArray();
+
+        foreach($videos as $v){
+            //加密
+            $rand   = rand (100, 10000000); //9031868223070871051
+            $time   = time ();
+            $Region = "ap-guangzhou";
+            $data_key = [
+                'Nonce' => $rand,
+                'Timestamp' => $time,
+                'SecretId' => $SecretId,
+                'Version' => '2018-07-17',
+                'Language' => 'zh-CN',
+                'Region' => '',
+
+                'Action' => 'PullUpload',
+                'MediaUrl' => $v->callback_url,
+                'MediaName' => $v->title,
+                'CoverUrl' => $v->cover_img,
+                'ClassId' => 935935,
+            ];
+            ksort ($data_key); //排序
+            $signStr    = "GETvod.tencentcloudapi.com/?";// . http_build_query ($data_key);
+            foreach ( $data_key as $key => $value ) {
+                $signStr = $signStr . $key . "=" . $value . "&";
+            }
+            $signStr = substr($signStr, 0, -1);
+
+            $signature = base64_encode(hash_hmac("sha1", $signStr, $SECRET_KEY, true));
+            $data_key['Signature'] = $signature;
+
+            //拉取转码成功信息
+            $url = "https://vod.tencentcloudapi.com/?".http_build_query ($data_key);
+            $info = ImClient::curlGet ($url);  //post
+            $info = json_decode($info, true);
+
+            dump($v->id);
+            if ( !empty($info) ) {
+                DB::table("nlsg_short_video")->Where("id",$v->id)
+                    ->update([ "task_id" => $info['Response']['TaskId'], ]);
+            }
+        }
+    }
+
+
+    /**
+     * UrlKey 防盗链
+     *
+     * @param string $url
+     * @param string $duration
+     *
+     * @return string
+     */
+    public static function UrlKey(string $url, string $duration="60:00"): string
+    {
+        $ex_times = explode(":",$duration);
+        $time_v = $ex_times[0]*60 + $ex_times[1];
+
+        $url = str_replace("http://1308168117.vod2.myqcloud.com/",
+            "https://vod.cloud.nlsgapp.com/",$url);
+        $key ="z0GECzqW2hU8Y7XVvBIh";
+        $Dir = str_replace(basename($url),'',parse_url($url,PHP_URL_PATH));
+        $time = time()+$time_v;
+        $t =dechex($time);
+        $rlimit= 5;
+        $us= rand(100000,999999);
+        $sign = md5($key . $Dir . $t  . $rlimit . $us );
+        $query = http_build_query([
+            "t" => $t,
+            "rlimit" => $rlimit,
+            "us" => $us,
+            "sign" => $sign,
+        ]);
+        return $url.'?'.$query;
+    }
 }

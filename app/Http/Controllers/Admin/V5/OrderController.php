@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin\V5;
 
 
 use App\Http\Controllers\ControllerBackend;
-use App\Servers\V5\OfflineOrderServers;
 use App\Servers\V5\ZeroOrderListServers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -29,6 +28,11 @@ class OrderController extends ControllerBackend
             '订单编号', '用户昵称', '用户账号', '推荐人昵称', '推荐人账号', '预约时间',
             '直播信息', '来源直播信息', '是否添加微信'
         ];
+
+        if ($this->user['role_id'] === 1){
+            $columns[] = '企业微信账号';
+            $columns[] = '企业微信名称';
+        }
 
         $fileName = date('Y-m-d H:i') . '-' . rand(100, 999) . '.csv';
         header('Content-Description: File Transfer');
@@ -55,16 +59,21 @@ class OrderController extends ControllerBackend
             $temp_data = $temp_data->toArray();
 
             foreach ($temp_data as $v) {
-                $temp_put_data                   = [];
-                $temp_put_data['ordernum']       = ($v['ordernum'] ?? '-')."\t";
-                $temp_put_data['nickname']       = ($v['user']['nickname'] ?? '-')."\t";
-                $temp_put_data['phone']          = ($v['user']['phone'] ?? '-')."\t";
-                $temp_put_data['t_nickname']     = ($v['twitter']['nickname'] ?? '-')."\t";
-                $temp_put_data['t_phone']        = ($v['twitter']['phone'] ?? '-')."\t";
-                $temp_put_data['pay_time']       = $v['pay_time'] ?? '-';
-                $temp_put_data['relation_title'] = $v['relation_live_info']['title'] ?? '-';
-                $temp_put_data['live_title']     = $v['from_live_info']['title'] ?? '-';
-                $temp_put_data['is_wechat']      = $v['is_wechat'] === 1 ? '未加' : '已加';
+                $temp_put_data                       = [];
+                $temp_put_data['ordernum']           = ($v['ordernum'] ?? '-') . "\t";
+                $temp_put_data['nickname']           = ($v['user']['nickname'] ?? '-') . "\t";
+                $temp_put_data['phone']              = ($v['user']['phone'] ?? '-') . "\t";
+                $temp_put_data['t_nickname']         = ($v['twitter']['nickname'] ?? '-') . "\t";
+                $temp_put_data['t_phone']            = ($v['twitter']['phone'] ?? '-') . "\t";
+                $temp_put_data['pay_time']           = $v['pay_time'] ?? '-';
+                $temp_put_data['relation_title']     = $v['relation_live_info']['title'] ?? '-';
+                $temp_put_data['live_title']         = $v['from_live_info']['title'] ?? '-';
+                $temp_put_data['is_wechat']          = $v['is_wechat'] === 1 ? '未加' : '已加';
+
+                if ($this->user['role_id'] === 1){
+                    $temp_put_data['follow_user_userid'] = ($v['admin_wechat']->follow_user_userid ?? '-') . "\t";
+                    $temp_put_data['follow_user']        = ($v['admin_wechat']->name ?? '-') . "\t";
+                }
 
                 mb_convert_variables('GBK', 'UTF-8', $temp_put_data);
                 fputcsv($fp, $temp_put_data);

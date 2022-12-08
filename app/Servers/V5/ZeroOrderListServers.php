@@ -4,8 +4,11 @@
 namespace App\Servers\V5;
 
 
+use App\Models\LiveCrm\CrmLiveWaiterWechat;
 use App\Models\OrderZero;
+use App\Models\User\UserWechat;
 use App\Servers\LiveInfoServers;
+use Illuminate\Support\Facades\DB;
 
 class ZeroOrderListServers
 {
@@ -13,7 +16,7 @@ class ZeroOrderListServers
     {
         $query = OrderZero::query()
             ->with([
-                'user:id,phone,nickname',
+                'user:id,phone,nickname,unionid',
                 'twitter:id,phone,nickname',
                 'relationLiveInfo:id,title,cover_img,price,is_zero',
                 'fromLiveInfo:id,title,cover_img,price,is_zero',
@@ -93,9 +96,32 @@ class ZeroOrderListServers
         $query->orderBy('id', 'desc');
 
         if ($is_excel) {
-            return $query->offset(($page - 1) * $size)->limit($size)->get();
+            $excel_list =  $query->offset(($page - 1) * $size)->limit($size)->get();
+            if ($this_user['role_id'] == 1) {
+                foreach ($excel_list as $v){
+                    if ($v->is_wechat === 2 &&$v->user->unionid ){
+                        $v->admin_wechat = $this->getOldBindWechatWaiter($v->user->unionid);
+                    }
+                }
+            }
+            return $excel_list;
         }
 
         return $query->paginate($size);
+    }
+
+    public function getOldBindWechatWaiter($unionid)
+    {
+        return  DB::table('nlsg_user_wechat as uw')
+            ->join('crm_live_waiter_wechat as ww',
+                'uw.follow_user_userid', '=', 'ww.follow_user_userid'
+            )
+            ->join('crm_admin_user as au','ww.admin_id','=','au.id')
+            ->where('uw.unionid', '=', $unionid)
+            ->select([
+                'ww.follow_user_userid', 'uw.follow_user_createtime as bind_admin_time',
+                'ww.admin_id','au.name'
+            ])
+            ->first();
     }
 }

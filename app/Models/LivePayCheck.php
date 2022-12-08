@@ -6,7 +6,7 @@ class LivePayCheck extends Base
 {
     protected $table = 'nlsg_live_pay_check';
     static $table_name = 'nlsg_live_pay_check';
-    protected $fillable = ['live_id', 'teacher_id', 'user_id', 'order_id', 'ordernum','is_zero'];
+    protected $fillable = ['live_id', 'teacher_id', 'user_id', 'order_id', 'ordernum', 'is_zero'];
 
     /**
      * @param int $user_id 用户id
@@ -56,6 +56,8 @@ class LivePayCheck extends Base
             return ['code' => false, 'msg' => '没有预约权限'];
         }
 
+        $user_info = User::query()->where('id', '=', $user_id)->select(['id', 'phone'])->first();
+
         $now = date('Y-m-d H:i:s');
 
         $res = Subscribe::query()
@@ -68,6 +70,13 @@ class LivePayCheck extends Base
                 'end_time'    => $now,
                 'pay_time'    => $now,
                 'remark'      => '基本库转入',
+            ]);
+
+        LiveCountDown::query()
+            ->firstOrCreate([
+                'live_id' => $live_id,
+                'user_id' => $user_id,
+                'phone'   => $user_info->phone,
             ]);
 
         if ($res) {
