@@ -239,7 +239,7 @@ class XiaoeTechServers
         $baseUser=User::query()->where('phone',$phone)->first();
         if(!$baseUser){
             $baseUser=new User();
-            $baseUser->phone=$phone;
+            $baseUser->phone=strval($phone);
             $baseUser->nickname= substr_replace($phone,'****',3,4);
             $res=$baseUser->save();
             if(!$res){
@@ -265,11 +265,11 @@ class XiaoeTechServers
         $res=self::curlPost('https://api.xiaoe-tech.com/xe.user.register/1.0.0',$paratms);
         if($res['body']['code']!=0){
             $this->err_msg=$res['body']['msg'];
-            return false;
+            return $res['body']['msg'];
         }
 
         if(empty($res['body']['data']['user_id'])){
-            return false;
+            return 'user_id为空';
         }
 
         return $res['body']['data'];
@@ -305,7 +305,7 @@ class XiaoeTechServers
             $res=self::curlPost('https://api.xiaoe-tech.com/xe.user.batch_by_user_id.get/1.0.0',$paratms);
             if($res['body']['code']!=0){
                 $this->err_msg=$res['body']['msg'];
-                return false;
+                return $res['body']['msg'];
             }
 
             $return_list=$res['body']['data']['list']??[];
@@ -354,7 +354,7 @@ class XiaoeTechServers
             $res=self::curlPost('https://api.xiaoe-tech.com/xe.distributor.list.get/1.0.0',$paratms);
             if($res['body']['code']!=0){
                 $this->err_msg=$res['body']['msg'];
-                return false;
+                return $res['body']['msg'];
             }
 
             $return_list=$res['body']['data']['return_list']??[];
@@ -500,7 +500,7 @@ class XiaoeTechServers
 
         $XeDistributor=XeDistributor::query()->where('xe_user_id',$user_id)->first();
         if($XeDistributor){
-            return '合伙人已存在';
+            return ['user_id'=>$user_id];
         }
 
         $paratms=[
@@ -509,9 +509,9 @@ class XiaoeTechServers
         ];
 
         $res=self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.add/1.0.0',$paratms);
-        if($res['body']['code']!=0){
+        if($res['body']['code']!=0 && $res['body']['code']!=20003){
             $this->err_msg=$res['body']['msg'];
-            return false;
+            return $res['body']['msg'];
         }
 
         $XeDistributor = new XeDistributor();
@@ -521,9 +521,82 @@ class XiaoeTechServers
         $XeDistributor->group_name='合伙人';
         $XeDistributor->save();
 
+        return ['user_id'=>$user_id];
+
+    }
+
+    /**
+     * 批量添加推广员
+     */
+    public function distributor_member_batch_add($phone_arr,$parent_phone=''){
+
+        if(count($phone_arr) >100){
+            return '最多添加100个';
+        }
+
+        $user_id_arr=[];
+        foreach ($phone_arr as $phone){
+            $res=$this->distributor_member_add($phone);
+            if(!checkRes($res)){
+                return $res;
+            }
+            $user_id_arr[]=$res['user_id'];
+        }
+
+        if(empty($parent_phone)){
+            return $user_id_arr;
+        }
+
+        $res=$this->distributor_member_add($parent_phone);
+        if(!checkRes($res)){
+            return $res;
+        }
+        $parent_user_id=$res['user_id'];
+        foreach ($user_id_arr as $user_id){
+            $res=$this->distributor_superior_set($user_id,$parent_user_id);
+            if(!checkRes($res)){
+                return $res;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 推广员上级
+     * $phone 推广员
+     */
+    public function distributor_superior_set($user_id,$parent_user_id){
+
+
+        $XeDistributor=XeDistributor::query()->where('xe_user_id',$user_id)->first();
+        if(!$XeDistributor){
+            return '推广员不已存在';
+        }
+
+        $XeParentDistributor=XeDistributor::query()->where('xe_user_id',$parent_user_id)->first();
+        if(!$XeParentDistributor){
+            return '上级推广员不已存在';
+        }
+
+        $paratms=[
+            'access_token'=>$this->access_token,
+            'user_id'=>$user_id,
+            'parent_user_id'=>$parent_user_id,
+        ];
+
+        $res=self::curlPost('https://api.xiaoe-tech.com/xe.distributor.superior.set/1.0.0',$paratms);
+        if($res['body']['code']!=0){
+            $this->err_msg=$res['body']['msg'];
+            return false;
+        }
+
+        $XeDistributor->xe_parent_user_id=$parent_user_id;
+        $XeDistributor->save();
+
         return true;
 
     }
+
 
     /**
      * 发送get请求
