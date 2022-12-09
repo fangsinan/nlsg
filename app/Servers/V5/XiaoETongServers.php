@@ -5,6 +5,7 @@ namespace App\Servers\V5;
 
 
 use App\Models\XiaoeTech\XeDistributor;
+use Illuminate\Support\Facades\Validator;
 
 class XiaoETongServers
 {
@@ -15,8 +16,6 @@ class XiaoETongServers
                 'id', 'xe_user_id', 'xe_parent_user_id', 'nickname',
                 'underling_number', 'total_amount', 'status', 'expire_time', 'created_at',
             ]);
-
-        $query->where('status', '=', 1);
 
         $query->with([
             'userInfo:user_id,xe_user_id,nickname,name,phone,is_seal',
@@ -61,6 +60,9 @@ class XiaoETongServers
                     'alias'    => 'expire_time',
                     'operator' => '<=',
                 ],
+                [
+                    'field' => 'status',
+                ],
             ]
         );
 
@@ -86,11 +88,42 @@ class XiaoETongServers
 
     public function vipAdd($params, $admin)
     {
-        return [__LINE__];
+        $validator = Validator::make($params, [
+            'phone' => 'required|string|size:11',
+        ], [
+            'phone.required' => '手机号不能为空',
+            'phone.size'     => '手机号长度应为11',
+        ]);
+
+        if ($validator->fails()) {
+            return $validator->messages()->first();
+        }
+
+        $xts = new XiaoeTechServers();
+        $res = $xts->distributor_member_add($params['phone']);
+
+        if ($res === true) {
+            return ['code' => true, 'msg' => '成功'];
+        } else {
+            return ['code' => false, 'msg' => is_bool($res) ? '成功' : $res];
+        }
     }
 
     public function vipBindUser($params, $admin)
     {
+        $validator = Validator::make($params, [
+            'phone' => 'required|string|size:11',
+        ], [
+            'phone.required' => '手机号不能为空',
+            'phone.size'     => '手机号长度应为11',
+        ]);
+
+        if ($validator->fails()) {
+            return $validator->messages()->first();
+        }
+
+
+
         return [__LINE__];
     }
 
