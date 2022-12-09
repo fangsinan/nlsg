@@ -615,7 +615,7 @@ class FeedbackServers
         if ($begin) {
             $begin = date('Y-m-d', strtotime($begin));
         } else {
-            $begin = date('Y-m-d', strtotime('-7 days'));
+            $begin = date('Y-m-d', strtotime('-6 days'));
         }
 
         if ($end) {
