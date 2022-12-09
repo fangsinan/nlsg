@@ -357,7 +357,7 @@ class TalkServers
     {
         return TalkUserStatistics::query()
             ->select([
-                'user_id', 'msg_count','updated_at','is_finish'
+                'user_id', 'msg_count', 'updated_at', 'is_finish'
             ])
             ->with([
                 'userInfo:id,nickname,phone'
@@ -579,7 +579,10 @@ class TalkServers
                 $check_id->status = 2;
                 break;
             case 'del':
-                $check_id->status = 3;
+                $check_id->status          = 3;
+                $check_id->is_finish       = 2;
+                $check_id->finish_at       = date('Y-m-d H:i:s');
+                $check_id->finish_admin_id = $admin['id'];
                 break;
         }
 
