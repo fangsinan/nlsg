@@ -626,9 +626,9 @@ class XiaoeTechServers
         }
 
         $XeDistributorCustomer=XeDistributorCustomer::query()->where('xe_user_id',$parent_user_id)->where('sub_user_id',$user_id)->first();
-//        if($XeDistributorCustomer){
-//            return '客户已绑定';
-//        }
+        if($XeDistributorCustomer){
+            return '客户已绑定';
+        }
 
         $paratms=[
             'access_token'=>$this->access_token,
