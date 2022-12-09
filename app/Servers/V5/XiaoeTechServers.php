@@ -250,7 +250,7 @@ class XiaoeTechServers
         //查询小鹅通用户
         $XeUser=XeUser::query()->where('phone',$phone)->first();
         if($XeUser){
-            return ['user_id'=>$XeUser->xe_user_id];
+            return ['user_id'=>$XeUser->xe_user_id,'created_at'=>$XeUser->user_created_at];
         }
 
         if(empty($baseUser->headimg)){
@@ -506,7 +506,7 @@ class XiaoeTechServers
 
         $XeDistributor=XeDistributor::query()->where('xe_user_id',$user_id)->first();
         if($XeDistributor){
-            return ['user_id'=>$user_id];
+            return ['user_id'=>$user_id,'created_at'=>$XeDistributor->created_at];
         }
 
         $paratms=[
@@ -527,7 +527,7 @@ class XiaoeTechServers
         $XeDistributor->group_name='合伙人';
         $XeDistributor->save();
 
-        return ['user_id'=>$user_id];
+        return ['user_id'=>$user_id,'created_at'=>date('Y-m-d H:i:s')];
 
     }
 

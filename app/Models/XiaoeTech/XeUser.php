@@ -27,7 +27,8 @@ class XeUser extends Base
             ->where('is_default','=',1);
     }
 
-    public function vipBindInfo(){
+    public function vipBindInfo(): HasOne
+    {
         return $this->hasOne(VipUserBind::class,'son','phone')
             ->where('status','=',1);
     }
