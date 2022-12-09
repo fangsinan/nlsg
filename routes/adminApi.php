@@ -470,6 +470,15 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
 
         Route::post('order/zero_order_list', 'OrderController@zeroOrderList');
         Route::get('order/zero_order_list_excel', 'OrderController@zeroOrderListExcel');
+
+
+        //⬇⬇⬇⬇⬇小鹅通部分⬇⬇⬇⬇⬇
+        Route::post('xet/vip_list','XiaoETongController@vipList');
+        Route::post('xet/vip_add','XiaoETongController@vipAdd');
+        Route::post('xet/vip_bind_user','XiaoETongController@vipBindUser');
+        Route::post('xet/vip_info','XiaoETongController@vipInfo');
+        Route::post('xet/order_list','XiaoETongController@orderList');
+        //⬆⬆⬆⬆⬆小鹅通部分⬆⬆⬆⬆⬆
     });
 
 
