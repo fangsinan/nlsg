@@ -147,6 +147,17 @@
 
 	}
 
+    /**
+     * 快速格式化时间为Y-m-d H:i:s格式
+     * @param string $time
+     * @return false|string
+     */
+    function times($time = '')
+    {
+        $time = $time ? $time : time();
+        return date("Y-m-d H:i:s", $time);
+    }
+
 	/**
 	 * 秒数 转换成 1:01
 	 */

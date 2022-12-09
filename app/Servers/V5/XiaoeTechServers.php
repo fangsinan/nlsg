@@ -4,6 +4,9 @@ namespace App\Servers\V5;
 
 use App\Models\User;
 use App\Models\XiaoeTech\XeDistributor;
+use App\Models\XiaoeTech\XeDistributorCustomer;
+use App\Models\XiaoeTech\XeOrder;
+use App\Models\XiaoeTech\XeOrderGoods;
 use App\Models\XiaoeTech\XeUser;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
@@ -45,9 +48,12 @@ class XiaoeTechServers
         return $res['body']['data']['access_token'];
     }
 
+
+    public function test(){
+        var_dump($this->access_token);
+    }
     /**
-     * @return string
-     * (二期)获取小鹅通订单 todo
+     * 获取小鹅通订单
      */
     public function sync_order_list(){
 
@@ -55,32 +61,169 @@ class XiaoeTechServers
             return $this->err_msg;
         }
 
-        $paratms=[
-            'access_token'=>$this->access_token,
-            'page'=>1,
-            'page_size'=>1,
-        ];
+        do {
 
-        $res=self::curlPost('https://api.xiaoe-tech.com/xe.ecommerce.order.list/1.0.0',$paratms);
-        if($res['body']['code']!=0){
-            $this->err_msg=$res['body']['msg'];
-            return false;
-        }
+            $redis_page_index_key='xe_sync_order_list_page_index';
+            $page_index=Redis::get($redis_page_index_key)??1;
+            $page_size=100;
+            $paratms=[
+                'access_token'=>$this->access_token,
+                'page'=>intval($page_index),
+                'page_size'=>intval($page_size),
+            ];
 
-        $list=$res['body']['data']['list'];
+            $res=self::curlPost('https://api.xiaoe-tech.com/xe.ecommerce.order.list/1.0.0',$paratms);
+            if($res['body']['code']!=0){
+                $this->err_msg=$res['body']['msg'];
+                return false;
+            }
 
-        foreach ($list as $order){
+            $return_list=$res['body']['data']['list']??[];
 
-            $order_info=$order['order_info']??[];
-            $good_list=$order['good_list']??[];
-            $buyer_info=$order['buyer_info']??[];
-            $payment_info=$order['payment_info']??[];
-            $price_info=$order['price_info']??[];
-            $ship_info=$order['ship_info']??[];
-            var_dump($order_info);die;
-        }
+            if(empty($return_list)){
+                Redis::set($redis_page_index_key,1);
+                return false;
+            }else{
+                Redis::set($redis_page_index_key,$page_index+1);
+            }
 
-        var_dump($list);die;
+            foreach ($return_list as $order){
+
+                $order_info=$order['order_info']??[];
+                $good_list=$order['good_list']??[];
+                $buyer_info=$order['buyer_info']??[];
+                $payment_info=$order['payment_info']??[];
+                $price_info=$order['price_info']??[];
+                $ship_info=$order['ship_info']??[];
+
+                //保存小鹅通用户
+                $XeUser=XeUser::query()->where('xe_user_id',$order_info['user_id'])->first();
+                if(!$XeUser){
+                    $XeUser =new XeUser();
+                    $XeUser->xe_user_id=$order_info['user_id'];
+                    $XeUser->avatar=$buyer_info['avatar_url'];
+                    $XeUser->nickname=$buyer_info['nickname'];
+                    $XeUser->phone=$buyer_info['phone_number'];
+                    $XeUser->is_sync=1;
+                    $XeUser->save();
+                }
+
+                //保存推广员用户
+                if($order_info['share_user_id']){
+                    $XeShareUser=XeUser::query()->where('xe_user_id',$order_info['share_user_id'])->first();
+                    if(!$XeShareUser){
+                        $XeShareUser =new XeUser();
+                        $XeShareUser->xe_user_id=$order_info['share_user_id'];
+                        $XeShareUser->is_sync=1;
+                        $XeShareUser->save();
+                    }
+                }
+
+                //查询订单是否存在
+                $XeOrder=XeOrder::query()->where('order_id',$order_info['order_id'])->first();
+                if(!$XeOrder){
+                    $XeOrder = new XeOrder();
+                }
+
+                foreach ($order_info as $key=>$val){
+
+                    if($val==='0000-00-00 00:00:00'){
+                        $val=null;
+                    }
+
+                    if(in_array($key,[
+                        'actual_fee', 'aftersale_show_state', 'aftersale_show_state_time', 'app_id', 'channel_bus_id', 'channel_type', 'check_state',
+                        'created_time', 'deduct_amount', 'discount_amount', 'freight_actual_price', 'freight_original_price', 'goods_buy_num', 'goods_name',
+                        'goods_original_total_price', 'goods_spu_sub_type', 'goods_spu_type', 'modified_amount', 'order_close_type', 'order_id', 'order_state',
+                        'order_state_time', 'order_type', 'pay_state', 'pay_state_time', 'pay_type', 'refund_fee', 'refund_time', 'relation_order_appid',
+                        'relation_order_id', 'relation_order_type', 'settle_state', 'settle_state_time', 'share_type', 'share_user_id', 'ship_way_choose_type',
+                        'sub_order_type', 'trade_id', 'update_time', 'use_collection', 'user_id', 'wx_app_type'])){
+                        switch ($key){
+                            case 'user_id':
+                                $XeOrder->xe_user_id=$val;
+                                break;
+                            case 'created_time':
+                                $XeOrder->xe_created_time=$val;
+                                break;
+                            case 'update_time':
+                                $XeOrder->xe_update_time=$val;
+                                break;
+                            default:
+                                $XeOrder->$key=$val;
+                        }
+                    }
+                }
+
+                foreach ($buyer_info as $k=>$v){
+                    if(in_array($k,['nickname','avatar_url','phone_number'])){
+                        $XeOrder->$k=$v;
+                    }
+                }
+
+                foreach ($payment_info as $k=>$v){
+                    if(in_array($k,['third_order_id','out_order_id'])) {
+                        $XeOrder->$k = $v;
+                    }
+                }
+                foreach ($price_info as $k=>$v){
+                    if(in_array($k,['actual_price','freight_modified_price','freight_price','origin_price','total_modified_amount','total_price'])) {
+                        $XeOrder->$k = $v;
+                    }
+                }
+                foreach ($ship_info as $k=>$v){
+                    if(in_array($k,[ "city","company","confirm_time","county","detail","express_id","invalid_time","phone","province","receiver","remark","ship_time","user_id"])){
+                        if(in_array($k,['confirm_time','ship_time','invalid_time']) && empty($v)){
+                            $v=null;
+                        }
+                        $key='ship_info_'.$k;
+                        $XeOrder->$key=$v;
+                    }
+                }
+                $XeOrder->save();
+
+                foreach ($good_list as $good){
+
+
+                    $XeOrderGoods=XeOrderGoods::query()->where('order_id',$order_info['order_id'])->where('sku_id',$good['sku_id'])->first();
+                    if(!$XeOrderGoods){
+                        $XeOrderGoods = new XeOrderGoods();
+                    }
+
+                    $discounts_info=$good['discounts_info']??[];
+                    unset($good['discounts_info']);
+
+                    $XeOrderGoods->xe_user_id=$order_info['user_id'];
+                    $XeOrderGoods->order_id=$order_info['order_id'];
+                    $XeOrderGoods->discount_amount_total=$discounts_info['discount_amount_total']??0;
+                    $XeOrderGoods->discount_count=$discounts_info['discount_count']??0;
+                    $XeOrderGoods->discount_desc=$discounts_info['discount_detail']['discount_desc']??'';
+                    $XeOrderGoods->discount_id=$discounts_info['discount_detail']['discount_id']??'';
+                    $XeOrderGoods->discount_name=$discounts_info['discount_detail']['discount_name']??'';
+                    $XeOrderGoods->discount_type=$discounts_info['discount_detail']['discount_type']??'';
+                    $XeOrderGoods->discount_price=$discounts_info['discount_detail']['discount_price']??0;
+
+                    foreach ($good as $k=>$v){
+                        if(in_array($k,[
+                            "buy_num","check_state","discounts_info","expire_desc","expire_end","expire_start",
+                            "goods_desc","goods_image","goods_name","goods_sn","goods_spec_desc","period_type",
+                            "refund_state","refund_state_desc","relation_goods_id","relation_goods_type","relation_goods_type_desc",
+                            "resource_id","resource_type","ship_state","ship_state_desc","sku_id","sku_spec_code","spu_id","spu_type","total_price","unit_price"])){
+
+                            if($v==='0000-00-00 00:00:00'){
+                                $v=null;
+                            }
+                            $XeOrderGoods->$k=$v;
+                        }
+
+                    }
+
+                    $XeOrderGoods->save();
+                }
+            }
+
+            sleep(1);
+
+        } while ($return_list);
     }
 
     /**
@@ -155,8 +298,8 @@ class XiaoeTechServers
             $paratms=[
                 'user_id_list'=>$user_ids,
                 'access_token'=>$this->access_token,
-                'page'=>$page_index,
-                'page_size'=>$page_size,
+                'page'=>intval($page_index),
+                'page_size'=>intval($page_size),
             ];
 
             $res=self::curlPost('https://api.xiaoe-tech.com/xe.user.batch_by_user_id.get/1.0.0',$paratms);
@@ -179,6 +322,8 @@ class XiaoeTechServers
                     $XeUser->wx_union_id=$user['wx_union_id'];
                     $XeUser->wx_open_id=$user['wx_open_id'];
                     $XeUser->wx_app_open_id=$user['wx_app_open_id'];
+                    $XeUser->is_sync=2;
+                    $XeUser->sync_time=times();
                     $XeUser->save();
                 }
             }
@@ -202,8 +347,8 @@ class XiaoeTechServers
             $page_size=50;
             $paratms=[
                 'access_token'=>$this->access_token,
-                'page_index'=>$page_index,
-                'page_size'=>$page_size,
+                'page_index'=>intval($page_index),
+                'page_size'=>intval($page_size),
             ];
 
             $res=self::curlPost('https://api.xiaoe-tech.com/xe.distributor.list.get/1.0.0',$paratms);
@@ -255,6 +400,90 @@ class XiaoeTechServers
     }
 
     /**
+     * 推广员客户列表
+     */
+    public function sync_distributor_customer_list(){
+
+        if(!$this->access_token){
+            return $this->err_msg;
+        }
+
+        //获取推广员列表
+        $XeDistributorList=XeDistributor::query()->where('is_sync_customer',1)->get();
+
+        foreach ($XeDistributorList as $XeDistributor){
+            do {
+
+                $redis_page_index_key='xe_sync_distributor_customer_list_page_index';
+                $page_index=Redis::get($redis_page_index_key)??1;
+                $page_size=100;
+                $paratms=[
+                    'access_token'=>$this->access_token,
+                    'user_id'=>$XeDistributor->xe_user_id,
+                    'page_index'=>intval($page_index),
+                    'page_size'=>intval($page_size),
+                ];
+
+                $res=self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.sub_customer/1.0.0',$paratms);
+                if($res['body']['code']!=0){
+                    Redis::set($redis_page_index_key,1);
+                    $this->err_msg=$res['body']['msg'];
+                    break;
+                }
+
+                $return_list=$res['body']['data']['list']??[];
+
+                if(empty($return_list)){
+                    Redis::set($redis_page_index_key,1);
+                    break;
+                }else{
+                    Redis::set($redis_page_index_key,$page_index+1);
+                }
+
+                foreach ($return_list as $customer){
+
+                    //保存小鹅通用户
+                    $XeUser=XeUser::query()->where('xe_user_id',$customer['sub_user_id'])->first();
+                    if(!$XeUser){
+                        $XeUser =new XeUser();
+                        $XeUser->xe_user_id=$customer['sub_user_id'];
+                        $XeUser->avatar=$customer['wx_avatar'];
+                        $XeUser->nickname=$customer['wx_nickname'];
+                        $XeUser->is_sync=1;
+                        $XeUser->save();
+                    }
+
+                    //保存推广员客户
+                    $XeDistributorCustomer=XeDistributorCustomer::query()->where('xe_user_id',$XeDistributor->xe_user_id)->first();
+                    if(!$XeDistributorCustomer){
+                        $XeDistributorCustomer =new XeDistributorCustomer();
+                    }
+
+                    $XeDistributorCustomer->xe_user_id=$XeDistributor->xe_user_id;
+                    $XeDistributorCustomer->sub_user_id=$customer['sub_user_id'];
+                    $XeDistributorCustomer->wx_nickname=$customer['wx_nickname'];
+                    $XeDistributorCustomer->wx_avatar=$customer['wx_avatar'];
+                    $XeDistributorCustomer->order_num=$customer['order_num'];
+                    $XeDistributorCustomer->sum_price=$customer['sum_price'];
+                    $XeDistributorCustomer->bind_time=$customer['bind_time'];
+                    $XeDistributorCustomer->status=$customer['status'];
+                    $XeDistributorCustomer->status_text=$customer['status_text'];
+                    $XeDistributorCustomer->remain_days=$customer['remain_days'];
+                    $XeDistributorCustomer->expired_at=$customer['expired_at'];
+                    $XeDistributorCustomer->is_editable=$customer['is_editable'];
+                    $XeDistributorCustomer->is_anonymous=$customer['is_anonymous']?1:0;
+                    $XeDistributorCustomer->save();
+
+                }
+
+                sleep(1);
+
+            } while ($return_list);
+        }
+
+    }
+
+    /**
      * 新增推广员
      */
     public function distributor_member_add($phone){
@@ -295,6 +524,7 @@ class XiaoeTechServers
         return true;
 
     }
+
     /**
      * 发送get请求
      * @param
