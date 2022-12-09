@@ -1113,6 +1113,7 @@ class OrderController extends ControllerBackend
         $pay_type = $request->get('pay_type');
         $os_type = $request->get('os_type');
         $sort = $request->get('sort');
+        $size = $request->get('size',10);
         $query = Order::with(
             [
                 'user:id,nickname,phone'
@@ -1165,7 +1166,7 @@ class OrderController extends ControllerBackend
             'created_at', 'status')
             ->where('type', 16)
             ->orderBy('id', $direction)
-            ->paginate(10)
+            ->paginate($size)
             ->toArray();
 
         return success($lists);
