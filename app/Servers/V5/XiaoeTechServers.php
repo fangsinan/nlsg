@@ -247,6 +247,12 @@ class XiaoeTechServers
             }
         }
 
+        //查询小鹅通用户
+        $XeUser=XeUser::query()->where('phone',$phone)->first();
+        if($XeUser){
+            return ['user_id'=>$XeUser->xe_user_id];
+        }
+
         if(empty($baseUser->headimg)){
             $avatar=config('env.IMAGES_URL').'/image/202009/13f952e04c720a550193e5655534be86.jpg';
         }else{
@@ -454,7 +460,7 @@ class XiaoeTechServers
                     }
 
                     //保存推广员客户
-                    $XeDistributorCustomer=XeDistributorCustomer::query()->where('xe_user_id',$XeDistributor->xe_user_id)->first();
+                    $XeDistributorCustomer=XeDistributorCustomer::query()->where('xe_user_id',$XeDistributor->xe_user_id)->where('sub_user_id',$customer['sub_user_id'])->first();
                     if(!$XeDistributorCustomer){
                         $XeDistributorCustomer =new XeDistributorCustomer();
                     }
@@ -553,19 +559,19 @@ class XiaoeTechServers
         }
         $parent_user_id=$res['user_id'];
         foreach ($user_id_arr as $user_id){
-            $res=$this->distributor_superior_set($user_id,$parent_user_id);
+            $res=$this->distributor_superior_set($parent_user_id,$user_id);
             if(!checkRes($res)){
                 return $res;
             }
         }
+
         return true;
     }
 
     /**
      * 推广员上级
-     * $phone 推广员
      */
-    public function distributor_superior_set($user_id,$parent_user_id){
+    public function distributor_superior_set($parent_user_id,$user_id){
 
 
         $XeDistributor=XeDistributor::query()->where('xe_user_id',$user_id)->first();
@@ -593,6 +599,60 @@ class XiaoeTechServers
         $XeDistributor->xe_parent_user_id=$parent_user_id;
         $XeDistributor->save();
 
+        return true;
+
+    }
+
+    /**
+     * 推广员绑定客户
+     */
+    public function distributor_member_bind($parent_user_id,$user_id='',$phone=''){
+
+        if($phone){
+            $res=$this->user_register($phone);
+            if(!checkRes($res)){
+                return $res;
+            }
+            $user_id=$res['user_id']??'';
+        }
+
+        if(empty($user_id)){
+            return '客户不存在';
+        }
+
+        $XeDistributor=XeDistributor::query()->where('xe_user_id',$parent_user_id)->first();
+        if(!$XeDistributor){
+            return '推广员不已存在';
+        }
+
+        $XeDistributorCustomer=XeDistributorCustomer::query()->where('xe_user_id',$parent_user_id)->where('sub_user_id',$user_id)->first();
+//        if($XeDistributorCustomer){
+//            return '客户已绑定';
+//        }
+
+        $paratms=[
+            'access_token'=>$this->access_token,
+            'user_id'=>$user_id,
+            'parent_user_id'=>$parent_user_id,
+        ];
+
+        $res=self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.bind/1.0.0',$paratms);
+        if($res['body']['code']!=0){
+            $this->err_msg=$res['body']['msg'];
+            return false;
+        }
+
+        if($XeDistributorCustomer){
+            $XeDistributorCustomer= new XeDistributorCustomer();
+        }
+        $XeDistributorCustomer->xe_user_id=$parent_user_id;
+        $XeDistributorCustomer->sub_user_id=$user_id;
+        $XeDistributorCustomer->status=1;
+        $XeDistributorCustomer->status_text='绑定中';
+        $XeDistributorCustomer->remain_days=365;
+        $XeDistributorCustomer->bind_time=times();
+        $XeDistributorCustomer->expired_at=times(strtotime('+1 years'));
+        $XeDistributorCustomer->save();
         return true;
 
     }
