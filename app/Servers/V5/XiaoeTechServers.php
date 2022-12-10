@@ -617,17 +617,21 @@ class XiaoeTechServers
         }
 
         if(empty($user_id)){
-            return '客户不存在';
+            return ['code'=>false,'msg'=>'客户不存在'];
         }
 
         $XeDistributor=XeDistributor::query()->where('xe_user_id',$parent_user_id)->first();
         if(!$XeDistributor){
-            return '推广员不已存在';
+            return ['code'=>false,'msg'=>'推广员不存在'];
         }
 
-        $XeDistributorCustomer=XeDistributorCustomer::query()->where('xe_user_id',$parent_user_id)->where('sub_user_id',$user_id)->first();
+        $XeDistributorCustomer=XeDistributorCustomer::query()
+            ->where('xe_user_id',$parent_user_id)
+            ->where('sub_user_id',$user_id)
+            ->first();
+
         if($XeDistributorCustomer){
-            return '客户已绑定';
+            return ['code'=>true,'msg'=>'成功','created_at'=>$XeDistributorCustomer->bind_time];
         }
 
         $paratms=[
@@ -639,12 +643,10 @@ class XiaoeTechServers
         $res=self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.bind/1.0.0',$paratms);
         if($res['body']['code']!=0){
             $this->err_msg=$res['body']['msg'];
-            return false;
+            return ['code'=>false,'msg'=>$this->err_msg];
         }
 
-        if($XeDistributorCustomer){
-            $XeDistributorCustomer= new XeDistributorCustomer();
-        }
+        $XeDistributorCustomer= new XeDistributorCustomer();
         $XeDistributorCustomer->xe_user_id=$parent_user_id;
         $XeDistributorCustomer->sub_user_id=$user_id;
         $XeDistributorCustomer->status=1;
@@ -653,7 +655,7 @@ class XiaoeTechServers
         $XeDistributorCustomer->bind_time=times();
         $XeDistributorCustomer->expired_at=times(strtotime('+1 years'));
         $XeDistributorCustomer->save();
-        return true;
+        return ['code'=>true,'msg'=>'成功','created_at'=>times()];
 
     }
 

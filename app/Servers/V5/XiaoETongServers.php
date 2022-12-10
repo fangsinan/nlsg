@@ -196,6 +196,8 @@ class XiaoETongServers
     /**定时任务**/
     public function runUserJobParent(): bool
     {
+        $xts = new XiaoeTechServers();
+
         while (true) {
 
             $list = XeUserJob::query()
@@ -209,8 +211,6 @@ class XiaoETongServers
             }
 
             $list = $list->toArray();
-
-            $xts = new XiaoeTechServers();
 
             foreach ($list as $v) {
 
@@ -254,6 +254,8 @@ class XiaoETongServers
 
     public function runUserJobSon(): bool
     {
+        $xts = new XiaoeTechServers();
+
         while (true) {
 
             $list = XeUserJob::query()
@@ -267,8 +269,6 @@ class XiaoETongServers
             }
 
             $list = $list->toArray();
-
-            $xts = new XiaoeTechServers();
 
             foreach ($list as $v) {
 
@@ -310,24 +310,52 @@ class XiaoETongServers
 
     }
 
-    public function runUserJobBind()
+    public function runUserJobBind(): bool
     {
+        $xts = new XiaoeTechServers();
 
-        $list = XeUserJob::query()
-            ->where('bind_job','=',1)
-            ->select(['id','parent_phone','parent_xe_user_id','son_phone','son_xe_user_id'])
-            ->limit(100)
-            ->get();
+        while (true) {
+            $list = XeUserJob::query()
+                ->where('bind_job', '=', 1)
+                ->where('parent_xe_user_id', '<>', '')
+                ->where('son_xe_user_id', '<>', '')
+                ->select(['id', 'parent_phone', 'parent_xe_user_id', 'son_phone', 'son_xe_user_id'])
+                ->limit(1)
+                ->get();
 
-        if ($list->isEmpty()) {
-            exit();
+            if ($list->isEmpty()) {
+                break;
+            }
+
+            $list = $list->toArray();
+
+            foreach ($list as $v) {
+                $temp_res = $xts->distributor_member_bind(
+                    $v['parent_xe_user_id'],
+                    $v['son_xe_user_id']
+                );
+                if ($temp_res['code'] === true) {
+                    XeUserJob::query()
+                        ->where('id', '=', $v['id'])
+                        ->update([
+                            'bind_job'      => 2,
+                            'bind_job_time' => $temp_res['created_at'] ?? date('Y-m-d H:i:s'),
+                        ]);
+                } else {
+                    $err_array = [
+                        'bind_job'     => 3,
+                        'bind_job_err' => $temp_res['msg'] ?? '',
+                    ];
+                    XeUserJob::query()
+                        ->where('id', '=', $v['id'])
+                        ->update($err_array);
+                }
+            }
+
+            sleep(1);
         }
 
-        $list = $list->toArray();
-
-        dd($list);
-
-
+        return true;
 
     }
 
