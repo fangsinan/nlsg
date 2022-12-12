@@ -33,4 +33,9 @@ class XeUser extends Base
             ->where('status','=',1);
     }
 
+    public function distributorInfo(): HasOne
+    {
+        return $this->hasOne(XeDistributor::class,'xe_user_id','xe_user_id');
+    }
+
 }

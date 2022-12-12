@@ -5,6 +5,7 @@ namespace App\Servers\V5;
 
 
 use App\Models\XiaoeTech\XeDistributor;
+use App\Models\XiaoeTech\XeDistributorCustomer;
 use App\Models\XiaoeTech\XeUser;
 use App\Models\XiaoeTech\XeUserJob;
 use Illuminate\Support\Facades\Validator;
@@ -183,8 +184,59 @@ class XiaoETongServers
 
     public function vipInfo($params, $admin)
     {
-        $this->runUserJobBind();
-        return [__LINE__];
+        $validator = Validator::make(
+            $params,
+            [
+                'xe_user_id' => 'required|string|exists:nlsg_xe_user',
+            ],
+            [
+                'xe_user_id.required' => '用户id不能为空',
+                'xe_user_id.exists'   => '用户不存在',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return $validator->messages()->first();
+        }
+
+        return XeUser::query()
+            ->where('xe_user_id','=',$params['xe_user_id'])
+            ->select([
+                'id','user_id','xe_user_id','nickname','name','avatar','gender','city','province','country',
+                'phone','birth','address','company','user_created_at'
+            ])
+            ->with([
+                'userInfo:id,phone,nickname,headimg,is_author,status,is_test_pay',
+                'distributorInfo',
+            ])
+            ->first();
+    }
+
+    public function sonList($params,$admin){
+        $validator = Validator::make(
+            $params,
+            [
+                'xe_user_id' => 'required|string|exists:nlsg_xe_user',
+            ],
+            [
+                'xe_user_id.required' => '用户id不能为空',
+                'xe_user_id.exists'   => '用户不存在',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return $validator->messages()->first();
+        }
+
+        return XeDistributorCustomer::query()
+            ->select([
+                'id','xe_user_id','sub_user_id','order_num','sum_price','bind_time','status','status_text',
+                'remain_days','expired_at','is_anonymous'
+            ])
+            ->with(['xeUserInfo:id,user_id,xe_user_id,nickname,name,avatar'])
+            ->where('xe_user_id','=',$params['xe_user_id'])
+            ->paginate($params['size'] ?? 10);
+
     }
 
     public function orderList($params, $admin)

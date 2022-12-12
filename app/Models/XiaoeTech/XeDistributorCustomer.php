@@ -5,6 +5,7 @@ namespace App\Models\XiaoeTech;
 
 
 use App\Models\Base;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class XeDistributorCustomer extends Base
 {
@@ -26,5 +27,10 @@ class XeDistributorCustomer extends Base
         'is_editable',
         'is_anonymous',
     ];
+
+    public function xeUserInfo(): HasOne
+    {
+        return $this->hasOne(XeUser::class,'xe_user_id','sub_user_id');
+    }
 
 }
