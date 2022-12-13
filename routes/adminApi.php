@@ -476,7 +476,8 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('xet/vip_list','XiaoETongController@vipList');
         Route::post('xet/vip_add','XiaoETongController@vipAdd');
         Route::post('xet/vip_bind_user','XiaoETongController@vipBindUser');
-        Route::post('xet/vip_info','XiaoETongController@vipInfo');
+        Route::post('xet/user_info','XiaoETongController@XeUserInfo');
+        Route::post('xet/user_son_list','XiaoETongController@sonList');
         Route::post('xet/order_list','XiaoETongController@orderList');
         //⬆⬆⬆⬆⬆小鹅通部分⬆⬆⬆⬆⬆
     });

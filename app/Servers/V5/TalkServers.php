@@ -105,17 +105,38 @@ class TalkServers
             return ['code' => false, 'msg' => '操作类型错误'];
         }
 
-        $res = Talk::query()
+        $user_id_list = Talk::query()
             ->whereIn('id', $id)
+            ->where('is_finish', '=', 1)
+            ->pluck('user_id')
+            ->toArray();
+
+        Talk::query()
+            ->whereIn('id', $id)
+            ->where('status', '=', 1)
+            ->where('is_finish', '=', 1)
+            ->update([
+                'status'          => 2,
+                'is_finish'       => 2,
+                'finish_at'       => date('Y-m-d H:i:s'),
+                'finish_admin_id' => $admin['id'],
+            ]);
+
+        Talk::query()
+            ->whereIn('id', $id)
+            ->where('status', '=', 1)
+            ->where('is_finish', '=', 2)
             ->update([
                 'status' => 2,
             ]);
 
-        if ($res) {
-            return ['code' => true, 'msg' => '成功'];
-        }
+        TalkUserStatistics::query()
+            ->whereIn('user_id', $user_id_list)
+            ->update([
+                'is_finish' => 2
+            ]);
 
-        return ['code' => false, 'msg' => '失败,请重试.'];
+        return ['code' => true, 'msg' => '成功'];
     }
 
 

@@ -11,7 +11,7 @@ class Talk extends Base
     protected $table = 'nlsg_talk';
 
     protected $fillable = [
-        'user_id', 'status','is_finish',
+        'user_id', 'status','is_finish','finish_admin_id','finish_at'
     ];
 
     /**
