@@ -419,7 +419,6 @@ class XiaoeTechServers
 
         foreach ($XeDistributorList as $XeDistributor){
             do {
-
                 $redis_page_index_key='xe_sync_distributor_customer_list_page_index';
                 $page_index=Redis::get($redis_page_index_key)??1;
                 $page_size=100;
@@ -485,6 +484,10 @@ class XiaoeTechServers
                 sleep(1);
 
             } while ($return_list);
+
+            $XeDistributor->is_sync_customer=2;
+            $XeDistributor->sync_customer_time=times();
+            $XeDistributor->save();
         }
 
     }
