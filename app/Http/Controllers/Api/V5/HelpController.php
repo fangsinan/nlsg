@@ -87,6 +87,15 @@ class HelpController extends Controller
             ]);
         }
 
+        if (empty($list)){
+            TalkList::insert([
+                "talk_id"    => $talk_id,
+                "type"       => 3,
+                "user_id"    => $uid,
+                "content"    => date('Y-m-d H:i'),
+            ]);
+        }
+
 
         TalkList::insert([
             "talk_id"    => $talk_id,

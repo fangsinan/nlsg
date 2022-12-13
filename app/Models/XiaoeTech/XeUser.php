@@ -8,6 +8,7 @@ use App\Models\Base;
 use App\Models\User;
 use App\Models\VipUser;
 use App\Models\VipUserBind;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class XeUser extends Base
@@ -15,7 +16,7 @@ class XeUser extends Base
     const DB_TABLE = 'nlsg_xe_user';
     protected $table = 'nlsg_xe_user';
 
-    public function userInfo(): HasOne
+    public function nlsgUserInfo(): HasOne
     {
         return $this->hasOne(User::class, 'id', 'user_id');
     }
@@ -36,6 +37,18 @@ class XeUser extends Base
     public function distributorInfo(): HasOne
     {
         return $this->hasOne(XeDistributor::class,'xe_user_id','xe_user_id');
+    }
+
+    public function parentList(): HasOne
+    {
+        return $this->hasOne(XeDistributorCustomer::class,'sub_user_id','xe_user_id')
+            ->where('status','=',1);
+    }
+
+    public function sonList(): HasMany
+    {
+        return $this->hasMany(XeDistributorCustomer::class,'xe_user_id','xe_user_id')
+            ->where('status','=',1);
     }
 
 }

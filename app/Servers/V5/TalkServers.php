@@ -600,10 +600,7 @@ class TalkServers
                 $check_id->status = 2;
                 break;
             case 'del':
-                $check_id->status          = 3;
-                $check_id->is_finish       = 2;
-                $check_id->finish_at       = date('Y-m-d H:i:s');
-                $check_id->finish_admin_id = $admin['id'];
+                $check_id->status = 3;
                 break;
         }
 

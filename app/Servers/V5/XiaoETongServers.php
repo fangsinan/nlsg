@@ -5,7 +5,6 @@ namespace App\Servers\V5;
 
 
 use App\Models\XiaoeTech\XeDistributor;
-use App\Models\XiaoeTech\XeDistributorCustomer;
 use App\Models\XiaoeTech\XeUser;
 use App\Models\XiaoeTech\XeUserJob;
 use Illuminate\Support\Facades\Validator;
@@ -21,10 +20,10 @@ class XiaoETongServers
             ]);
 
         $query->with([
-            'userInfo:user_id,xe_user_id,nickname,name,phone,is_seal',
-            'userInfo.vipInfo:id,user_id,nickname,username,level',
-            'userInfo.vipBindInfo:parent,son,life,begin_at,end_at',
-            'userParentInfo:user_id,xe_user_id,nickname,name,phone,is_seal',
+            'XeUserInfo:user_id,xe_user_id,nickname,name,phone,is_seal',
+            'XeUserInfo.vipInfo:id,user_id,nickname,username,level',
+            'XeUserInfo.vipBindInfo:parent,son,life,begin_at,end_at',
+            'XeUserParentInfo:user_id,xe_user_id,nickname,name,phone,is_seal',
         ]);
 
         HelperService::queryWhen(
@@ -35,13 +34,13 @@ class XiaoETongServers
                     'field'    => 'user_phone',
                     'alias'    => 'phone',
                     'operator' => 'like',
-                    'model'    => 'userInfo',
+                    'model'    => 'XeUserInfo',
                 ],
                 [
                     'field'    => 'user_parent_phone',
                     'alias'    => 'phone',
                     'operator' => 'like',
-                    'model'    => 'userParentInfo',
+                    'model'    => 'XeUserParentInfo',
                 ],
                 [
                     'field'    => 'created_begin',
@@ -66,6 +65,9 @@ class XiaoETongServers
                 [
                     'field' => 'status',
                 ],
+                [
+                    'field' => 'xe_user_id'
+                ]
             ]
         );
 
@@ -105,7 +107,7 @@ class XiaoETongServers
         $xts = new XiaoeTechServers();
         $res = $xts->distributor_member_add($params['phone']);
 
-        if ($res === true) {
+        if (is_array($res)) {
             return ['code' => true, 'msg' => '成功'];
         } else {
             return ['code' => false, 'msg' => is_bool($res) ? '成功' : $res];
@@ -200,42 +202,95 @@ class XiaoETongServers
         }
 
         return XeUser::query()
-            ->where('xe_user_id','=',$params['xe_user_id'])
+            ->where('xe_user_id', '=', $params['xe_user_id'])
             ->select([
-                'id','user_id','xe_user_id','nickname','name','avatar','gender','city','province','country',
-                'phone','birth','address','company','user_created_at'
+                'id', 'user_id', 'xe_user_id', 'nickname', 'name', 'avatar', 'gender', 'city', 'province', 'country',
+                'phone', 'birth', 'address', 'company', 'user_created_at'
             ])
             ->with([
-                'userInfo:id,phone,nickname,headimg,is_author,status,is_test_pay',
+                'nlsgUserInfo:id,phone,nickname,headimg,is_author,status,is_test_pay',
                 'distributorInfo',
             ])
             ->first();
     }
 
-    public function sonList($params,$admin){
-        $validator = Validator::make(
+    public function userList($params, $admin)
+    {
+        $query = XeUser::query()
+            ->select(['id', 'user_id', 'xe_user_id', 'nickname', 'name', 'avatar', 'phone', 'user_created_at']);
+
+        $query->with([
+            'parentList:xe_user_id,sub_user_id',
+            'sonList:xe_user_id,sub_user_id',
+        ]);
+
+//        $query->withCount('sonList');
+
+        HelperService::queryWhen(
+            $query,
             $params,
             [
-                'xe_user_id' => 'required|string|exists:nlsg_xe_user',
-            ],
-            [
-                'xe_user_id.required' => '用户id不能为空',
-                'xe_user_id.exists'   => '用户不存在',
+                [
+                    //根据pid查下面用户
+                    'field'  => 'parent_xe_user_id',
+                    'alias'  => 'xe_user_id',
+                    'models' => 'sonList'
+                ],
             ]
         );
 
-        if ($validator->fails()) {
-            return $validator->messages()->first();
-        }
 
-        return XeDistributorCustomer::query()
-            ->select([
-                'id','xe_user_id','sub_user_id','order_num','sum_price','bind_time','status','status_text',
-                'remain_days','expired_at','is_anonymous'
-            ])
-            ->with(['xeUserInfo:id,user_id,xe_user_id,nickname,name,avatar'])
-            ->where('xe_user_id','=',$params['xe_user_id'])
-            ->paginate($params['size'] ?? 10);
+//        $query = XeDistributorCustomer::query()
+//            ->select([
+//                'id', 'xe_user_id', 'sub_user_id', 'order_num', 'sum_price', 'bind_time', 'status', 'status_text',
+//                'remain_days', 'expired_at', 'is_anonymous'
+//            ])
+//            ->with(['xeUserInfo:id,user_id,xe_user_id,nickname,name,avatar,phone,user_created_at']);
+//
+//        HelperService::queryWhen(
+//            $query,
+//            $params,
+//            [
+//                [
+//                    'field' => 'parent_user_id',
+//                    'alias' => 'xe_user_id',
+//                ],
+//                [
+//                    'field' => 'son_user_id',
+//                    'alias' => 'sub_user_id',
+//                ],
+//                [
+//                    'field'    => 'bind_time_begin',
+//                    'alias'    => 'bind_time',
+//                    'operator' => '>=',
+//                ],
+//                [
+//                    'field'    => 'bind_time_begin',
+//                    'alias'    => 'bind_time',
+//                    'operator' => '<=',
+//                ],
+//                [
+//                    'field'    => 'phone',
+//                    'model'    => 'xeUserInfo',
+//                    'operator' => 'like',
+//                ],
+//                [
+//                    'field'    => 'user_created_at_begin',
+//                    'model'    => 'xeUserInfo',
+//                    'alias'    => 'user_created_at',
+//                    'operator' => '>=',
+//                ],
+//                [
+//                    'field'    => 'user_created_at_end',
+//                    'model'    => 'xeUserInfo',
+//                    'alias'    => 'user_created_at',
+//                    'operator' => '<=',
+//                ],
+//            ]
+//        );
+
+
+        return $query->paginate($params['size'] ?? 10);
 
     }
 

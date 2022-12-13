@@ -44,8 +44,8 @@ class XiaoETongController extends ControllerBackend
         return $this->getRes((new XiaoETongServers())->vipInfo($request->input(), $this->user));
     }
 
-    public function sonList(Request $request): JsonResponse{
-        return $this->getRes((new XiaoETongServers())->sonList($request->input(), $this->user));
+    public function userList(Request $request): JsonResponse{
+        return $this->getRes((new XiaoETongServers())->userList($request->input(), $this->user));
     }
 
     public function orderList(Request $request): JsonResponse
