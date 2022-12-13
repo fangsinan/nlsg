@@ -34,13 +34,13 @@ class XiaoETongServers
                     'field'    => 'user_phone',
                     'alias'    => 'phone',
                     'operator' => 'like',
-                    'model'    => 'userInfo',
+                    'model'    => 'XeUserInfo',
                 ],
                 [
                     'field'    => 'user_parent_phone',
                     'alias'    => 'phone',
                     'operator' => 'like',
-                    'model'    => 'userParentInfo',
+                    'model'    => 'XeUserParentInfo',
                 ],
                 [
                     'field'    => 'created_begin',
