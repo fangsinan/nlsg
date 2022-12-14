@@ -52,8 +52,10 @@ class XiaoeTechServers
     public function test(){
         var_dump($this->access_token);
     }
+
     /**
      * 获取小鹅通订单
+     * 一小时运行一次 todo
      */
     public function sync_order_list(){
 
@@ -283,7 +285,8 @@ class XiaoeTechServers
 
 
     /**
-     * 获取推广员列表
+     * 获取客户详情列表
+     * 五分钟一次 todo
      */
     public function sync_user_info(){
 
@@ -339,6 +342,7 @@ class XiaoeTechServers
 
     /**
      * 获取推广员列表
+     * 5分钟一次 todo
      */
     public function sync_distributor_list(){
 
@@ -407,6 +411,7 @@ class XiaoeTechServers
 
     /**
      * 推广员客户列表
+     * 一小时一次 todo
      */
     public function sync_distributor_customer_list(){
 
@@ -658,7 +663,64 @@ class XiaoeTechServers
         $XeDistributorCustomer->bind_time=times();
         $XeDistributorCustomer->expired_at=times(strtotime('+1 years'));
         $XeDistributorCustomer->save();
+
         return ['code'=>true,'msg'=>'成功','created_at'=>times()];
+
+    }
+
+    /**
+     * 修改/解除绑定关系
+     */
+    public function distributor_member_change($user_id,$former_parent_user_id,$parent_user_id=''){
+
+        if(empty($user_id)){
+            return '客户不存在';
+        }
+
+        $XeDistributor=XeDistributor::query()->where('xe_user_id',$former_parent_user_id)->first();
+        if(!$XeDistributor){
+            return '推广员不存在';
+        }
+
+        $XeDistributorCustomer=XeDistributorCustomer::query()
+            ->where('xe_user_id',$former_parent_user_id)
+            ->where('sub_user_id',$user_id)
+            ->where('status',1)
+            ->first();
+
+        if(!$XeDistributorCustomer){
+            return '原推广员未绑定客户';
+        }
+
+        $paratms=[
+            'access_token'=>$this->access_token,
+            'user_id'=>$user_id,
+            'parent_user_id'=>$parent_user_id,
+            'former_parent_user_id'=>$former_parent_user_id,
+        ];
+        $res=self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.change/1.0.0',$paratms);
+        if($res['body']['code']!=0){
+            $this->err_msg=$res['body']['msg'];
+            return $this->err_msg;
+        }
+
+        if($parent_user_id){
+            $XeDistributorCustomer= new XeDistributorCustomer();
+            $XeDistributorCustomer->xe_user_id=$parent_user_id;
+            $XeDistributorCustomer->sub_user_id=$user_id;
+            $XeDistributorCustomer->status=1;
+            $XeDistributorCustomer->status_text='绑定中';
+            $XeDistributorCustomer->remain_days=365;
+            $XeDistributorCustomer->bind_time=times();
+            $XeDistributorCustomer->expired_at=times(strtotime('+1 years'));
+            $XeDistributorCustomer->save();
+        }else{
+            $XeDistributorCustomer->remain_days=0;
+            $XeDistributorCustomer->status=0;
+            $XeDistributorCustomer->status_text='已解绑';
+        }
+
+        return true;
 
     }
 
