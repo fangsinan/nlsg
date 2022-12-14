@@ -49,10 +49,6 @@ class XiaoeTechServers
     }
 
 
-    public function test(){
-        var_dump($this->access_token);
-    }
-
     /**
      * 获取小鹅通订单
      * 一小时运行一次 todo
@@ -69,7 +65,7 @@ class XiaoeTechServers
             $page_index=Redis::get($redis_page_index_key)??1;
             $page_size=100;
             $paratms=[
-                'access_token'=>$this->access_token,
+                'access_token'=>$this->get_token(),
                 'page'=>intval($page_index),
                 'page_size'=>intval($page_size),
             ];
@@ -262,7 +258,7 @@ class XiaoeTechServers
         }
 
         $paratms=[
-            'access_token'=>$this->access_token,
+            'access_token'=>$this->get_token(),
             'data'=>[
                 'phone'=>strval($phone),
                 'avatar'=>$avatar,
@@ -310,7 +306,7 @@ class XiaoeTechServers
             $page_index=Redis::get($redis_page_index_key)??'';
             $page_size=50;
             $paratms=[
-                'access_token'=>$this->access_token,
+                'access_token'=>$this->get_token(),
                 'page_size'=>intval($page_size),
             ];
 
@@ -383,7 +379,7 @@ class XiaoeTechServers
             $page_size=50;
             $paratms=[
                 'user_id_list'=>$user_ids,
-                'access_token'=>$this->access_token,
+                'access_token'=>$this->get_token(),
                 'page'=>intval($page_index),
                 'page_size'=>intval($page_size),
             ];
@@ -433,7 +429,7 @@ class XiaoeTechServers
             $page_index=Redis::get($redis_page_index_key)??1;
             $page_size=50;
             $paratms=[
-                'access_token'=>$this->access_token,
+                'access_token'=>$this->get_token(),
                 'page_index'=>intval($page_index),
                 'page_size'=>intval($page_size),
             ];
@@ -505,7 +501,7 @@ class XiaoeTechServers
                 $page_index=Redis::get($redis_page_index_key)??1;
                 $page_size=100;
                 $paratms=[
-                    'access_token'=>$this->access_token,
+                    'access_token'=>$this->get_token(),
                     'user_id'=>$XeDistributor->xe_user_id,
                     'page_index'=>intval($page_index),
                     'page_size'=>intval($page_size),
@@ -595,7 +591,7 @@ class XiaoeTechServers
         }
 
         $paratms=[
-            'access_token'=>$this->access_token,
+            'access_token'=>$this->get_token(),
             'user_id'=>$user_id,
         ];
 
@@ -670,7 +666,7 @@ class XiaoeTechServers
         }
 
         $paratms=[
-            'access_token'=>$this->access_token,
+            'access_token'=>$this->get_token(),
             'user_id'=>$user_id,
             'parent_user_id'=>$parent_user_id,
         ];
@@ -720,7 +716,7 @@ class XiaoeTechServers
         }
 
         $paratms=[
-            'access_token'=>$this->access_token,
+            'access_token'=>$this->get_token(),
             'user_id'=>$user_id,
             'parent_user_id'=>$parent_user_id,
         ];
@@ -770,7 +766,7 @@ class XiaoeTechServers
         }
 
         $paratms=[
-            'access_token'=>$this->access_token,
+            'access_token'=>$this->get_token(),
             'user_id'=>$user_id,
             'parent_user_id'=>$parent_user_id,
             'former_parent_user_id'=>$former_parent_user_id,
