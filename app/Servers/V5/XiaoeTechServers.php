@@ -264,7 +264,7 @@ class XiaoeTechServers
         $paratms=[
             'access_token'=>$this->access_token,
             'data'=>[
-                'phone'=>$phone,
+                'phone'=>strval($phone),
                 'avatar'=>$avatar,
                 'nickname'=>$baseUser->nickname,
             ],
@@ -286,6 +286,7 @@ class XiaoeTechServers
             $XeUser= new XeUser();
             $XeUser->xe_user_id=$xe_user_id;
             $XeUser->avatar=$avatar;
+            $XeUser->phone=$phone;
             $XeUser->nickname=$baseUser->nickname;
             $XeUser->save();
         }
