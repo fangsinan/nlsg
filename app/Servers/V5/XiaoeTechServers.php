@@ -280,9 +280,85 @@ class XiaoeTechServers
             return 'user_id为空';
         }
 
+        $xe_user_id=$res['body']['data']['user_id'];
+        $XeUser=XeUser::query()->where('xe_user_id',$xe_user_id)->first();
+        if(!$XeUser){
+            $XeUser= new XeUser();
+            $XeUser->xe_user_id=$xe_user_id;
+            $XeUser->avatar=$avatar;
+            $XeUser->nickname=$baseUser->nickname;
+            $XeUser->save();
+        }
+
         return $res['body']['data'];
     }
 
+    /**
+     * @return string
+     * 更新用户列表数据
+     */
+    public function sync_user_batch_get(){
+
+        if(!$this->access_token){
+            return $this->err_msg;
+        }
+
+        do {
+
+            $redis_page_index_key='xe_sync_user_batch_get_page_index';
+            $page_index=Redis::get($redis_page_index_key)??'';
+            $page_size=50;
+            $paratms=[
+                'access_token'=>$this->access_token,
+                'page_size'=>intval($page_size),
+            ];
+
+            if($page_index){
+                $paratms['es_skip']=json_decode($page_index,true);
+            }
+
+            $res=self::curlPost('https://api.xiaoe-tech.com/xe.user.batch.get/2.0.0',$paratms);
+            var_dump($paratms);
+
+            if($res['body']['code']!=0){
+                $this->err_msg=$res['body']['msg'];
+                return $this->err_msg;
+            }
+
+            $return_list=$res['body']['data']['list']??[];
+
+            if(empty($return_list)){
+                Redis::set($redis_page_index_key,'');
+                return false;
+            }
+
+            $last=$return_list[count($return_list)-1];
+            if(!empty($last['es_skip'])){
+                Redis::set($redis_page_index_key,json_encode($last['es_skip']));
+            }
+
+            foreach ($return_list as $user){
+                var_dump($user['user_id']);
+                $XeUser=XeUser::query()->where('xe_user_id',$user['user_id'])->first();
+                if(!$XeUser){
+                    $XeUser = new XeUser();
+                }
+                $XeUser->xe_user_id=$user['user_id'];
+                $XeUser->wx_union_id=$user['wx_union_id'];
+                $XeUser->wx_open_id=$user['wx_open_id'];
+                $XeUser->wx_app_open_id=$user['wx_app_open_id'];
+                $XeUser->nickname=$user['user_nickname'];
+                $XeUser->user_created_at=$user['user_created_at'];
+                $XeUser->avatar=$user['avatar'];
+                $XeUser->phone=$user['bind_phone'];
+                $XeUser->save();
+            }
+
+            sleep(1);
+
+        } while ($return_list);
+
+    }
 
     /**
      * 获取客户详情列表
