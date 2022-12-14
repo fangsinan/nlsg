@@ -682,13 +682,13 @@ class XiaoeTechServers
             return '推广员不存在';
         }
 
-        $XeDistributorCustomer=XeDistributorCustomer::query()
+        $XeOldDistributorCustomer=XeDistributorCustomer::query()
             ->where('xe_user_id',$former_parent_user_id)
             ->where('sub_user_id',$user_id)
             ->where('status',1)
             ->first();
 
-        if(!$XeDistributorCustomer){
+        if(!$XeOldDistributorCustomer){
             return '原推广员未绑定客户';
         }
 
@@ -715,9 +715,9 @@ class XiaoeTechServers
             $XeDistributorCustomer->expired_at=times(strtotime('+1 years'));
             $XeDistributorCustomer->save();
         }else{
-            $XeDistributorCustomer->remain_days=0;
-            $XeDistributorCustomer->status=0;
-            $XeDistributorCustomer->status_text='已解绑';
+            $XeOldDistributorCustomer->remain_days=0;
+            $XeOldDistributorCustomer->status=0;
+            $XeOldDistributorCustomer->status_text='已解绑';
         }
 
         return true;
