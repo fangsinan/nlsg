@@ -368,8 +368,10 @@ class XiaoETongServers
                 ->where('son_job', '=', 1)
                 ->select(['id', 'son_phone', 'son_xe_user_id']);
 
-            $query->where('id', '>=', $begin_id + ($flag - 1) * $fen_limit);
-            $query->where('id', '<=', $begin_id + $flag * $fen_limit);
+            if ($flag){
+                $query->where('id', '>=', $begin_id + ($flag - 1) * $fen_limit);
+                $query->where('id', '<=', $begin_id + $flag * $fen_limit);
+            }
 
             $list = $query->limit(100)->get();
 
@@ -443,8 +445,10 @@ class XiaoETongServers
                 ->where('parent_xe_user_id', '<>', '')
                 ->where('son_xe_user_id', '<>', '');
 
-            $query->where('id', '>=', $begin_id + ($flag - 1) * $fen_limit);
-            $query->where('id', '<=', $begin_id + $flag * $fen_limit);
+            if ($flag){
+                $query->where('id', '>=', $begin_id + ($flag - 1) * $fen_limit);
+                $query->where('id', '<=', $begin_id + $flag * $fen_limit);
+            }
 
             $list = $query
                 ->select(['id', 'parent_phone', 'parent_xe_user_id', 'son_phone', 'son_xe_user_id'])
@@ -559,7 +563,7 @@ and `status` = 1  LIMIT ? OFFSET ?';
             dd($err_list);
 
         }
-        
+
         if (0){
             $err_list = [];
 
