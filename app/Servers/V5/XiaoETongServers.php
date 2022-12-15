@@ -295,7 +295,8 @@ class XiaoETongServers
 
             $list = XeUserJob::query()
                 ->where('parent_job', '=', 1)
-                ->select(['id', 'parent_phone', 'parent_xe_user_id'])
+                ->select(['parent_phone'])
+                ->groupBy('parent_phone')
                 ->limit(100)
                 ->get();
 
@@ -309,7 +310,7 @@ class XiaoETongServers
 
                 if (empty($v['parent_phone'])) {
                     XeUserJob::query()
-                        ->where('id', '=', $v['id'])
+                        ->where('parent_phone', '=', '')
                         ->update([
                             'parent_job' => 2,
                         ]);
@@ -320,7 +321,7 @@ class XiaoETongServers
 
                 if (strlen($temp_res['user_id'] ?? '') > 0) {
                     XeUserJob::query()
-                        ->where('id', '=', $v['id'])
+                        ->where('parent_phone', '=', $v['parent_phone'])
                         ->update([
                             'parent_xe_user_id' => $temp_res['user_id'],
                             'parent_job'        => 2,
@@ -334,12 +335,10 @@ class XiaoETongServers
                         $err_array['parent_job_err'] = $temp_res;
                     }
                     XeUserJob::query()
-                        ->where('id', '=', $v['id'])
+                        ->where('parent_phone', '=', '')
                         ->update($err_array);
                 }
             }
-
-            sleep(1);
         }
 
         return true;
