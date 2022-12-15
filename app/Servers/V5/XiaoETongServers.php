@@ -345,17 +345,25 @@ class XiaoETongServers
         return true;
     }
 
-    public function runUserJobSon(): bool
+    public function runUserJobSon($flag): bool
     {
         $xts = new XiaoeTechServers();
+        //515529 813685   6分
+        $begin_id  = 1;
+        $end_id    = 900000;
+        $fen       = 8;
+        $fen_limit = (int)ceil(($end_id - $begin_id) / $fen);
 
         while (true) {
 
-            $list = XeUserJob::query()
+            $query = XeUserJob::query()
                 ->where('son_job', '=', 1)
-                ->select(['id', 'son_phone', 'son_xe_user_id'])
-                ->limit(100)
-                ->get();
+                ->select(['id', 'son_phone', 'son_xe_user_id']);
+
+            $query->where('id', '>=', $begin_id + ($flag - 1) * $fen_limit);
+            $query->where('id', '<=', $begin_id + $flag * $fen_limit);
+
+            $list = $query->limit(100)->get();
 
             if ($list->isEmpty()) {
                 break;
@@ -373,7 +381,7 @@ class XiaoETongServers
                         ]);
                     continue;
                 }
-
+                echo $v['id'], '---', $v['son_phone'], PHP_EOL;
                 $temp_res = $xts->user_register($v['son_phone']);
                 if (strlen($temp_res['user_id'] ?? '') > 0) {
                     XeUserJob::query()
@@ -395,25 +403,34 @@ class XiaoETongServers
                         ->update($err_array);
                 }
             }
-
-            sleep(1);
         }
 
         return true;
 
     }
 
-    public function runUserJobBind(): bool
+
+    public function runUserJobBind($flag): bool
     {
         $xts = new XiaoeTechServers();
 
+        $begin_id  = 1;
+        $end_id    = 900000;
+        $fen       = 8;
+        $fen_limit = (int)ceil(($end_id - $begin_id) / $fen);
+
         while (true) {
-            $list = XeUserJob::query()
+            $query = XeUserJob::query()
                 ->where('bind_job', '=', 1)
                 ->where('parent_xe_user_id', '<>', '')
-                ->where('son_xe_user_id', '<>', '')
+                ->where('son_xe_user_id', '<>', '');
+
+            $query->where('id', '>=', $begin_id + ($flag - 1) * $fen_limit);
+            $query->where('id', '<=', $begin_id + $flag * $fen_limit);
+
+            $list = $query
                 ->select(['id', 'parent_phone', 'parent_xe_user_id', 'son_phone', 'son_xe_user_id'])
-                ->limit(1)
+                ->limit(100)
                 ->get();
 
             if ($list->isEmpty()) {
@@ -427,6 +444,7 @@ class XiaoETongServers
                     $v['parent_xe_user_id'],
                     $v['son_xe_user_id']
                 );
+                echo $v['id'], '---', $v['son_xe_user_id'], PHP_EOL;
                 if ($temp_res['code'] === true) {
                     XeUserJob::query()
                         ->where('id', '=', $v['id'])
@@ -444,11 +462,40 @@ class XiaoETongServers
                         ->update($err_array);
                 }
             }
-
-            sleep(1);
         }
 
         return true;
+
+    }
+
+    public function vipBindToUserJob()
+    {
+        $page = 1;
+        $size = 100;
+
+        while (true) {
+            $offset = ($page - 1) * $size;
+            $page++;
+            $sql = 'SELECT parent as parent_phone,son as son_phone from nlsg_vip_user_bind
+where parent = "18512378959"
+and (
+	life = 1 or (life = 2 and end_at >= "2022-12-14 00:00:00" )
+)
+and `status` = 1  LIMIT ? OFFSET ?';
+
+            $list = DB::select($sql, [$size, $offset]);
+            if (empty($list)) {
+                exit('没有数据了:' . $page);
+            }
+
+            foreach ($list as &$v) {
+                $v = (array)$v;
+            }
+
+            echo $page, '--', PHP_EOL;
+
+            XeUserJob::query()->insert($list);
+        }
 
     }
 
