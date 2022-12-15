@@ -348,8 +348,16 @@ class XiaoETongServers
     {
         $xts = new XiaoeTechServers();
         //515529 813685   6分
-        $begin_id  = 1;
-        $end_id    = 900000;
+        $begin_id = XeUserJob::query()
+            ->where('son_phone', '<>', '')
+            ->where('son_job', '=', 1)
+            ->min('id');
+
+        $end_id = XeUserJob::query()
+                ->where('son_phone', '<>', '')
+                ->where('son_job', '=', 1)
+                ->max('id') + 200;
+
         $fen       = 8;
         $fen_limit = (int)ceil(($end_id - $begin_id) / $fen);
 
@@ -413,8 +421,18 @@ class XiaoETongServers
     {
         $xts = new XiaoeTechServers();
 
-        $begin_id  = 1;
-        $end_id    = 900000;
+        $begin_id = XeUserJob::query()
+            ->where('parent_xe_user_id', '<>', '')
+            ->where('son_xe_user_id', '<>', '')
+            ->where('bind_job', '=', 1)
+            ->min('id');
+
+        $end_id = XeUserJob::query()
+                ->where('parent_xe_user_id', '<>', '')
+                ->where('son_xe_user_id', '<>', '')
+                ->where('bind_job', '=', 1)
+                ->min('id') + 200;
+
         $fen       = 8;
         $fen_limit = (int)ceil(($end_id - $begin_id) / $fen);
 
