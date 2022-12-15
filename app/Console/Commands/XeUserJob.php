@@ -94,6 +94,10 @@ class XeUserJob extends Command
             case 27:
                 $xes->runUserJobSon(8);
                 break;
+
+            case 99:
+                $xes->hjCheck();
+                break;
         }
         return 0;
     }
