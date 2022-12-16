@@ -69,6 +69,10 @@ class XeUserJob extends Command
             case 17:
                 $xes->runUserJobBind(8);
                 break;
+            case 19:
+                $xes->runUserJobBind(0);
+                break;
+
 
             case 20:
                 $xes->runUserJobSon(1);
@@ -93,6 +97,9 @@ class XeUserJob extends Command
                 break;
             case 27:
                 $xes->runUserJobSon(8);
+                break;
+            case 29:
+                $xes->runUserJobSon(0);
                 break;
 
             case 99:
