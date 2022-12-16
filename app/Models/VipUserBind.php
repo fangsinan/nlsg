@@ -4,6 +4,8 @@
 namespace App\Models;
 
 
+use App\Models\XiaoeTech\XeDistributor;
+use App\Models\XiaoeTech\XeUserJob;
 use Illuminate\Support\Facades\DB;
 
 class VipUserBind extends Base
@@ -44,33 +46,45 @@ class VipUserBind extends Base
 
     public static function clear()
     {
-        $now_date=date('Y-m-d H:i:s',time());
-        $map=[];
-        $data = DB::table('nlsg_vip_user_bind')->where('end_at', '<', $now_date)->whereIn('status',[0,1])->where('life','=',2) //时效性
-            ->select(['id','parent','son' ])->limit(30000)->get()->toArray();
+        $now_date = date('Y-m-d H:i:s', time());
+        $map      = [];
+        $data     = DB::table('nlsg_vip_user_bind')
+                      ->where('end_at', '<', $now_date)
+                      ->whereIn('status', [0, 1])
+                      ->where('life', '=', 2) //时效性
+                      ->select(['id', 'parent', 'son'])
+                      ->limit(30000)
+                      ->get();
+
+        if ($data->isEmpty()) {
+            $data = [];
+        } else {
+            $data = $data->toArray();
+        }
+
         DB::beginTransaction();
         try {
             if (!empty($data)) {
 
                 foreach ($data as $key => $val) {
-                    if(($key%5000)==0){
+                    if (($key % 5000) == 0) {
                         DB::table('nlsg_vip_user_bind')->insert($map);
-                        $map=[];
+                        $map = [];
                     }
                     $map[] = [
-                        'parent' => '18512378959', //保护到公司
-                        'son' => $val->son,
-                        'life' => 2, //有效期
-                        'begin_at' => $now_date,
-                        'end_at' => '2030-12-31 23:59:59',
-                        'status' => 1,
-                        'is_manual' => 1, //1 手动绑定 配合小鹅通
-                        'channel' => 2, //'来源渠道 1导入 2平台 3抖音 4直播渠道 5:哈佛订单绑定平台'
-                        'remark' => '保护过期，自动保护：' . $val->id,
+                        'parent'     => '18512378959', //保护到公司
+                        'son'        => $val->son,
+                        'life'       => 2, //有效期
+                        'begin_at'   => $now_date,
+                        'end_at'     => '2030-12-31 23:59:59',
+                        'status'     => 1,
+                        'is_manual'  => 1, //1 手动绑定 配合小鹅通
+                        'channel'    => 2, //'来源渠道 1导入 2平台 3抖音 4直播渠道 5:哈佛订单绑定平台'
+                        'remark'     => '保护过期，自动保护：' . $val->id,
                         'created_at' => $now_date,
                     ];
                 }
-                if(!empty($map)){
+                if (!empty($map)) {
                     DB::table('nlsg_vip_user_bind')->insert($map);
                 }
             }
@@ -83,10 +97,64 @@ class VipUserBind extends Base
 
             DB::commit();
             echo '执行成功';
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollBack();
             var_dump($e->getMessage());
         }
+
+    }
+
+    public function bindToXeUserJob()
+    {
+        $begin_at    = date('Y-m-d H:i:00', strtotime('-6 minutes'));
+        $parent_list = self::query()
+                           ->where('created_at', '>=', $begin_at)
+                           ->where('parent', '<>', '18512378959')
+                           ->where('status', '=', 1)
+                           ->groupBy('parent')
+                           ->pluck('parent')
+                           ->toArray();
+
+        if (!$parent_list) {
+            return 0;
+        }
+
+        $check_parent_list = XeDistributor::query()
+                                          ->select(['id', 'xe_user_id'])
+                                          ->with(['XeUserInfo:xe_user_id,phone'])
+                                          ->whereHas('XeUserInfo', function ($q) use ($parent_list) {
+                                              $q->whereIn('phone', $parent_list);
+                                          })
+                                          ->where('status', '=', 1)
+                                          ->get();
+
+        if ($check_parent_list->isEmpty()) {
+            return 0;
+        }
+
+        foreach ($check_parent_list as $v) {
+            $temp_list = self::query()
+                             ->where('parent', '=', $v->XeUserInfo['phone'])
+                             ->where('status', '=', 1)
+                             ->where('created_at', '>=', $begin_at)
+                             ->pluck('son')
+                             ->toArray();
+
+            $temp_data = [];
+            foreach ($temp_list as $vv) {
+                $temp_data[] = [
+                    'parent_phone'      => $v->XeUserInfo['phone'],
+                    'parent_xe_user_id' => $v->XeUserInfo['xe_user_id'],
+                    'son_phone'         => $vv,
+                    'parent_job'        => 2,
+                    'parent_job_time'   => $begin_at,
+                ];
+            }
+
+            XeUserJob::query()->insert($temp_data);
+        }
+
+        return 0;
 
     }
 

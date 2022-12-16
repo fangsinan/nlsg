@@ -117,6 +117,7 @@ class Kernel extends ConsoleKernel
 //        $schedule->command('command:XeUserJob 25')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
 //        $schedule->command('command:XeUserJob 26')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
 //        $schedule->command('command:XeUserJob 27')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
+//        $schedule->command('command:XeUserJob 30')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
         //⬆⬆⬆⬆xe_user_job⬆⬆⬆⬆
 
 
