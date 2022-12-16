@@ -25,12 +25,16 @@ class XiaoeTechServers
     public function test(){
         var_dump($this->access_token);die;
     }
-    public function get_token(){
+
+    public function get_token($is_refresh=0){
+
         $token_key='xiaoe-tech-token';
-        $access_token=Redis::get($token_key);
-        if($access_token){
-            $this->access_token=$access_token;
-            return $access_token;
+        if(!$is_refresh){
+            $access_token=Redis::get($token_key);
+            if($access_token){
+                $this->access_token=$access_token;
+                return $access_token;
+            }
         }
 
         $paratms=
@@ -47,7 +51,7 @@ class XiaoeTechServers
             return false;
         }
 
-        Redis::setex($token_key, 7000,$res['body']['data']['access_token']);
+        Redis::setex($token_key, 300,$res['body']['data']['access_token']);
         $this->access_token= $res['body']['data']['access_token'];
         return $res['body']['data']['access_token'];
     }
@@ -580,6 +584,7 @@ class XiaoeTechServers
             $res=self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.sub_customer/1.0.0',$paratms);
             if($res['body']['code']!=0){
                 $this->err_msg=$res['body']['msg'];
+                var_dump($this->err_msg);
                 return $this->err_msg;
             }
             $return_list=$res['body']['data']['list']??[];
