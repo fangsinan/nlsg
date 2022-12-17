@@ -894,12 +894,14 @@ class DouDianServers
         $request->setParam($param);
         $param->cipher_infos = $cipher_infos;
         $response            = $request->execute('');
-
+        DouDianOrderLog::query()->create((array)$response);
         $response->job_type     = 2;
         $response->decrypt_text = json_encode($response);
+        if (!isset($response->data)){
+            return ['code' => false, 'msg' => '结构错误', 'data' => []];
+        }
         $response->err_no = $response->data->custom_err->err_code;
         $response->err_msg = $response->data->custom_err->err_msg;
-        DouDianOrderLog::query()->create((array)$response);
         /**
          * 之前的接口返回 error在外层
          */
@@ -1026,6 +1028,7 @@ class DouDianServers
 
                 //解密
                 $temp_res = $this->runDecryptApi([$cipher_infos]);
+            
                 if ($temp_res['code'] === false) {
                     break;
                 }
