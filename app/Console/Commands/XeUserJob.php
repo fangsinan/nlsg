@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Models\VipUserBind;
 use App\Servers\V5\XiaoETongServers;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Model;
 
 class XeUserJob extends Command
 {
@@ -100,6 +102,12 @@ class XeUserJob extends Command
                 break;
             case 29:
                 $xes->runUserJobSon(0);
+                break;
+
+            case 30:
+                $vub = new VipUserBind();
+                $vub->bindToXeUserJobLiveRole();
+                $vub->bindToXeUserJob();
                 break;
 
             case 99:
