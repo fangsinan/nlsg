@@ -72,6 +72,7 @@ class XiaoeTechServers
             return $this->err_msg;
         }
 
+
         do {
 
             $redis_page_index_key = 'xe_sync_order_list_page_index';
@@ -91,7 +92,6 @@ class XiaoeTechServers
                 'page' => intval($page_index),
                 'page_size' => intval($page_size),
             ];
-
             var_dump($paratms);
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.ecommerce.order.list/1.0.0', $paratms);
             if ($res['body']['code'] != 0) {
@@ -110,6 +110,7 @@ class XiaoeTechServers
                     $count = $res['body']['data']['total'];
                     $total_page = ceil($count / $page_size) + 1;
                     for ($i = 2; $i <= $total_page; $i++) {
+                        var_dump($i);
                         Redis::rpush($redis_page_index_key, $i);
                     }
                 }
@@ -124,6 +125,7 @@ class XiaoeTechServers
                 $price_info = $order['price_info'] ?? [];
                 $ship_info = $order['ship_info'] ?? [];
 
+                var_dump($order_info['order_id']);
                 try {
                     //保存小鹅通用户
                     $XeUser = XeUser::query()->where('xe_user_id', $order_info['user_id'])->first();
@@ -222,6 +224,26 @@ class XiaoeTechServers
                             $XeOrder->$key = $v;
                         }
                     }
+
+                    //判断是否是推广员
+                    if($XeOrder->is_distributor==0
+                        && $XeOrder->goods_name=='幸福学社合伙人'
+                        && $XeOrder->goods_original_total_price==258000
+                        && $XeOrder->pay_state==1
+                        && $XeOrder->order_state==4
+                    ){
+
+                        var_dump($XeOrder->goods_name);
+                        $res=$this->distributor_member_add('',$XeOrder->xe_user_id);
+                        if(checkRes($res)){
+                            if(empty($res['is_exist'])){
+                                $XeOrder->is_distributor=1;
+                            }else{
+                                $XeOrder->is_distributor=2;
+                            }
+                        }
+                    }
+
                     $XeOrder->save();
                 } catch (\Exception $e) {
                     $errCode = $e->getCode();
@@ -229,6 +251,8 @@ class XiaoeTechServers
                         return $e->getMessage();
                     }
                 }
+
+
 
                 foreach ($good_list as $good) {
 
@@ -746,22 +770,27 @@ class XiaoeTechServers
     /**
      * 新增推广员
      */
-    public function distributor_member_add($phone)
+    public function distributor_member_add($phone='',$user_id='')
     {
-
-        $res = $this->user_register($phone);
-        if (!checkRes($res)) {
-            return $res;
+        if(empty($phone) && empty($user_id)){
+            return '参数错误';
         }
 
-        $user_id = $res['user_id'] ?? '';
+        if($phone){
+            $res = $this->user_register($phone);
+            if (!checkRes($res)) {
+                return $res;
+            }
+            $user_id = $res['user_id'] ?? '';
+        }
+
         if (!$user_id) {
             return '客户不存在';
         }
 
         $XeDistributor = XeDistributor::query()->where('xe_user_id', $user_id)->first();
         if ($XeDistributor) {
-            return ['user_id' => $user_id, 'created_at' => $XeDistributor->created_at];
+            return ['user_id' => $user_id,'is_exist'=>1, 'created_at' => $XeDistributor->created_at];
         }
 
         $paratms = [
@@ -782,7 +811,12 @@ class XiaoeTechServers
         $XeDistributor->group_name = '合伙人';
         $XeDistributor->save();
 
-        return ['user_id' => $user_id, 'created_at' => date('Y-m-d H:i:s')];
+        $is_exist=0;
+        if($res['body']['code'] == 20003){
+            $is_exist=1;
+        }
+
+        return ['user_id' => $user_id,'is_exist'=>$is_exist, 'created_at' => date('Y-m-d H:i:s')];
 
     }
 
