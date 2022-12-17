@@ -106,6 +106,7 @@ class XeUserJob extends Command
 
             case 30:
                 $vub = new VipUserBind();
+                $vub->bindToXeUserJobLiveRole();
                 $vub->bindToXeUserJob();
                 break;
 

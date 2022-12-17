@@ -13,7 +13,7 @@ class VipUserBind extends Base
     protected $table = 'nlsg_vip_user_bind';
 
     protected $fillable = [
-        'parent','son','life','begin_at','end_at','channel','status'
+        'parent', 'son', 'life', 'begin_at', 'end_at', 'channel', 'status'
     ];
 
     //0没绑定   -1绑定但是无效   其他父类用户id
@@ -23,17 +23,17 @@ class VipUserBind extends Base
             return 0;
         }
         $res = DB::table('nlsg_vip_user_bind as vub')
-            ->leftJoin('nlsg_user as u', 'vub.parent', '=', 'u.phone')
-            ->leftJoin('nlsg_vip_user as vu', function ($join) {
-                $join->on('vu.user_id', '=', 'u.id')
-                    ->where('vu.is_default', '=', 1)
-                    ->where('vu.status', '=', 1);
-            })
-            ->where('son', '=', $phone)
-            ->where('vub.status','=',1)
-            ->whereRaw('(life = 1 or (life = 2 AND FROM_UNIXTIME(UNIX_TIMESTAMP()) BETWEEN begin_at and end_at))')
-            ->select(['parent', 'u.id as parent_user_id', 'vu.user_id as vuid'])
-            ->first();
+                 ->leftJoin('nlsg_user as u', 'vub.parent', '=', 'u.phone')
+                 ->leftJoin('nlsg_vip_user as vu', function ($join) {
+                     $join->on('vu.user_id', '=', 'u.id')
+                          ->where('vu.is_default', '=', 1)
+                          ->where('vu.status', '=', 1);
+                 })
+                 ->where('son', '=', $phone)
+                 ->where('vub.status', '=', 1)
+                 ->whereRaw('(life = 1 or (life = 2 AND FROM_UNIXTIME(UNIX_TIMESTAMP()) BETWEEN begin_at and end_at))')
+                 ->select(['parent', 'u.id as parent_user_id', 'vu.user_id as vuid'])
+                 ->first();
 
         if (empty($res)) {
             return 0;
@@ -155,6 +155,50 @@ class VipUserBind extends Base
         }
 
         return 0;
+
+    }
+
+    public function bindToXeUserJobLiveRole()
+    {
+        $now      = date('Y-m-d H:i:s');
+        $begin_at = date('Y-m-d H:i:00', strtotime('-6 minutes'));
+        $page     = 1;
+        $size     = 300;
+
+        $total = 0;
+        while (true) {
+
+            $list = DB::table('nlsg_backend_live_role as lr')
+                      ->join('nlsg_vip_user_bind as ub', 'lr.son', '=', 'ub.parent')
+                      ->where('ub.created_at', '>=', $begin_at)
+                      ->limit($size)
+                      ->offset(($page - 1) * $size)
+                      ->select(['ub.son'])
+                      ->get();
+
+            if ($list->isEmpty()) {
+                break;
+            }
+
+            $page++;
+
+            $add_data = [];
+
+            foreach ($list as $v) {
+                $total++;
+                $add_data[] = [
+                    'parent_phone'      => '18512378959',
+                    'parent_xe_user_id' => 'u_5d538b27472fb_gbuhCZK6To',
+                    'parent_job'        => '2',
+                    'parent_job_time'   => $now,
+                    'son_phone'         => $v->son,
+                ];
+            }
+            XeUserJob::query()->insert($add_data);
+        }
+
+        dd($total);
+
 
     }
 
