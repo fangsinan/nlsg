@@ -196,10 +196,6 @@ class VipUserBind extends Base
             }
             XeUserJob::query()->insert($add_data);
         }
-
-        dd($total);
-
-
     }
 
 }
