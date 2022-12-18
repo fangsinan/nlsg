@@ -53,10 +53,10 @@ class DouDianServers
             $end_time   = $begin_time + 86400;
 
             ConfigModel::query()
-                ->where('id', 71)
-                ->update([
-                    'value' => date('Y-m-d H:i:00', $end_time)
-                ]);
+                       ->where('id', 71)
+                       ->update([
+                                    'value' => date('Y-m-d H:i:00', $end_time)
+                                ]);
 
         } else {
             $end_time   = time();
@@ -73,9 +73,9 @@ class DouDianServers
     public function decryptJob(): bool
     {
         $decrypt_quota = DouDianOrderDecryptQuota::query()
-            ->where('dou_dian_type', '=', 1)
-            ->orderBy('id', 'desc')
-            ->first();
+                                                 ->where('dou_dian_type', '=', 1)
+                                                 ->orderBy('id', 'desc')
+                                                 ->first();
 
         $now_date   = date('Y-m-d H:i:s');
         $check_flag = 0;//解密任务中,0表示正常请求  1表示单条请求
@@ -134,10 +134,10 @@ class DouDianServers
             $end_time   = $begin_time + 43200;
 
             ConfigModel::query()
-                ->where('id', 70)
-                ->update([
-                    'value' => date('Y-m-d H:i:00', $end_time)
-                ]);
+                       ->where('id', 70)
+                       ->update([
+                                    'value' => date('Y-m-d H:i:00', $end_time)
+                                ]);
 
         } else {
             $end_time   = time();
@@ -154,30 +154,31 @@ class DouDianServers
 
 
     //根据订单号获取订单详情
-    public function tempGetOrderDetails(){
+    public function tempGetOrderDetails()
+    {
         $list = DouDianOrder::query()
-            ->where('dou_dian_type', '=', 3)
-            ->limit(50)
-            ->select('order_id')
-            ->get();
+                            ->where('dou_dian_type', '=', 3)
+                            ->limit(50)
+                            ->select('order_id')
+                            ->get();
 
-        if ($list->isEmpty()){
+        if ($list->isEmpty()) {
             return true;
         }
 
         $list = $list->toArray();
 
         $request = new OrderOrderDetailRequest();
-        $param = new OrderOrderDetailParam();
+        $param   = new OrderOrderDetailParam();
         $request->setParam($param);
 
 
-        foreach ($list as $v){
+        foreach ($list as $v) {
 
 //            echo '开始:'.$v['order_id'].' : '.date('Y-m-d H:i:s').PHP_EOL;
 
             $param->shop_order_id = $v['order_id'];
-            $response = $request->execute('');
+            $response             = $request->execute('');
 
             try {
                 $order = $response->data->shop_order_detail;
@@ -194,7 +195,7 @@ class DouDianServers
                 $order->post_addr_street_id      = 0;
 
                 $order->dou_dian_type = 1;
-                $order->created_at = date('Y-m-d H:i:s',$order->create_time);
+                $order->created_at    = date('Y-m-d H:i:s', $order->create_time);
                 DouDianOrder::query()->updateOrCreate(
                     [
                         'order_id' => $order->order_id
@@ -218,15 +219,15 @@ class DouDianServers
                     $logistics->order_id = $order->order_id;
 
                     DouDianOrderLogistics::query()
-                        ->updateOrCreate(
-                            [
-                                'tracking_no' => $logistics->tracking_no,
-                                'company'     => $logistics->company,
-                            ],
-                            (array)$logistics
-                        );
+                                         ->updateOrCreate(
+                                             [
+                                                 'tracking_no' => $logistics->tracking_no,
+                                                 'company'     => $logistics->company,
+                                             ],
+                                             (array)$logistics
+                                         );
                 }
-            }catch (\Exception $e){
+            } catch (\Exception $e) {
                 print_r($e->getMessage());
                 continue;
             }
@@ -238,43 +239,44 @@ class DouDianServers
     }
 
     //临时用于导入列表接口不能抓取的订单
-    public function tempExcelAddOrder(){
+    public function tempExcelAddOrder()
+    {
         $list = DB::table('wwwwww_douyin')
 //            ->limit(20000)
-            ->get()
-            ->toArray();
+                  ->get()
+                  ->toArray();
 
         $count = 0;
 
-        foreach ($list as $v){
+        foreach ($list as $v) {
             $vid = $v->id;
-            $v = trim($v->phone);
+            $v   = trim($v->phone);
 
             $temp_check = DouDianOrder::query()
-                ->where('order_id','=',$v)
-                ->first();
+                                      ->where('order_id', '=', $v)
+                                      ->first();
 
-            if(empty($temp_check)){
+            if (empty($temp_check)) {
                 DouDianOrder::query()
-                    ->insert([
-                        'order_id'=>$v,
-                        'dou_dian_type'=>3,
-                        'order_status'=>1,
-                        'order_status_desc'=>1,
-                        'main_status'=>1,
-                        'main_status_desc'=>1,
-                    ]);
+                            ->insert([
+                                         'order_id'          => $v,
+                                         'dou_dian_type'     => 3,
+                                         'order_status'      => 1,
+                                         'order_status_desc' => 1,
+                                         'main_status'       => 1,
+                                         'main_status_desc'  => 1,
+                                     ]);
                 $count++;
-                echo $v.'不存在,写入...'.PHP_EOL;
+                echo $v . '不存在,写入...' . PHP_EOL;
             }
 
             DB::table('wwwwww_douyin')
-                ->where('id','=',$vid)
-                ->delete();
+              ->where('id', '=', $vid)
+              ->delete();
 
         }
 
-        dd('写入成功:'.$count);
+        dd('写入成功:' . $count);
     }
 
     public function testGetOrder()
@@ -304,9 +306,9 @@ class DouDianServers
 
 
         dd([
-            $response,
-            $response_1
-        ]);
+               $response,
+               $response_1
+           ]);
     }
 
     //sku列表
@@ -315,10 +317,10 @@ class DouDianServers
         $begin_created_at = date('Y-m-d H:i:s', $begin_create_time);
 
         $product_list = DouDianProductList::query()
-            ->where('create_time', '>', $begin_create_time)
-            ->orWhere('created_at', '>', $begin_created_at)
-            ->select(['id', 'product_id'])
-            ->get();
+                                          ->where('create_time', '>', $begin_create_time)
+                                          ->orWhere('created_at', '>', $begin_created_at)
+                                          ->select(['id', 'product_id'])
+                                          ->get();
 
         $request = new SkuListRequest();
 
@@ -443,7 +445,7 @@ class DouDianServers
             DouDianOrderLog::query()->create((array)$response);
 
             if ($response->code !== 10000) {
-                if (in_array($response->err_no, [30001, 30002, 30005, 30007])) {
+                if (in_array($response->err_no ?? 0, [30001, 30002, 30005, 30007])) {
                     $this->accessTokenJob();
                 }
                 return true;
@@ -491,13 +493,13 @@ class DouDianServers
                     $logistics->order_id = $order->order_id;
 
                     DouDianOrderLogistics::query()
-                        ->updateOrCreate(
-                            [
-                                'tracking_no' => $logistics->tracking_no,
-                                'company'     => $logistics->company,
-                            ],
-                            (array)$logistics
-                        );
+                                         ->updateOrCreate(
+                                             [
+                                                 'tracking_no' => $logistics->tracking_no,
+                                                 'company'     => $logistics->company,
+                                             ],
+                                             (array)$logistics
+                                         );
                 }
 
 
@@ -512,9 +514,9 @@ class DouDianServers
     {
 
         $main_status = DouDianOrder::query()
-            ->select(['main_status', 'main_status_desc'])
-            ->groupBy('main_status')
-            ->get();
+                                   ->select(['main_status', 'main_status_desc'])
+                                   ->groupBy('main_status')
+                                   ->get();
 
         foreach ($main_status as $ms) {
             DouDianOrderStatus::query()->firstOrCreate(
@@ -528,11 +530,11 @@ class DouDianServers
         }
 
         $order_status = DouDianOrder::query()
-            ->select([
-                'order_status', 'order_status_desc',
-            ])
-            ->groupBy('order_status')
-            ->get();
+                                    ->select([
+                                                 'order_status', 'order_status_desc',
+                                             ])
+                                    ->groupBy('order_status')
+                                    ->get();
 
         foreach ($order_status as $os) {
             DouDianOrderStatus::query()->firstOrCreate(
@@ -556,17 +558,17 @@ class DouDianServers
         }
 
         $list = DouDianOrder::query()
-            ->where('decrypt_step', $step)
-            ->whereNotIn('order_status', [1, 4])
+                            ->where('decrypt_step', $step)
+                            ->whereNotIn('order_status', [1, 4])
 //            ->where('order_id', '>', '4933714072054765432')
-            ->where('dou_dian_type', '=', 1)
-            ->select([
-                'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
-                'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
-            ])
-            ->limit($size)
-            ->orderBy('order_id', 'desc')
-            ->get();
+                            ->where('dou_dian_type', '=', 1)
+                            ->select([
+                                         'order_id', 'order_status', 'order_status_desc', 'decrypt_step',
+                                         'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
+                                     ])
+                            ->limit($size)
+                            ->orderBy('order_id', 'desc')
+                            ->get();
 
         if ($list->isEmpty()) {
             return true;
@@ -640,8 +642,8 @@ class DouDianServers
                 }
 
                 $check_order = DouDianOrder::query()
-                    ->where('order_id', $decrypt_info->auth_id)
-                    ->first();
+                                           ->where('order_id', $decrypt_info->auth_id)
+                                           ->first();
 
                 if ($decrypt_info->err_no == 0) {
                     switch ($step) {
@@ -713,8 +715,8 @@ class DouDianServers
                     }
 
                     $check_order = DouDianOrder::query()
-                        ->where('order_id', $decrypt_info->auth_id)
-                        ->first();
+                                               ->where('order_id', $decrypt_info->auth_id)
+                                               ->first();
 
                     if ($decrypt_info->err_no == 0) {
                         switch ($step) {
@@ -752,28 +754,28 @@ class DouDianServers
     public function runDecrypt(): bool
     {
         DouDianOrder::query()
-            ->where('decrypt_step', '<>', 3)
-            ->where('post_tel', '<>', '')
-            ->where('post_receiver', '<>', '')
-            ->where('post_addr_detail', '<>', '')
-            ->update([
-                'decrypt_step' => 3
-            ]);
+                    ->where('decrypt_step', '<>', 3)
+                    ->where('post_tel', '<>', '')
+                    ->where('post_receiver', '<>', '')
+                    ->where('post_addr_detail', '<>', '')
+                    ->update([
+                                 'decrypt_step' => 3
+                             ]);
 
         $list = DouDianOrder::query()
-            ->whereNotIn('order_status', [1, 4])
-            ->where('decrypt_step', '<>', 9)
-            ->where('decrypt_step', '<', self::DECRYPT_JOB_TYPE)
-            ->where('dou_dian_type', '=', 1)
-            ->where('encrypt_post_tel','<>','')
-            ->select([
-                'order_id', 'order_status', 'decrypt_step',
-                'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
-                'post_tel', 'post_receiver', 'post_addr_detail'
-            ])
-            ->limit($this->runPageSize)
-            ->orderBy('order_id', 'desc')
-            ->get();
+                            ->whereNotIn('order_status', [1, 4])
+                            ->where('decrypt_step', '<>', 9)
+                            ->where('decrypt_step', '<', self::DECRYPT_JOB_TYPE)
+                            ->where('dou_dian_type', '=', 1)
+                            ->where('encrypt_post_tel', '<>', '')
+                            ->select([
+                                         'order_id', 'order_status', 'decrypt_step',
+                                         'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
+                                         'post_tel', 'post_receiver', 'post_addr_detail'
+                                     ])
+                            ->limit($this->runPageSize)
+                            ->orderBy('order_id', 'desc')
+                            ->get();
 
         if ($list->isEmpty()) {
             return true;
@@ -790,8 +792,8 @@ class DouDianServers
 
             for ($i = 1; $i <= self::DECRYPT_JOB_TYPE; $i++) {
                 $check_this_order = DouDianOrder::query()
-                    ->where('order_id', '=', $v['order_id'])
-                    ->first();
+                                                ->where('order_id', '=', $v['order_id'])
+                                                ->first();
 
                 $cipher_infos            = [];
                 $cipher_infos['auth_id'] = $v['order_id'];
@@ -897,10 +899,10 @@ class DouDianServers
         DouDianOrderLog::query()->create((array)$response);
         $response->job_type     = 2;
         $response->decrypt_text = json_encode($response);
-        if (!isset($response->data)){
+        if (!isset($response->data)) {
             return ['code' => false, 'msg' => '结构错误', 'data' => []];
         }
-        $response->err_no = $response->data->custom_err->err_code;
+        $response->err_no  = $response->data->custom_err->err_code;
         $response->err_msg = $response->data->custom_err->err_msg;
         /**
          * 之前的接口返回 error在外层
@@ -925,53 +927,54 @@ class DouDianServers
     }
 
     //抖店配额和风险改版 新任务
-    public function runDecryptNew(){
+    public function runDecryptNew()
+    {
         $search_product_type = [3];//允许解密的订单类型
         DouDianOrder::query()
-            ->where('decrypt_step', '<>', 3)
-            ->where('post_tel', '<>', '')
-            ->where('post_receiver', '<>', '')
-            ->where('post_addr_detail', '<>', '')
-            ->update([
-                'decrypt_step' => 3
-            ]);
+                    ->where('decrypt_step', '<>', 3)
+                    ->where('post_tel', '<>', '')
+                    ->where('post_receiver', '<>', '')
+                    ->where('post_addr_detail', '<>', '')
+                    ->update([
+                                 'decrypt_step' => 3
+                             ]);
 
-        $config = ConfigModel::getData(83,1);
-        $config = explode(',',$config);
-        $c_s_1 = $config[0] ?? 5;
-        $c_s_2 = $config[1] ?? 10;
+        $config = ConfigModel::getData(83, 1);
+        $config = explode(',', $config);
+        $c_s_1  = $config[0] ?? 5;
+        $c_s_2  = $config[1] ?? 10;
 
         $limit = (int)(300 / ($c_s_2 * 3));
 
-        if ($limit < 1){
+        if ($limit < 1) {
             $limit = 10;
         }
 
         $list = DouDianOrder::query()
-            ->with([
-                'orderList:order_id,product_id,parent_order_id',
-                'orderList.productInfo:id,product_type,product_id'
-            ])
-            ->whereHas('orderList.productInfo', function ($query) use ($search_product_type) {
-                $query->where(function($q)use($search_product_type){
-                    $q->whereIn('product_type',$search_product_type)
-                        ->orWhere('to_decrypt','=',2);
-                });
-            })
-            ->whereNotIn('order_status', [1, 4])
-            ->where('decrypt_step', '<>', 9)
-            ->where('decrypt_step', '<', self::DECRYPT_JOB_TYPE)
-            ->where('dou_dian_type', '=', 1)
-            ->where('encrypt_post_tel','<>','')
-            ->where('create_time','>',1659283200)
-            ->select([
-                'order_id', 'order_status', 'decrypt_step',
-                'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
-                'post_tel', 'post_receiver', 'post_addr_detail'
-            ])
-            ->limit($limit)
-            ->orderBy('order_id', 'desc')
-            ->get();
+                            ->with([
+                                       'orderList:order_id,product_id,parent_order_id',
+                                       'orderList.productInfo:id,product_type,product_id'
+                                   ])
+                            ->whereHas('orderList.productInfo', function ($query) use ($search_product_type) {
+                                $query->where(function ($q) use ($search_product_type) {
+                                    $q->whereIn('product_type', $search_product_type)
+                                      ->orWhere('to_decrypt', '=', 2);
+                                });
+                            })
+                            ->whereNotIn('order_status', [1, 4])
+                            ->where('decrypt_step', '<>', 9)
+                            ->where('decrypt_step', '<', self::DECRYPT_JOB_TYPE)
+                            ->where('dou_dian_type', '=', 1)
+                            ->where('encrypt_post_tel', '<>', '')
+                            ->where('create_time', '>', 1659283200)
+                            ->select([
+                                         'order_id', 'order_status', 'decrypt_step',
+                                         'encrypt_post_tel', 'encrypt_post_receiver', 'encrypt_post_addr_detail',
+                                         'post_tel', 'post_receiver', 'post_addr_detail'
+                                     ])
+                            ->limit($limit)
+                            ->orderBy('order_id', 'desc')
+                            ->get();
 
         if ($list->isEmpty()) {
             exit('没有需要解密的订单');
@@ -987,11 +990,11 @@ class DouDianServers
                     exit('任务开关关闭');
                 }
 
-                sleep(rand($c_s_1,$c_s_2));
+                sleep(rand($c_s_1, $c_s_2));
 
                 $check_this_order = DouDianOrder::query()
-                    ->where('order_id', '=', $v['order_id'])
-                    ->first();
+                                                ->where('order_id', '=', $v['order_id'])
+                                                ->first();
 
                 $cipher_infos            = [];
                 $cipher_infos['auth_id'] = $v['order_id'];
@@ -1028,7 +1031,7 @@ class DouDianServers
 
                 //解密
                 $temp_res = $this->runDecryptApi([$cipher_infos]);
-            
+
                 if ($temp_res['code'] === false) {
                     break;
                 }
@@ -1072,7 +1075,7 @@ class DouDianServers
                     //查看err_msg中是否包含 '隐私','额度','安全'
 
                     $err_msg = $temp_res['data']['err_msg'];
-                    if (strpos($err_msg,'隐私') !== false){
+                    if (strpos($err_msg, '隐私') !== false) {
                         //隐私问题,直接9
                         $check_this_order->decrypt_step    = 9;
                         $check_this_order->decrypt_err_no  = $temp_res['data']['err_no'];
@@ -1081,12 +1084,12 @@ class DouDianServers
                         continue;
                     }
 
-                    if (strpos($err_msg,'额度') !== false){
+                    if (strpos($err_msg, '额度') !== false) {
                         $this->DecryptQuotaInsert(1, 1, 1);
                         exit('额度已用完');
                     }
 
-                    if (strpos($err_msg,'安全风险') !== false){
+                    if (strpos($err_msg, '安全风险') !== false) {
                         $this->DecryptQuotaInsert(1, 2, 1);
                         exit('环境风险');
                     }
@@ -1261,14 +1264,14 @@ class DouDianServers
     public function canToDecryptNew(int $dou_dian_type = 1): bool
     {
         $temp = DouDianOrderDecryptQuota::query()
-            ->where('expire','>',date('Y-m-d H:i:s'))
-            ->where('flag','=',1)
-            ->where('dou_dian_type','=', $dou_dian_type)
-            ->first();
+                                        ->where('expire', '>', date('Y-m-d H:i:s'))
+                                        ->where('flag', '=', 1)
+                                        ->where('dou_dian_type', '=', $dou_dian_type)
+                                        ->first();
 
         if ($temp) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
@@ -1281,9 +1284,9 @@ class DouDianServers
     public function canToDecrypt(int $dou_dian_type = 1): int
     {
         $decrypt_quota = DouDianOrderDecryptQuota::query()
-            ->where('dou_dian_type', '=', $dou_dian_type)
-            ->orderBy('id', 'desc')
-            ->first();
+                                                 ->where('dou_dian_type', '=', $dou_dian_type)
+                                                 ->orderBy('id', 'desc')
+                                                 ->first();
 
         if (empty($decrypt_quota)) {
             return 1;
@@ -1316,13 +1319,13 @@ class DouDianServers
         $time = $err_type == 1 ? 600 : 1800;
 
         DouDianOrderDecryptQuota::query()
-            ->create([
-                'flag'          => 1,
-                'expire'        => date('Y-m-d H:i:s', time() + $time),
-                'check'         => $check,
-                'err_type'      => $err_type,
-                'dou_dian_type' => $dou_dian_type,
-            ]);
+                                ->create([
+                                             'flag'          => 1,
+                                             'expire'        => date('Y-m-d H:i:s', time() + $time),
+                                             'check'         => $check,
+                                             'err_type'      => $err_type,
+                                             'dou_dian_type' => $dou_dian_type,
+                                         ]);
 
     }
 
@@ -1333,10 +1336,10 @@ class DouDianServers
             $accessToken = AccessTokenBuilder::build($this->shopId, ACCESS_TOKEN_SHOP_ID);
             if ($accessToken->isSuccess()) {
                 ConfigModel::query()->where('id', 68)
-                    ->update(['value' => $accessToken->getAccessToken()]);
+                           ->update(['value' => $accessToken->getAccessToken()]);
 
                 ConfigModel::query()->where('id', 69)
-                    ->update(['value' => $accessToken->getRefreshToken()]);
+                           ->update(['value' => $accessToken->getRefreshToken()]);
             }
             return $accessToken;
 
