@@ -431,12 +431,12 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_order_list(1);
-        })->everyTenMinutes()->runInBackground();
+        })->everyFifteenMinutes()->runInBackground();
 
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_order_list(0);
-        })->everyThirtyMinutes()->runInBackground();
+        })->everyFiveMinutes()->runInBackground();
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_order_list(0);
