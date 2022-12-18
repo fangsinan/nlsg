@@ -91,6 +91,7 @@ class XiaoeTechServers
                 'access_token' => $this->get_token(),
                 'page' => intval($page_index),
                 'page_size' => intval($page_size),
+                'order_asc' => 'desc',
             ];
             var_dump($paratms);
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.ecommerce.order.list/1.0.0', $paratms);
