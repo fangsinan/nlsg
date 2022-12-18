@@ -55,7 +55,7 @@ class XiaoeTechServers
             return false;
         }
 
-        Redis::setex($token_key, 300, $res['body']['data']['access_token']);
+        Redis::setex($token_key, 3000, $res['body']['data']['access_token']);
         $this->access_token = $res['body']['data']['access_token'];
         return $res['body']['data']['access_token'];
     }
