@@ -431,7 +431,7 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_order_list(1);
-        })->hourly()->runInBackground();//每5分同步发送到达量
+        })->everyTenMinutes()->runInBackground();
 
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
@@ -440,11 +440,11 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_order_list(0);
-        })->everyThirtyMinutes()->runInBackground();
+        })->everyFiveMinutes()->runInBackground();
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_order_list(0);
-        })->everyThirtyMinutes()->runInBackground();
+        })->everyFiveMinutes()->runInBackground();
 
     }
 
