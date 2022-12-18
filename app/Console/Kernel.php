@@ -31,6 +31,7 @@ use App\Servers\UserWechatServers;
 use App\Servers\V5\JpushService;
 use App\Servers\V5\ShareServers;
 use App\Servers\V5\WechatServers;
+use App\Servers\V5\XiaoeTechServers;
 use EasyWeChat\Factory;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -425,6 +426,25 @@ class Kernel extends ConsoleKernel
             $UserWechatServers->set_wechat_user_id();
 
         })->between('1:00', '6:00')->everyThirtyMinutes();
+
+        //小鹅通
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_order_list(1);
+        })->hourly()->runInBackground();//每5分同步发送到达量
+
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_order_list(0);
+        })->everyThirtyMinutes()->runInBackground();
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_order_list(0);
+        })->everyThirtyMinutes()->runInBackground();
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_order_list(0);
+        })->everyThirtyMinutes()->runInBackground();
 
     }
 
