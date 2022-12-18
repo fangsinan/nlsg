@@ -94,9 +94,17 @@ class XiaoeTechServers
                 'order_asc' => 'desc',
             ];
 
-            var_dump($paratms);
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.ecommerce.order.list/1.0.0', $paratms);
+            DB::table('nlsg_log_info')->insert([
+                'url'           =>  'xe.ecommerce.order.list',
+                'parameter'     =>  json_encode($paratms),
+                'message'       =>  json_encode($res),
+                'created_at'    =>  date('Y-m-d H:i:s', time())
+            ]);
             if ($res['body']['code'] != 0) {
+                if($res['body']['code']==2008){
+                    $this->get_token(1);
+                }
                 $this->err_msg = $res['body']['msg'];
                 return false;
             }
@@ -237,6 +245,7 @@ class XiaoeTechServers
 
                         var_dump($XeOrder->goods_name);
                         $res=$this->distributor_member_add('',$XeOrder->xe_user_id);
+                        var_dump($res);
                         if(checkRes($res)){
                             if(empty($res['is_exist'])){
                                 $XeOrder->is_distributor=1;
