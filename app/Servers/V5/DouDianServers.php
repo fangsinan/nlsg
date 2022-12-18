@@ -1028,7 +1028,7 @@ class DouDianServers
 
                 //解密
                 $temp_res = $this->runDecryptApi([$cipher_infos]);
-            
+
                 if ($temp_res['code'] === false) {
                     break;
                 }
