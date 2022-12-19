@@ -431,7 +431,7 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_order_list(1);
-        })->everyTenMinutes()->runInBackground();
+        })->everyTenMinutes()->runInBackground()->onOneServer();
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_order_list(0);
@@ -441,7 +441,7 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_distributor_list(1);
-        })->everyTenMinutes()->runInBackground();
+        })->everyTenMinutes()->runInBackground()->onOneServer();
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_distributor_list(0);
@@ -462,7 +462,7 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_distributor_customer_list(1);
-        })->dailyAt('0:01')->runInBackground();
+        })->dailyAt('0:01')->runInBackground()->onOneServer();
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_distributor_customer_list(0);
