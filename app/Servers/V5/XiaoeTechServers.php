@@ -79,15 +79,16 @@ class XiaoeTechServers
         }
 
 
-        do {
+        for ($i=1; $i<=1000; $i++)
+        {
 
             $redis_page_index_key = 'xe_sync_order_list_page_index';
-
             $page_index = Redis::lpop($redis_page_index_key);
 
             if ($is_init) {
                 $page_index = 1;
             }
+
             if (empty($page_index)) {
                 return false;
             }
@@ -108,9 +109,11 @@ class XiaoeTechServers
                 'message'       =>  json_encode($res),
                 'created_at'    =>  date('Y-m-d H:i:s', time())
             ]);
+
             if ($res['body']['code'] != 0) {
                 if($res['body']['code']==2008){
                     $this->get_token(1);
+                    continue;
                 }
                 $this->err_msg = $res['body']['msg'];
                 return false;
@@ -271,7 +274,6 @@ class XiaoeTechServers
                 }
 
 
-
                 foreach ($good_list as $good) {
 
 
@@ -315,7 +317,8 @@ class XiaoeTechServers
             if ($is_init) {
                 return false;
             }
-        } while (Redis::llen($redis_page_index_key));
+
+        }
 
     }
 
@@ -495,7 +498,8 @@ class XiaoeTechServers
         }
 
 
-        do {
+        for ($i=1; $i<=1000; $i++)
+        {
 
             $user_ids = json_decode(Redis::lpop($redis_page_index_key),true);
             if (empty($user_ids)) {
@@ -510,6 +514,7 @@ class XiaoeTechServers
                 'page' => intval($page_index),
                 'page_size' => intval($page_size),
             ];
+
             var_dump($paratms);
 
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.user.batch_by_user_id.get/1.0.0', $paratms);
@@ -558,8 +563,8 @@ class XiaoeTechServers
                     }
                 }
             }
+        }
 
-        } while (Redis::llen($redis_page_index_key));
     }
 
     /**
@@ -573,7 +578,8 @@ class XiaoeTechServers
             return $this->err_msg;
         }
 
-        do {
+        for ($i=1; $i<=1000; $i++)
+        {
 
             $redis_page_index_key = 'xe_get_distributor_list_page_index';
             $page_index = Redis::lpop($redis_page_index_key);
@@ -601,6 +607,7 @@ class XiaoeTechServers
                 'message'       =>  json_encode($res),
                 'created_at'    =>  date('Y-m-d H:i:s', time())
             ]);
+
             if ($res['body']['code'] != 0) {
                 if($res['body']['code']==2008){
                     $this->get_token(1);
@@ -674,7 +681,7 @@ class XiaoeTechServers
                 return false;
             }
 
-        } while (Redis::llen($redis_page_index_key));
+        }
     }
 
     /**
@@ -705,7 +712,8 @@ class XiaoeTechServers
 
         $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
 
-        do {
+        for ($i=1; $i<=1000; $i++)
+        {
 
             if ($is_init) {
                 $page_index = 1;
@@ -724,6 +732,7 @@ class XiaoeTechServers
             if (empty($page_index)) {
                 return false;
             }
+
             $page_size = 100;
             $paratms = [
                 'access_token' => $this->get_token(),
@@ -802,9 +811,10 @@ class XiaoeTechServers
             if ($is_init) {
                 return false;
             }
+
             var_dump('end');
 
-        } while (Redis::llen($redis_page_index_key));
+        }
 
     }
 
