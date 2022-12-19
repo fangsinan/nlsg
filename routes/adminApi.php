@@ -479,6 +479,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('xet/user_info','XiaoETongController@XeUserInfo');
         Route::post('xet/user_list','XiaoETongController@userList');
         Route::post('xet/order_list','XiaoETongController@orderList');
+        Route::post('select_data/xe', 'SelectDataController@XeOrderSelect');
         //⬆⬆⬆⬆⬆小鹅通部分⬆⬆⬆⬆⬆
     });
 

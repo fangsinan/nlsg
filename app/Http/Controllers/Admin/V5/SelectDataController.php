@@ -108,4 +108,10 @@ class SelectDataController extends ControllerBackend
     }
 
 
+    public function XeOrderSelect(Request $request){
+        return $this->getRes((new sds())->XeOrderSelect($request->input()));
+    }
+
+
+
 }

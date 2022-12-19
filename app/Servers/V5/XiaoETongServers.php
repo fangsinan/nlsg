@@ -288,12 +288,14 @@ class XiaoETongServers
             ->select([
                 'id','xe_user_id','order_id','wx_app_type','pay_type','channel_type',
                 'actual_fee','actual_price',
-                'goods_original_total_price','goods_name','goods_spu_type','goods_buy_num',
                 'order_type','xe_created_time',
                 'pay_state','pay_state_time',
                 'order_state','order_state_time',
             ])
-            ->with(['xeUserInfo:id,xe_user_id,user_id,nickname,phone,name']);
+            ->with([
+                'xeUserInfo:id,xe_user_id,user_id,nickname,phone,name',
+                'orderGoodsInfo:order_id,sku_id,goods_name,goods_image,buy_num',
+            ]);
 
         HelperService::queryWhen(
             $query,
@@ -339,7 +341,19 @@ class XiaoETongServers
             ]
         );
 
-        return $query->paginate($params['size'] ?? 10);
+        $list = $query->paginate($params['size'] ?? 10);
+
+        $xeo = new XeOrder();
+
+        foreach ($list as $v){
+            $v->pay_type_desc = $xeo->payType($v->pay_type);
+            $v->order_type_desc = $xeo->orderType($v->order_type);
+            $v->pay_state_desc = $xeo->payState($v->pay_state);
+            $v->order_state_desc = $xeo->orderState($v->order_state);
+            $v->wx_app_type_desc = $xeo->wx_app_type($v->wx_app_type);
+        }
+
+        return $list;
     }
 
 
