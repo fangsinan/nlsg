@@ -106,7 +106,7 @@ class XiaoeTechServers
                 'url'           =>  'xe.ecommerce.order.list',
                 'line'           =>  $res['body']['code'],
                 'parameter'     =>  json_encode($paratms),
-                'message'       =>  json_encode($res),
+                'message'       =>  $res['body']['data']['total']??0,
                 'created_at'    =>  date('Y-m-d H:i:s', time())
             ]);
 
@@ -523,7 +523,7 @@ class XiaoeTechServers
                 'url'           =>  'xe.user.batch_by_user_id.get',
                 'line'           =>  $res['body']['code'],
                 'parameter'     =>  json_encode($paratms),
-                'message'       =>  json_encode($res),
+//                'message'       =>  json_encode($res),
                 'created_at'    =>  date('Y-m-d H:i:s', time())
             ]);
 
@@ -604,7 +604,7 @@ class XiaoeTechServers
                 'url'           =>  'xe.distributor.list.get',
                 'line'           =>  $res['body']['code'],
                 'parameter'     =>  json_encode($paratms),
-                'message'       =>  json_encode($res),
+                'message'       =>  $res['body']['data']['count']??0,
                 'created_at'    =>  date('Y-m-d H:i:s', time())
             ]);
 
@@ -744,8 +744,12 @@ class XiaoeTechServers
 
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.sub_customer/1.0.0', $paratms);
             if ($res['body']['code'] != 0) {
+
+                if($res['body']['code']==2008){
+                    $this->get_token(1);
+                }
+
                 $this->err_msg = $res['body']['msg'];
-                var_dump($this->err_msg);
                 return $this->err_msg;
             }
             $return_list = $res['body']['data']['list'] ?? [];

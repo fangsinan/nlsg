@@ -431,7 +431,7 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_order_list(1);
-        })->everyTenMinutes()->runInBackground();
+        })->everyTenMinutes()->runInBackground()->onOneServer();
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_order_list(0);
@@ -441,7 +441,7 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_distributor_list(1);
-        })->everyTenMinutes()->runInBackground();
+        })->everyTenMinutes()->runInBackground()->onOneServer();
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_distributor_list(0);
@@ -452,11 +452,21 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_user_info(1);
-        })->everyTenMinutes()->runInBackground();
+        })->everyTenMinutes()->runInBackground()->onOneServer();
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_user_info(0);
         })->everyMinute()->runInBackground();
+
+        //获取推广员客户
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_distributor_customer_list(1);
+        })->dailyAt('0:01')->runInBackground()->onOneServer();
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_distributor_customer_list(0);
+        })->everyMinute()->between('0:00', '5:00')->runInBackground();//每分钟执行一次
 
     }
 
