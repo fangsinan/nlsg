@@ -96,7 +96,8 @@ class XiaoeTechServers
 
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.ecommerce.order.list/1.0.0', $paratms);
             DB::table('nlsg_log_info')->insert([
-                'url'           =>  'xe.ecommerce.order.list',
+                'url'           =>  'xe.distributor.list.get',
+                'line'           =>  $res['body']['code'],
                 'parameter'     =>  json_encode($paratms),
                 'message'       =>  json_encode($res),
                 'created_at'    =>  date('Y-m-d H:i:s', time())
@@ -506,6 +507,15 @@ class XiaoeTechServers
             var_dump($paratms);
 
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.user.batch_by_user_id.get/1.0.0', $paratms);
+
+            DB::table('nlsg_log_info')->insert([
+                'url'           =>  'xe.distributor.list.get',
+                'line'           =>  $res['body']['code'],
+                'parameter'     =>  json_encode($paratms),
+                'message'       =>  json_encode($res),
+                'created_at'    =>  date('Y-m-d H:i:s', time())
+            ]);
+
             if ($res['body']['code'] != 0) {
                 $this->err_msg = $res['body']['msg'];
                 return $res['body']['msg'];
@@ -574,6 +584,13 @@ class XiaoeTechServers
 
             var_dump($paratms);
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.list.get/1.0.0', $paratms);
+            DB::table('nlsg_log_info')->insert([
+                'url'           =>  'xe.distributor.list.get',
+                'line'           =>  $res['body']['code'],
+                'parameter'     =>  json_encode($paratms),
+                'message'       =>  json_encode($res),
+                'created_at'    =>  date('Y-m-d H:i:s', time())
+            ]);
             if ($res['body']['code'] != 0) {
                 $this->err_msg = $res['body']['msg'];
                 return $res['body']['msg'];

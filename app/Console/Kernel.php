@@ -427,7 +427,7 @@ class Kernel extends ConsoleKernel
 
         })->between('1:00', '6:00')->everyThirtyMinutes();
 
-        //小鹅通
+        //小鹅通 订单
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_order_list(1);
@@ -435,6 +435,27 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_order_list(0);
+        })->everyMinute()->runInBackground();
+
+        //小鹅通 推广员
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_distributor_list(1);
+        })->everyTenMinutes()->runInBackground();
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_distributor_list(0);
+        })->everyMinute()->runInBackground();
+
+
+        //小鹅通用户
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_user_info(1);
+        })->everyTenMinutes()->runInBackground();
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_user_info(0);
         })->everyMinute()->runInBackground();
 
     }
