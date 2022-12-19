@@ -295,6 +295,7 @@ class XiaoETongServers
             ->with([
                 'xeUserInfo:id,xe_user_id,user_id,nickname,phone,name',
                 'orderGoodsInfo:order_id,sku_id,goods_name,goods_image,buy_num',
+                'distributeInfo',
             ]);
 
         HelperService::queryWhen(

@@ -30,6 +30,11 @@ class XeOrder extends Base
         return $this->hasMany(XeOrderGoods::class,'order_id','order_id');
     }
 
+    public function distributeInfo(): HasOne
+    {
+        return $this->hasOne(XeOrderDistribute::class,'order_id','order_id');
+    }
+
     public function payType($k, $f = 0)
     {
         $arr = [
