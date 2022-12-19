@@ -51,7 +51,7 @@ class XiaoeTechServers
 
         $res = self::curlGet('https://api.xiaoe-tech.com/token', $paratms);
         DB::table('nlsg_log_info')->insert([
-            'url'           =>  'xe.distributor.list.get',
+            'url'           =>  'token',
             'parameter'     =>  json_encode($paratms),
             'message'       =>  json_encode($res),
             'created_at'    =>  date('Y-m-d H:i:s', time())
@@ -102,7 +102,7 @@ class XiaoeTechServers
 
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.ecommerce.order.list/1.0.0', $paratms);
             DB::table('nlsg_log_info')->insert([
-                'url'           =>  'xe.distributor.list.get',
+                'url'           =>  'xe.ecommerce.order.list',
                 'line'           =>  $res['body']['code'],
                 'parameter'     =>  json_encode($paratms),
                 'message'       =>  json_encode($res),
@@ -515,7 +515,7 @@ class XiaoeTechServers
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.user.batch_by_user_id.get/1.0.0', $paratms);
 
             DB::table('nlsg_log_info')->insert([
-                'url'           =>  'xe.distributor.list.get',
+                'url'           =>  'xe.user.batch_by_user_id.get',
                 'line'           =>  $res['body']['code'],
                 'parameter'     =>  json_encode($paratms),
                 'message'       =>  json_encode($res),
