@@ -7,6 +7,7 @@ namespace App\Servers\V5;
 use App\Models\VipUserBind;
 use App\Models\XiaoeTech\XeDistributor;
 use App\Models\XiaoeTech\XeDistributorCustomer;
+use App\Models\XiaoeTech\XeOrder;
 use App\Models\XiaoeTech\XeUser;
 use App\Models\XiaoeTech\XeUserJob;
 use Illuminate\Support\Facades\DB;
@@ -283,7 +284,62 @@ class XiaoETongServers
 
     public function orderList($params, $admin)
     {
-        return [__LINE__];
+        $query = XeOrder::query()
+            ->select([
+                'id','xe_user_id','order_id','wx_app_type','pay_type','channel_type',
+                'actual_fee','actual_price',
+                'goods_original_total_price','goods_name','goods_spu_type','goods_buy_num',
+                'order_type','xe_created_time',
+                'pay_state','pay_state_time',
+                'order_state','order_state_time',
+            ])
+            ->with(['xeUserInfo:id,xe_user_id,user_id,nickname,phone,name']);
+
+        HelperService::queryWhen(
+            $query,
+            $params,
+            [
+                [
+                    'field' => 'xe_user_id',
+                ],
+                [
+                    'field' => 'order_id',
+                ],
+                [
+                    'field' => 'wx_app_type',
+                ],
+                [
+                    'field' => 'pay_type',
+                ],
+                [
+                    'field'    => 'phone',
+                    'model'    => 'xeUserInfo',
+                    'operator' => 'like',
+                ],
+                [
+                    'field'    => 'xe_created_time_begin',
+                    'alias'    => 'xe_created_time',
+                    'operator' => '>=',
+                ],
+                [
+                    'field'    => 'xe_created_time_end',
+                    'alias'    => 'xe_created_time',
+                    'operator' => '<=',
+                ],
+                [
+                    'field'    => 'pay_state_time_begin',
+                    'alias'    => 'pay_state_time',
+                    'operator' => '>=',
+                ],
+                [
+                    'field'    => 'pay_state_time_end',
+                    'alias'    => 'pay_state_time',
+                    'operator' => '<=',
+                ],
+            ]
+        );
+
+        return $query->paginate($params['size'] ?? 10);
     }
 
 
