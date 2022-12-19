@@ -50,6 +50,12 @@ class XiaoeTechServers
             ];
 
         $res = self::curlGet('https://api.xiaoe-tech.com/token', $paratms);
+        DB::table('nlsg_log_info')->insert([
+            'url'           =>  'xe.distributor.list.get',
+            'parameter'     =>  json_encode($paratms),
+            'message'       =>  json_encode($res),
+            'created_at'    =>  date('Y-m-d H:i:s', time())
+        ]);
         if (empty($res['body']['data']['access_token'])) {
             $this->err_msg = $res['body']['msg'];
             return false;
@@ -517,6 +523,10 @@ class XiaoeTechServers
             ]);
 
             if ($res['body']['code'] != 0) {
+                if($res['body']['code']==2008){
+                    $this->get_token(1);
+                }
+
                 $this->err_msg = $res['body']['msg'];
                 return $res['body']['msg'];
             }
@@ -592,6 +602,9 @@ class XiaoeTechServers
                 'created_at'    =>  date('Y-m-d H:i:s', time())
             ]);
             if ($res['body']['code'] != 0) {
+                if($res['body']['code']==2008){
+                    $this->get_token(1);
+                }
                 $this->err_msg = $res['body']['msg'];
                 return $res['body']['msg'];
             }
