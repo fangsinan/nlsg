@@ -744,8 +744,12 @@ class XiaoeTechServers
 
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.sub_customer/1.0.0', $paratms);
             if ($res['body']['code'] != 0) {
+
+                if($res['body']['code']==2008){
+                    $this->get_token(1);
+                }
+
                 $this->err_msg = $res['body']['msg'];
-                var_dump($this->err_msg);
                 return $this->err_msg;
             }
             $return_list = $res['body']['data']['list'] ?? [];
