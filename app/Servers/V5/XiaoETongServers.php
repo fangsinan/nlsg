@@ -20,7 +20,7 @@ class XiaoETongServers
     {
         $query = XeDistributor::query()
             ->select([
-                'id', 'xe_user_id', 'xe_parent_user_id', 'nickname',
+                'id', 'xe_user_id', 'xe_parent_user_id', 'nickname','group_name','source',
                 'underling_number', 'total_amount', 'status', 'expire_time', 'created_at',
             ]);
 
@@ -237,7 +237,8 @@ class XiaoETongServers
             ->select(['id', 'user_id', 'xe_user_id', 'nickname', 'name', 'avatar', 'phone', 'user_created_at']);
 
         $query->with([
-            'parentList:xe_user_id,sub_user_id,bind_time'
+            'parentList:xe_user_id,sub_user_id,bind_time',
+            'parentList.xeParenUserInfo:xe_user_id,phone,nickname',
         ]);
 
         $query->withCount('sonList');

@@ -33,4 +33,9 @@ class XeDistributorCustomer extends Base
         return $this->hasOne(XeUser::class,'xe_user_id','sub_user_id');
     }
 
+    public function xeParenUserInfo(): HasOne
+    {
+        return $this->hasOne(XeUser::class,'xe_user_id','xe_user_id');
+    }
+
 }
