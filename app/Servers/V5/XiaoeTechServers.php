@@ -841,12 +841,13 @@ class XiaoeTechServers
 
         $redis_page_index_key = 'sync_order_detail_order_ids';
         if ($is_init) {
-            $list = XeOrder::query()->where('share_type', 5)->where('order_state', 4)->get()->toArray();
+            $list = XeOrder::query()->where('share_type', 5)->where('order_state', 4)->whereIn('settle_state',[0,1])->get()->toArray();
             if (empty($list)) {
                 return false;
             }
             Redis::del($redis_page_index_key);
             foreach ($list as $order) {
+                var_dump($order['order_id']);
                 Redis::rpush($redis_page_index_key, $order['order_id']);
             }
             return false;
@@ -863,13 +864,14 @@ class XiaoeTechServers
                 'access_token' => $this->get_token(),
                 'order_id' => $order_id,
             ];
+            var_dump($paratms);
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.order.detail/1.0.0', $paratms);
-            DB::table('nlsg_log_info')->insert([
-                'url' => 'xe.order.detail',
-                'line' => $res['body']['code'],
-                'parameter' => json_encode($paratms),
-                'created_at' => date('Y-m-d H:i:s', time())
-            ]);
+//            DB::table('nlsg_log_info')->insert([
+//                'url' => 'xe.order.detail',
+//                'line' => $res['body']['code'],
+//                'parameter' => json_encode($paratms),
+//                'created_at' => date('Y-m-d H:i:s', time())
+//            ]);
 
             if ($res['body']['code'] != 0) {
                 if ($res['body']['code'] == 2008) {
@@ -884,7 +886,7 @@ class XiaoeTechServers
 
             if ($distribute_info) {
 
-                var_dump($order_id);
+                var_dump($distribute_info);
                 try {
                     //保存分销
                     $XeOrderDistribute = XeOrderDistribute::query()->where('order_id', $order_id)->first();
