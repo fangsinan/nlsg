@@ -476,6 +476,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('xet/vip_list','XiaoETongController@vipList');
         Route::post('xet/vip_add','XiaoETongController@vipAdd');
         Route::post('xet/vip_bind_user','XiaoETongController@vipBindUser');
+        Route::post('xet/vip_unbind_user','XiaoETongController@vipUnbindUser');
         Route::post('xet/user_info','XiaoETongController@XeUserInfo');
         Route::post('xet/user_list','XiaoETongController@userList');
         Route::post('xet/order_list','XiaoETongController@orderList');
@@ -491,4 +492,5 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
 });
 //内部使用，生成环境不用提交
 Route::post('auth/get_token','Admin\V4\AuthController@getToken');
+
 

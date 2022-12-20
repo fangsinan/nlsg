@@ -20,7 +20,7 @@ class XiaoETongServers
     {
         $query = XeDistributor::query()
             ->select([
-                'id', 'xe_user_id', 'xe_parent_user_id', 'nickname','group_name','source',
+                'id', 'xe_user_id', 'xe_parent_user_id', 'nickname', 'group_name', 'source',
                 'underling_number', 'total_amount', 'status', 'expire_time', 'created_at',
             ]);
 
@@ -199,6 +199,27 @@ class XiaoETongServers
         }
 
         return ['code' => false, 'msg' => '失败'];
+    }
+
+    public function vipUnbindUser($params, $admin)
+    {
+        $validator = Validator::make(
+            $params,
+            [
+                'list' => 'required|array'
+            ]
+        );
+
+        if ($validator->fails()) {
+            return $validator->messages()->first();
+        }
+
+        $xts = new XiaoeTechServers();
+        foreach ($params['list'] as $v) {
+            $xts->distributor_member_change($v['sub_user_id'], $v['xe_user_id']);
+        }
+
+        return ['code' => true, 'msg' => '成功'];
     }
 
     public function vipInfo($params, $admin)
