@@ -377,7 +377,7 @@ class XiaoETongServers
                 'order_state', 'order_state_time',
             ])
             ->with([
-                'xeUserInfo:id,xe_user_id,user_id,nickname,phone,name,wx_union_id',
+                'xeUserInfo:id,xe_user_id,user_id,nickname,phone,name,wx_union_id,user_created_at',
                 'xeUserInfo.vipInfo:id,user_id,username,source,source_vip_id',
                 'xeUserInfo.vipInfo.sourceVipInfo:id,nickname,username',
                 'xeUserInfo.liveUserWaiterInfo:user_id,admin_id',
