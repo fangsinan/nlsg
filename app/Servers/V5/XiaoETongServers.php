@@ -26,7 +26,8 @@ class XiaoETongServers
 
         $query->with([
             'XeUserInfo:user_id,xe_user_id,nickname,name,phone,is_seal',
-            'XeUserInfo.vipInfo:id,user_id,nickname,username,level',
+            'XeUserInfo.vipInfo:id,user_id,nickname,username,level,source,source_vip_id',
+            'XeUserInfo.vipInfo.sourceVipInfo:id,user_id,nickname,username,level',
             'XeUserInfo.vipBindInfo:parent,son,life,begin_at,end_at',
             'XeUserParentInfo:user_id,xe_user_id,nickname,name,phone,is_seal',
         ]);
@@ -44,8 +45,13 @@ class XiaoETongServers
                 [
                     'field'    => 'user_parent_phone',
                     'alias'    => 'phone',
-                    'operator' => 'like',
+                    'operator' => '=',
                     'model'    => 'XeUserParentInfo',
+                ], [
+                    'field'    => 'bind_parent_phone',
+                    'alias'    => 'parent',
+                    'operator' => '=',
+                    'model'    => 'XeUserInfo.vipBindInfo',
                 ],
                 [
                     'field'    => 'created_begin',
@@ -99,10 +105,13 @@ class XiaoETongServers
     public function vipAdd($params, $admin)
     {
         $validator = Validator::make($params, [
-            'phone' => 'required|string|size:11',
+            'phone'  => 'required|string|size:11',
+            'source' => 'required|in:2,3,4'
         ], [
-            'phone.required' => '手机号不能为空',
-            'phone.size'     => '手机号长度应为11',
+            'phone.required'  => '手机号不能为空',
+            'phone.size'      => '手机号长度应为11',
+            'source.required' => '来源不能为空',
+            'source.in'       => '来源不正确',
         ]);
 
         if ($validator->fails()) {
@@ -110,7 +119,10 @@ class XiaoETongServers
         }
 
         $xts = new XiaoeTechServers();
-        $res = $xts->distributor_member_add($params['phone']);
+        $res = $xts->distributor_member_add($params['phone'], 0, [
+            'admin_id' => $admin['id'],
+            'source'   => $params['source']
+        ]);
 
         if (is_array($res)) {
             return ['code' => true, 'msg' => '成功'];
@@ -348,6 +360,7 @@ class XiaoETongServers
                 'xeUserInfo.vipInfo.sourceVipInfo:id,nickname,username',
                 'xeUserInfo.liveUserWaiterInfo:user_id,admin_id',
                 'xeUserInfo.liveUserWaiterInfo.adminUserInfo:id,name',
+                'xeUserInfo.vipBindInfo:parent,son,life,begin_at,end_at',
                 'orderGoodsInfo:order_id,sku_id,goods_name,goods_image,buy_num',
                 'distributeInfo:id,order_id,share_user_id,distribute_price',
                 'distributeInfo.shareUserInfo:id,xe_user_id,nickname',
