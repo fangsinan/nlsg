@@ -841,7 +841,7 @@ class XiaoeTechServers
 
         $redis_page_index_key = 'sync_order_detail_order_ids';
         if ($is_init) {
-            $list = XeOrder::query()->where('share_type', 5)->where('order_state', 4)->get()->toArray();
+            $list = XeOrder::query()->where('share_type', 5)->where('order_state', 4)->whereIn('settle_state',[0,1])->get()->toArray();
             if (empty($list)) {
                 return false;
             }
@@ -866,12 +866,12 @@ class XiaoeTechServers
             ];
             var_dump($paratms);
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.order.detail/1.0.0', $paratms);
-            DB::table('nlsg_log_info')->insert([
-                'url' => 'xe.order.detail',
-                'line' => $res['body']['code'],
-                'parameter' => json_encode($paratms),
-                'created_at' => date('Y-m-d H:i:s', time())
-            ]);
+//            DB::table('nlsg_log_info')->insert([
+//                'url' => 'xe.order.detail',
+//                'line' => $res['body']['code'],
+//                'parameter' => json_encode($paratms),
+//                'created_at' => date('Y-m-d H:i:s', time())
+//            ]);
 
             if ($res['body']['code'] != 0) {
                 if ($res['body']['code'] == 2008) {
