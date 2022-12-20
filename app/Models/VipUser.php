@@ -716,5 +716,8 @@ where a.user_id = ' . $user_id . ' and a.status = 2
     }
 
 
+    public function sourceVipInfo(){
+        return $this->hasOne(self::class,'id','source_vip_id');
+    }
 
 }

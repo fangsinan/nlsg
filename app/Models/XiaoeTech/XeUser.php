@@ -8,6 +8,7 @@ use App\Models\Base;
 use App\Models\User;
 use App\Models\VipUser;
 use App\Models\VipUserBind;
+use App\Models\CrmLiveUserWaiter;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -23,32 +24,37 @@ class XeUser extends Base
 
     public function vipInfo(): HasOne
     {
-        return $this->hasOne(VipUser::class,'username','phone')
-            ->where('status','=',1)
-            ->where('is_default','=',1);
+        return $this->hasOne(VipUser::class, 'username', 'phone')
+            ->where('status', '=', 1)
+            ->where('is_default', '=', 1);
     }
 
     public function vipBindInfo(): HasOne
     {
-        return $this->hasOne(VipUserBind::class,'son','phone')
-            ->where('status','=',1);
+        return $this->hasOne(VipUserBind::class, 'son', 'phone')
+            ->where('status', '=', 1);
     }
 
     public function distributorInfo(): HasOne
     {
-        return $this->hasOne(XeDistributor::class,'xe_user_id','xe_user_id');
+        return $this->hasOne(XeDistributor::class, 'xe_user_id', 'xe_user_id');
     }
 
     public function parentList(): HasOne
     {
-        return $this->hasOne(XeDistributorCustomer::class,'sub_user_id','xe_user_id')
-            ->where('status','=',1);
+        return $this->hasOne(XeDistributorCustomer::class, 'sub_user_id', 'xe_user_id')
+            ->where('status', '=', 1);
     }
 
     public function sonList(): HasMany
     {
-        return $this->hasMany(XeDistributorCustomer::class,'xe_user_id','xe_user_id')
-            ->where('status','=',1);
+        return $this->hasMany(XeDistributorCustomer::class, 'xe_user_id', 'xe_user_id')
+            ->where('status', '=', 1);
     }
 
+    public function liveUserWaiterInfo(): HasOne
+    {
+        return $this->hasOne(CrmLiveUserWaiter::class, 'user_id', 'user_id')
+            ->where('status', '=', 1);
+    }
 }
