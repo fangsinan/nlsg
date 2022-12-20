@@ -847,6 +847,7 @@ class XiaoeTechServers
             }
             Redis::del($redis_page_index_key);
             foreach ($list as $order) {
+                var_dump($order['order_id']);
                 Redis::rpush($redis_page_index_key, $order['order_id']);
             }
             return false;
@@ -863,6 +864,7 @@ class XiaoeTechServers
                 'access_token' => $this->get_token(),
                 'order_id' => $order_id,
             ];
+            var_dump($paratms);
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.order.detail/1.0.0', $paratms);
             DB::table('nlsg_log_info')->insert([
                 'url' => 'xe.order.detail',
@@ -884,7 +886,7 @@ class XiaoeTechServers
 
             if ($distribute_info) {
 
-                var_dump($order_id);
+                var_dump($distribute_info);
                 try {
                     //保存分销
                     $XeOrderDistribute = XeOrderDistribute::query()->where('order_id', $order_id)->first();
