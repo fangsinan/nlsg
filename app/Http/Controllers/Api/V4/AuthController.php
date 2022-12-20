@@ -314,8 +314,8 @@ class AuthController extends Controller
         $data = [
             'nickname' => $input['nickname'] ?? '',
             'sex' => $input['sex'] == '男' ? 1 : 2,
-            'province' => $input['province'],
-            'city' => $input['city'],
+            'province' => $input['province']??'',
+            'city' => $input['city']??'',
             'unionid' => $input['unionid'] ?? '',
             'wxopenid' => $input['wx_openid'] ?? '',
             'headimg' => $input['headimg'] ?? '',
