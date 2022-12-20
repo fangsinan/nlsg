@@ -22,4 +22,5 @@ class XeOrderDistribute extends Base
         return $this->hasOne(XeUser::class,'xe_user_id','superior_distribute_user_idv');
     }
 
+
 }

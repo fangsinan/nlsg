@@ -54,4 +54,9 @@ class XiaoETongController extends ControllerBackend
         return $this->getRes((new XiaoETongServers())->orderList($request->input(), $this->user));
     }
 
+    public function orderDistributeList(Request $request): JsonResponse
+    {
+        return $this->getRes((new XiaoETongServers())->orderDistributeList($request->input(), $this->user));
+    }
+
 }

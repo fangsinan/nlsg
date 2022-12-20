@@ -8,6 +8,7 @@ use App\Models\VipUserBind;
 use App\Models\XiaoeTech\XeDistributor;
 use App\Models\XiaoeTech\XeDistributorCustomer;
 use App\Models\XiaoeTech\XeOrder;
+use App\Models\XiaoeTech\XeOrderDistribute;
 use App\Models\XiaoeTech\XeUser;
 use App\Models\XiaoeTech\XeUserJob;
 use Illuminate\Support\Facades\DB;
@@ -282,6 +283,54 @@ class XiaoETongServers
 
     }
 
+    public function orderDistributeList($params, $admin)
+    {
+        $query = XeOrderDistribute::query()
+            ->select([
+                'id', 'order_id', 'share_user_id', 'share_user_nickname', 'distribute_price', 'created_at'
+            ]);
+
+        $query->with([
+            'shareUserInfo:id,user_id,xe_user_id,phone',
+        ]);
+
+        HelperService::queryWhen(
+            $query,
+            $params,
+            [
+                [
+                    'field' => 'share_user_id',
+                ],
+                [
+                    'field' => 'order_id',
+                ],
+                [
+                    'field'    => 'share_user_nickname',
+                    'operator' => 'like',
+                ],
+                [
+                    'field'    => 'phone',
+                    'model'    => 'shareUserInfo',
+                    'operator' => 'like',
+                ],
+                [
+                    'field'    => 'created_at_begin',
+                    'alias'    => 'created_at',
+                    'operator' => '>=',
+                ],
+                [
+                    'field'    => 'created_at_end',
+                    'alias'    => 'created_at',
+                    'operator' => '<=',
+                ],
+            ]
+        );
+
+        $query->orderBy('id', 'desc');
+
+        return $query->paginate($params['size'] ?? 10);
+    }
+
     public function orderList($params, $admin)
     {
         $query = XeOrder::query()
@@ -352,6 +401,8 @@ class XiaoETongServers
                 ],
             ]
         );
+
+        $query->orderBy('id', 'desc');
 
         $list = $query->paginate($params['size'] ?? 10);
 
