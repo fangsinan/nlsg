@@ -975,7 +975,7 @@ class XiaoeTechServers
     /**
      * 新增推广员
      */
-    public function distributor_member_add($phone = '', $user_id = '')
+    public function distributor_member_add($phone = '', $user_id = '', $params = [])
     {
         if (empty($phone) && empty($user_id)) {
             return '参数错误';
@@ -1000,7 +1000,7 @@ class XiaoeTechServers
 
         $paratms = [
             'access_token' => $this->get_token(),
-            'user_id' => $user_id,
+            'user_id'      => $user_id,
         ];
 
         $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.add/1.0.0', $paratms);
@@ -1009,11 +1009,14 @@ class XiaoeTechServers
             return $res['body']['msg'];
         }
 
-        $XeDistributor = new XeDistributor();
+        $XeDistributor             = new XeDistributor();
         $XeDistributor->xe_user_id = $user_id;
-        $XeDistributor->level = 1;
-        $XeDistributor->group_id = 0;
+        $XeDistributor->level      = 1;
+        $XeDistributor->group_id   = 0;
         $XeDistributor->group_name = '合伙人';
+        $XeDistributor->source     = $params['source'] ?? 0;
+        $XeDistributor->admin_id   = $params['admin_id'] ?? 0;
+
         $XeDistributor->save();
 
         $is_exist = 0;
