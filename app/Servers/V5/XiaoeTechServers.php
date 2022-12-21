@@ -718,6 +718,7 @@ class XiaoeTechServers
     public function do_distributor_customer_list($xe_user_id = '', $is_init = 0)
     {
 
+
         $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
 
         for ($i = 1; $i <= 1000; $i++) {
