@@ -696,6 +696,8 @@ class XiaoeTechServers
 
         //获取推广员列表
         if ($is_init) {
+            $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
+            Redis::del($redis_page_index_key);
             $XeDistributorList = XeDistributor::query()->where('is_sync_customer', 1)->get();
             foreach ($XeDistributorList as $XeDistributor) {
                 $this->do_distributor_customer_list($XeDistributor->xe_user_id, $is_init);
@@ -760,8 +762,6 @@ class XiaoeTechServers
             $return_list = $res['body']['data']['list'] ?? [];
 
             if ($is_init) {
-
-                Redis::del($redis_page_index_key);
                 $count = $res['body']['data']['count'];
                 $total_page = ceil($count / $page_size) + 1;
                 for ($i = 2; $i <= $total_page; $i++) {
