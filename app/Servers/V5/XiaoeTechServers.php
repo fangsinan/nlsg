@@ -767,6 +767,7 @@ class XiaoeTechServers
                 Redis::rpush($redis_page_index_key, json_encode(['xe_user_id' => $xe_user_id, 'page_index' => $page_index]));
 
                 $this->err_msg = $res['body']['msg'];
+
                 return $this->err_msg;
             }
 
