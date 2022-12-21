@@ -720,7 +720,7 @@ class XiaoeTechServers
 
         $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
 
-        for ($i = 1; $i <= 100; $i++) {
+        for ($i = 1; $i <= 1000; $i++) {
 
             if ($is_init) {
                 $page_index = 1;
@@ -763,9 +763,12 @@ class XiaoeTechServers
                     $this->get_token(1);
                 }
 
+                Redis::rpush($redis_page_index_key, json_encode(['xe_user_id' => $xe_user_id, 'page_index' => $page_index]));
+
                 $this->err_msg = $res['body']['msg'];
                 return $this->err_msg;
             }
+
             $return_list = $res['body']['data']['list'] ?? [];
 
             if ($is_init) {
