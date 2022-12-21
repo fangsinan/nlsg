@@ -653,6 +653,7 @@ class XiaoeTechServers
                 }
 
                 try {
+
                     //保存推广员
                     $XeDistributor = XeDistributor::query()->where('xe_user_id', $distributor['user_id'])->first();
                     if (!$XeDistributor) {
@@ -665,6 +666,7 @@ class XiaoeTechServers
                     $XeDistributor->group_name = $distributor['group_name'];
                     $XeDistributor->group_id = $distributor['group_id'];
                     $XeDistributor->avatar = $distributor['avatar'];
+                    $XeDistributor->refresh_time = times();
                     $XeDistributor->save();
 
                 } catch (\Exception $e) {
