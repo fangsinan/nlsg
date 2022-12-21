@@ -539,6 +539,7 @@ class XiaoeTechServers
             $return_list = $res['body']['data']['list'] ?? [];
 
             foreach ($return_list as $user) {
+
                 try {
                     //保存小鹅通用户
                     $XeUser = XeUser::query()->where('xe_user_id', $user['user_id'])->first();
