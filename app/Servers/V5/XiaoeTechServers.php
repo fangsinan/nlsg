@@ -622,6 +622,8 @@ class XiaoeTechServers
                 return false;
             } else {
                 if ($is_init) {
+                    //清除过期数据
+                    XeDistributor::query()->where('refresh_time','<=',date("Y-m-d H:i:s",strtotime("-1 day")))->delete();
                     Redis::del($redis_page_index_key);
                     $count = $res['body']['data']['count'];
                     $total_page = ceil($count / $page_size) + 1;
@@ -668,6 +670,7 @@ class XiaoeTechServers
                     $XeDistributor->group_id = $distributor['group_id'];
                     $XeDistributor->avatar = $distributor['avatar'];
                     $XeDistributor->refresh_time = times();
+                    $XeDistributor->status = 1;
                     $XeDistributor->save();
 
                 } catch (\Exception $e) {
@@ -812,6 +815,7 @@ class XiaoeTechServers
                     $XeDistributorCustomer->expired_at = $customer['expired_at'];
                     $XeDistributorCustomer->is_editable = $customer['is_editable'];
                     $XeDistributorCustomer->is_anonymous = $customer['is_anonymous'] ? 1 : 0;
+                    $XeDistributorCustomer->refresh_time = times();
                     $XeDistributorCustomer->save();
                 } catch (\Exception $e) {
                     $errCode = $e->getCode();
