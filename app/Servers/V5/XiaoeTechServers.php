@@ -720,7 +720,7 @@ class XiaoeTechServers
 
         $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
 
-        for ($i = 1; $i <= 200; $i++) {
+        for ($i = 1; $i <= 50; $i++) {
 
             if ($is_init) {
                 $page_index = 1;
@@ -830,8 +830,6 @@ class XiaoeTechServers
             }
 
             var_dump('end');
-
-            sleep(rand(1, 3));
 
         }
 
