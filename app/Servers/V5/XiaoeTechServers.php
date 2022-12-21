@@ -714,7 +714,6 @@ class XiaoeTechServers
 
     }
 
-
     public function do_distributor_customer_list($xe_user_id = '', $is_init = 0)
     {
 
@@ -828,7 +827,6 @@ class XiaoeTechServers
             if ($is_init) {
                 return false;
             }
-
             var_dump('end');
 
         }
