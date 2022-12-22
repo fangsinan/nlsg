@@ -71,8 +71,9 @@ class XiaoETongController extends ControllerBackend
 
         while (true) {
 
-            $params['page'] = $page;
-            $data           = (new XiaoETongServers())->vipList($params, $this->user);
+            $request->offsetSet('page', $page);
+
+            $data = (new XiaoETongServers())->vipList($params, $this->user);
             if ($data->isEmpty()) {
                 break;
             }
@@ -123,7 +124,7 @@ class XiaoETongController extends ControllerBackend
     public function orderListExcel(Request $request): JsonResponse
     {
         set_time_limit(1200);
-        //订单号  商品名称  订单类型  购买手机号  昵称  支付金额   成为合伙人时间  分享人  保护人  钻石合伙人  状态  能量时光客服  订单时间
+
         $title = [
             '订单号', '商品名称', '订单类型', '购买手机号', '昵称', '支付金额', '成为合伙人时间',
             '分享人', '保护人', '钻石合伙人', '状态', '能量时光客服', '订单时间'
@@ -136,9 +137,10 @@ class XiaoETongController extends ControllerBackend
         $params['size'] = 100;
 
         while (true) {
+            $request->offsetSet('page', $page);
 
-            $params['page'] = $page;
-            $data           = (new XiaoETongServers())->orderList($params, $this->user);
+            $data = (new XiaoETongServers())->orderList($params, $this->user);
+
             if ($data->isEmpty()) {
                 break;
             }
@@ -174,8 +176,6 @@ class XiaoETongController extends ControllerBackend
 
     public function orderDistributeListExcel(Request $request): JsonResponse
     {
-        //列表 （订单号   推广员账号(小鹅通id)   收益人昵称  收益人手机号   金额   收益时间）  可导出
-
         set_time_limit(1200);
 
         $title = [
@@ -190,8 +190,9 @@ class XiaoETongController extends ControllerBackend
 
         while (true) {
 
-            $params['page'] = $page;
-            $data           = (new XiaoETongServers())->orderDistributeList($params, $this->user);
+            $request->offsetSet('page', $page);
+
+            $data = (new XiaoETongServers())->orderDistributeList($params, $this->user);
             if ($data->isEmpty()) {
                 break;
             }
