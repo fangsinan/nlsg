@@ -722,12 +722,13 @@ class XiaoeTechServers
 
         //获取推广员列表
         if ($is_init) {
+            $batch_number=date('YmdHis');
             $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
             Redis::del($redis_page_index_key);
             $XeDistributorList = XeDistributor::query()->where('is_sync_customer', 1)->get();
             foreach ($XeDistributorList as $k=>$XeDistributor) {
                 var_dump($k);
-                Redis::rpush($redis_page_index_key, json_encode(['xe_user_id' => $XeDistributor->xe_user_id, 'page_index' => 1]));
+                Redis::rpush($redis_page_index_key, json_encode(['batch_number'=>$batch_number,'xe_user_id' => $XeDistributor->xe_user_id, 'page_index' => 1]));
             }
 
         } else {
@@ -761,6 +762,7 @@ class XiaoeTechServers
                 $page_index = $page_index_arr['page_index'] ?? 0;
                 $is_fast = $page_index_arr['is_fast'] ?? 0;
                 $customer_number = $page_index_arr['customer_number'] ?? 0;
+                $batch_number = $page_index_arr['batch_number'] ?? 0;
             }else{
                 return  false;
             }
@@ -821,7 +823,7 @@ class XiaoeTechServers
 
 //                for ($i = 2; $i <= $total_page; $i++) {
 //                    var_dump($i);
-//                    Redis::rpush($redis_page_index_key, json_encode(['xe_user_id' => $xe_user_id, 'page_index' => $i]));
+//                    Redis::rpush($redis_page_index_key, json_encode(['batch_number'=>$batch_number,'xe_user_id' => $xe_user_id, 'page_index' => $i]));
 //                }
 
             }
@@ -866,6 +868,7 @@ class XiaoeTechServers
                     $XeDistributorCustomer->is_editable = $customer['is_editable'];
                     $XeDistributorCustomer->is_anonymous = $customer['is_anonymous'] ? 1 : 0;
                     $XeDistributorCustomer->refresh_time = times();
+                    $XeDistributorCustomer->batch_number = $batch_number;
                     $XeDistributorCustomer->save();
                 } catch (\Exception $e) {
                     $errCode = $e->getCode();
