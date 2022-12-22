@@ -30,6 +30,7 @@ class DealServers
 
     //获取成交订单
     //https://app.v4.api.nlsgapp.com/api/admin_v4/deal/get_order_info?live_id=199
+    //http://127.0.0.1:8000/api/admin_v4/deal/get_order_info?live_id=177
     public static function getOrderInfo($data,$live_id,$crontab=0)
     {
 
