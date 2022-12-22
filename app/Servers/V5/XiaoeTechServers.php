@@ -829,6 +829,7 @@ class XiaoeTechServers
             }
 
             foreach ($return_list as $customer) {
+
                 try {
                     //保存小鹅通用户
                     $XeUser = XeUser::query()->where('xe_user_id', $customer['sub_user_id'])->first();
@@ -883,7 +884,6 @@ class XiaoeTechServers
         }
 
     }
-
 
 
     /**
