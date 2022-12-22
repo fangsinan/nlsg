@@ -660,12 +660,13 @@ class XiaoeTechServers
                     $XeUser = XeUser::query()->where('xe_user_id', $distributor['user_id'])->first();
                     if (!$XeUser) {
                         $XeUser = new XeUser();
-                        $XeUser->xe_user_id = $distributor['user_id'];
-                        $XeUser->avatar = $distributor['avatar'];
-                        $XeUser->nickname = $distributor['nickname'];
-                        $XeUser->is_sync = 1;
-                        $XeUser->save();
                     }
+                    $XeUser->xe_user_id = $distributor['user_id'];
+                    $XeUser->avatar = $distributor['avatar'];
+                    $XeUser->nickname = $distributor['nickname'];
+                    $XeUser->is_sync = 1;
+                    $XeUser->save();
+
                 } catch (\Exception $e) {
                     $errCode = $e->getCode();
                     if ($errCode != 23000) {
