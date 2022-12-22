@@ -641,7 +641,7 @@ class XiaoeTechServers
             } else {
                 if ($is_init) {
                     //清除过期数据
-                    XeDistributor::query()->where('refresh_time','<=',date("Y-m-d H:i:s",strtotime("-1 day")))->delete();
+                    XeDistributor::query()->where('refresh_time','<=',date("Y-m-d H:i:s",strtotime("-2 hour")))->delete();
                     Redis::del($redis_page_index_key);
                     $count = $res['body']['data']['count'];
                     $total_page = ceil($count / $page_size) + 1;
