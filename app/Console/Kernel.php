@@ -475,6 +475,7 @@ class Kernel extends ConsoleKernel
             $servers->sync_user_info(0);
         })->everyMinute()->runInBackground();
 
+
         //查询最新的推广员客户
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
@@ -507,9 +508,6 @@ class Kernel extends ConsoleKernel
             $servers = new XiaoeTechServers();
             $servers->sync_distributor_customer_list(0);
         })->everyMinute()->runInBackground();//每分钟执行一次
-
-
-
 
     }
 
