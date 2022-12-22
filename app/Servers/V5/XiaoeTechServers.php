@@ -689,6 +689,7 @@ class XiaoeTechServers
                     $XeDistributor->avatar = $distributor['avatar'];
                     $XeDistributor->refresh_time = times();
                     $XeDistributor->status = 1;
+                    $XeDistributor->is_sync_customer   = 1;
                     $XeDistributor->save();
 
                 } catch (\Exception $e) {
@@ -1047,7 +1048,7 @@ class XiaoeTechServers
         $XeDistributor->group_name = '合伙人';
         $XeDistributor->source     = $params['source'] ?? 0;
         $XeDistributor->admin_id   = $params['admin_id'] ?? 0;
-
+        $XeDistributor->is_sync_customer   = 1;
         $XeDistributor->save();
 
         $is_exist = 0;
@@ -1185,6 +1186,7 @@ class XiaoeTechServers
         $XeDistributorCustomer->remain_days = 365;
         $XeDistributorCustomer->bind_time = times();
         $XeDistributorCustomer->expired_at = times(strtotime('+1 years'));
+        $XeDistributorCustomer->refresh_time = times();
         $XeDistributorCustomer->save();
 
         return ['code' => true, 'msg' => '成功', 'created_at' => times()];
@@ -1238,6 +1240,7 @@ class XiaoeTechServers
             $XeDistributorCustomer->remain_days = 365;
             $XeDistributorCustomer->bind_time = times();
             $XeDistributorCustomer->expired_at = times(strtotime('+1 years'));
+            $XeDistributorCustomer->refresh_time = times();
             $XeDistributorCustomer->save();
         }
 
