@@ -349,7 +349,13 @@ class XiaoETongServers
                 [
                     'field'    => 'phone',
                     'model'    => 'shareUserInfo',
-                    'operator' => 'like',
+                    'operator' => '=',
+                ],
+                [
+                    'field'    => 'share_user_phone',
+                    'alias'    => 'phone',
+                    'model'    => 'shareUserInfo',
+                    'operator' => '=',
                 ],
                 [
                     'field'    => 'created_at_begin',
@@ -383,7 +389,7 @@ class XiaoETongServers
             ->with([
                 'xeUserInfo:id,xe_user_id,user_id,nickname,phone,name,wx_union_id,user_created_at',
                 'xeUserInfo.vipInfo:id,user_id,username,source,source_vip_id',
-                'xeUserInfo.vipInfo.sourceVipInfo:id,nickname,username',
+                'xeUserInfo.vipInfo.sourceVipInfo:id,nickname,username,username as phone',
                 'xeUserInfo.liveUserWaiterInfo:user_id,admin_id',
                 'xeUserInfo.liveUserWaiterInfo.adminUserInfo:id,name',
                 'xeUserInfo.vipBindInfo:parent,son,life,begin_at,end_at',
