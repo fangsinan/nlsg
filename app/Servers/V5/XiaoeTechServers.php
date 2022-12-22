@@ -748,7 +748,7 @@ class XiaoeTechServers
         }
     }
 
-    public function do_distributor_customer_list($xe_user_id = '')
+    public function do_distributor_customer_list()
     {
 
         $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
@@ -756,6 +756,7 @@ class XiaoeTechServers
         for ($i = 1; $i <= 1000; $i++) {
 
             $page_index_json = Redis::lpop($redis_page_index_key);
+//            $page_index_json = json_encode(['is_fast'=>1,'customer_number'=>'826673','xe_user_id' => 'u_5d538b27472fb_gbuhCZK6To', 'page_index' => 1]);
             if ($page_index_json) {
                 $page_index_arr = json_decode($page_index_json, true);
                 $xe_user_id = $page_index_arr['xe_user_id'] ?? 0;
@@ -821,11 +822,10 @@ class XiaoeTechServers
 
                 $total_page = ceil($count / $page_size) + 1;
 
-//                for ($i = 2; $i <= $total_page; $i++) {
-//                    var_dump($i);
-//                    Redis::rpush($redis_page_index_key, json_encode(['batch_number'=>$batch_number,'xe_user_id' => $xe_user_id, 'page_index' => $i]));
-//                }
-
+                for ($i = 2; $i <= $total_page; $i++) {
+                    var_dump($i);
+                    Redis::rpush($redis_page_index_key, json_encode(['batch_number'=>$batch_number,'xe_user_id' => $xe_user_id, 'page_index' => $i]));
+                }
             }
 
             foreach ($return_list as $customer) {
@@ -898,6 +898,7 @@ class XiaoeTechServers
 
         $redis_page_index_key = 'sync_order_detail_order_ids';
         if ($is_init) {
+
             $list = XeOrder::query()->where('share_type', 5)->where('order_state', 4)->whereIn('settle_state',[0,1])->get()->toArray();
             if (empty($list)) {
                 return false;
@@ -913,6 +914,7 @@ class XiaoeTechServers
         for ($i = 1; $i <= 1000; $i++) {
 
             $order_id = Redis::lpop($redis_page_index_key);
+
             if (empty($order_id)) {
                 return false;
             }
@@ -923,14 +925,15 @@ class XiaoeTechServers
             ];
             var_dump($paratms);
             $res = self::curlPost('https://api.xiaoe-tech.com/xe.order.detail/1.0.0', $paratms);
-//            DB::table('nlsg_log_info')->insert([
-//                'url' => 'xe.order.detail',
-//                'line' => $res['body']['code'],
-//                'parameter' => json_encode($paratms),
-//                'created_at' => date('Y-m-d H:i:s', time())
-//            ]);
+            DB::table('nlsg_log_info')->insert([
+                'url' => 'xe.order.detail',
+                'line' => $res['body']['code'],
+                'parameter' => json_encode($paratms),
+                'created_at' => date('Y-m-d H:i:s', time())
+            ]);
 
             if ($res['body']['code'] != 0) {
+
                 if ($res['body']['code'] == 2008) {
                     $this->get_token(1);
                 }
@@ -943,7 +946,7 @@ class XiaoeTechServers
 
             if ($distribute_info) {
 
-                var_dump($distribute_info);
+
                 try {
                     //保存分销
                     $XeOrderDistribute = XeOrderDistribute::query()->where('order_id', $order_id)->first();
@@ -992,11 +995,6 @@ class XiaoeTechServers
 
             $user_id = $XeUser->base_user_id;
             $unionid = $XeUser->unionid;
-
-            var_dump($k);
-            var_dump($XeUser->id);
-            var_dump($user_id);
-            var_dump($unionid);
 
             if ($unionid) {
 

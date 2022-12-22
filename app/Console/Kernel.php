@@ -438,6 +438,23 @@ class Kernel extends ConsoleKernel
             $servers->sync_order_list(0);
         })->everyMinute()->runInBackground();
 
+        //小鹅通订单分销
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_order_detail(1);
+        })->everyTenMinutes()->runInBackground();
+
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_order_detail(0);
+        })->everyMinute()->runInBackground();
+
+        //小鹅通用户user_id同步
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_user_userid();
+        })->everyTenMinutes()->runInBackground();
+
         //小鹅通 推广员
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
@@ -458,11 +475,18 @@ class Kernel extends ConsoleKernel
             $servers->sync_user_info(0);
         })->everyMinute()->runInBackground();
 
+        //查询最新的推广员客户
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_fast_distributor_customer_list();
+        })->between('8:00', '23:00')->everyTenMinutes()->runInBackground();
+
         //获取推广员客户
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_distributor_customer_list(1);
         })->dailyAt('0:01')->runInBackground();
+
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_distributor_customer_list(0);
@@ -484,21 +508,7 @@ class Kernel extends ConsoleKernel
             $servers->sync_distributor_customer_list(0);
         })->everyMinute()->runInBackground();//每分钟执行一次
 
-        //小鹅通订单分销
-        $schedule->call(function () {
-            $servers = new XiaoeTechServers();
-            $servers->sync_order_detail(1);
-        })->everyTenMinutes()->runInBackground();
-        $schedule->call(function () {
-            $servers = new XiaoeTechServers();
-            $servers->sync_order_detail(0);
-        })->everyMinute()->runInBackground();
 
-        //小鹅通用户user_id同步
-        $schedule->call(function () {
-            $servers = new XiaoeTechServers();
-            $servers->sync_user_userid();
-        })->everyTenMinutes()->runInBackground();
 
 
     }
