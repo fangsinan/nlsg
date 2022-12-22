@@ -442,7 +442,8 @@ class XiaoETongServers
                     'field' => 'order_type',
                 ],
                 [
-                    'field' => 'order_state',
+                    'field'    => 'order_state',
+                    'can_zero' => true,
                 ],
                 [
                     'field'    => 'phone',
