@@ -727,6 +727,7 @@ class XiaoeTechServers
                 var_dump($k);
                 Redis::rpush($redis_page_index_key, json_encode(['xe_user_id' => $XeDistributor->xe_user_id, 'page_index' => 1]));
             }
+
         } else {
 
             $this->do_distributor_customer_list();
