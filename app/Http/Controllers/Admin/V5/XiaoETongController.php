@@ -109,8 +109,10 @@ class XiaoETongController extends ControllerBackend
 
                 }
                 $arr[] = $temp_arr;
-                $csv->insert($arr);
             }
+
+            $csv->insert($arr);
+
             $page++;
         }
 
@@ -159,10 +161,11 @@ class XiaoETongController extends ControllerBackend
                     'waiter_user' => $v->xeUserInfo->liveUserWaiterInfo->adminUserInfo['name'] ?? '-',
                     'pay_time'    => $v->pay_state_time ?: $v->order_state_time,
                 ];
-
-                $arr[] = $temp_arr;
-                $csv->insert($arr);
+                $arr[]    = $temp_arr;
             }
+
+            $csv->insert($arr);
+
             $page++;
         }
 
@@ -171,7 +174,48 @@ class XiaoETongController extends ControllerBackend
 
     public function orderDistributeListExcel(Request $request): JsonResponse
     {
-        return $this->getRes((new XiaoETongServers())->orderDistributeList($request->input(), $this->user));
+        //列表 （订单号   推广员账号(小鹅通id)   收益人昵称  收益人手机号   金额   收益时间）  可导出
+
+        set_time_limit(1200);
+
+        $title = [
+            '订单号', '推广员id', '推广人昵称', '推广员手机号', '金额', '时间'
+        ];
+
+        $csv = new CsvHelper($title);
+
+        $page           = 1;
+        $params         = $request->input();
+        $params['size'] = 100;
+
+        while (true) {
+
+            $params['page'] = $page;
+            $data           = (new XiaoETongServers())->orderDistributeList($params, $this->user);
+            if ($data->isEmpty()) {
+                break;
+            }
+
+            $arr = [];
+
+            foreach ($data as $v) {
+                $temp_arr = [
+                    'order_id' => $v->order_id,
+                    'user_id'  => $v->share_user_id,
+                    'nickname' => $v->share_user_nickname,
+                    'phone'    => $v->shareUserInfo['phone'],
+                    'price'    => $v->distribute_price / 100,
+                    'date'     => $v->created_at,
+                ];
+                $arr[]    = $temp_arr;
+            }
+
+            $csv->insert($arr);
+
+            $page++;
+        }
+
+        $csv->end();
     }
 
 
