@@ -738,6 +738,14 @@ class XiaoeTechServers
 
     }
 
+    public function sync_fast_distributor_customer_list(){
+        $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
+        $XeDistributorList = XeDistributor::query()->where('is_sync_customer', 1)->get();
+        foreach ($XeDistributorList as $k=>$XeDistributor) {
+            var_dump($k);
+            Redis::rpush($redis_page_index_key, json_encode(['is_fast'=>1,'customer_number'=>$XeDistributor->customer_number,'xe_user_id' => $XeDistributor->xe_user_id, 'page_index' => 1]));
+        }
+    }
 
     public function do_distributor_customer_list($xe_user_id = '')
     {
@@ -746,11 +754,15 @@ class XiaoeTechServers
 
         for ($i = 1; $i <= 1000; $i++) {
 
-            $page_index = Redis::lpop($redis_page_index_key);
-            if ($page_index) {
-                $page_index_arr = json_decode($page_index, true);
+            $page_index_json = Redis::lpop($redis_page_index_key);
+            if ($page_index_json) {
+                $page_index_arr = json_decode($page_index_json, true);
                 $xe_user_id = $page_index_arr['xe_user_id'] ?? 0;
                 $page_index = $page_index_arr['page_index'] ?? 0;
+                $is_fast = $page_index_arr['is_fast'] ?? 0;
+                $customer_number = $page_index_arr['customer_number'] ?? 0;
+            }else{
+                return  false;
             }
 
             if (empty($xe_user_id)) {
@@ -784,7 +796,7 @@ class XiaoeTechServers
                     $this->get_token(1);
                 }
 
-                Redis::rpush($redis_page_index_key, json_encode(['xe_user_id' => $xe_user_id, 'page_index' => $page_index]));
+                Redis::rpush($redis_page_index_key, $page_index_json);
 
                 $this->err_msg = $res['body']['msg'];
 
@@ -796,11 +808,21 @@ class XiaoeTechServers
             if ($page_index==1 && $return_list) {
 
                 $count = $res['body']['data']['count'];
-                $total_page = ceil($count / $page_size) + 1;
-                for ($i = 2; $i <= $total_page; $i++) {
-                    var_dump($i);
-                    Redis::rpush($redis_page_index_key, json_encode(['xe_user_id' => $xe_user_id, 'page_index' => $i]));
+                XeDistributor::query()->where('xe_user_id',$xe_user_id)->update(['customer_number'=>$count]);
+
+                if($is_fast && $customer_number){
+                    $count=$count-$customer_number;
+                    if($count <0){
+                        $count=1;
+                    }
                 }
+
+                $total_page = ceil($count / $page_size) + 1;
+
+//                for ($i = 2; $i <= $total_page; $i++) {
+//                    var_dump($i);
+//                    Redis::rpush($redis_page_index_key, json_encode(['xe_user_id' => $xe_user_id, 'page_index' => $i]));
+//                }
 
             }
 
@@ -816,6 +838,7 @@ class XiaoeTechServers
                         $XeUser->is_sync = 1;
                         $XeUser->save();
                     }
+
                 } catch (\Exception $e) {
                     $errCode = $e->getCode();
                     if ($errCode != 23000) {
