@@ -78,7 +78,11 @@ class XiaoETongServers
                 ],
                 [
                     'field' => 'xe_user_id'
+                ],
+                [
+                    'field' => 'source'
                 ]
+
             ]
         );
 
@@ -377,7 +381,7 @@ class XiaoETongServers
                 'order_state', 'order_state_time',
             ])
             ->with([
-                'xeUserInfo:id,xe_user_id,user_id,nickname,phone,name,wx_union_id',
+                'xeUserInfo:id,xe_user_id,user_id,nickname,phone,name,wx_union_id,user_created_at',
                 'xeUserInfo.vipInfo:id,user_id,username,source,source_vip_id',
                 'xeUserInfo.vipInfo.sourceVipInfo:id,nickname,username',
                 'xeUserInfo.liveUserWaiterInfo:user_id,admin_id',
@@ -385,7 +389,7 @@ class XiaoETongServers
                 'xeUserInfo.vipBindInfo:parent,son,life,begin_at,end_at',
                 'orderGoodsInfo:order_id,sku_id,goods_name,goods_image,buy_num',
                 'distributeInfo:id,order_id,share_user_id,distribute_price',
-                'distributeInfo.shareUserInfo:id,xe_user_id,nickname',
+                'distributeInfo.shareUserInfo:id,xe_user_id,nickname,phone',
             ]);
 
         HelperService::queryWhen(
@@ -394,6 +398,29 @@ class XiaoETongServers
             [
                 [
                     'field' => 'xe_user_id',
+                ],
+                [
+                    'field'    => 'goods_name',
+                    'model'    => 'orderGoodsInfo',
+                    'operator' => 'like',
+                ],
+                [
+                    'field'    => 'share_user_phone',
+                    'model'    => 'distributeInfo.shareUserInfo',
+                    'alias'    => 'phone',
+                    'operator' => '=',
+                ],
+                [
+                    'field'    => 'admin_id',
+                    'model'    => 'xeUserInfo.liveUserWaiterInfo',
+                    'alias'    => 'admin_id',
+                    'operator' => '=',
+                ],
+                [
+                    'field'    => 'vip_bind_parent',
+                    'model'    => 'xeUserInfo.vipBindInfo',
+                    'alias'    => 'parent',
+                    'operator' => '=',
                 ],
                 [
                     'field' => 'order_id',
@@ -405,7 +432,19 @@ class XiaoETongServers
                     'field' => 'pay_type',
                 ],
                 [
+                    'field' => 'order_type',
+                ],
+                [
+                    'field' => 'order_state',
+                ],
+                [
                     'field'    => 'phone',
+                    'model'    => 'xeUserInfo',
+                    'operator' => 'like',
+                ],
+                [
+                    'field'    => 'xe_user_phone',
+                    'alias'    => 'phone',
                     'model'    => 'xeUserInfo',
                     'operator' => 'like',
                 ],
@@ -432,6 +471,16 @@ class XiaoETongServers
                 [
                     'field'    => 'pay_state_time_end',
                     'alias'    => 'pay_state_time',
+                    'operator' => '<=',
+                ],
+                [
+                    'field'    => 'order_state_time_begin',
+                    'alias'    => 'order_state_time',
+                    'operator' => '>=',
+                ],
+                [
+                    'field'    => 'order_state_time_end',
+                    'alias'    => 'order_state_time',
                     'operator' => '<=',
                 ],
             ]

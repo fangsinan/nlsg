@@ -8,6 +8,8 @@ use App\Models\Base;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class XeOrder extends Base
 {
@@ -27,12 +29,12 @@ class XeOrder extends Base
 
     public function orderGoodsInfo(): HasMany
     {
-        return $this->hasMany(XeOrderGoods::class,'order_id','order_id');
+        return $this->hasMany(XeOrderGoods::class, 'order_id', 'order_id');
     }
 
     public function distributeInfo(): HasOne
     {
-        return $this->hasOne(XeOrderDistribute::class,'order_id','order_id');
+        return $this->hasOne(XeOrderDistribute::class, 'order_id', 'order_id');
     }
 
     public function payType($k, $f = 0)
@@ -151,6 +153,57 @@ class XeOrder extends Base
         } else {
             return array_search($k, $arr) ?: '-';
         }
+
+    }
+
+    public function ke_fu()
+    {
+        $expire_num     = 120;
+        $cache_key_name = 'xet_select_ke_fu';
+
+        $list = Cache::get($cache_key_name);
+
+        if (empty($list)) {
+            $list = DB::table('crm_live_waiter_wechat as ww')
+                ->join('crm_admin_user as au', 'ww.admin_id', '=', 'au.id')
+                ->select(['ww.admin_id', 'au.name'])
+                ->groupBy('ww.admin_id')
+                ->get();
+
+            if ($list->isEmpty()) {
+                $list = [];
+            } else {
+                $list = $list->toArray();
+            }
+            Cache::put($cache_key_name, $list, $expire_num);
+        }
+
+        return $list;
+
+    }
+
+    public function goods()
+    {
+        $expire_num     = 120;
+        $cache_key_name = 'xet_select_goods';
+
+        $list = Cache::get($cache_key_name);
+
+        if (empty($list)) {
+            $list = XeOrderGoods::query()
+                ->select(['sku_id', 'goods_name'])
+                ->groupBy('sku_id')
+                ->get();
+
+            if ($list->isEmpty()) {
+                $list = [];
+            } else {
+                $list = $list->toArray();
+            }
+            Cache::put($cache_key_name, $list, $expire_num);
+        }
+
+        return $list;
 
     }
 

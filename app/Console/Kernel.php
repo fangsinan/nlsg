@@ -427,6 +427,7 @@ class Kernel extends ConsoleKernel
 
         })->between('1:00', '6:00')->everyThirtyMinutes();
 
+
         //小鹅通 订单
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
@@ -447,7 +448,6 @@ class Kernel extends ConsoleKernel
             $servers->sync_distributor_list(0);
         })->everyMinute()->runInBackground();
 
-
         //小鹅通用户
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
@@ -466,7 +466,23 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_distributor_customer_list(0);
-        })->everyMinute()->between('0:00', '7:00')->runInBackground();//每分钟执行一次
+        })->everyMinute()->runInBackground();//每分钟执行一次
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_distributor_customer_list(0);
+        })->everyMinute()->runInBackground();//每分钟执行一次
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_distributor_customer_list(0);
+        })->everyMinute()->runInBackground();//每分钟执行一次
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_distributor_customer_list(0);
+        })->everyMinute()->runInBackground();//每分钟执行一次
+        $schedule->call(function () {
+            $servers = new XiaoeTechServers();
+            $servers->sync_distributor_customer_list(0);
+        })->everyMinute()->runInBackground();//每分钟执行一次
 
         //小鹅通订单分销
         $schedule->call(function () {

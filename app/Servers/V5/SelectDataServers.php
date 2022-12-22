@@ -136,6 +136,12 @@ class SelectDataServers
             case 'wx_app_type':
                 $res = $xeo->wx_app_type(0, 1);
                 break;
+            case 'ke_fu':
+                $res = $xeo->ke_fu();
+                break;
+            case 'goods':
+                $res=$xeo->goods();
+                break;
             default :
                 $res = [];
         }

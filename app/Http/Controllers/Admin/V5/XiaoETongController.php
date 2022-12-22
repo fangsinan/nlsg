@@ -56,26 +56,29 @@ class XiaoETongController extends ControllerBackend
 
 
     public function vipListExcel(Request $request): JsonResponse
-    {dd(__LINE__);
-        $csv_helper = new CsvHelper();
-
+    {
+        set_time_limit(1200);
 
         $title = [
             '小鹅通id', '手机', '昵称', '状态', '保护人', '钻石合伙人', '分组信息', '来源',
         ];
 
-        $csv_helper->init($title);
-        dd(__LINE__);
+        $csv = new CsvHelper($title);
+
         $page           = 1;
         $params         = $request->input();
         $params['size'] = 100;
-
 
         while (true) {
 
             $params['page'] = $page;
             $data           = (new XiaoETongServers())->vipList($params, $this->user);
-            $arr            = [];
+            if ($data->isEmpty()) {
+                break;
+            }
+
+            $arr = [];
+
             foreach ($data as $v) {
                 $temp_arr = [
                     'xe_user_id' => $v->xe_user_id,
@@ -106,16 +109,64 @@ class XiaoETongController extends ControllerBackend
 
                 }
                 $arr[] = $temp_arr;
+                $csv->insert($arr);
             }
             $page++;
         }
 
+        $csv->end();
 
     }
 
     public function orderListExcel(Request $request): JsonResponse
     {
-        return $this->getRes((new XiaoETongServers())->orderList($request->input(), $this->user));
+        set_time_limit(1200);
+        //订单号  商品名称  订单类型  购买手机号  昵称  支付金额   成为合伙人时间  分享人  保护人  钻石合伙人  状态  能量时光客服  订单时间
+        $title = [
+            '订单号', '商品名称', '订单类型', '购买手机号', '昵称', '支付金额', '成为合伙人时间',
+            '分享人', '保护人', '钻石合伙人', '状态', '能量时光客服', '订单时间'
+        ];
+
+        $csv = new CsvHelper($title);
+
+        $page           = 1;
+        $params         = $request->input();
+        $params['size'] = 100;
+
+        while (true) {
+
+            $params['page'] = $page;
+            $data           = (new XiaoETongServers())->orderList($params, $this->user);
+            if ($data->isEmpty()) {
+                break;
+            }
+
+            $arr = [];
+
+            foreach ($data as $v) {
+                $temp_arr = [
+                    'order_id'    => $v->order_id,
+                    'goods_name'  => implode(',', array_column($v->orderGoodsInfo->toArray(), 'goods_name')),
+                    'order_type'  => $v->order_type_desc,
+                    'phone'       => $v->xeUserInfo['phone'] ?? '-',
+                    'nickname'    => $v->xeUserInfo['nickname'] ?? '-',
+                    'pay_price'   => $v->actual_price ? $v->actual_price / 100 : 0,
+                    'created_at'  => $v->xe_created_time,
+                    'share_user'  => $v->distributeInfo->shareUserInfo->nickname ?? '-',
+                    'bind_user'   => $v->xeUserInfo->vipBindInfo['parent'] ?? '-',
+                    'source_user' => $v->xeUserInfo->vipInfo->sourceVipInfo['username'] ?? '-',
+                    'order_state' => $v->order_state_desc,
+                    'waiter_user' => $v->xeUserInfo->liveUserWaiterInfo->adminUserInfo['name'] ?? '-',
+                    'pay_time'    => $v->pay_state_time ?: $v->order_state_time,
+                ];
+
+                $arr[] = $temp_arr;
+                $csv->insert($arr);
+            }
+            $page++;
+        }
+
+        $csv->end();
     }
 
     public function orderDistributeListExcel(Request $request): JsonResponse
