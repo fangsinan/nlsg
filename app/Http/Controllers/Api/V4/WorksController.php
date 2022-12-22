@@ -827,7 +827,7 @@ class WorksController extends Controller
                 'info_id' =>$works_info_id,
                 'user_id'   =>$user_id,
                 // 'is_del'    =>0,
-                'os_type'   =>$os_type??0,//  1 安卓 2ios 3微信
+                // 'os_type'   =>$os_type??0,//  1 安卓 2ios 3微信
             ]);
             //学习记录条数会只按relation_id算   不根据章节走
             if($his->wasRecentlyCreated && empty($check_his_num)){
