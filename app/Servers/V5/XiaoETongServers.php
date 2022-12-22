@@ -275,10 +275,11 @@ class XiaoETongServers
             $temp_parent_xe_user_id = XeUser::query()
                 ->where('phone', '=', $parent_phone)
                 ->value('xe_user_id');
+
             if (empty($temp_parent_xe_user_id)) {
                 return $query->where('id', '=', 0)->paginate($params['size'] ?? 10);
             } else {
-                if ($temp_parent_xe_user_id !== $parent_xe_user_id) {
+                if (!empty($parent_xe_user_id) && $temp_parent_xe_user_id !== $parent_xe_user_id) {
                     return $query->where('id', '=', 0)->paginate($params['size'] ?? 10);
                 }
             }
