@@ -798,6 +798,7 @@ class XiaoeTechServers
                     var_dump($i);
                     Redis::rpush($redis_page_index_key, json_encode(['xe_user_id' => $xe_user_id, 'page_index' => $i]));
                 }
+
             }
 
             foreach ($return_list as $customer) {
@@ -848,9 +849,6 @@ class XiaoeTechServers
                 }
             }
 
-            if ($is_init) {
-                return false;
-            }
             var_dump('end');
 
         }
