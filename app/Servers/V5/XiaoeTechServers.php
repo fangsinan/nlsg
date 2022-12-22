@@ -723,33 +723,31 @@ class XiaoeTechServers
             $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
             Redis::del($redis_page_index_key);
             $XeDistributorList = XeDistributor::query()->where('is_sync_customer', 1)->get();
-            foreach ($XeDistributorList as $XeDistributor) {
-                $this->do_distributor_customer_list($XeDistributor->xe_user_id, $is_init);
+            foreach ($XeDistributorList as $k=>$XeDistributor) {
+                var_dump($k);
+                Redis::rpush($redis_page_index_key, json_encode(['xe_user_id' => $XeDistributor->xe_user_id, 'page_index' => 1]));
             }
         } else {
+
             $this->do_distributor_customer_list();
+
         }
 
     }
 
 
-    public function do_distributor_customer_list($xe_user_id = '', $is_init = 0)
+    public function do_distributor_customer_list($xe_user_id = '')
     {
-
 
         $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
 
         for ($i = 1; $i <= 1000; $i++) {
 
-            if ($is_init) {
-                $page_index = 1;
-            } else {
-                $page_index = Redis::lpop($redis_page_index_key);
-                if ($page_index) {
-                    $page_index_arr = json_decode($page_index, true);
-                    $xe_user_id = $page_index_arr['xe_user_id'] ?? 0;
-                    $page_index = $page_index_arr['page_index'] ?? 0;
-                }
+            $page_index = Redis::lpop($redis_page_index_key);
+            if ($page_index) {
+                $page_index_arr = json_decode($page_index, true);
+                $xe_user_id = $page_index_arr['xe_user_id'] ?? 0;
+                $page_index = $page_index_arr['page_index'] ?? 0;
             }
 
             if (empty($xe_user_id)) {
@@ -776,6 +774,7 @@ class XiaoeTechServers
                 'parameter' => json_encode($paratms),
                 'created_at' => date('Y-m-d H:i:s', time())
             ]);
+
             if ($res['body']['code'] != 0) {
 
                 if ($res['body']['code'] == 2008) {
@@ -791,10 +790,11 @@ class XiaoeTechServers
 
             $return_list = $res['body']['data']['list'] ?? [];
 
-            if ($is_init) {
+            if ($page_index==1 && $return_list) {
+
                 $count = $res['body']['data']['count'];
                 $total_page = ceil($count / $page_size) + 1;
-                for ($i = 1000; $i <= $total_page; $i++) {
+                for ($i = 2; $i <= $total_page; $i++) {
                     var_dump($i);
                     Redis::rpush($redis_page_index_key, json_encode(['xe_user_id' => $xe_user_id, 'page_index' => $i]));
                 }
