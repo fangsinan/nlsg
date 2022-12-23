@@ -753,7 +753,7 @@ class XiaoeTechServers
 
         $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
 
-        for ($i = 1; $i <= 1000; $i++) {
+        for ($i = 1; $i <= 500; $i++) {
 
             $page_index_json = Redis::lpop($redis_page_index_key);
 //            $page_index_json = json_encode(['is_fast'=>1,'customer_number'=>'826673','xe_user_id' => 'u_5d538b27472fb_gbuhCZK6To', 'page_index' => 1]);
@@ -797,6 +797,10 @@ class XiaoeTechServers
 
                 if ($res['body']['code'] == 2008) {
                     $this->get_token(1);
+                }
+
+                if($res['body']['code']==1002){
+                    sleep(rand(1,5));
                 }
 
                 Redis::rpush($redis_page_index_key, $page_index_json);
@@ -873,6 +877,7 @@ class XiaoeTechServers
                     $XeDistributorCustomer->save();
                 } catch (\Exception $e) {
                     $errCode = $e->getCode();
+                    var_dump($e->getMessage());
                     if ($errCode != 23000) {
                         return $e->getMessage();
                     }
