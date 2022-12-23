@@ -641,7 +641,7 @@ class XiaoeTechServers
             } else {
                 if ($is_init) {
                     //清除过期数据
-                    XeDistributor::query()->where('refresh_time','<=',date("Y-m-d H:i:s",strtotime("-2 hour")))->delete();
+                    XeDistributor::query()->where('refresh_time', '<=', date("Y-m-d H:i:s", strtotime("-2 hour")))->delete();
                     Redis::del($redis_page_index_key);
                     $count = $res['body']['data']['count'];
                     $total_page = ceil($count / $page_size) + 1;
@@ -690,7 +690,7 @@ class XiaoeTechServers
                     $XeDistributor->avatar = $distributor['avatar'];
                     $XeDistributor->refresh_time = times();
                     $XeDistributor->status = 1;
-                    $XeDistributor->is_sync_customer   = 1;
+                    $XeDistributor->is_sync_customer = 1;
                     $XeDistributor->save();
 
                 } catch (\Exception $e) {
@@ -713,8 +713,14 @@ class XiaoeTechServers
      * 推广员客户列表
      * 一小时一次 todo
      */
-    public function sync_distributor_customer_list($is_init = 0)
+    public function sync_distributor_customer_list($is_init = 0,$task=0)
     {
+
+        DB::table('nlsg_log_info')->insert([
+            'url' => 'sync_distributor_customer_list',
+            'parameter' => $is_init.'-'.$task,
+            'created_at' => date('Y-m-d H:i:s', time())
+        ]);
 
         if (!$this->access_token) {
             return $this->err_msg;
@@ -722,13 +728,13 @@ class XiaoeTechServers
 
         //获取推广员列表
         if ($is_init) {
-            $batch_number=date('YmdHis');
+            $batch_number = date('YmdHis');
             $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
             Redis::del($redis_page_index_key);
             $XeDistributorList = XeDistributor::query()->where('is_sync_customer', 1)->get();
-            foreach ($XeDistributorList as $k=>$XeDistributor) {
+            foreach ($XeDistributorList as $k => $XeDistributor) {
                 var_dump($k);
-                Redis::rpush($redis_page_index_key, json_encode(['batch_number'=>$batch_number,'xe_user_id' => $XeDistributor->xe_user_id, 'page_index' => 1]));
+                Redis::rpush($redis_page_index_key, json_encode(['batch_number' => $batch_number, 'xe_user_id' => $XeDistributor->xe_user_id, 'page_index' => 1]));
             }
 
         } else {
@@ -739,16 +745,17 @@ class XiaoeTechServers
 
     }
 
-    public function sync_fast_distributor_customer_list(){
+    public function sync_fast_distributor_customer_list()
+    {
         $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
         $XeDistributorList = XeDistributor::query()->where('is_sync_customer', 1)->get();
-        $total=Redis::llen($redis_page_index_key);
-        if($total >3000){
+        $total = Redis::llen($redis_page_index_key);
+        if ($total > 3000) {
             return false;
         }
-        foreach ($XeDistributorList as $k=>$XeDistributor) {
+        foreach ($XeDistributorList as $k => $XeDistributor) {
             var_dump($k);
-            Redis::rpush($redis_page_index_key, json_encode(['is_fast'=>1,'customer_number'=>$XeDistributor->customer_number,'xe_user_id' => $XeDistributor->xe_user_id, 'page_index' => 1]));
+            Redis::rpush($redis_page_index_key, json_encode(['is_fast' => 1, 'customer_number' => $XeDistributor->customer_number, 'xe_user_id' => $XeDistributor->xe_user_id, 'page_index' => 1]));
         }
     }
 
@@ -757,7 +764,7 @@ class XiaoeTechServers
 
         $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
 
-        for ($i = 1; $i <= 1000; $i++) {
+        for ($i = 1; $i <= 500; $i++) {
 
             $page_index_json = Redis::lpop($redis_page_index_key);
 //            $page_index_json = json_encode(['is_fast'=>1,'customer_number'=>'826673','xe_user_id' => 'u_5d538b27472fb_gbuhCZK6To', 'page_index' => 1]);
@@ -768,8 +775,8 @@ class XiaoeTechServers
                 $is_fast = $page_index_arr['is_fast'] ?? 0;
                 $customer_number = $page_index_arr['customer_number'] ?? 0;
                 $batch_number = $page_index_arr['batch_number'] ?? 0;
-            }else{
-                return  false;
+            } else {
+                return false;
             }
 
             if (empty($xe_user_id)) {
@@ -789,51 +796,61 @@ class XiaoeTechServers
 
             var_dump($paratms);
 
-            $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.sub_customer/1.0.0', $paratms);
-            DB::table('nlsg_log_info')->insert([
-                'url' => 'xe.distributor.member.sub_customer',
-                'line' => $res['body']['code'],
-                'parameter' => json_encode($paratms),
-                'created_at' => date('Y-m-d H:i:s', time())
-            ]);
+            try {
 
-            if ($res['body']['code'] != 0) {
+                $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.sub_customer/1.0.0', $paratms);
+                DB::table('nlsg_log_info')->insert([
+                    'url' => 'xe.distributor.member.sub_customer',
+                    'line' => $res['body']['code'],
+                    'parameter' => json_encode($paratms),
+                    'created_at' => date('Y-m-d H:i:s', time())
+                ]);
 
-                if ($res['body']['code'] == 2008) {
-                    $this->get_token(1);
+
+                if ($res['body']['code'] != 0) {
+
+                    Redis::rpush($redis_page_index_key, $page_index_json);
+
+                    if ($res['body']['code'] == 2008) {
+                        $this->get_token(1);
+                    }
+
+                    if ($res['body']['code'] == 1002) {
+                        sleep(rand(1,3));
+                    }
+
+                    $this->err_msg = $res['body']['msg'];
+                    var_dump($this->err_msg);
+                    continue;
                 }
 
-                if($res['body']['code']==1002){
-                    sleep(rand(1,5));
-                }
+                $return_list = $res['body']['data']['list'] ?? [];
 
-                Redis::rpush($redis_page_index_key, $page_index_json);
+                if ($page_index == 1 && $return_list) {
 
-                $this->err_msg = $res['body']['msg'];
+                    $count = $res['body']['data']['count'];
+                    XeDistributor::query()->where('xe_user_id', $xe_user_id)->update(['customer_number' => $count]);
 
-                return $this->err_msg;
-            }
+                    if ($is_fast && $customer_number) {
+                        $count = $count - $customer_number;
+                        if ($count < 0) {
+                            $count = 1;
+                        }
+                    }
 
-            $return_list = $res['body']['data']['list'] ?? [];
+                    $total_page = ceil($count / $page_size) + 1;
 
-            if ($page_index==1 && $return_list) {
-
-                $count = $res['body']['data']['count'];
-                XeDistributor::query()->where('xe_user_id',$xe_user_id)->update(['customer_number'=>$count]);
-
-                if($is_fast && $customer_number){
-                    $count=$count-$customer_number;
-                    if($count <0){
-                        $count=1;
+                    for ($i = 2; $i <= $total_page; $i++) {
+                        var_dump($i);
+                        Redis::rpush($redis_page_index_key, json_encode(['batch_number' => $batch_number, 'xe_user_id' => $xe_user_id, 'page_index' => $i]));
                     }
                 }
 
-                $total_page = ceil($count / $page_size) + 1;
+            } catch (\Exception $e) {
 
-                for ($i = 2; $i <= $total_page; $i++) {
-                    var_dump($i);
-                    Redis::rpush($redis_page_index_key, json_encode(['batch_number'=>$batch_number,'xe_user_id' => $xe_user_id, 'page_index' => $i]));
-                }
+                Redis::rpush($redis_page_index_key, $page_index_json);
+                var_dump($e->getMessage());
+                continue;
             }
 
             foreach ($return_list as $customer) {
@@ -856,6 +873,7 @@ class XiaoeTechServers
                         return $e->getMessage();
                     }
                 }
+
                 try {
                     //保存推广员客户
                     $XeDistributorCustomer = XeDistributorCustomer::query()->where('xe_user_id', $xe_user_id)->where('sub_user_id', $customer['sub_user_id'])->first();
@@ -878,6 +896,8 @@ class XiaoeTechServers
                     $XeDistributorCustomer->is_anonymous = $customer['is_anonymous'] ? 1 : 0;
                     $XeDistributorCustomer->refresh_time = times();
                     $XeDistributorCustomer->batch_number = $batch_number;
+                    $XeDistributorCustomer->page_index = $page_index;
+
                     $XeDistributorCustomer->save();
                 } catch (\Exception $e) {
                     $errCode = $e->getCode();
@@ -908,7 +928,7 @@ class XiaoeTechServers
         $redis_page_index_key = 'sync_order_detail_order_ids';
         if ($is_init) {
 
-            $list = XeOrder::query()->where('share_type', 5)->where('order_state', 4)->whereIn('settle_state',[0,1])->get()->toArray();
+            $list = XeOrder::query()->where('share_type', 5)->where('order_state', 4)->whereIn('settle_state', [0, 1])->get()->toArray();
             if (empty($list)) {
                 return false;
             }
@@ -994,12 +1014,12 @@ class XiaoeTechServers
             ->select('XeUser.*', 'User.unionid', 'User.id as base_user_id')
             ->leftJoin('nlsg_user as User', 'User.phone', '=', 'XeUser.phone')
             ->whereRaw(DB::raw("XeUser.phone <> '' and XeUser.user_id=0 and User.id is not null "))
-            ->orderBy('XeUser.id','asc')
+            ->orderBy('XeUser.id', 'asc')
             ->get();
 
-        foreach ($list as $k=>$XeUser) {
+        foreach ($list as $k => $XeUser) {
 
-            $XeUser->user_id=$XeUser->base_user_id;
+            $XeUser->user_id = $XeUser->base_user_id;
             $XeUser->save();
 
             $user_id = $XeUser->base_user_id;
@@ -1066,7 +1086,7 @@ class XiaoeTechServers
 
         $paratms = [
             'access_token' => $this->get_token(),
-            'user_id'      => $user_id,
+            'user_id' => $user_id,
         ];
 
         $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.add/1.0.0', $paratms);
@@ -1075,14 +1095,14 @@ class XiaoeTechServers
             return $res['body']['msg'];
         }
 
-        $XeDistributor             = new XeDistributor();
+        $XeDistributor = new XeDistributor();
         $XeDistributor->xe_user_id = $user_id;
-        $XeDistributor->level      = 1;
-        $XeDistributor->group_id   = 0;
+        $XeDistributor->level = 1;
+        $XeDistributor->group_id = 0;
         $XeDistributor->group_name = '合伙人';
-        $XeDistributor->source     = $params['source'] ?? 0;
-        $XeDistributor->admin_id   = $params['admin_id'] ?? 0;
-        $XeDistributor->is_sync_customer   = 1;
+        $XeDistributor->source = $params['source'] ?? 0;
+        $XeDistributor->admin_id = $params['admin_id'] ?? 0;
+        $XeDistributor->is_sync_customer = 1;
         $XeDistributor->save();
 
         $is_exist = 0;

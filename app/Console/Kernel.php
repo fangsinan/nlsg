@@ -490,19 +490,19 @@ class Kernel extends ConsoleKernel
 
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
-            $servers->sync_distributor_customer_list(0);
+            $servers->sync_distributor_customer_list(0,1);
         })->everyMinute()->runInBackground();//每分钟执行一次
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
-            $servers->sync_distributor_customer_list(0);
+            $servers->sync_distributor_customer_list(0,2);
         })->everyMinute()->runInBackground();//每分钟执行一次
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
-            $servers->sync_distributor_customer_list(0);
+            $servers->sync_distributor_customer_list(0,3);
         })->everyMinute()->runInBackground();//每分钟执行一次
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
-            $servers->sync_distributor_customer_list(0);
+            $servers->sync_distributor_customer_list(0,4);
         })->everyMinute()->runInBackground();//每分钟执行一次
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
