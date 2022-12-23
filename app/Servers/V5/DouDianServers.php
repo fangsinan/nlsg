@@ -28,7 +28,7 @@ use SkuListRequest;
 class DouDianServers
 {
     protected $shopId;
-    protected $pageSize = 50;
+    protected $pageSize = 80;
     protected $runPageSize = 100;
     const DECRYPT_JOB_TYPE = 3;//1只解手机 2解手机和姓名  3接手机姓名地址
 
@@ -431,7 +431,6 @@ class DouDianServers
             $param->page      = $page;
             $param->order_by  = $order_by;
             $param->order_asc = false;
-
             $response           = $request->execute('');
             $response->job_type = $job_type;
             $response->page     = $response->data->page ?? 0;
@@ -439,7 +438,7 @@ class DouDianServers
             $response->total    = $response->data->total ?? 0;
 
             if ($response->size < $this->pageSize || empty($response->data->shop_order_list)) {
-                $while_flag = false;
+               break;
             }
 
             DouDianOrderLog::query()->create((array)$response);
@@ -507,7 +506,6 @@ class DouDianServers
 
             $page++;
         }
-
     }
 
     public function orderStatusData()
