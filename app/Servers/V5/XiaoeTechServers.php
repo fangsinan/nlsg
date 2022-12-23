@@ -742,6 +742,10 @@ class XiaoeTechServers
     public function sync_fast_distributor_customer_list(){
         $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
         $XeDistributorList = XeDistributor::query()->where('is_sync_customer', 1)->get();
+        $total=Redis::llen($redis_page_index_key);
+        if($total >3000){
+            return false;
+        }
         foreach ($XeDistributorList as $k=>$XeDistributor) {
             var_dump($k);
             Redis::rpush($redis_page_index_key, json_encode(['is_fast'=>1,'customer_number'=>$XeDistributor->customer_number,'xe_user_id' => $XeDistributor->xe_user_id, 'page_index' => 1]));
@@ -753,7 +757,7 @@ class XiaoeTechServers
 
         $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
 
-        for ($i = 1; $i <= 500; $i++) {
+        for ($i = 1; $i <= 1000; $i++) {
 
             $page_index_json = Redis::lpop($redis_page_index_key);
 //            $page_index_json = json_encode(['is_fast'=>1,'customer_number'=>'826673','xe_user_id' => 'u_5d538b27472fb_gbuhCZK6To', 'page_index' => 1]);
