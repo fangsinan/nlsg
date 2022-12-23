@@ -46,7 +46,12 @@ class XiaoTechJob extends Command
 
         switch ($task){
             case 'sync_distributor_customer_list':
+                //获取推广员客户
                 $XiaoeTechServers->sync_distributor_customer_list($is_init,$num);
+                break;
+            case 'sync_fast_distributor_customer_list':
+                //查询最新的推广员客户
+                $XiaoeTechServers->sync_fast_distributor_customer_list();
                 break;
         }
 //        $XiaoeTechServers->sync_distributor_customer_list(0);
