@@ -15,14 +15,15 @@ use Illuminate\Support\Facades\DB;
 
 class VipServers
 {
-    public function list($params, $role_id) {
+    public function list($params, $role_id)
+    {
         $size  = $params['size'] ?? 10;
         $query = VipUser::query()
-            ->where('status','=','1');
-        if($role_id==28){
-            $query=$query->where('created_at','>','2022-01-01');
+            ->where('status', '=', '1');
+        if ($role_id == 28) {
+            $query = $query->where('created_at', '>', '2022-01-01');
         }
-        $query=$query->orderBy('created_at', 'asc')
+        $query = $query->orderBy('created_at', 'asc')
             ->groupBy('user_id')
             ->select(['id', 'id as vip_id', 'user_id', 'nickname', 'username']);
 
@@ -74,7 +75,8 @@ class VipServers
         return $list;
     }
 
-    public function change360ExpireTime($params, $admin_id) {
+    public function change360ExpireTime($params, $admin_id)
+    {
         $vip_id      = $params['vip_id'] ?? 0;
         $user_id     = $params['user_id'] ?? 0;
         $expire_time = $params['expire_time'] ?? '';
@@ -91,7 +93,7 @@ class VipServers
             ->where('status', '=', 1)
             ->where('is_default', '=', 1)
             ->select(['id', 'user_id', 'level', 'start_time', 'expire_time', 'status', 'is_default', 'is_open_360',
-                'time_begin_360', 'time_end_360', 'username'])
+                      'time_begin_360', 'time_end_360', 'username'])
             ->first();
 
         if (empty($check)) {
@@ -145,7 +147,8 @@ class VipServers
 
     }
 
-    public function assign($params, $admin_id = 0) {
+    public function assign($params, $admin_id = 0)
+    {
         if (empty($admin_id)) {
             return ['code' => false, 'msg' => '用户错误'];
         }
@@ -229,7 +232,8 @@ class VipServers
 
     }
 
-    public function openVip($user_id, $phone, $channel = '') {
+    public function openVip($user_id, $phone, $channel = '')
+    {
         $now_date  = date('Y-m-d H:i:s');
         $user_info = User::where('id', '=', $user_id)->first();
         $check_vip = VipUser::where('user_id', '=', $user_id)
@@ -276,7 +280,8 @@ class VipServers
 
     }
 
-    public function createVip_2($params, $admin_id) {
+    public function createVip_2($params, $admin_id)
+    {
         $phone    = $params['phone'] ?? 0;
         $now_date = date('Y-m-d H:i:s');
         $end_date = date('Y-m-d 23:59:59', strtotime("+2 years"));
@@ -383,7 +388,8 @@ class VipServers
         return ['code' => true, 'msg' => '成功', 'success_msg' => $success_msg];
     }
 
-    public function createVip_1($params, $admin_id) {
+    public function createVip_1($params, $admin_id)
+    {
         $parent     = $params['parent'] ?? 0;
         $son        = $params['phone'] ?? 0;
         $send_money = $params['send_money'] ?? 0;
@@ -450,8 +456,8 @@ class VipServers
             ->where('vu.is_default', '=', 1)
             ->where('vu.expire_time', '>', $now_date)
             ->select(['vu.id', 'vu.user_id', 'vu.username', 'vu.level',
-                'vu.inviter', 'vu.inviter_vip_id',
-                'source', 'source_vip_id'])
+                      'vu.inviter', 'vu.inviter_vip_id',
+                      'source', 'source_vip_id'])
             ->first();
 
         if (!empty($bind_info)) {
@@ -655,7 +661,8 @@ class VipServers
     }
 
 
-    public function createVip($params, $admin_id = 0) {
+    public function createVip($params, $admin_id = 0)
+    {
         $flag = $params['flag'] ?? 0;
 
         switch (intval($flag)) {
@@ -672,7 +679,8 @@ class VipServers
 
     }
 
-    public function vipUserBindClear() {
+    public function vipUserBindClear()
+    {
         VipUserBind::query()
             ->where('status', '=', 1)
             ->where('end_at', '<=', date('Y-m-d H:i:s'))
@@ -681,7 +689,8 @@ class VipServers
             ]);
     }
 
-    public function createVip_3($params, $admin_id) {
+    public function createVip_3($params, $admin_id)
+    {
         $phone = $params['phone'] ?? 0;
         if (empty($phone)) {
             return ['code' => false, 'msg' => '开通人不能为空'];
@@ -760,6 +769,89 @@ class VipServers
 
         DB::commit();
         return ['code' => true, 'msg' => '成功', 'success_msg' => $success_msg];
+
+    }
+
+    public function vipUserBindSource()
+    {
+        //废弃
+        //处理bind的source部分
+        VipUserBind::query()
+            ->where('source', '=', '')
+            ->where('status', '=', 2)
+            ->update([
+                'source' => 'NULL',
+            ]);
+
+        $list = VipUserBind::query()
+            ->where('source', '=', '')
+            ->where('status', '=', 1)
+            ->groupBy('parent')
+            ->limit(100)
+            ->pluck('parent')
+            ->toArray();
+
+        if (empty($list)) {
+            return true;
+        }
+
+        $check = VipUser::query()
+            ->whereIn('username', $list)
+            ->where('status', '=', 1)
+            ->where('is_default', '=', 1)
+            ->select(['username', 'source', 'source_vip_id', 'level'])
+            ->with(['sourceVipInfo:id,username'])
+            ->get()
+            ->toArray();
+
+        foreach ($list as $k => $v) {
+            foreach ($check as $kk => $vv) {
+                if ($v === $vv['username']) {
+                    if ($vv['level'] === 2) {
+
+                        //钻石合伙人,source就是自己
+                        VipUserBind::query()
+                            ->where('source', '=', '')
+                            ->where('parent', '=', $v)
+                            ->where('status', '=', 1)
+                            ->update([
+                                'source' => $vv['username'],
+                            ]);
+                    } else {
+                        if (empty($vv['source_vip_info']['username'] ?? '')) {
+
+                            VipUserBind::query()
+                                ->where('source', '=', '')
+                                ->where('parent', '=', $v)
+                                ->where('status', '=', 1)
+                                ->update([
+                                    'source' => 'NULL',
+                                ]);
+                        } else {
+
+                            VipUserBind::query()
+                                ->where('source', '=', '')
+                                ->where('parent', '=', $v)
+                                ->where('status', '=', 1)
+                                ->update([
+                                    'source' => $vv['source_vip_info']['username'],
+                                ]);
+                        }
+                    }
+                    unset($list[$k], $check[$kk]);
+                }
+            }
+        }
+
+        if ($list) {
+            VipUserBind::query()
+                ->where('source', '=', '')
+                ->where('status', '=', 1)
+                ->whereIn('parent', $list)
+                ->update([
+                    'source' => 'NULL',
+                ]);
+        }
 
     }
 
