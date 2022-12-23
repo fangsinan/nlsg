@@ -79,6 +79,11 @@ class Kernel extends ConsoleKernel
             ->everyFifteenMinutes()->withoutOverlapping(1)
             ->runInBackground()->onOneServer();
 
+        //vip_bind的source补全
+        $schedule->command('command:VipUserBindSource')
+            ->everyFiveMinutes()->withoutOverlapping(3)
+            ->runInBackground()->onOneServer();
+
         $schedule->call(function () {
             JpushService::TimedPush();
         })->everyMinute()->runInBackground();//每分发送极光消息

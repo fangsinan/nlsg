@@ -772,10 +772,9 @@ class VipServers
 
     }
 
+    //补全bind的source信息
     public function vipUserBindSource()
     {
-        //废弃
-        //处理bind的source部分
         VipUserBind::query()
             ->where('source', '=', '')
             ->where('status', '=', 2)
@@ -787,7 +786,7 @@ class VipServers
             ->where('source', '=', '')
             ->where('status', '=', 1)
             ->groupBy('parent')
-            ->limit(100)
+            ->limit(500)
             ->pluck('parent')
             ->toArray();
 
@@ -801,8 +800,13 @@ class VipServers
             ->where('is_default', '=', 1)
             ->select(['username', 'source', 'source_vip_id', 'level'])
             ->with(['sourceVipInfo:id,username'])
-            ->get()
-            ->toArray();
+            ->get();
+
+        if ($check->isEmpty()){
+            $check = [];
+        }else{
+            $check = $check->toArray();
+        }
 
         foreach ($list as $k => $v) {
             foreach ($check as $kk => $vv) {
@@ -852,6 +856,89 @@ class VipServers
                     'source' => 'NULL',
                 ]);
         }
+        return true;
+    }
+
+    public function vipUpateBindSource(){
+        $parent_list = VipUser::query()
+            ->where('updated_at','>=',date('Y-m-d H:i:00',strtotime('-3 minutes')))
+            ->pluck('username')
+            ->toArray();
+
+        if (empty($parent_list)){
+            return true;
+        }
+
+        $parent_list = array_unique($parent_list);
+
+        $list = VipUserBind::query()
+            ->whereIn('parent',$parent_list)
+            ->where('status', '=', 1)
+            ->groupBy('parent')
+            ->pluck('parent')
+            ->toArray();
+
+        if (empty($list)) {
+            return true;
+        }
+
+        $check = VipUser::query()
+            ->whereIn('username', $list)
+            ->where('status', '=', 1)
+            ->where('is_default', '=', 1)
+            ->select(['username', 'source', 'source_vip_id', 'level'])
+            ->with(['sourceVipInfo:id,username'])
+            ->get();
+
+        if ($check->isEmpty()){
+            $check = [];
+        }else{
+            $check = $check->toArray();
+        }
+
+        foreach ($list as $k => $v) {
+            foreach ($check as $kk => $vv) {
+                if ($v === $vv['username']) {
+                    if ($vv['level'] === 2) {
+                        //钻石合伙人,source就是自己
+                        VipUserBind::query()
+                            ->where('parent', '=', $v)
+                            ->where('status', '=', 1)
+                            ->update([
+                                'source' => $vv['username'],
+                            ]);
+                    } else {
+                        if (empty($vv['source_vip_info']['username'] ?? '')) {
+                            VipUserBind::query()
+                                ->where('parent', '=', $v)
+                                ->where('status', '=', 1)
+                                ->update([
+                                    'source' => 'NULL',
+                                ]);
+                        } else {
+                            VipUserBind::query()
+                                ->where('parent', '=', $v)
+                                ->where('status', '=', 1)
+                                ->update([
+                                    'source' => $vv['source_vip_info']['username'],
+                                ]);
+                        }
+                    }
+                    unset($list[$k], $check[$kk]);
+                }
+            }
+        }
+
+        if ($list) {
+            VipUserBind::query()
+                ->where('status', '=', 1)
+                ->whereIn('parent', $list)
+                ->update([
+                    'source' => 'NULL',
+                ]);
+        }
+
+        return true;
 
     }
 
