@@ -480,7 +480,7 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
             $servers->sync_fast_distributor_customer_list();
-        })->between('8:00', '23:00')->everyTenMinutes()->runInBackground();
+        })->between('8:00', '23:00')->everyThirtyMinutes()->runInBackground();
 
         //获取推广员客户
         $schedule->call(function () {
