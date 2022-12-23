@@ -738,9 +738,7 @@ class XiaoeTechServers
             }
 
         } else {
-
             $this->do_distributor_customer_list();
-
         }
 
     }

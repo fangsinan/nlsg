@@ -12,7 +12,7 @@ class XiaoTechJob extends Command
      *
      * @var string
      */
-    protected $signature = 'XiaoTechJob';
+    protected $signature = 'XiaoTechJob {task} {is_init} {num}';
 
     /**
      * The console command description.
@@ -38,8 +38,18 @@ class XiaoTechJob extends Command
      */
     public function handle()
     {
+        $task = $this->argument('task')??'';
+        $is_init = $this->argument('is_init')??0;
+        $num = $this->argument('num')??0;
+
         $XiaoeTechServers=new XiaoeTechServers();
-        $XiaoeTechServers->sync_distributor_customer_list(0);
+
+        switch ($task){
+            case 'sync_distributor_customer_list':
+                $XiaoeTechServers->sync_distributor_customer_list($is_init,$num);
+                break;
+        }
+//        $XiaoeTechServers->sync_distributor_customer_list(0);
 
     }
 }
