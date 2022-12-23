@@ -506,7 +506,7 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分钟执行一次
         $schedule->call(function () {
             $servers = new XiaoeTechServers();
-            $servers->sync_distributor_customer_list(0);
+            $servers->sync_distributor_customer_list(0,5);
         })->everyMinute()->runInBackground();//每分钟执行一次
 
     }
