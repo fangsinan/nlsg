@@ -240,15 +240,18 @@ class WechatServersNew
     //模板配置
     public  static function sendBespeakClass($Url,$open_id){
 
-        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=749&time=1669023081250&inviter=211370';
-        $hello='你好，王琨老师全新内容、本人直播今晚19:30开始~';
-        $title='王琨老师直播：教你培养孩子好习惯的N个小秘诀”';
-        $day='中小学家长';
-        $remarks="点击下面详情按钮，免费学习~";
+//        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=749&time=1669023081250&inviter=211370';
+        $hrefurl='https://ekl.h5.xeknow.com/sl/12UdVf';
+        $hello='王琨老师全新内容免费直播';
+        $title='幸福人生的4大经营';
+        $leibie='直播课';
+        $teacher='王琨老师';
+        $time='2022-12-24 19:30';
+        $remarks="点击下面详情按钮，免费预约直播课学习~";
 
         $data=[
             'touser'=>$open_id,
-            'template_id'=>'OSUiWEQWgh4IFjKgi4MDu9TNX_FGT6P2wkzwNvzZ4XU',
+            'template_id'=>'532669V5WV_TatVM4t0k4Z3KgeedavS7M3HkqCq69Pc',
             'url'=>$hrefurl, #抖音直播不需要跳转
             'topcolor'=>"#FF0000",
             'data'=>[
@@ -260,8 +263,16 @@ class WechatServersNew
                     "value"=>$title,
                     "color"=>"#FF0000",
                 ],
-                "keyword2"=>[ //开课时间
-                    "value"=>$day,
+                "keyword2"=>[
+                    "value"=>$leibie,
+                    "color"=>"#FF0000",
+                ],
+                "keyword3"=>[
+                    "value"=>$teacher,
+                    "color"=>"#FF0000",
+                ],
+                "keyword4"=>[
+                    "value"=>$time,
                     "color"=>"#FF0000",
                 ],
                 "remark"=>[
