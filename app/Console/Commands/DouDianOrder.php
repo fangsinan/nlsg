@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\CommandJobLog;
 use App\Servers\V5\DouDianServers;
 use Illuminate\Console\Command;
 
@@ -38,6 +39,7 @@ class DouDianOrder extends Command
      */
     public function handle()
     {
+        CommandJobLog::add(__METHOD__,$this->arguments());
         $type = $this->argument('type');
         if ($type == 3) {
             (new DouDianServers())->tempGetOrderDetails();//根据单号获取订单详情

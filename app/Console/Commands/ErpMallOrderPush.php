@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\CommandJobLog;
 use App\Servers\ErpServers;
 use Illuminate\Console\Command;
 
@@ -38,6 +39,7 @@ class ErpMallOrderPush extends Command
      */
     public function handle()
     {
+        CommandJobLog::add(__METHOD__,$this->arguments());
         $s = new ErpServers();
         $s->pushRun();
     }

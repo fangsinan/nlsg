@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\CommandJobLog;
 use App\Models\VipUserBind;
 use App\Servers\V5\XiaoETongServers;
 use Illuminate\Console\Command;
@@ -39,6 +40,7 @@ class XeUserJob extends Command
      */
     public function handle()
     {
+        CommandJobLog::add(__METHOD__,$this->arguments());
         $type = (int)$this->argument('type');
         $xes  = new XiaoETongServers();
         switch ($type) {
