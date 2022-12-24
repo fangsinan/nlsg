@@ -140,8 +140,9 @@ class DouDianServers
                 ]);
 
         } else {
-            $end_time   = time();
-            $begin_time = $end_time - 720;
+            //5分
+            $end_time   = strtotime(date('Y-m-d H:i:59'));
+            $begin_time = strtotime(date('Y-m-d H:i:30', strtotime('-2 minutes')));
         }
 
         $this->orderSearchList($begin_time, $end_time, $type);
@@ -401,7 +402,6 @@ class DouDianServers
     //订单
     public function orderSearchList(int $begin, int $end, $type)
     {
-
         $page       = 0;
         $while_flag = true;
 
@@ -436,6 +436,8 @@ class DouDianServers
             $response->page     = $response->data->page ?? 0;
             $response->size     = $response->data->size ?? 0;
             $response->total    = $response->data->total ?? 0;
+
+            //echo $page,'页;共',$response->data->total,'条;',PHP_EOL;
 
             if ($response->size < $this->pageSize || empty($response->data->shop_order_list)) {
                 break;
