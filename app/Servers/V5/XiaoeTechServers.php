@@ -1229,18 +1229,29 @@ class XiaoeTechServers
             $this->err_msg = $res['body']['msg'];
             return ['code' => false, 'msg' => $this->err_msg];
         }
-
-        $XeDistributorCustomer = new XeDistributorCustomer();
-        $XeDistributorCustomer->xe_user_id = $parent_user_id;
-        $XeDistributorCustomer->sub_user_id = $user_id;
-        $XeDistributorCustomer->status = 1;
-        $XeDistributorCustomer->status_text = '绑定中';
-        $XeDistributorCustomer->remain_days = 365;
-        $XeDistributorCustomer->bind_time = times();
-        $XeDistributorCustomer->expired_at = times(strtotime('+1 years'));
-        $XeDistributorCustomer->refresh_time = times();
-        $XeDistributorCustomer->save();
-
+        try {
+            $XeDistributorCustomer = XeDistributorCustomer::query()
+                ->where('xe_user_id', $parent_user_id)
+                ->where('sub_user_id', $user_id)
+                ->first();
+            if(!$XeDistributorCustomer){
+                $XeDistributorCustomer = new XeDistributorCustomer();
+            }
+            $XeDistributorCustomer->xe_user_id = $parent_user_id;
+            $XeDistributorCustomer->sub_user_id = $user_id;
+            $XeDistributorCustomer->status = 1;
+            $XeDistributorCustomer->status_text = '绑定中';
+            $XeDistributorCustomer->remain_days = 365;
+            $XeDistributorCustomer->bind_time = times();
+            $XeDistributorCustomer->expired_at = times(strtotime('+1 years'));
+            $XeDistributorCustomer->refresh_time = times();
+            $XeDistributorCustomer->save();
+        } catch (\Exception $e) {
+            $errCode = $e->getCode();
+            if ($errCode != 23000) {
+                return ['code' => false, 'msg' => $e->getMessage()];
+            }
+        }
         return ['code' => true, 'msg' => '成功', 'created_at' => times()];
 
     }
