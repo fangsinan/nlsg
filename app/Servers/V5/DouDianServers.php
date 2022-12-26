@@ -3,6 +3,7 @@
 namespace App\Servers\V5;
 
 use AccessTokenBuilder;
+use App\Models\CommandJobLog;
 use App\Models\ConfigModel;
 use App\Models\DouDian\DouDianOrder;
 use App\Models\DouDian\DouDianOrderDecryptQuota;
@@ -144,7 +145,12 @@ class DouDianServers
             $end_time   = strtotime(date('Y-m-d H:i:59'));
             $begin_time = strtotime(date('Y-m-d H:i:30', strtotime('-2 minutes')));
         }
-
+        CommandJobLog::add('App\Console\Commands\DouDianOrder::handle',[
+            'begin_time'=>$begin_time,
+            'end_time'=>$end_time,
+        ]);
+        //$begin_time = strtotime('2022-12-26 10:00:00');
+        //$end_time   = strtotime('2022-12-26 23:00:00');
         $this->orderSearchList($begin_time, $end_time, $type);
 
         //临时使用  补充订单状态
@@ -437,7 +443,7 @@ class DouDianServers
             $response->size     = $response->data->size ?? 0;
             $response->total    = $response->data->total ?? 0;
 
-            //echo $page,'页;共',$response->data->total,'条;',PHP_EOL;
+            echo $page, '页;共', $response->data->total, '条;', $response->page * $response->size, PHP_EOL;
 
             if ($response->size < $this->pageSize || empty($response->data->shop_order_list)) {
                 break;
