@@ -87,7 +87,8 @@ class XiaoETongController extends ControllerBackend
                     'nickname'   => $v->XeUserInfo['nickname'] ?? '-',
                     'status'     => $v->status == 1 ? '有效' : '无效',
                     'bind'       => $v->XeUserInfo->vipBindInfo['parent'] ?? '-',
-                    'vip_source' => $v->XeUserInfo->vipInfo->sourceVipInfo['phone'] ?? '-',
+                    'vip_source'       => $v->XeUserInfo->vipBindInfo['source'] ?? '-',
+//                    'vip_source' => $v->XeUserInfo->vipInfo->sourceVipInfo['phone'] ?? '-',
                     'group_name' => $v->group_name ?? '-',
                 ];
 
@@ -158,7 +159,8 @@ class XiaoETongController extends ControllerBackend
                     'created_at'  => $v->xe_created_time,
                     'share_user'  => $v->distributeInfo->shareUserInfo->nickname ?? '-',
                     'bind_user'   => $v->xeUserInfo->vipBindInfo['parent'] ?? '-',
-                    'source_user' => $v->xeUserInfo->vipInfo->sourceVipInfo['username'] ?? '-',
+                    'source_user' => $v->xeUserInfo->vipBindInfo['source'] ?? '-',
+//                    'source_user' => $v->xeUserInfo->vipInfo->sourceVipInfo['username'] ?? '-',
                     'order_state' => $v->order_state_desc,
                     'waiter_user' => $v->xeUserInfo->liveUserWaiterInfo->adminUserInfo['name'] ?? '-',
                     'pay_time'    => $v->pay_state_time ?: $v->order_state_time,

@@ -39,7 +39,6 @@ class DouDianOrder extends Command
      */
     public function handle()
     {
-        CommandJobLog::add(__METHOD__,$this->arguments());
         $type = $this->argument('type');
         if ($type == 3) {
             (new DouDianServers())->tempGetOrderDetails();//根据单号获取订单详情
