@@ -42,6 +42,68 @@ class CytxUserPhoneChange extends Command
      */
     public function handle()
     {
+        //慧鱼提交经销商保护表格处理
+        if(1){
+            //todo w_linshi_huiyu_vip_bind
+        }
+
+
+        //创业天下号码更改
+        if (0) {
+            $list = [
+//            ['18198080359','13369423657'],
+//            ['18877762860','13684118715'],
+//            ['15945369583','18104537687'],
+//            ['15595182687','13995193090'],
+//            ['17752314931','13895002795'],
+//            ['13995370916','15378964931'],
+//            ['18260429996','13776046443'],
+            ];
+
+            DB::beginTransaction();
+            try {
+                foreach ($list as $p) {
+                    $check_p1 = User::query()->where('phone', '=', $p[0])->first();
+
+                    if (empty($check_p1)) {
+                        continue;
+                    }
+
+                    $check_p2 = User::query()->where('phone', '=', $p[1])->first();
+
+                    if (empty($check_p2)) {
+                        $check_p1->phone = $p[1];
+                        $check_p1->save();
+                    } else {
+                        $check_p2->phone = $check_p2->id;
+                        $check_p2->save();
+
+                        $check_p1->phone = $p[1];
+                        $check_p1->save();
+
+                        $check_p2->phone = $p[0];
+                        $check_p2->save();
+                    }
+
+                }
+                DB::commit();
+                echo '成功';
+            } catch (\Exception $e) {
+                DB::rollBack();
+                echo '失败';
+            }
+        }
+
+        if (0) {
+            //临时调试用
+            $r = (new TempLiveExcelServers())->qiYeWeiXin([
+                'live_id'    => 617,
+                'is_bind'    => 0,
+                'begin_time' => '2022-08-22 00:00:00',
+                'end_time'   => '2022-08-22 23:59:59'
+            ], 168934);
+            dd($r);
+        }
 
         if (0) {
             //根据w_temp_360表  批量添加396收益
@@ -143,7 +205,6 @@ class CytxUserPhoneChange extends Command
 
         }
 
-
         if (0) {
             //批量开通360部分
             $list = [
@@ -164,64 +225,5 @@ class CytxUserPhoneChange extends Command
 
             dd($vip_temp_res);
         }
-
-
-        if (0) {
-            //创业天下号码更改
-            $list = [
-//            ['18198080359','13369423657'],
-//            ['18877762860','13684118715'],
-//            ['15945369583','18104537687'],
-//            ['15595182687','13995193090'],
-//            ['17752314931','13895002795'],
-//            ['13995370916','15378964931'],
-//            ['18260429996','13776046443'],
-            ];
-
-            DB::beginTransaction();
-            try {
-                foreach ($list as $p) {
-                    $check_p1 = User::query()->where('phone', '=', $p[0])->first();
-
-                    if (empty($check_p1)) {
-                        continue;
-                    }
-
-                    $check_p2 = User::query()->where('phone', '=', $p[1])->first();
-
-                    if (empty($check_p2)) {
-                        $check_p1->phone = $p[1];
-                        $check_p1->save();
-                    } else {
-                        $check_p2->phone = $check_p2->id;
-                        $check_p2->save();
-
-                        $check_p1->phone = $p[1];
-                        $check_p1->save();
-
-                        $check_p2->phone = $p[0];
-                        $check_p2->save();
-                    }
-
-                }
-                DB::commit();
-                echo '成功';
-            } catch (\Exception $e) {
-                DB::rollBack();
-                echo '失败';
-            }
-        }
-
-        if (0) {
-            //临时调试用
-            $r = (new TempLiveExcelServers())->qiYeWeiXin([
-                'live_id'    => 617,
-                'is_bind'    => 0,
-                'begin_time' => '2022-08-22 00:00:00',
-                'end_time'   => '2022-08-22 23:59:59'
-            ], 168934);
-            dd($r);
-        }
-
     }
 }
