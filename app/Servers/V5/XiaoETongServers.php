@@ -28,7 +28,7 @@ class XiaoETongServers
             'XeUserInfo:user_id,xe_user_id,nickname,name,phone,is_seal',
             'XeUserInfo.vipInfo:id,user_id,nickname,username,level,source,source_vip_id',
             'XeUserInfo.vipInfo.sourceVipInfo:id,user_id,nickname,username,level',
-            'XeUserInfo.vipBindInfo:parent,son,life,begin_at,end_at',
+            'XeUserInfo.vipBindInfo:source,parent,son,life,begin_at,end_at',
             'XeUserParentInfo:user_id,xe_user_id,nickname,name,phone,is_seal',
         ]);
 
@@ -393,7 +393,7 @@ class XiaoETongServers
                 'xeUserInfo.vipInfo.sourceVipInfo:id,nickname,username,username as phone',
                 'xeUserInfo.liveUserWaiterInfo:user_id,admin_id',
                 'xeUserInfo.liveUserWaiterInfo.adminUserInfo:id,name',
-                'xeUserInfo.vipBindInfo:parent,son,life,begin_at,end_at',
+                'xeUserInfo.vipBindInfo:source,parent,son,life,begin_at,end_at',
                 'orderGoodsInfo:order_id,sku_id,goods_name,goods_image,buy_num',
                 'distributeInfo:id,order_id,share_user_id,distribute_price',
                 'distributeInfo.shareUserInfo:id,xe_user_id,nickname,phone',
