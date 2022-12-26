@@ -488,7 +488,7 @@ class Kernel extends ConsoleKernel
 
         //获取推广员客户
         $schedule->command('XiaoTechJob sync_distributor_customer_list 1 0')->dailyAt('0:01')->runInBackground();
-        $schedule->command('XiaoTechJob sync_distributor_customer_list 0 1')->everyMinute()->runInBackground();//每分钟执行一次
+        $schedule->command('XiaoTechJob sync_distributor_customer_list 0 1')->everyMinute()->runInBackground()->onOneServer()->withoutOverlapping();//每分钟执行一次
 
     }
 

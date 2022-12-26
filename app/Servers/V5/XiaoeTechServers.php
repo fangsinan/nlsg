@@ -765,7 +765,6 @@ class XiaoeTechServers
         for ($i = 1; $i <= 50; $i++) {
 
             $page_index_json = Redis::lpop($redis_page_index_key);
-//            $page_index_json = json_encode(['is_fast'=>1,'customer_number'=>'826673','xe_user_id' => 'u_5d538b27472fb_gbuhCZK6To', 'page_index' => 1]);
             if ($page_index_json) {
                 $page_index_arr = json_decode($page_index_json, true);
                 $xe_user_id = $page_index_arr['xe_user_id'] ?? 0;
@@ -926,6 +925,23 @@ class XiaoeTechServers
 
     }
 
+    /**
+     * @param $xe_user_id
+     * @param $page_index
+     * @return mixed
+     * 获取推广员下的客户
+     */
+    public function get_page_distributor_customer_list($xe_user_id,$page_index=1){
+        $page_size = 100;
+        $paratms = [
+            'access_token' => $this->get_token(),
+            'user_id' => $xe_user_id,
+            'page_index' => intval($page_index),
+            'page_size' => intval($page_size),
+        ];
+        $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.sub_customer/1.0.0', $paratms);
+        return $res['body'];
+    }
 
     /**
      * 同步订单详情
