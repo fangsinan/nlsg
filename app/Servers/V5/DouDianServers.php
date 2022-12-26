@@ -145,13 +145,17 @@ class DouDianServers
             $end_time   = strtotime(date('Y-m-d H:i:59'));
             $begin_time = strtotime(date('Y-m-d H:i:30', strtotime('-2 minutes')));
         }
-        CommandJobLog::add('App\Console\Commands\DouDianOrder::handle',[
-            'begin_time'=>$begin_time,
-            'end_time'=>$end_time,
-        ]);
+
         //$begin_time = strtotime('2022-12-26 10:00:00');
         //$end_time   = strtotime('2022-12-26 23:00:00');
-        $this->orderSearchList($begin_time, $end_time, $type);
+        $res = $this->orderSearchList($begin_time, $end_time, $type);
+
+        CommandJobLog::add('App\Console\Commands\DouDianOrder::handle', [
+            'begin_time' => date('H.i.s', $begin_time),
+            'end_time'   => date('H.i.s', $end_time),
+            'type'       => $type,
+            'total'      => is_numeric($res) ? $res : -1,
+        ]);
 
         //临时使用  补充订单状态
         $this->orderStatusData();
@@ -421,6 +425,7 @@ class DouDianServers
             $order_by = 'update_time';
             $job_type = 12;
         }
+        $total_count = 0;
 
         while ($while_flag) {
             $request->setParam($param);
@@ -442,8 +447,8 @@ class DouDianServers
             $response->page     = $response->data->page ?? 0;
             $response->size     = $response->data->size ?? 0;
             $response->total    = $response->data->total ?? 0;
-
-            echo $page, '页;共', $response->data->total, '条;', $response->page * $response->size, PHP_EOL;
+            $total_count        = $response->data->total ?? 0;
+            echo $page, '页;共', $response->data->total, '条;', ($response->page + 1) * $response->size, PHP_EOL;
 
             if ($response->size < $this->pageSize || empty($response->data->shop_order_list)) {
                 break;
@@ -514,6 +519,7 @@ class DouDianServers
 
             $page++;
         }
+        return $total_count;
     }
 
     public function orderStatusData()
