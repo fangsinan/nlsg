@@ -792,18 +792,23 @@ class XiaoeTechServers
                 'page_size' => intval($page_size),
             ];
 
+            var_dump($i);
             var_dump($paratms);
 
             try {
 
                 $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.sub_customer/1.0.0', $paratms);
-                DB::table('nlsg_log_info')->insert([
+
+                DB::table('nlsg_xe_log')->insert([
                     'url' => 'xe.distributor.member.sub_customer',
                     'line' => $res['body']['code'],
                     'parameter' => json_encode($paratms),
+                    'message' => $res['body']['data']['count']??0,
+                    'batch_number' => $batch_number,
+                    'page_index' => $page_index,
+                    'xe_user_id' => $xe_user_id,
                     'created_at' => date('Y-m-d H:i:s', time())
                 ]);
-
 
                 if ($res['body']['code'] != 0) {
 
@@ -854,6 +859,7 @@ class XiaoeTechServers
             foreach ($return_list as $customer) {
 
                 try {
+
                     //保存小鹅通用户
                     $XeUser = XeUser::query()->where('xe_user_id', $customer['sub_user_id'])->first();
                     if (!$XeUser) {
@@ -873,6 +879,7 @@ class XiaoeTechServers
                 }
 
                 try {
+
                     //保存推广员客户
                     $XeDistributorCustomer = XeDistributorCustomer::query()->where('xe_user_id', $xe_user_id)->where('sub_user_id', $customer['sub_user_id'])->first();
                     if (!$XeDistributorCustomer) {
@@ -896,7 +903,14 @@ class XiaoeTechServers
                     $XeDistributorCustomer->batch_number = $batch_number;
                     $XeDistributorCustomer->page_index = $page_index;
 
+                    if($XeDistributorCustomer->refresh_number){
+                        $XeDistributorCustomer->refresh_number=$XeDistributorCustomer->refresh_number+1;
+                    }else{
+                        $XeDistributorCustomer->refresh_number=1;
+                    }
+
                     $XeDistributorCustomer->save();
+
                 } catch (\Exception $e) {
                     $errCode = $e->getCode();
                     var_dump($e->getMessage());
