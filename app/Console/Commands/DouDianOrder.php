@@ -47,6 +47,7 @@ class DouDianOrder extends Command
         } else {
             (new DouDianServers())->getOrderJob($type);
         }
+        CommandJobLog::add(__METHOD__,$this->arguments());
         return 0;
     }
 }
