@@ -142,12 +142,11 @@ class DouDianServers
 
         } else {
             //5分
-            $end_time   = strtotime(date('Y-m-d H:i:59'));
-            $begin_time = strtotime(date('Y-m-d H:i:30', strtotime('-2 minutes')));
+            $end_time   = date('Y-m-d H:i:00');
+            $begin_time = strtotime(date('Y-m-d H:i:30', strtotime($end_time.' -3 minutes')));
+            $end_time = strtotime($end_time);
         }
 
-        //$begin_time = strtotime('2022-12-26 10:00:00');
-        //$end_time   = strtotime('2022-12-26 23:00:00');
         $res = $this->orderSearchList($begin_time, $end_time, $type);
 
         CommandJobLog::add('App\Console\Commands\DouDianOrder::handle', [
@@ -448,7 +447,8 @@ class DouDianServers
             $response->size     = $response->data->size ?? 0;
             $response->total    = $response->data->total ?? 0;
             $total_count        = $response->data->total ?? 0;
-            echo $page, '页;共', $response->data->total, '条;', ($response->page + 1) * $response->size, PHP_EOL;
+            
+            //echo $page, '页;共', $response->data->total, '条;', ($response->page + 1) * $response->size, PHP_EOL;
 
             if ($response->size < $this->pageSize || empty($response->data->shop_order_list)) {
                 break;
