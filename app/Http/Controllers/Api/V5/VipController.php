@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
 use App\Models\VipUser;
+use App\Models\VipUserBind;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class VipController extends Controller
@@ -94,6 +96,56 @@ class VipController extends Controller
         $model = new VipUser();
         $data = $model->homePage($this->user, $request->input());
         return $this->getRes($data);
+    }
+
+    /**
+     * getVipSonList 获取钻石合伙人名下数据
+     *
+     * @param Request $request
+     *
+     * @return JsonResponse
+     */
+    public function getVipSonList(Request $request)
+    {
+        $son = $request->input("phone","");
+        $status = $request->input("status",0);   //1保护有效   2保护失效
+
+        $phone = $this->user['phone'];
+
+        $query = VipUserBind::query()
+            ->with([
+                'SonUser:id,phone,nickname'
+            ]);
+        $query->where("source",$phone);
+        if(!empty($son)){
+            $query->where("son",$son);
+        }
+        if(!empty($status)){
+            $query->where("status",$status);
+        }
+
+        //
+        // if($status == 2){
+        //     $query->where("status",1);
+        //     // 永久保护life =1   或者 结束时间在有效范围内
+        //     $query->where(function ($query)use($now){
+        //         $query->orWhere('life',1);
+        //         $query->orWhere("end_at",">=",$now);
+        //     });
+        // }else if($status == 3){
+        //     $query->where("status",2);
+        //     $query->where("end_at","<",$now);
+        // }
+
+        $data = $query->select("source","son","life","begin_at","end_at","status")
+            ->orderBy('status')
+            ->orderBy('begin_at', 'desc')
+            ->paginate(10)
+            ->toArray();
+
+
+        return $this->getRes($data['data']);
+
     }
 
 

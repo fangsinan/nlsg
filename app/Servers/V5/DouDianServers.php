@@ -447,11 +447,11 @@ class DouDianServers
             $response->size     = $response->data->size ?? 0;
             $response->total    = $response->data->total ?? 0;
             $total_count        = $response->data->total ?? 0;
-            
+
             //echo $page, '页;共', $response->data->total, '条;', ($response->page + 1) * $response->size, PHP_EOL;
 
             if ($response->size < $this->pageSize || empty($response->data->shop_order_list)) {
-                break;
+                $while_flag = false;
             }
 
             DouDianOrderLog::query()->create((array)$response);

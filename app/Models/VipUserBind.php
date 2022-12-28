@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\XiaoeTech\XeDistributor;
 use App\Models\XiaoeTech\XeUserJob;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 
 class VipUserBind extends Base
@@ -15,6 +16,11 @@ class VipUserBind extends Base
     protected $fillable = [
         'parent', 'son', 'life', 'begin_at', 'end_at', 'channel', 'status'
     ];
+
+    public function SonUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'son', 'phone');
+    }
 
     //0没绑定   -1绑定但是无效   其他父类用户id
     public static function getBindParent($phone = '')
