@@ -294,14 +294,14 @@ class WorksController extends Controller
      */
     public function editHistoryTime(Request $request){
 
-       DB::table('nlsg_log_info')->insert([
-           'url'     => 'infoLog:'.$request->fullUrl(),
-           'parameter'    =>  json_encode($request->all()),
-           'user_id'    =>  $this->user['id'] ?? 0,
-           'created_at' =>date('Y-m-d H:i:s', time())
-       ]);
+       // DB::table('nlsg_log_info')->insert([
+       //     'url'     => 'infoLog:'.$request->fullUrl(),
+       //     'parameter'    =>  json_encode($request->all()),
+       //     'user_id'    =>  $this->user['id'] ?? 0,
+       //     'created_at' =>date('Y-m-d H:i:s', time())
+       // ]);
 
-        $user_id    = 17578847;//$this->user['id'] ?? 0;
+        $user_id    = $this->user['id'] ?? 0;
         $relation_id  = $request->input('relation_id',0);
         $relation_type  = $request->input('relation_type',0);
         $time_leng  = $request->input('time_leng',0);

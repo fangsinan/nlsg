@@ -105,7 +105,7 @@ class VipController extends Controller
      *
      * @return JsonResponse
      */
-    public function getVipSonList(Request $request)
+    public function getVipSonList(Request $request): JsonResponse
     {
         $son = $request->input("phone","");
         $status = $request->input("status",0);   //1保护有效   2保护失效
@@ -117,6 +117,7 @@ class VipController extends Controller
                 'SonUser:id,phone,nickname'
             ]);
         $query->where("source",$phone);
+        $total = $query->count();
         if(!empty($son)){
             $query->where("son",$son);
         }
@@ -140,11 +141,16 @@ class VipController extends Controller
         $data = $query->select("source","son","life","begin_at","end_at","status")
             ->orderBy('status')
             ->orderBy('begin_at', 'desc')
-            ->paginate(10)
+            ->paginate(15)
             ->toArray();
 
-
-        return $this->getRes($data['data']);
+        foreach($data['data'] as &$val){
+            $val['end_at'] = date('Y-m-d H:i',strtotime($val['end_at']));
+        }
+        return $this->getRes([
+            "data" => $data['data'],
+            "total" => $total??0,
+        ]);
 
     }
 
