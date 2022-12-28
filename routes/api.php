@@ -644,6 +644,9 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
         //用户设置
         Route::post('user/settings', 'UserController@settings');
+        // vip
+        Route::any('vip/get_son_list', 'VipController@getVipSonList');
+
     });
     //训练营
     Route::any('camp/get_camp_list', 'CampController@getCampList');//->middleware('replaceNull');

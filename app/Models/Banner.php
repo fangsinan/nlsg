@@ -116,6 +116,7 @@ class Banner extends Base
         //1:h5(走url,其他都object_id)  2:商品  3:优惠券领取页面4精品课 5.讲座 6.听书 7 360  13活动开屏图
         $res = [];
         if (!empty($data)) {
+            $res['id'] = $data->id;
             $res['obj_id'] = $data->obj_id;
             $res['info_id'] = $data->info_id;
             $res['type'] = $data->jump_type;
