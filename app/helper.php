@@ -365,6 +365,7 @@ function formatDataTime($param_time, $type = 1)
 }
 
 function checkDuplicateEntry($e){
+
     $errCode = $e->getCode();
     $msg=$e->getMessage();
     if($errCode==23000 && preg_match('/Integrity constraint violation: 1062 Duplicate entry/',$msg)){
