@@ -1247,6 +1247,7 @@ class XiaoeTechServers
         $XeDistributorCustomer = XeDistributorCustomer::query()
             ->where('xe_user_id', $parent_user_id)
             ->where('sub_user_id', $user_id)
+            ->where('status', 1)
             ->first();
 
         if ($XeDistributorCustomer) {
@@ -1294,27 +1295,38 @@ class XiaoeTechServers
     /**
      * 修改/解除绑定关系
      */
-    public function distributor_member_change($user_id, $former_parent_user_id, $parent_user_id = '')
+    public function distributor_member_change($user_id, $former_parent_user_id='', $parent_user_id = '')
     {
 
         if (empty($user_id)) {
             return '客户不存在';
         }
 
-        $XeDistributor = XeDistributor::query()->where('xe_user_id', $former_parent_user_id)->first();
-        if (!$XeDistributor) {
-            return '推广员不存在';
+
+        if($former_parent_user_id){
+            $XeOldDistributorCustomer = XeDistributorCustomer::query()
+                ->where('xe_user_id', $former_parent_user_id)
+                ->where('sub_user_id', $user_id)
+                ->where('status', 1)
+                ->first();
+        }else{
+            $XeOldDistributorCustomer = XeDistributorCustomer::query()
+                ->where('sub_user_id', $user_id)
+                ->where('status', 1)
+                ->first();
         }
 
-        $XeOldDistributorCustomer = XeDistributorCustomer::query()
-            ->where('xe_user_id', $former_parent_user_id)
-            ->where('sub_user_id', $user_id)
-            ->where('status', 1)
-            ->first();
 
         if (!$XeOldDistributorCustomer) {
             return '原推广员未绑定客户';
         }
+
+        $former_parent_user_id = $XeOldDistributorCustomer->xe_user_id;
+
+//        $XeDistributor = XeDistributor::query()->where('xe_user_id', $former_parent_user_id)->first();
+//        if (!$XeDistributor) {
+//            return '推广员不存在';
+//        }
 
         $paratms = [
             'access_token' => $this->get_token(),
@@ -1324,9 +1336,17 @@ class XiaoeTechServers
         ];
 
         $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.change/1.0.0', $paratms);
-        if ($res['body']['code'] != 0) {
-            $this->err_msg = $res['body']['msg'];
-            return $this->err_msg;
+        var_dump($res);die;
+        if($parent_user_id){
+            if ($res['body']['code'] != 0 ) {
+                $this->err_msg = $res['body']['msg'];
+                return $this->err_msg;
+            }
+        }else{
+            if ($res['body']['code'] != 0 && $res['body']['code'] !=  20200) {
+                $this->err_msg = $res['body']['msg'];
+                return $this->err_msg;
+            }
         }
 
         if ($parent_user_id) {
