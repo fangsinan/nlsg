@@ -14,7 +14,7 @@ class TestJob extends Command
      *
      * @var string
      */
-    protected $signature = 'TestJob {batch} {page}';
+    protected $signature = 'TestJob {task} {batch} {page}';
 
     /**
      * The console command description.
@@ -40,6 +40,20 @@ class TestJob extends Command
      */
     public function handle()
     {
+        $task = $this->argument('task')??'';
+        if(empty($task)){
+            echo 'task参数错误';die;
+        }
+        switch ($task){
+            case 'unbind':
+                $this->unbind();
+                break;
+            case 'again_bind':
+                $this->again_bind();
+                break;
+            default:
+                echo 'task参数错误';die;
+        }
         $this->unbind();
     }
 
@@ -75,10 +89,15 @@ class TestJob extends Command
     }
 
     function again_bind(){
+
+        $page = (int)$this->argument('page');
+        if(empty($page)){
+            $page=1;
+        }
         $XiaoeTechServers=new XiaoeTechServers();
         $list=DB::table('nlsg_xe_distributor_customer')->where('status',0)
             ->where('bind_time','>=','2022-12-27 12:00:00')
-            ->orderBy('xe_user_id','desc')->forPage(1,2000)->get();
+            ->orderBy('xe_user_id','desc')->forPage($page,10000)->get();
         foreach ($list as $k=>$user){
             var_dump($k);
             var_dump($user->xe_user_id,$user->sub_user_id);
