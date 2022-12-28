@@ -6,7 +6,8 @@ use App\Servers\V5\XiaoeTechServers;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
-
+//php artisan TestJob 1
+//php artisan TestJob 2
 class TestJob extends Command
 {
     /**
