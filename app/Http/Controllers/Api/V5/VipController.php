@@ -117,6 +117,7 @@ class VipController extends Controller
                 'SonUser:id,phone,nickname'
             ]);
         $query->where("source",$phone);
+        $total = $query->count();
         if(!empty($son)){
             $query->where("son",$son);
         }
@@ -143,10 +144,12 @@ class VipController extends Controller
             ->paginate(15)
             ->toArray();
 
-
+        foreach($data['data'] as &$val){
+            $val['end_at'] = date('Y-m-d H:i',strtotime($val['end_at']));
+        }
         return $this->getRes([
             "data" => $data['data'],
-            "total" => $data['total']??0,
+            "total" => $total??0,
         ]);
 
     }
