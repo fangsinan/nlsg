@@ -73,4 +73,17 @@ class TestJob extends Command
             var_dump($k);
         }
     }
+
+    function again_bind(){
+        $XiaoeTechServers=new XiaoeTechServers();
+        $list=DB::table('nlsg_xe_distributor_customer')->where('status',0)
+            ->where('bind_time','>=','2022-12-27 12:00:00')
+            ->orderBy('xe_user_id','desc')->forPage(1,2000)->get();
+        foreach ($list as $k=>$user){
+            var_dump($k);
+            var_dump($user->xe_user_id,$user->sub_user_id);
+            $res=$XiaoeTechServers->distributor_member_bind($user->xe_user_id,$user->sub_user_id);
+            var_dump($res);
+        }
+    }
 }
