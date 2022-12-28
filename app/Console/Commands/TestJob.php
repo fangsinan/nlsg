@@ -61,7 +61,6 @@ class TestJob extends Command
 
         foreach ($list as $k=>$user){
             if($user->status !=1){
-
                 $res = $XiaoeTechServers->distributor_member_change($user->sub_user_id);
                 if(checkRes($res)){
                     DB::table('nlsg_xe_unbind')->where('id',$user->id)->update(['status'=>1]);
@@ -69,7 +68,6 @@ class TestJob extends Command
                     DB::table('nlsg_xe_unbind')->where('id',$user->id)->update(['status'=>2,'remark'=>$res]);
                 }
                 var_dump($res);
-
             }
 
             var_dump($k);
