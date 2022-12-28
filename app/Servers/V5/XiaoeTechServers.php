@@ -798,10 +798,14 @@ class XiaoeTechServers
             try {
 
                 $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.sub_customer/1.0.0', $paratms);
-
+                $page_count=0;
+                if(isset($res['body']['data']['list'])){
+                    $page_count=count($res['body']['data']['list']);
+                }
                 DB::table('nlsg_xe_log')->insert([
                     'url' => 'xe.distributor.member.sub_customer',
                     'line' => $res['body']['code'],
+                    'file' => $page_count,
                     'parameter' => json_encode($paratms),
                     'message' => $res['body']['data']['count']??0,
                     'batch_number' => $batch_number,
