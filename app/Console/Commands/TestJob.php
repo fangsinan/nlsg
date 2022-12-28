@@ -14,7 +14,7 @@ class TestJob extends Command
      *
      * @var string
      */
-    protected $signature = 'TestJob {page}';
+    protected $signature = 'TestJob {batch} {page}';
 
     /**
      * The console command description.
@@ -50,19 +50,29 @@ class TestJob extends Command
             $page=1;
         }
 
+        $batch = (int)$this->argument('batch');
+        if(empty($batch)){
+            $batch=1;
+        }
+
         $XiaoeTechServers=new XiaoeTechServers();
 
-        $list=DB::table('nlsg_xe_unbind')->where('status',0)->orderBy('id','asc')->forPage($page,10000)->get();
+        $list=DB::table('nlsg_xe_unbind')->where('batch_number',$batch)->orderBy('id','asc')->forPage($page,10000)->get();
 
         foreach ($list as $k=>$user){
-            $res = $XiaoeTechServers->distributor_member_change($user->sub_user_id);
-            if(checkRes($res)){
-                DB::table('nlsg_xe_unbind')->where('id',$user->id)->update(['status'=>1]);
-            }else{
-                DB::table('nlsg_xe_unbind')->where('id',$user->id)->update(['status'=>2,'remark'=>$res]);
+            if($user->status !=1){
+
+                $res = $XiaoeTechServers->distributor_member_change($user->sub_user_id);
+                if(checkRes($res)){
+                    DB::table('nlsg_xe_unbind')->where('id',$user->id)->update(['status'=>1]);
+                }else{
+                    DB::table('nlsg_xe_unbind')->where('id',$user->id)->update(['status'=>2,'remark'=>$res]);
+                }
+                var_dump($res);
+
             }
+
             var_dump($k);
-            var_dump($res);
         }
     }
 }
