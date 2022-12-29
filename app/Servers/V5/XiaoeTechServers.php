@@ -1315,7 +1315,6 @@ class XiaoeTechServers
         ];
 
         $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.change/1.0.0', $paratms);
-        var_dump($res);die;
         if($parent_user_id){
             if ($res['body']['code'] != 0 ) {
                 $this->err_msg = $res['body']['msg'];
@@ -1329,7 +1328,13 @@ class XiaoeTechServers
         }
 
         if ($parent_user_id) {
-            $XeDistributorCustomer = new XeDistributorCustomer();
+            $XeDistributorCustomer = XeDistributorCustomer::query()
+                ->where('xe_user_id', $parent_user_id)
+                ->where('sub_user_id', $user_id)
+                ->first();
+            if(!$XeDistributorCustomer){
+                $XeDistributorCustomer = new XeDistributorCustomer();
+            }
             $XeDistributorCustomer->xe_user_id = $parent_user_id;
             $XeDistributorCustomer->sub_user_id = $user_id;
             $XeDistributorCustomer->status = 1;
