@@ -64,7 +64,7 @@ class TeacherServers
         }
 
         if (empty($id) && empty($data['phone'])) {
-            $data['phone'] = date('YmdHis') . rand(1, 9);
+            $data['phone'] = date('Ymd') . rand(1000, 9999);
         } elseif ($id && $data['phone']) {
             $temp_check = DB::table('nlsg_user')
                 ->where('id', '<>', $id)
