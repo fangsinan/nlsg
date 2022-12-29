@@ -364,3 +364,13 @@ function formatDataTime($param_time, $type = 1)
     return date('m月d日 H:i', $time);
 }
 
+function checkDuplicateEntry($e){
+
+    $errCode = $e->getCode();
+    $msg=$e->getMessage();
+    if($errCode==23000 && preg_match('/Integrity constraint violation: 1062 Duplicate entry/',$msg)){
+        return true;
+    }else{
+        return false;
+    }
+}

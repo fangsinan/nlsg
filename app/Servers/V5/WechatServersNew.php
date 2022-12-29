@@ -241,12 +241,12 @@ class WechatServersNew
     public  static function sendBespeakClass($Url,$open_id){
 
 //        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=749&time=1669023081250&inviter=211370';
-        $hrefurl='https://ekl.h5.xeknow.com/sl/12UdVf';
-        $hello='王琨老师全新内容免费直播';
-        $title='幸福人生的4大经营';
+        $hrefurl='https://ekl.h5.xeknow.com/sl/14w77q';
+        $hello='王琨老师教你创业、迎接2023年';
+        $title='《幸福创业营》跨年直播';
         $leibie='直播课';
         $teacher='王琨老师';
-        $time='2022-12-24 19:30';
+        $time='2022-12-31 19:30';
         $remarks="点击下面详情按钮，免费预约直播课学习~";
 
         $data=[
