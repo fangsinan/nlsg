@@ -193,8 +193,8 @@ class VipUserBind extends Base
             foreach ($list as $v) {
                 $total++;
                 $add_data[] = [
-                    'parent_phone'      => '18512378959',
-                    'parent_xe_user_id' => 'u_5d538b27472fb_gbuhCZK6To',
+                    'parent_phone'      => '18966893687',
+                    'parent_xe_user_id' => 'u_api_63ad5c92e37d7_thK3yErlvp',
                     'parent_job'        => '2',
                     'parent_job_time'   => $now,
                     'son_phone'         => $v->son,
