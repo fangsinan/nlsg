@@ -56,12 +56,12 @@ class VipUserBind extends Base
         $map      = [];
 
         //获取所有公司保护数据
-        $role_array=DB::table('nlsg_backend_live_role')->where('status','=',1)->pluck('son')->toArray();//渠道推广码
-        $role_array=array_merge($role_array,['18512378959']);
+        $company_array=DB::table('nlsg_backend_live_role')->where('status','=',1)->pluck('son')->toArray();//渠道推广码
+        $company_array=array_merge($company_array,['18512378959']);
 
         $data     = DB::table('nlsg_vip_user_bind')
             ->where('end_at', '<', $now_date)->whereIn('status', [0, 1])->where('life', '=', 2) //时效性
-            ->whereIn('parent',$role_array) //公司客户
+            ->whereIn('parent',$company_array) //公司保护客户
             ->select(['id', 'parent', 'son'])
             ->limit(50000)
             ->get();
