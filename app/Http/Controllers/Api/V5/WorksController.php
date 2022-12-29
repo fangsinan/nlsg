@@ -332,7 +332,6 @@ class WorksController extends Controller
             ->where('relation_type','=',$relation_type)
             ->where('info_id','=',$works_info_id)
             ->where('user_id','=',$user_id)
-            // ->where('is_del','=',0)
             ->first();
 
 
@@ -342,15 +341,22 @@ class WorksController extends Controller
                     ->where('user_id','=',$user_id)
                     ->first();
 
-            //防止 show接口未请求
-            $his = History::firstOrCreate([
-                'relation_id' =>$relation_id,
-                'relation_type'  =>$relation_type,
-                'info_id' =>$works_info_id,
-                'user_id'   =>$user_id,
-                // 'is_del'    =>0,
-                // 'os_type'   =>$os_type ?? 0,
-            ]);
+            try{
+                //防止 show接口未请求
+                $his = History::firstOrCreate([
+                    'relation_id' =>$relation_id,
+                    'relation_type'  =>$relation_type,
+                    'info_id' =>$works_info_id,
+                    'user_id'   =>$user_id,
+                ]);
+            }catch(\Exception $e){
+                $code = $e->getCode();
+                if($code != 23000){
+                    return $e->getMessage();
+                }
+            }
+
+
             if( $his->wasRecentlyCreated){
                 // 学习记录数增一
                 //4.24号  如果有当前课程id 的记录  不累加历史记录数
