@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\DB;
 
 //php artisan TestJob 1
 //php artisan TestJob 2
+//TestJob {task} {batch} {page} //任务名 批次 页数
+//TestJob unbind 1 1 解绑
+//TestJob again_bind 1 1 重新绑定
 class TestJob extends Command
 {
     /**

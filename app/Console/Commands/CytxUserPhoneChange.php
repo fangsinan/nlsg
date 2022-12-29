@@ -43,8 +43,225 @@ class CytxUserPhoneChange extends Command
     public function handle()
     {
         //慧鱼提交经销商保护表格处理
-        if(1){
-            //todo w_linshi_huiyu_vip_bind
+        if (0) {
+            //处理待处理数据重复的问题
+            $check_cf_sql = "SELECT * from (
+SELECT parent,son,count(*) as counts from w_linshi_huiyu_vip_bind where `status` = 1 GROUP BY CONCAT(parent,'-',son)
+) as a where counts > 1";
+            $check_cf     = DB::select($check_cf_sql);
+            if ($check_cf) {
+                foreach ($check_cf as $v) {
+                    $temp_v     = DB::table('w_linshi_huiyu_vip_bind')
+                        ->where('parent', '=', $v->parent)
+                        ->where('son', '=', $v->son)
+                        ->where('status', '=', 1)
+                        ->select('id')
+                        ->get()
+                        ->toArray();
+                    $temp_v_id  = array_column($temp_v, 'id');
+                    $bao_liu_id = $temp_v_id[0];
+                    unset($temp_v_id[0]);
+                    DB::table('w_linshi_huiyu_vip_bind')
+                        ->whereIn('id', $temp_v_id)
+                        ->update([
+                            'status' => 4,
+                            'msg'    => '和' . $bao_liu_id . '重复',
+                        ]);
+
+                }
+            }
+
+            //处理待处理中的冲突数据
+            $check_data_sql = "SELECT son from (
+    SELECT son,count(*) as counts from w_linshi_huiyu_vip_bind where status = 1 GROUP BY son
+    ) as gs where counts > 1";
+            $check_data_res = DB::select($check_data_sql);
+
+            if (!empty($check_data_res)) {
+                $check_data_res = array_column($check_data_res, 'son');
+
+                foreach ($check_data_res as $cdr_son) {
+                    $check_cdr_son = DB::table('w_linshi_huiyu_vip_bind')
+                        ->where('son', '=', $cdr_son)
+                        ->where('status', '=', 1)
+                        ->select(['id', 'parent', 'son'])
+                        ->get()
+                        ->toArray();
+
+                    $check_id_list = array_column($check_cdr_son, 'id');
+
+                    DB::table('w_linshi_huiyu_vip_bind')
+                        ->whereIn('id', $check_id_list)
+                        ->update([
+                            'status' => 5,
+                            'msg'    => '上级冲突:' . implode(',', $check_id_list),
+                        ]);
+                }
+            }
+
+
+            //处理绑定
+            $while_flag = true;
+            $page       = 1;
+            $size       = 50;
+            $today      = date('Y-m-d H:i:s');
+
+            while ($while_flag) {
+                $temp_list = DB::table('w_linshi_huiyu_vip_bind')
+                    ->where('id', '<=', 15)
+                    ->where('status', '=', 1)
+                    ->limit($size)
+                    ->offset(($page - 1) * $size)
+                    ->select(['id', 'parent', 'son', 'life_type'])
+                    ->get()
+                    ->toArray();
+                if (empty($temp_list)) {
+                    $while_flag = false;
+                }
+                $page++;
+
+
+                foreach ($temp_list as $v) {
+
+                    if ($v->life_type === '终身') {
+                        $life     = 1;
+                        $begin_at = $today;
+                        $end_at   = '2030-12-31 23:59:59';
+
+                    } elseif (is_numeric($v->life_type) && $v->life_type > 0 && $v->life_type < 120) {
+                        $life     = 2;
+                        $begin_at = $today;
+                        $end_at   = date('Y-m-d 23:59:59', strtotime("+ " . $v->life_type . ' months'));
+                    } else {
+                        DB::table('w_linshi_huiyu_vip_bind')
+                            ->where('id', '=', $v->id)
+                            ->update([
+                                'status' => 6,
+                                'msg'    => '保护期限配置错误',
+                            ]);
+                        continue;
+                    }
+
+                    $get_vip_bind = DB::table('nlsg_vip_user_bind')
+                        ->where('son', '=', $v->son)
+                        ->where('status', '=', 1)
+                        ->select(['id', 'parent', 'son', 'remark'])
+                        ->first();
+
+                    if (empty($get_vip_bind)) {
+
+                        DB::beginTransaction();
+                        $t_res = true;
+
+                        //直接绑定
+                        $temp_res = DB::table('nlsg_vip_user_bind')
+                            ->insert([
+                                'parent'   => $v->parent,
+                                'son'      => $v->son,
+                                'life'     => $life,
+                                'begin_at' => $begin_at,
+                                'end_at'   => $end_at,
+                                'status'   => 1,
+                                'remark'   => '慧宇表单提交:' . $v->id,
+                            ]);
+                        if (!$temp_res) {
+                            $t_res = false;
+                        }
+
+                        //修改任务状态
+                        $temp_res = DB::table('w_linshi_huiyu_vip_bind')
+                            ->where('id', '=', $v->id)
+                            ->update([
+                                'status' => 2
+                            ]);
+                        if (!$temp_res) {
+                            $t_res = false;
+                        }
+
+                        if ($t_res) {
+                            DB::rollBack();
+//                            DB::commit();
+                            break;
+                        }
+
+                        DB::rollBack();
+                        DB::table('w_linshi_huiyu_vip_bind')
+                            ->where('id', '=', $v->id)
+                            ->update([
+                                'status' => 3,
+                                'err'    => '任务处理失败,请重试',
+                            ]);
+
+                    } else {
+                        if ($get_vip_bind->parent === '18512378959') {
+                            DB::beginTransaction();
+                            $t_res = true;
+
+                            //修改原来的
+                            $temp_res = DB::table('nlsg_vip_user_bind')
+                                ->where('id', '=', $get_vip_bind->id)
+                                ->update([
+                                    'status' => 2,
+                                    'remark' => '慧宇表单提交取消' . $v->id . ';' . $get_vip_bind->remark,
+                                ]);
+                            if (!$temp_res) {
+                                $t_res = false;
+                            }
+
+                            //写入
+                            $temp_res = DB::table('nlsg_vip_user_bind')
+                                ->insert([
+                                    'parent'   => $v->parent,
+                                    'son'      => $v->son,
+                                    'life'     => $life,
+                                    'begin_at' => $begin_at,
+                                    'end_at'   => $end_at,
+                                    'status'   => 1,
+                                    'remark'   => '慧宇表单提交:' . $v->id,
+                                ]);
+                            if (!$temp_res) {
+                                $t_res = false;
+                            }
+
+                            //修改任务状态
+                            $temp_res = DB::table('w_linshi_huiyu_vip_bind')
+                                ->where('id', '=', $v->id)
+                                ->update([
+                                    'status' => 2
+                                ]);
+                            if (!$temp_res) {
+                                $t_res = false;
+                            }
+
+                            if ($t_res) {
+                                DB::rollBack();
+//                                DB::commit();
+                                break;
+                            }
+
+                            DB::rollBack();
+                            DB::table('w_linshi_huiyu_vip_bind')
+                                ->where('id', '=', $v->id)
+                                ->update([
+                                    'status' => 3,
+                                    'err'    => '任务处理失败,请重试',
+                                ]);
+
+                        } else {
+
+                            DB::table('w_linshi_huiyu_vip_bind')
+                                ->where('id', '=', $v->id)
+                                ->update([
+                                    'status' => 3,
+                                    'err'    => '和现有绑定冲突:' . $get_vip_bind->id, ':', $get_vip_bind->parent,
+                                ]);
+
+                        }
+                    }
+                }
+
+            }
+
         }
 
 

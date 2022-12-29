@@ -807,10 +807,11 @@ class WorksController extends Controller
         if( empty($user_id) ) return $this->success();
 
         //4月24 查询当前是否有该课程下的历史数据,如果有当前课程id的记录  不累加历史记录数
-        $check_his_num = History::select('id')->where('relation_id','=',$relation_id)
-                    ->where('relation_type','=',$relation_type)
-                    ->where('user_id','=',$user_id)
-                    ->first();
+        $check_his_num = History::select('id')
+            ->where('relation_id','=',$relation_id)
+            ->where('relation_type','=',$relation_type)
+            ->where('user_id','=',$user_id)
+            ->first();
 
         $check_his = History::where('relation_id','=',$relation_id)
             ->where('relation_type','=',$relation_type)
@@ -821,14 +822,22 @@ class WorksController extends Controller
 
 
         if(empty($check_his)){
-            $his= History::firstOrCreate([
-                'relation_id' =>$relation_id,
-                'relation_type'  =>$relation_type,
-                'info_id' =>$works_info_id,
-                'user_id'   =>$user_id,
-                // 'is_del'    =>0,
-                // 'os_type'   =>$os_type??0,//  1 安卓 2ios 3微信
-            ]);
+            try{
+                $his= History::firstOrCreate([
+                    'relation_id' =>$relation_id,
+                    'relation_type'  =>$relation_type,
+                    'info_id' =>$works_info_id,
+                    'user_id'   =>$user_id,
+                    // 'is_del'    =>0,
+                    // 'os_type'   =>$os_type??0,//  1 安卓 2ios 3微信
+                ]);
+            }catch(\Exception $e){
+                $code = $e->getCode();
+                if($code == 23000){
+                    return $this->success();
+                }
+            }
+
             //学习记录条数会只按relation_id算   不根据章节走
             if($his->wasRecentlyCreated && empty($check_his_num)){
                 // 学习记录数增一

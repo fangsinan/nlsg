@@ -64,7 +64,22 @@ class TeacherServers
         }
 
         if (empty($id) && empty($data['phone'])) {
-            $data['phone'] = date('YmdHis') . rand(1, 9);
+            $data['phone'] = date('Ymd') . rand(1000, 9999);
+        } elseif ($id && $data['phone']) {
+            $temp_check = DB::table('nlsg_user')
+                ->where('id', '<>', $id)
+                ->where('phone', '=', $data['phone'])
+                ->first();
+            if ($temp_check) {
+                return ['code' => false, 'msg' => '手机号已被占用'];
+            }
+        } elseif (empty($id) && strlen($data['phone']) === 11) {
+            $check_phone = DB::table('nlsg_user')
+                ->where('phone', '=', $data['phone'])
+                ->first();
+            if ($check_phone) {
+                $id = $check_phone->id;
+            }
         }
 
         $data['is_author'] = 1;
