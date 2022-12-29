@@ -45,6 +45,18 @@ class CytxUserPhoneChange extends Command
         //慧鱼提交经销商保护表格处理
         if(1){
             //todo w_linshi_huiyu_vip_bind
+            $check_data_sql = "SELECT son from (
+    SELECT son,count(*) as counts from w_linshi_huiyu_vip_bind where status = 1 GROUP BY son
+    ) as gs where counts > 1";
+            $check_data_res = DB::select($check_data_sql);
+dd($check_data_res);
+//            if (!empty($check_data_res)){
+//                dd('有重复冲突数据,处理后继续');
+//            }
+
+//            dd($check_data_res);
+
+
         }
 
 
