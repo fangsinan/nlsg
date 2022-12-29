@@ -54,12 +54,16 @@ class VipUserBind extends Base
     {
         $now_date = date('Y-m-d H:i:s', time());
         $map      = [];
+
+        //获取所有公司保护数据
+        $company_array=DB::table('nlsg_backend_live_role')->where('status','=',1)->pluck('son')->toArray();//渠道推广码
+        $company_array=array_merge($company_array,['18512378959']);
+
         $data     = DB::table('nlsg_vip_user_bind')
-            ->where('end_at', '<', $now_date)
-            ->whereIn('status', [0, 1])
-            ->where('life', '=', 2) //时效性
+            ->where('end_at', '<', $now_date)->whereIn('status', [0, 1])->where('life', '=', 2) //时效性
+            ->whereIn('parent',$company_array) //公司保护客户
             ->select(['id', 'parent', 'son'])
-            ->limit(30000)
+            ->limit(50000)
             ->get();
 
         if ($data->isEmpty()) {
@@ -71,22 +75,22 @@ class VipUserBind extends Base
         DB::beginTransaction();
         try {
             if (!empty($data)) {
-
+                $end_at=date('Y-m-d H:i:s',strtotime('+1 year'));
                 foreach ($data as $key => $val) {
                     if (($key % 5000) == 0) {
                         DB::table('nlsg_vip_user_bind')->insert($map);
                         $map = [];
                     }
                     $map[] = [
-                        'parent'     => '18512378959', //保护到公司
+                        'parent'     => '18966893687', //保护到公司
                         'son'        => $val->son,
                         'life'       => 2, //有效期
                         'begin_at'   => $now_date,
-                        'end_at'     => '2030-12-31 23:59:59',
+                        'end_at'     => $end_at,
                         'status'     => 1,
                         'is_manual'  => 1, //1 手动绑定 配合小鹅通
                         'channel'    => 2, //'来源渠道 1导入 2平台 3抖音 4直播渠道 5:哈佛订单绑定平台'
-                        'remark'     => '保护过期，自动保护：' . $val->id,
+                        'remark'     => $val->id,
                         'created_at' => $now_date,
                     ];
                 }
