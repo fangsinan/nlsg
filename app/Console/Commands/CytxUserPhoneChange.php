@@ -264,6 +264,39 @@ SELECT parent,son,count(*) as counts from w_linshi_huiyu_vip_bind where `status`
 
         }
 
+        //抖音订单转入公司保护
+        if (0) {
+
+            $phone_list = DB::select("SELECT post_tel from nlsg_dou_dian_order as o
+join nlsg_dou_dian_order_list as ol on o.order_id = ol.order_id
+join nlsg_dou_dian_product_list as pl on ol.product_id = pl.product_id
+where o.post_tel <> '' and pl.product_type = 3
+GROUP BY post_tel");
+
+            foreach ($phone_list as $v) {
+                $check_phone = DB::table('nlsg_vip_user_bind')
+                    ->where('son', '=', $v->post_tel)
+                    ->where('status', '=', 1)
+                    ->first();
+                if (!empty($check_phone)) {
+                    echo $v->post_tel, '跳过', $check_phone->parent, PHP_EOL;
+                    continue;
+                }
+
+                DB::table('nlsg_vip_user_bind')
+                    ->insert([
+                        'parent'   => '18966893687',
+                        'son'      => $v->post_tel,
+                        'life'     => 2,
+                        'begin_at' => '2022-12-30 14:00:00',
+                        'end_at'   => '2023-12-20 23:59:59',
+                        'status'   => 1,
+                        'remark'   => '22.12.30由抖店虚拟订单导入',
+                    ]);
+                echo $v->post_tel, '绑定成功', PHP_EOL;
+            }
+
+        }
 
         //创业天下号码更改
         if (0) {
