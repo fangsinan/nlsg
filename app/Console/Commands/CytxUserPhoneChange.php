@@ -308,13 +308,25 @@ from nlsg_live_deal where type in (6,7,12,15,16,17,18,19,20,21,25,29) and
  )
 );");
 
-            foreach ($list as $v) {
+            foreach ($list as $k => $v) {
                 $check_phone = DB::table('nlsg_vip_user_bind')
                     ->where('son', '=', $v->phone)
                     ->where('status', '=', 1)
                     ->first();
                 if (!empty($check_phone)) {
-                    echo $v->phone, '跳过', $check_phone->parent, PHP_EOL;
+                    if ($check_phone->parent === '18512378959' && $check_phone->life === 2) {
+                        DB::table('nlsg_vip_user_bind')
+                            ->where('id', '=', $check_phone->id)
+                            ->update([
+                                'life'     => 1,
+                                'begin_at' => '2022-12-30 14:00:00',
+                                'end_at'   => '2030-12-21 23:59:59',
+                                'remark'   => $check_phone->remark . '2980用户:22.12.30',
+                            ]);
+                        echo $k, ':', $v->phone, '修改成功', PHP_EOL;
+                    } else {
+                        echo $k, ':', $v->phone, '跳过', $check_phone->parent, PHP_EOL;
+                    }
                     continue;
                 }
 
@@ -328,9 +340,25 @@ from nlsg_live_deal where type in (6,7,12,15,16,17,18,19,20,21,25,29) and
                         'status'   => 1,
                         'remark'   => '22.12.30大课订单导入',
                     ]);
-                echo $v->phone, '绑定成功', PHP_EOL;
+                echo $k, ':', $v->phone, '绑定成功', PHP_EOL;
             }
 
+        }
+
+        //修改备注
+        if (0) {
+            $list = DB::select('select * from nlsg_vip_user_bind where remark != "2980用户:22.12.30" and remark like  "%2980用户:22.12.30%"');
+
+            foreach ($list as $k => $v) {
+                $remark = $v->remark;
+                $remark = str_replace('2980用户:22.12.30', '', $remark) . ';2980用户:22.12.30';
+                DB::table('nlsg_vip_user_bind')
+                    ->where('id', '=', $v->id)
+                    ->update([
+                        'remark' => $remark
+                    ]);
+                echo $k, ':', $remark, PHP_EOL;
+            }
         }
 
         //创业天下号码更改
