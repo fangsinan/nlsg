@@ -457,7 +457,7 @@ class VipServers
             ->where('vu.expire_time', '>', $now_date)
             ->select(['vu.id', 'vu.user_id', 'vu.username', 'vu.level',
                       'vu.inviter', 'vu.inviter_vip_id',
-                      'source', 'source_vip_id'])
+                      'vu.source', 'source_vip_id'])
             ->first();
 
         if (!empty($bind_info)) {
