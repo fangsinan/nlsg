@@ -11,7 +11,8 @@ class Banner extends Base
     protected $table = 'nlsg_banner';
 
     protected $fillable = [
-        'title', 'pic', 'url', 'rank', 'type', 'obj_id', 'status', 'jump_type', 'start_time', 'end_time'
+        'title', 'pic', 'url','h5_url','rank','type','start_time','end_time','page_view',
+        'status','jump_type','obj_id','info_id','show_type','version',
     ];
 
     /**

@@ -486,6 +486,13 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::get('xet/order_list_excel','XiaoETongController@orderListExcel');
         Route::get('xet/order_distribute_list_excel','XiaoETongController@orderDistributeListExcel');
         //⬆⬆⬆⬆⬆小鹅通部分⬆⬆⬆⬆⬆
+
+
+        //v5 新版banner后台
+        Route::post('banner/list','BannerController@list');
+        Route::post('banner/add','BannerController@add');
+        Route::post('banner/info','BannerController@info');
+        Route::post('banner/select_data', 'BannerController@selectData');
     });
 
 
