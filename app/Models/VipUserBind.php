@@ -56,7 +56,7 @@ class VipUserBind extends Base
         $map      = [];
 
         //获取所有公司保护数据
-        //渠道推广码
+        //能量时光渠道推广码
         $company_array=DB::table('nlsg_backend_live_role')->where('status','=',1)->pluck('son')->toArray();
         //韩建以前代理商账号
         $company_array=array_merge($company_array,['18512378959']);
