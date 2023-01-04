@@ -64,9 +64,9 @@ class BannerServers
 
         if ((int)($params['type'] ?? 0) === 61) {
             $query->orderBy('start_time');
-        } else {
-            $query->orderBy('id', 'desc');
         }
+
+        $query->orderBy('id', 'desc');
 
         $jump_type = $this->selectData(['flag' => 'jump_type', 'only_key' => false]);
 
@@ -244,10 +244,10 @@ class BannerServers
 
         $jump_type_array = [
 //            ['key' => 1, 'value' => 'H5', 'mrt_search_data' => 0],
-            ['key' => 2, 'value' => '商品', 'mrt_search_data' => 122],
-            ['key' => 4, 'value' => '课程', 'mrt_search_data' => 101],
-            ['key' => 5, 'value' => '讲座', 'mrt_search_data' => 111],
-            ['key' => 8, 'value' => '直播', 'mrt_search_data' => 131],
+['key' => 2, 'value' => '商品', 'mrt_search_data' => 122],
+['key' => 4, 'value' => '课程', 'mrt_search_data' => 101],
+['key' => 5, 'value' => '讲座', 'mrt_search_data' => 111],
+['key' => 8, 'value' => '直播', 'mrt_search_data' => 131],
 //            ['key' => 13, 'value' => 'APP内部H5', 'mrt_search_data' => 0],
         ];
 
