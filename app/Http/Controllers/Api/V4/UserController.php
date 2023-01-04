@@ -1267,8 +1267,7 @@ class UserController extends Controller
                 "is_del"=>0,
             ])->sum("time_number");
 
-            // 社会节日
-            $res['app_skin'] = ConfigModel::getData(87, 1);
+
 
             return success($res);
 
