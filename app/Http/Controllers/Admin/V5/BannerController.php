@@ -31,4 +31,7 @@ class BannerController extends ControllerBackend
         return $this->getRes((new BannerServers())->selectData($request->input()));
     }
 
+    public function changeStatus(Request $request): JsonResponse{
+        return $this->getRes((new BannerServers())->changeStatus($request->input()));
+    }
 }

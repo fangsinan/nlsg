@@ -493,6 +493,7 @@ Route::group(['namespace' => 'Admin\V5', 'prefix' => 'admin_v5'], function () {
         Route::post('banner/add','BannerController@add');
         Route::post('banner/info','BannerController@info');
         Route::post('banner/select_data', 'BannerController@selectData');
+        Route::post('banner/change_status','BannerController@changeStatus');
     });
 
 

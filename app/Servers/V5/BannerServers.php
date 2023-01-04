@@ -146,6 +146,46 @@ class BannerServers
         return ['code' => false, 'msg' => '失败'];
     }
 
+    public function changeStatus($params): array
+    {
+        $validator = Validator::make(
+            $params,
+            [
+                'flag' => 'bail|required|string|in:on,off,del',
+                'id'   => 'bail|required|exists:nlsg_banner,id'
+            ],
+            [
+                'flag.in' => '操作类型错误',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return ['code' => false, 'msg' => $validator->messages()->first()];
+        }
+
+        $check = Banner::query()->find($params['id']);
+
+        switch ($params['flag']) {
+            case 'on':
+                $check->status = 1;
+                break;
+            case 'off':
+                $check->status = 2;
+                break;
+            case 'del':
+                $check->status = 3;
+                break;
+        }
+
+        $res = $check->save();
+
+        if ($res) {
+            return ['code' => true, 'msg' => '成功'];
+        }
+
+        return ['code' => false, 'msg' => '失败'];
+
+    }
 
     public function selectData($params): array
     {
