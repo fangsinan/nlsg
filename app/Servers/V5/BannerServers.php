@@ -84,8 +84,8 @@ class BannerServers
                 'pic'        => 'bail|required|url',
                 'type'       => 'bail|required|in:' . implode(',', $type_list),
                 'jump_type'  => 'bail|required|in:' . implode(',', $jump_type_list),
-                'start_time' => 'exclude_unless:type,61|required|date|size:18',
-                'end_time'   => 'exclude_unless:type,61|required|date|size:18',
+                'start_time' => 'exclude_unless:type,61|required|date|size:19',
+                'end_time'   => 'exclude_unless:type,61|required|date|size:19',
                 'obj_id'     => [
                     function ($attribute, $value, $fail) use ($params) {
                         if (!in_array($params['jump_type'], [1, 13]) && empty($value)) {
