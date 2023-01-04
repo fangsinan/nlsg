@@ -88,10 +88,9 @@ class BannerServers
 
     public function add($params): array
     {
-        $type_list      = $this->selectData(['flag' => 'type', 'only_key' => true]);
-        $jump_type_list = $this->selectData(['flag' => 'jump_type', 'only_key' => true]);
-        $jump_type_list = array_merge($jump_type_list, [1]);
-        dd($jump_type_list);
+        $type_list        = $this->selectData(['flag' => 'type', 'only_key' => true]);
+        $jump_type_list   = $this->selectData(['flag' => 'jump_type', 'only_key' => true]);
+        $jump_type_list   = array_merge($jump_type_list, [1]);
         $params['h5_url'] = $params['url'] ?? '';
 
         $validator = Validator::make(
