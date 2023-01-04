@@ -22,15 +22,15 @@ class LivePayCheck extends Base
         $now = date('Y-m-d H:i:s');
 
         $check = self::query()
-            ->where('teacher_id', '=', $teacher_id)
-            ->where('user_id', '=', $user_id)
-            ->where('begin_at', '<=', $now)
-            ->where(function ($q) use ($now) {
-                $q->where('protect_end_time', '>=', $now)
-                    ->orWhereNull('protect_end_time');
-            })
-            ->select('id')
-            ->first();
+                     ->where('teacher_id', '=', $teacher_id)
+                     ->where('user_id', '=', $user_id)
+                     ->where('begin_at', '<=', $now)
+                     ->where(function ($q) use ($now) {
+                         $q->where('protect_end_time', '>=', $now)
+                           ->orWhereNull('protect_end_time');
+                     })
+                     ->select('id')
+                     ->first();
 
         if ($check) {
             return 1;
@@ -61,23 +61,23 @@ class LivePayCheck extends Base
         $now = date('Y-m-d H:i:s');
 
         $res = Subscribe::query()
-            ->firstOrCreate([
-                'type'        => 3,
-                'user_id'     => $user_id,
-                'relation_id' => $live_id,
-                'status'      => 1,
-                'start_time'  => $now,
-                'end_time'    => $now,
-                'pay_time'    => $now,
-                'remark'      => '基本库转入',
-            ]);
+                        ->firstOrCreate([
+                            'type'        => 3,
+                            'user_id'     => $user_id,
+                            'relation_id' => $live_id,
+                            'status'      => 1,
+                            'start_time'  => $now,
+                            'end_time'    => $now,
+                            'pay_time'    => $now,
+                            'remark'      => '基本库转入',
+                        ]);
 
         LiveCountDown::query()
-            ->firstOrCreate([
-                'live_id' => $live_id,
-                'user_id' => $user_id,
-                'phone'   => $user_info->phone,
-            ]);
+                     ->firstOrCreate([
+                         'live_id' => $live_id,
+                         'user_id' => $user_id,
+                         'phone'   => $user_info->phone,
+                     ]);
 
         if ($res) {
             return ['code' => true, 'msg' => '成功'];
