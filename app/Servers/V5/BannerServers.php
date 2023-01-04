@@ -68,7 +68,22 @@ class BannerServers
             $query->orderBy('id', 'desc');
         }
 
-        return $query->paginate($params['size'] ?? 10);
+        $jump_type = $this->selectData(['flag' => 'jump_type', 'only_key' => false]);
+
+        $list = $query->paginate($params['size'] ?? 10);
+
+        foreach ($list as &$v) {
+            $v->jump_type_desc = '-';
+
+            foreach ($jump_type as $vv) {
+                if ($vv['key'] === $v->jump_type) {
+                    $v->jump_type_desc = $vv['value'];
+                }
+            }
+
+        }
+
+        return $list;
     }
 
     public function add($params): array
