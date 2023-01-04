@@ -84,8 +84,8 @@ class BannerServers
                 'pic'        => 'bail|required|url',
                 'type'       => 'bail|required|in:' . implode(',', $type_list),
                 'jump_type'  => 'bail|required|in:' . implode(',', $jump_type_list),
-                'start_time' => 'exclude_unless:type,61|required|date|size:16',
-                'end_time'   => 'exclude_unless:type,61|required|date|size:16',
+                'start_time' => 'exclude_unless:type,61|required|date|size:18',
+                'end_time'   => 'exclude_unless:type,61|required|date|size:18',
                 'obj_id'     => [
                     function ($attribute, $value, $fail) use ($params) {
                         if (!in_array($params['jump_type'], [1, 13]) && empty($value)) {
@@ -115,8 +115,8 @@ class BannerServers
             ],
             [
                 'flag.in'         => '类型错误:type,jump_type',
-                'start_time.size' => '时间格式为 2022-01-01 01:01',
-                'end_time.size'   => '时间格式为 2022-01-01 01:01',
+                'start_time.size' => '时间格式为 2022-01-01 01:00:00',
+                'end_time.size'   => '时间格式为 2022-01-01 01:00:00',
             ]
         );
 
@@ -125,8 +125,8 @@ class BannerServers
         }
 
         if ($params['type'] == 61) {
-            $params['start_time'] .= ':00';
-            $params['end_time']   .= ':59';
+            $params['start_time'] = date('Y-m-d H:i:00', strtotime($params['start_time']));
+            $params['end_time']   = date('Y-m-d H:i:59', strtotime($params['end_time']));
         }
 
         if ($params['id'] ?? 0) {
