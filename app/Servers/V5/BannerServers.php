@@ -144,6 +144,8 @@ class BannerServers
             $params['end_time']   = date('Y-m-d H:i:59', strtotime($params['end_time']));
         }
 
+        $params['status'] = 1;
+
         if ($params['id'] ?? 0) {
             $res = Banner::query()
                          ->find($params['id'])
