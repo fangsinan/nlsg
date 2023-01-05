@@ -49,24 +49,25 @@ class CytxUserPhoneChange extends Command
 SELECT parent,son,count(*) as counts from w_linshi_huiyu_vip_bind where `status` = 1 GROUP BY CONCAT(parent,'-',son)
 ) as a where counts > 1";
             $check_cf     = DB::select($check_cf_sql);
+
             if ($check_cf) {
                 foreach ($check_cf as $v) {
                     $temp_v     = DB::table('w_linshi_huiyu_vip_bind')
-                        ->where('parent', '=', $v->parent)
-                        ->where('son', '=', $v->son)
-                        ->where('status', '=', 1)
-                        ->select('id')
-                        ->get()
-                        ->toArray();
+                                    ->where('parent', '=', $v->parent)
+                                    ->where('son', '=', $v->son)
+                                    ->where('status', '=', 1)
+                                    ->select('id')
+                                    ->get()
+                                    ->toArray();
                     $temp_v_id  = array_column($temp_v, 'id');
                     $bao_liu_id = $temp_v_id[0];
                     unset($temp_v_id[0]);
                     DB::table('w_linshi_huiyu_vip_bind')
-                        ->whereIn('id', $temp_v_id)
-                        ->update([
-                            'status' => 4,
-                            'msg'    => '和' . $bao_liu_id . '重复',
-                        ]);
+                      ->whereIn('id', $temp_v_id)
+                      ->update([
+                          'status' => 4,
+                          'msg'    => '和' . $bao_liu_id . '重复',
+                      ]);
 
                 }
             }
@@ -82,20 +83,20 @@ SELECT parent,son,count(*) as counts from w_linshi_huiyu_vip_bind where `status`
 
                 foreach ($check_data_res as $cdr_son) {
                     $check_cdr_son = DB::table('w_linshi_huiyu_vip_bind')
-                        ->where('son', '=', $cdr_son)
-                        ->where('status', '=', 1)
-                        ->select(['id', 'parent', 'son'])
-                        ->get()
-                        ->toArray();
+                                       ->where('son', '=', $cdr_son)
+                                       ->where('status', '=', 1)
+                                       ->select(['id', 'parent', 'son'])
+                                       ->get()
+                                       ->toArray();
 
                     $check_id_list = array_column($check_cdr_son, 'id');
 
                     DB::table('w_linshi_huiyu_vip_bind')
-                        ->whereIn('id', $check_id_list)
-                        ->update([
-                            'status' => 5,
-                            'msg'    => '上级冲突:' . implode(',', $check_id_list),
-                        ]);
+                      ->whereIn('id', $check_id_list)
+                      ->update([
+                          'status' => 5,
+                          'msg'    => '上级冲突:' . implode(',', $check_id_list),
+                      ]);
                 }
             }
 
@@ -108,21 +109,24 @@ SELECT parent,son,count(*) as counts from w_linshi_huiyu_vip_bind where `status`
 
             while ($while_flag) {
                 $temp_list = DB::table('w_linshi_huiyu_vip_bind')
-                    ->where('id', '<=', 15)
-                    ->where('status', '=', 1)
-                    ->limit($size)
-                    ->offset(($page - 1) * $size)
-                    ->select(['id', 'parent', 'son', 'life_type'])
-                    ->get()
-                    ->toArray();
-                if (empty($temp_list)) {
+                               ->where('status', '=', 1)
+                               ->limit($size)
+                               ->offset(($page - 1) * $size)
+                               ->select(['id', 'parent', 'son', 'life_type', 'column_name'])
+                               ->orderBy('id')
+                               ->get();
+
+                if ($temp_list->isEmpty()) {
                     $while_flag = false;
                 }
+
+                $temp_list = $temp_list->toArray();
+
                 $page++;
 
 
                 foreach ($temp_list as $v) {
-
+                    echo $v->id, ':', $v->son, PHP_EOL;
                     if ($v->life_type === '终身') {
                         $life     = 1;
                         $begin_at = $today;
@@ -134,19 +138,19 @@ SELECT parent,son,count(*) as counts from w_linshi_huiyu_vip_bind where `status`
                         $end_at   = date('Y-m-d 23:59:59', strtotime("+ " . $v->life_type . ' months'));
                     } else {
                         DB::table('w_linshi_huiyu_vip_bind')
-                            ->where('id', '=', $v->id)
-                            ->update([
-                                'status' => 6,
-                                'msg'    => '保护期限配置错误',
-                            ]);
+                          ->where('id', '=', $v->id)
+                          ->update([
+                              'status' => 6,
+                              'msg'    => '保护期限配置错误',
+                          ]);
                         continue;
                     }
 
                     $get_vip_bind = DB::table('nlsg_vip_user_bind')
-                        ->where('son', '=', $v->son)
-                        ->where('status', '=', 1)
-                        ->select(['id', 'parent', 'son', 'remark'])
-                        ->first();
+                                      ->where('son', '=', $v->son)
+                                      ->where('status', '=', 1)
+                                      ->select(['id', 'parent', 'son', 'remark'])
+                                      ->first();
 
                     if (empty($get_vip_bind)) {
 
@@ -155,42 +159,44 @@ SELECT parent,son,count(*) as counts from w_linshi_huiyu_vip_bind where `status`
 
                         //直接绑定
                         $temp_res = DB::table('nlsg_vip_user_bind')
-                            ->insert([
-                                'parent'   => $v->parent,
-                                'son'      => $v->son,
-                                'life'     => $life,
-                                'begin_at' => $begin_at,
-                                'end_at'   => $end_at,
-                                'status'   => 1,
-                                'remark'   => '慧宇表单提交:' . $v->id,
-                            ]);
+                                      ->insert([
+                                          'parent'       => $v->parent,
+                                          'son'          => $v->son,
+                                          'life'         => $life,
+                                          'begin_at'     => $begin_at,
+                                          'end_at'       => $end_at,
+                                          'status'       => 1,
+                                          'remark'       => '慧宇表单提交:' . $v->id,
+                                          'column_name'  => $v->column_name,
+                                          'channel_name' => '慧宇',
+                                      ]);
                         if (!$temp_res) {
                             $t_res = false;
                         }
 
                         //修改任务状态
                         $temp_res = DB::table('w_linshi_huiyu_vip_bind')
-                            ->where('id', '=', $v->id)
-                            ->update([
-                                'status' => 2
-                            ]);
+                                      ->where('id', '=', $v->id)
+                                      ->update([
+                                          'status' => 2
+                                      ]);
                         if (!$temp_res) {
                             $t_res = false;
                         }
 
                         if ($t_res) {
+                            DB::commit();
+                            continue;
+                        } else {
                             DB::rollBack();
-//                            DB::commit();
-                            break;
-                        }
+                            DB::table('w_linshi_huiyu_vip_bind')
+                              ->where('id', '=', $v->id)
+                              ->update([
+                                  'status' => 3,
+                                  'err'    => '任务处理失败,请重试',
+                              ]);
 
-                        DB::rollBack();
-                        DB::table('w_linshi_huiyu_vip_bind')
-                            ->where('id', '=', $v->id)
-                            ->update([
-                                'status' => 3,
-                                'err'    => '任务处理失败,请重试',
-                            ]);
+                        }
 
                     } else {
                         if ($get_vip_bind->parent === '18512378959') {
@@ -199,62 +205,64 @@ SELECT parent,son,count(*) as counts from w_linshi_huiyu_vip_bind where `status`
 
                             //修改原来的
                             $temp_res = DB::table('nlsg_vip_user_bind')
-                                ->where('id', '=', $get_vip_bind->id)
-                                ->update([
-                                    'status' => 2,
-                                    'remark' => '慧宇表单提交取消' . $v->id . ';' . $get_vip_bind->remark,
-                                ]);
+                                          ->where('id', '=', $get_vip_bind->id)
+                                          ->update([
+                                              'status' => 2,
+                                              'remark' => '慧宇表单提交取消' . $v->id . ';' . $get_vip_bind->remark,
+                                          ]);
                             if (!$temp_res) {
                                 $t_res = false;
                             }
 
                             //写入
                             $temp_res = DB::table('nlsg_vip_user_bind')
-                                ->insert([
-                                    'parent'   => $v->parent,
-                                    'son'      => $v->son,
-                                    'life'     => $life,
-                                    'begin_at' => $begin_at,
-                                    'end_at'   => $end_at,
-                                    'status'   => 1,
-                                    'remark'   => '慧宇表单提交:' . $v->id,
-                                ]);
+                                          ->insert([
+                                              'parent'       => $v->parent,
+                                              'son'          => $v->son,
+                                              'life'         => $life,
+                                              'begin_at'     => $begin_at,
+                                              'end_at'       => $end_at,
+                                              'status'       => 1,
+                                              'remark'       => '慧宇表单提交:' . $v->id,
+                                              'column_name'  => $v->column_name,
+                                              'channel_name' => '慧宇',
+                                          ]);
                             if (!$temp_res) {
                                 $t_res = false;
                             }
 
                             //修改任务状态
                             $temp_res = DB::table('w_linshi_huiyu_vip_bind')
-                                ->where('id', '=', $v->id)
-                                ->update([
-                                    'status' => 2
-                                ]);
+                                          ->where('id', '=', $v->id)
+                                          ->update([
+                                              'status' => 2
+                                          ]);
                             if (!$temp_res) {
                                 $t_res = false;
                             }
 
                             if ($t_res) {
+                                DB::commit();
+                                continue;
+                            } else {
                                 DB::rollBack();
-//                                DB::commit();
-                                break;
-                            }
+                                DB::table('w_linshi_huiyu_vip_bind')
+                                  ->where('id', '=', $v->id)
+                                  ->update([
+                                      'status' => 3,
+                                      'err'    => '任务处理失败,请重试',
+                                  ]);
 
-                            DB::rollBack();
-                            DB::table('w_linshi_huiyu_vip_bind')
-                                ->where('id', '=', $v->id)
-                                ->update([
-                                    'status' => 3,
-                                    'err'    => '任务处理失败,请重试',
-                                ]);
+                            }
 
                         } else {
 
                             DB::table('w_linshi_huiyu_vip_bind')
-                                ->where('id', '=', $v->id)
-                                ->update([
-                                    'status' => 3,
-                                    'err'    => '和现有绑定冲突:' . $get_vip_bind->id, ':', $get_vip_bind->parent,
-                                ]);
+                              ->where('id', '=', $v->id)
+                              ->update([
+                                  'status' => 3,
+                                  'err'    => '和现有绑定冲突:' . $get_vip_bind->id . ':' . $get_vip_bind->parent,
+                              ]);
 
                         }
                     }
@@ -275,24 +283,24 @@ GROUP BY post_tel");
 
             foreach ($phone_list as $v) {
                 $check_phone = DB::table('nlsg_vip_user_bind')
-                    ->where('son', '=', $v->post_tel)
-                    ->where('status', '=', 1)
-                    ->first();
+                                 ->where('son', '=', $v->post_tel)
+                                 ->where('status', '=', 1)
+                                 ->first();
                 if (!empty($check_phone)) {
                     echo $v->post_tel, '跳过', $check_phone->parent, PHP_EOL;
                     continue;
                 }
 
                 DB::table('nlsg_vip_user_bind')
-                    ->insert([
-                        'parent'   => '18966893687',
-                        'son'      => $v->post_tel,
-                        'life'     => 2,
-                        'begin_at' => '2022-12-30 14:00:00',
-                        'end_at'   => '2023-12-20 23:59:59',
-                        'status'   => 1,
-                        'remark'   => '22.12.30由抖店虚拟订单导入',
-                    ]);
+                  ->insert([
+                      'parent'   => '18966893687',
+                      'son'      => $v->post_tel,
+                      'life'     => 2,
+                      'begin_at' => '2022-12-30 14:00:00',
+                      'end_at'   => '2023-12-20 23:59:59',
+                      'status'   => 1,
+                      'remark'   => '22.12.30由抖店虚拟订单导入',
+                  ]);
                 echo $v->post_tel, '绑定成功', PHP_EOL;
             }
 
@@ -310,19 +318,19 @@ from nlsg_live_deal where type in (6,7,12,15,16,17,18,19,20,21,25,29) and
 
             foreach ($list as $k => $v) {
                 $check_phone = DB::table('nlsg_vip_user_bind')
-                    ->where('son', '=', $v->phone)
-                    ->where('status', '=', 1)
-                    ->first();
+                                 ->where('son', '=', $v->phone)
+                                 ->where('status', '=', 1)
+                                 ->first();
                 if (!empty($check_phone)) {
                     if ($check_phone->parent === '18512378959' && $check_phone->life === 2) {
                         DB::table('nlsg_vip_user_bind')
-                            ->where('id', '=', $check_phone->id)
-                            ->update([
-                                'life'     => 1,
-                                'begin_at' => '2022-12-30 14:00:00',
-                                'end_at'   => '2030-12-21 23:59:59',
-                                'remark'   => $check_phone->remark . '2980用户:22.12.30',
-                            ]);
+                          ->where('id', '=', $check_phone->id)
+                          ->update([
+                              'life'     => 1,
+                              'begin_at' => '2022-12-30 14:00:00',
+                              'end_at'   => '2030-12-21 23:59:59',
+                              'remark'   => $check_phone->remark . '2980用户:22.12.30',
+                          ]);
                         echo $k, ':', $v->phone, '修改成功', PHP_EOL;
                     } else {
                         echo $k, ':', $v->phone, '跳过', $check_phone->parent, PHP_EOL;
@@ -331,15 +339,15 @@ from nlsg_live_deal where type in (6,7,12,15,16,17,18,19,20,21,25,29) and
                 }
 
                 DB::table('nlsg_vip_user_bind')
-                    ->insert([
-                        'parent'   => '18966893687',
-                        'son'      => $v->phone,
-                        'life'     => 1,
-                        'begin_at' => '2022-12-30 14:00:00',
-                        'end_at'   => '2030-12-21 23:59:59',
-                        'status'   => 1,
-                        'remark'   => '22.12.30大课订单导入',
-                    ]);
+                  ->insert([
+                      'parent'   => '18966893687',
+                      'son'      => $v->phone,
+                      'life'     => 1,
+                      'begin_at' => '2022-12-30 14:00:00',
+                      'end_at'   => '2030-12-21 23:59:59',
+                      'status'   => 1,
+                      'remark'   => '22.12.30大课订单导入',
+                  ]);
                 echo $k, ':', $v->phone, '绑定成功', PHP_EOL;
             }
 
@@ -353,10 +361,10 @@ from nlsg_live_deal where type in (6,7,12,15,16,17,18,19,20,21,25,29) and
                 $remark = $v->remark;
                 $remark = str_replace('2980用户:22.12.30', '', $remark) . ';2980用户:22.12.30';
                 DB::table('nlsg_vip_user_bind')
-                    ->where('id', '=', $v->id)
-                    ->update([
-                        'remark' => $remark
-                    ]);
+                  ->where('id', '=', $v->id)
+                  ->update([
+                      'remark' => $remark
+                  ]);
                 echo $k, ':', $remark, PHP_EOL;
             }
         }
@@ -426,8 +434,8 @@ from nlsg_live_deal where type in (6,7,12,15,16,17,18,19,20,21,25,29) and
              */
             if (0) {
                 $list = DB::table('w_temp_396')
-                    ->where('is_done', '=', 0)
-                    ->get();
+                          ->where('is_done', '=', 0)
+                          ->get();
 
                 if ($list->isEmpty()) {
                     exit('没有数据');
@@ -450,11 +458,11 @@ from nlsg_live_deal where type in (6,7,12,15,16,17,18,19,20,21,25,29) and
 
                     if (empty($value->user_id)) {
                         $check_user             = User::query()
-                            ->firstOrCreate([
-                                'phone' => (string)$value->phone,
-                            ], [
-                                'nickname' => substr_replace($value->phone, '****', 3, 4),
-                            ]);
+                                                      ->firstOrCreate([
+                                                          'phone' => (string)$value->phone,
+                                                      ], [
+                                                          'nickname' => substr_replace($value->phone, '****', 3, 4),
+                                                      ]);
                         $update_data['user_id'] = $check_user->id;
                     }
 
@@ -473,8 +481,8 @@ from nlsg_live_deal where type in (6,7,12,15,16,17,18,19,20,21,25,29) and
              */
             if (1) {
                 $list = DB::table('w_temp_396')
-                    ->where('is_done', '=', 0)
-                    ->get();
+                          ->where('is_done', '=', 0)
+                          ->get();
 
                 if ($list->isEmpty()) {
                     exit('没有数据');
@@ -496,15 +504,15 @@ from nlsg_live_deal where type in (6,7,12,15,16,17,18,19,20,21,25,29) and
                     DB::beginTransaction();
 
                     $insert_res = PayRecordDetail::query()
-                        ->insert($temp_insert_data);
+                                                 ->insert($temp_insert_data);
                     if (!$insert_res) {
                         DB::rollBack();
                         continue;
                     }
 
                     $update_res = DB::table('w_temp_396')
-                        ->where('id', '=', $v->id)
-                        ->update(['is_done' => 1]);
+                                    ->where('id', '=', $v->id)
+                                    ->update(['is_done' => 1]);
                     if (!$update_res) {
                         DB::rollBack();
                         continue;
