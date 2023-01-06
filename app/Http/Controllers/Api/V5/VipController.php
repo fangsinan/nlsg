@@ -145,7 +145,7 @@ class VipController extends Controller
             ->toArray();
 
         foreach($data['data'] as &$val){
-            $val['end_at'] = date('Y-m-d H:i',strtotime($val['end_at']));
+            $val['end_at'] = date('Y.m.d',strtotime($val['end_at']));
         }
         return $this->getRes([
             "data" => $data['data'],
