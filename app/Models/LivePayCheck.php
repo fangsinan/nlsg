@@ -66,6 +66,7 @@ class LivePayCheck extends Base
                             'user_id'     => $user_id,
                             'relation_id' => $live_id,
                             'status'      => 1,
+                        ],[
                             'start_time'  => $now,
                             'end_time'    => $now,
                             'pay_time'    => $now,
