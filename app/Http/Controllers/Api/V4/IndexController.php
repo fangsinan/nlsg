@@ -1224,7 +1224,7 @@ class IndexController extends Controller
     public function event()
     {
         $list = Banner::select('id', 'title', 'pic', 'h5_url', 'url', 'jump_type', 'obj_id')
-            ->where('app_project_type','=',app_project_type())
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->where('type', 54)
             ->first();
         return success($list);

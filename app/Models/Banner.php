@@ -31,7 +31,7 @@ class Banner extends Base
             ->where('type', 1)
             ->where('start_time', '<=', $today)
             ->where('end_time', '>=', $today)
-            ->where('app_project_type','=',app_project_type())
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->whereIn('show_type', [0,$show_type])
             ->orderBy('rank')
             ->orderBy('created_at', 'desc')

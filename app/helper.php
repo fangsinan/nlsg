@@ -1,4 +1,5 @@
 <?php
+const APP_PROJECT_TYPE = 1;
 
 /**
  * 成功输出

@@ -224,7 +224,7 @@ class Column extends Base
 
         }
        $list = $query
-           ->where('app_project','=',app_project_type())
+           ->where('app_project','=',APP_PROJECT_TYPE)
            ->where($where)
            ->orderBy('updated_at', 'desc')
             ->orderBy('sort', $order_str)->paginate($page)->toArray();
