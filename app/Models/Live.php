@@ -75,6 +75,7 @@ class Live extends Base
             ->where('status', 4)
             ->where('is_finish', 0)
             ->where('is_del', 0)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('begin_at')
             ->limit(3)
             ->get()
