@@ -1267,10 +1267,13 @@ class IncomeController extends Controller
                     'price'     => $twitter->price,
                     'ctime'     => time(),
                 ];
+
+
                 $order = Order::where(['ordernum'=>$twitter->ordernum,'status'=>1])->first();
                 if(empty($order)){ //微信线下返款
                     $add_data['ordernum']='';
-                    $add_data['remark']  =$twitter->ordernum.'_线下交易';
+                    $add_data['remark']  =$twitter->ordernum.'_线下交易。'.$twitter->remark;
+
                 }else{
                     $add_data['ordernum']=$twitter->ordernum;
                 }
