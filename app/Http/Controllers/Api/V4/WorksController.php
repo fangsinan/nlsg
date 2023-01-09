@@ -355,6 +355,7 @@ class WorksController extends Controller
                 $worksDb->whereIn('relation.category_id',$cate_id_arr);
             }
             $where['works.is_show'] =1;  //是否展示
+            $where['works.app_project_type'] = app_project_type();
             $worksData = $worksDb->where($where)
                 ->orderBy('works.'.$order_str,$sort)
                 ->groupBy('works.id')->paginate($this->page_per_page)->toArray();

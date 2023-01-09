@@ -199,7 +199,11 @@ class Column extends Base
             return ["data"=>[]];
         }
         $where = ["status" => 1,];
-        $field = ['id', 'name', 'title', 'subtitle', 'message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time','index_pic', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num', 'is_free', 'is_start','show_info_num'];
+        $field = [
+            'id', 'name', 'title', 'subtitle', 'message', 'column_type', 'user_id', 'message', 'original_price',
+            'price', 'online_time', 'works_update_time','index_pic', 'cover_pic', 'details_pic', 'subscribe_num',
+            'info_num', 'is_free', 'is_start','show_info_num'
+        ];
         $query = Column::select($field);
         foreach ($param_where as $key=>$val){
 //            if(count($val) !== 3 || empty($val[2])){
@@ -219,7 +223,10 @@ class Column extends Base
             }
 
         }
-       $list = $query->where($where)->orderBy('updated_at', 'desc')
+       $list = $query
+           ->where('app_project','=',app_project_type())
+           ->where($where)
+           ->orderBy('updated_at', 'desc')
             ->orderBy('sort', $order_str)->paginate($page)->toArray();
         return $list;
     }

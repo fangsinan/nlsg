@@ -41,6 +41,7 @@ class Recommend extends Base
         $ids = Recommend::where('position', $position)
             ->where('type', $type)
             ->where('status', 1)
+            ->where('app_project_type','=',app_project_type())
             ->orderBy('sort')
             ->orderBy('created_at', 'desc')
             ->pluck('relation_id')
