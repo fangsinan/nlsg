@@ -564,5 +564,60 @@ from nlsg_live_deal where type in (6,7,12,15,16,17,18,19,20,21,25,29) and
 
             dd($vip_temp_res);
         }
+
+        if (0) {
+            $db_list = DB::select('show tables');
+            $db_list = array_column($db_list, 'Tables_in_nlsg_v4');
+
+            $list = [];
+            foreach ($db_list as $v) {
+
+                if (strpos($v, 'nlsg_') !== false) {
+
+                    if (in_array($v, ['nlsg_area'])) {
+                        continue;
+                    }
+
+                    if (strpos($v, 'nlsg_mall') !== false) {
+                        continue;
+                    }
+
+                    if (strpos($v, 'nlsg_xe') !== false) {
+                        continue;
+                    }
+
+                    if (strpos($v, 'nlsg_vip') !== false) {
+                        continue;
+                    }
+
+                    if (strpos($v, 'nlsg_im') !== false) {
+                        continue;
+                    }
+
+                    if (strpos($v, 'nlsg_dou_dian') !== false) {
+                        continue;
+                    }
+
+                    if (strpos($v, 'nlsg_short') !== false) {
+                        continue;
+                    }
+
+                    if (strpos($v, 'nlsg_erp') !== false) {
+                        continue;
+                    }
+
+                    if (strpos($v, 'nlsg_coupon') !== false) {
+                        continue;
+                    }
+
+
+                    $list[] = $v;
+
+                }
+
+            }
+
+            dd($list);
+        }
     }
 }
