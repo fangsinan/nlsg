@@ -20,12 +20,14 @@ class Live extends Base
         $list = $this->select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num')
             ->whereIn('id', $ids)
             ->where('is_del', 0)
+            ->where('app_project_type', APP_PROJECT_TYPE)
             ->orderBy('created_at', 'desc')
             ->first();
 
         if ($list) {
             $channel = LiveInfo::where('live_pid', $list->id)
                 ->where('status', 1)
+                ->where('app_project_type', APP_PROJECT_TYPE)
                 ->orderBy('id', 'desc')
                 ->first();
             $list['info_id'] = $channel->id;
