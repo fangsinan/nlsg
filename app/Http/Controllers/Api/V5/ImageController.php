@@ -59,6 +59,7 @@ class ImageController extends Controller
             'relation_type' => $relation_type,
             'relation_id'   => $relation_id,
             'status'   => 1,
+            'app_project_type'=>APP_PROJECT_TYPE,
         ])->first();
         // $qr_urls = array_column($res,'qr_url');
         // if(empty($res)){
