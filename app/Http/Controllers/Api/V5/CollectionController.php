@@ -18,6 +18,7 @@ use App\Models\WorksInfo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use PHPUnit\Util\PHP\AbstractPhpProcess;
 
 class CollectionController extends Controller
 {
@@ -41,7 +42,7 @@ class CollectionController extends Controller
         $input_type = $request->input('type', 1);
         $version = $request->input('version', 0);
         $os_type = $request->input('os_type', 0);
-        
+
         if ($user_id == 0) {
             return $this->success();
         }
@@ -56,11 +57,15 @@ class CollectionController extends Controller
                 $where = [
                     'user_id' => $user_id,
                     'type' => $types['col_type'],
+                    'app_project_type'=>APP_PROJECT_TYPE,
                 ];
 
                 // 根据收藏时间排序
                 // $collection_maxid = Collection::select("fid",DB::raw('max(id) as id'))->where($where)->where("fid",">","0")->groupBy("fid")->paginate($this->page_per_page)->toArray();
-                $collection_maxid = Collection::select("id","relation_id","fid")->where($where)->orderBy('id','desc')->paginate(50)->toArray();
+                $collection_maxid = Collection::select("id","relation_id","fid")
+                    ->where('app_project_type','=',APP_PROJECT_TYPE)
+                                              ->where($where)->orderBy('id','desc')
+                                                             ->paginate(50)->toArray();
                 // $collection_ids = array_column($collection_maxid['data'], 'id');
 
                 // // 获取最新的fid的收藏数据   根据最新的收藏数据查询期数
@@ -88,7 +93,11 @@ class CollectionController extends Controller
                     if( in_array( $fid,$parent_column_ids) ){
                         continue;
                     }
-                    $col_fid = Collection::where(["relation_id"=>$fid,"user_id"=>$user_id,"type"=>8,"info_id"=>0,"fid"=>0])->value("id");
+                    $col_fid = Collection::where([
+                        "relation_id"=>$fid,"user_id"=>$user_id,"type"=>8,"info_id"=>0,"fid"=>0,
+                        'app_project_type'=>APP_PROJECT_TYPE,
+                    ])
+                                         ->value("id");
                     $parent_column = [];
                     if(!empty($col_fid)){
                         $parent_column = Column::select($filed)->where("type",4)->find($fid) ?? [];
@@ -134,7 +143,7 @@ class CollectionController extends Controller
                 return $this->success($res);
         }
 
-        
+
 
         //  1专栏  2课程  3商品  4书单 5百科 6听书 7讲座  8训练营
         $collection = Collection::where([
