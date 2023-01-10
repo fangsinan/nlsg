@@ -16,6 +16,7 @@ use App\Servers\V5\CampServers;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Util\PHP\AbstractPhpProcess;
 
 class ClassController extends ControllerBackend
 {
@@ -81,6 +82,7 @@ class ClassController extends ControllerBackend
                 ]);
             });
 
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at',
             'info_num')
             ->where('type', 1)
@@ -150,7 +152,7 @@ class ClassController extends ControllerBackend
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         $lists = $query->select('id', 'user_id', 'name', 'title', 'subtitle', 'price', 'status', 'created_at',
             'info_num')
             ->where('type', 2)
@@ -250,7 +252,7 @@ class ClassController extends ControllerBackend
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price',
             'is_end', 'chapter_num', 'is_pay')
             ->where('status', '>', 0)
@@ -347,7 +349,7 @@ class ClassController extends ControllerBackend
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         $lists = $query->select('id', 'title', 'type', 'is_end', 'created_at', 'user_id', 'view_num', 'status', 'price',
             'is_end', 'chapter_num')
             ->where('is_audio_book', 1)
@@ -415,7 +417,7 @@ class ClassController extends ControllerBackend
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         $lists = $query->select('id', 'category_id', 'name', 'cover', 'detail_img', 'status', 'created_at', 'view_num')
             ->orderBy('created_at', 'desc')
             ->paginate(10)
@@ -1776,7 +1778,8 @@ class ClassController extends ControllerBackend
 
             left join nlsg_user as u on u.id=his.user_id
 
-            where  works_info.status=4 and works_info.column_id=".$column_id." and his.is_end=1 and sub.`status` = 1 and sub.is_del = 0
+            where  works_info.status=4 and works_info.column_id=".$column_id." and his.is_end=1
+            and sub.`status` = 1 and sub.is_del = 0
 
             order by works_info.rank,works_info.id";
 

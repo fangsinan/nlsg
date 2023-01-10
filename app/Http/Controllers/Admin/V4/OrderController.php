@@ -118,7 +118,7 @@ class OrderController extends ControllerBackend
 			->whereHas('user', function ($q) {
 				$q->where('is_test_pay', '=', 0);
 			});
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
 		if (!empty($teacher_name)){
 			$query->whereHas('works.user',function($q)use($teacher_name){
 				$q->where('nickname','like',"%$teacher_name%");
@@ -486,6 +486,8 @@ class OrderController extends ControllerBackend
 				$q->where('is_test_pay', '=', 0);
 			});
 
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
+
 		if (!empty($teacher_name)){
 			$query->whereHas('column.user',function($q)use($teacher_name){
 				$q->where('nickname','like',"%$teacher_name%");
@@ -621,6 +623,7 @@ class OrderController extends ControllerBackend
         ])
             ->where('status', 1)
             ->where('is_shill', 0)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->where('type', $type);
         if(in_array($role_id,[28])){
             $today=$today->where('activity_tag', '<>', 'cytx');
@@ -793,7 +796,7 @@ class OrderController extends ControllerBackend
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         $direction = $sort == 'asc' ? 'asc' : 'desc';
         $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
             'vip_order_type',
@@ -920,7 +923,7 @@ class OrderController extends ControllerBackend
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         $direction = $sort == 'asc' ? 'asc' : 'desc';
         $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
             'created_at', 'status')
@@ -1036,7 +1039,7 @@ class OrderController extends ControllerBackend
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         $direction = $sort == 'asc' ? 'asc' : 'desc';
         $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
             'created_at', 'status', 'reward_type', 'reward_num', 'reward')
@@ -1160,7 +1163,7 @@ class OrderController extends ControllerBackend
 		$query->whereHas('user',function($q){
 		    $q->where('is_test_pay','=',0);
 		});
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         $direction = $sort == 'asc' ? 'asc' : 'desc';
         $lists = $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price', 'os_type', 'pay_type',
             'created_at', 'status')
@@ -1297,7 +1300,7 @@ class OrderController extends ControllerBackend
         if ($is_shill === 1) {
             $query->where('is_shill', '=', 1);
         }
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         $direction = $sort === 'asc' ? 'asc' : 'desc';
         $query->select('id', 'user_id', 'relation_id', 'ordernum', 'price', 'pay_price',
             'os_type', 'pay_type', 'created_at', 'status', 'activity_tag', 'is_shill','pay_time')

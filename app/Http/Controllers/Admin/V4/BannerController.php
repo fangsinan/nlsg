@@ -6,6 +6,7 @@ use App\Http\Controllers\ControllerBackend;
 use App\Models\Banner;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use PHPUnit\Util\PHP\AbstractPhpProcess;
 
 class BannerController extends ControllerBackend
 {
@@ -65,6 +66,7 @@ class BannerController extends ControllerBackend
                 $query->where('status',$status);
             });
 
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         $lists = $query->select('id', 'title', 'pic', 'rank', 'url', 'type', 'jump_type', 'obj_id', 'created_at', 'status')
             ->orderBy('rank')
             ->orderBy('created_at', 'desc')
