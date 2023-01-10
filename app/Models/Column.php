@@ -116,6 +116,7 @@ class Column extends Base
         $lists= $this->select('id','type','name', 'column_type', 'title','subtitle', 'message','price','index_pic', 'cover_pic','details_pic','info_num as chapter_num','is_free','is_start','cover_pic as cover_images','cover_pic as cover_img','classify_column_id','info_column_id')
             ->whereIn('id', $ids)
             ->where($where)
+            ->where("app_project_type",APP_PROJECT_TYPE)
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get()
@@ -347,7 +348,7 @@ class Column extends Base
     // 获取训练营第一章节id
     static function getFirstInfo($get_id){
 
-        $first_info_id = WorksInfo::select('id')->where(['column_id'=>$get_id,'type'=>1,'status'=>4 ])->orderBy('rank','asc')->first();
+        $first_info_id = WorksInfo::select('id')->where(['column_id'=>$get_id,'type'=>1,'status'=>4,'app_project_type'=>APP_PROJECT_TYPE ])->orderBy('rank','asc')->first();
         return  $first_info_id['id'] ?? 0;
     }
 

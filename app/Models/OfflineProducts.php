@@ -47,7 +47,7 @@ class OfflineProducts extends Base
 
     /**
      * getOfflineProducts get offline from ids
-     * 
+     *
      * @return array $offline
      * */
     public function getOfflineProducts($ids=[]){
@@ -58,6 +58,7 @@ class OfflineProducts extends Base
         $offline = OfflineProducts::select($fields)
                       ->whereIn('id', $ids)
                       ->where([ 'type'=>3, 'is_del' => 0])
+                      ->where('app_project_type',APP_PROJECT_TYPE)
                       ->orderBy('created_at', 'desc')->get()->toArray();
         return $offline;
     }

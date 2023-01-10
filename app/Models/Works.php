@@ -54,6 +54,7 @@ class Works extends Base
             $WorksObj->where('is_free', $is_free);
         }
 
+        $WorksObj->where('app_project_type', APP_PROJECT_TYPE);
         $lists = $WorksObj
             ->orderByRaw('FIELD(id,'.implode(',', $ids).')')
             ->take($size)
