@@ -617,7 +617,17 @@ from nlsg_live_deal where type in (6,7,12,15,16,17,18,19,20,21,25,29) and
 
             }
 
-            dd($list);
+            foreach ($list as $v) {
+                $desc = DB::select('desc ' . $v);
+                $desc = array_column($desc, 'Field');
+
+                if (!in_array('app_project_type', $desc)) {
+                    DB::select("ALTER TABLE $v ADD COLUMN `app_project_type` tinyint(1) UNSIGNED NULL DEFAULT 1 COMMENT '平台类型 1能量时光 2幸福学社'");
+                }
+
+                echo $v, '添加', PHP_EOL;
+            }
+
         }
     }
 }
