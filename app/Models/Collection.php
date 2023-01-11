@@ -5,7 +5,7 @@ namespace App\Models;
 class Collection extends Base
 {
     protected $table = 'nlsg_collection';
-    protected $fillable = ['type', 'user_id', 'relation_id', 'info_id', 'type','fid'];
+    protected $fillable = ['type', 'user_id', 'relation_id', 'info_id', 'type','fid','app_project_type'];
 
 
     static public function isCollection($type=[],$relation_id,$info_id,$user_id)
@@ -13,18 +13,21 @@ class Collection extends Base
 
         //  收藏按总id走
         $is_collection= 0;
-        
+
         $collectionObj = Collection::select("id")->where([
             'user_id' => $user_id,
             'info_id' => $info_id,
             'relation_id' => $relation_id,
         ]);
-        $collection = $collectionObj->whereIn('type',$type)->get()->toArray();
+        $collection = $collectionObj
+            ->whereIn('type',$type)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
+                                    ->get()->toArray();
         if(!empty($collection)){
             $is_collection = 1;
         }
         return $is_collection;
-        
+
 
     }
     //收藏 操作
@@ -35,7 +38,10 @@ class Collection extends Base
         if (!in_array($type, [1, 2, 3, 4, 5, 6, 7, 8])) {
             return 0;
         }
-        $where = ['type' => $type, 'user_id' => $user_id, 'relation_id' => $target_id,'info_id'=>$info_id];
+        $where = [
+            'type' => $type, 'user_id' => $user_id, 'relation_id' => $target_id,
+            'info_id'=>$info_id,'app_project_type'=>APP_PROJECT_TYPE,
+        ];
         $data = Collection::where($where)->first();
         //用户商品收藏缓存清理
 
@@ -123,10 +129,12 @@ class Collection extends Base
         if (empty($user_id)) {
             $res = [];
         } else {
-            $res = Collection::where('user_id', '=', $user_id)
-                ->where('type', '=', 3)
-                ->select(['relation_id as goods_id'])
-                ->get();
+            $res = Collection::query()
+                             ->where('user_id', '=', $user_id)
+                             ->where('type', '=', 3)
+                             ->where('app_project_type', '=', APP_PROJECT_TYPE)
+                             ->select(['relation_id as goods_id'])
+                             ->get();
             if ($res->isEmpty()) {
                 $res = [];
             } else {

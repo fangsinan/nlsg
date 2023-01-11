@@ -90,7 +90,12 @@ class Column extends Base
         //是否购买
         $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,$sub_type);
 
-        $collection = Collection::where(['type'=>$col_type,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
+        $collection = Collection::query()
+                                ->where([
+                                    'type'=>$col_type,'user_id'=>$user_id,'relation_id'=>$column_id,
+                                    'app_project_type'=>APP_PROJECT_TYPE,
+                                ])
+                                ->first();
 
         //是否收藏
         $column['is_collection'] = $collection ? 1 : 0;

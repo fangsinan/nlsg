@@ -22,6 +22,7 @@ class Click extends Base
         $model->cpid = $params['wid'];
         $model->flag = $params['flag']??'';
         $model->ip = $ip;
+        $model->app_project_type = APP_PROJECT_TYPE;
         $res = $model->save();
         if ($res){
             return ['code'=>true,'msg'=>'成功'];
