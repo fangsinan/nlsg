@@ -32,7 +32,9 @@ class MessageServers
             ->where('status', 1)
             ->where('is_del', 1)
             ->where('is_send', 3)
-            ->where('receive_user', $user_id)->count();
+            ->where('receive_user', $user_id)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
+            ->count();
     }
 
     static function get_user_new_msg($type_arr,$user_id){
@@ -45,7 +47,10 @@ class MessageServers
             ->whereIn('type', $type_arr)
             ->where('is_del', 1)
             ->where('is_send', 3)
-            ->where('receive_user', $user_id)->orderBy('id','desc')->first();
+            ->where('receive_user', $user_id)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
+            ->orderBy('id','desc')
+            ->first();
 
 
         return $MessageUser;
