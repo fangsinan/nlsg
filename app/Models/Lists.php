@@ -11,7 +11,7 @@ class Lists extends Model
 {
     protected $table = 'nlsg_lists';
     protected $fillable = [
-        'title', 'subtitle', 'status', 'type','cover','details_pic','sort'
+        'title', 'subtitle', 'status', 'type','cover','details_pic','sort','app_project_type',
     ];
 
 
@@ -31,7 +31,7 @@ class Lists extends Model
                     'data' => $this->getRankWorks(),
                 ],
 
-                
+
             ];
 
             $expire_num = CacheTools::getExpire($cache_key_name);
@@ -61,6 +61,7 @@ class Lists extends Model
             ->whereIn('id', $ids)
             ->whereIn('type', $type)
             ->where('status', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->limit(3)
             ->get()
             ->toArray();
@@ -70,7 +71,7 @@ class Lists extends Model
         if ($lists) {
             foreach ($lists as $k => &$v) {
 
-                
+
                 if(!empty($v['type']) && $v['type'] == 10){ //大咖讲书 单独判断   因为需要返回时间
                     if($os_type == 2){//
                         $v['describe'] = str_replace("元",'能量币',$v['describe']);
@@ -99,6 +100,7 @@ class Lists extends Model
                             }])
                             ->where('id', $vv['works_id'])
                             ->where('status', 4)
+                            ->where('app_project_type','=',APP_PROJECT_TYPE)
                             ->first();
                             // $works_data["is_teacherBook"] = WorksInfo::IsTeacherBook($vv['works_id']);
                         //->get()->toArray();
@@ -115,6 +117,7 @@ class Lists extends Model
                             ->where('id', $vv['works_id'])
                             ->where('is_audio_book', 1)
                             ->where('status', 4)
+                            ->where('app_project_type','=',APP_PROJECT_TYPE)
                             ->first();
                         // $works_data["is_teacherBook"] = WorksInfo::IsTeacherBook($vv['works_id']);
                     } elseif ($vv['type'] == 4) {
@@ -130,6 +133,7 @@ class Lists extends Model
                             ->where('id', $vv['works_id'])
                             ->where('type', 2)
                             ->where('status', 1)
+                            ->where('app_project_type','=',APP_PROJECT_TYPE)
                             ->first();
                     } else {
                         unset($lists[$k]['list_works'][$kk]);
@@ -147,7 +151,7 @@ class Lists extends Model
 
 
 
-                    
+
                     $vv['historyData'] = History::getHistoryData($vv['id'], 4, $uid);
 
 
@@ -180,6 +184,7 @@ class Lists extends Model
                 }
             ])->whereIn('id', $ids)
             ->where('type', $type)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->limit(3)
             ->first();
         if ($lists) {
@@ -195,6 +200,7 @@ class Lists extends Model
         $lists = Lists::query()
             ->select('id', 'title', 'subtitle', 'cover')
             ->whereIn('id', $ids)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get()
@@ -206,6 +212,7 @@ class Lists extends Model
     {
         $lists = Lists::select('id', 'title', 'num', 'cover')
             ->where('type', 4)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->get()
             ->toArray();
 
@@ -213,12 +220,14 @@ class Lists extends Model
             foreach ($lists as &$v) {
                 $work_ids = ListsWork::where('lists_id', $v['id'])
                     ->where('state', 1)
+                    ->where('app_project_type','=',APP_PROJECT_TYPE)
                     ->orderBy('sort')
                     ->orderBy('created_at', 'desc')
                     ->pluck('works_id')
                     ->toArray();
                 $works = Works::select('id as works_id', 'title')
                     ->whereIn('id', $work_ids)
+                    ->where('app_project_type','=',APP_PROJECT_TYPE)
                     ->orderByRaw('FIELD(id,'.implode(',', $work_ids).')')
                     ->orderBy('created_at', 'desc')
                     ->get()
@@ -235,6 +244,7 @@ class Lists extends Model
     {
         $lists = Lists::select('id', 'title', 'num', 'cover')
             ->where('type', 5)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->get()
             ->toArray();
 
@@ -242,12 +252,14 @@ class Lists extends Model
             foreach ($lists as &$v) {
                 $work_ids = ListsWork::where('lists_id', $v['id'])
                     ->where('state', 1)
+                    ->where('app_project_type','=',APP_PROJECT_TYPE)
                     ->orderBy('sort')
                     ->orderBy('created_at', 'desc')
                     ->pluck('works_id')
                     ->toArray();
                 $wikis = Wiki::select('id as works_id', 'name')
                     ->whereIn('id', $work_ids)
+                    ->where('app_project_type','=',APP_PROJECT_TYPE)
                     ->orderByRaw('FIELD(id,'.implode(',', $work_ids).')')
                     ->orderBy('created_at', 'desc')
                     ->get()
@@ -263,18 +275,21 @@ class Lists extends Model
     {
         $lists = Lists::select('id', 'title', 'num', 'cover')
             ->where('type', 6)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->get()
             ->toArray();
         if ($lists) {
             foreach ($lists as &$v) {
                 $work_ids = ListsWork::where('lists_id', $v['id'])
                     ->where('state', 1)
+                    ->where('app_project_type','=',APP_PROJECT_TYPE)
                     ->orderBy('sort')
                     ->orderBy('created_at', 'desc')
                     ->pluck('works_id')
                     ->toArray();
                 $wikis = MallGoods::select('id as works_id', 'name')
                     ->whereIn('id', $work_ids)
+                    ->where('app_project_type','=',APP_PROJECT_TYPE)
                     ->orderByRaw('FIELD(id,'.implode(',', $work_ids).')')
                     ->orderBy('created_at', 'desc')
                     ->get()
@@ -288,25 +303,31 @@ class Lists extends Model
 
     public function listWorks()
     {
-        return $this->hasMany('App\Models\ListsWork', 'lists_id', 'id')->where('state',1)->orderBy("sort");
+        return $this->hasMany('App\Models\ListsWork', 'lists_id', 'id')
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
+                    ->where('state',1)
+                    ->orderBy("sort");
     }
 
     public function works()
     {
         return $this->belongsToMany('App\Models\Works',
-            'nlsg_lists_work', 'lists_id', 'works_id')->where('state',1);
+            'nlsg_lists_work', 'lists_id', 'works_id')->where('state',1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE);
     }
 
     public function wiki()
     {
         return $this->belongsTo('App\Models\Wiki',
-            'nlsg_lists_work', 'lists_id', 'works_id');
+            'nlsg_lists_work', 'lists_id', 'works_id')
+            ->where('app_project_type','=',APP_PROJECT_TYPE);
     }
 
     public function listGoods()
     {
         return $this->belongsToMany('App\Models\MallGoods',
-            'nlsg_lists_work', 'lists_id', 'works_id');
+            'nlsg_lists_work', 'lists_id', 'works_id')
+            ->where('app_project_type','=',APP_PROJECT_TYPE);
     }
 
 
@@ -315,13 +336,17 @@ class Lists extends Model
     public function getNewIndexListCourse($ids,$limit=100)
     {
         $lists = Lists::select('id', 'title', 'num', 'cover','type')
-            ->whereIn('id',$ids) ->get()->toArray();
+            ->whereIn('id',$ids)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
+            ->get()->toArray();
 
 
         if (!empty($lists)) {
             foreach ($lists as &$v) {
                 $work_ids = ListsWork::where('lists_id', $v['id'])
-                    ->where('state', 1)->orderBy('sort')
+                    ->where('state', 1)
+                    ->where('app_project_type','=',APP_PROJECT_TYPE)
+                    ->orderBy('sort')
                     ->orderBy('created_at', 'desc')->limit($limit)->pluck('works_id')->toArray();
                 $v['data'] = [];
 
@@ -362,6 +387,7 @@ class Lists extends Model
                         'user:id,nickname,teacher_title'
                     ])->select('id as works_id', 'title',"user_id",'cover_img')
                         ->whereIn('id', $work_ids)
+                        ->where('app_project_type','=',APP_PROJECT_TYPE)
                         ->orderByRaw('FIELD(id,'.implode(',', $work_ids).')')
                         ->orderBy('created_at', 'desc')
                         ->get()
