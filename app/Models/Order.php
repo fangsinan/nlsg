@@ -115,14 +115,17 @@ class Order extends Base
                 $result = Live::select("id","title",'describe','cover_img','teacher_img','banner_img','msg','content','user_id','reason','profit_sharing','twitter_money','price','playback_price','is_del',
                 'rank','type','begin_at','end_at','password','helper','is_free','is_show','can_push','check_time','is_finish','is_playback','order_num','need_virtual','need_virtual_num','virtual_online_num',
                 'is_forb','is_join','relation_live','status','is_test','flag','cover_img as cover_images'
-                        )->where(['id' => $liveinfo['live_pid']])->get()->toArray();
+                        )->where(['id' => $liveinfo['live_pid']])
+                    ->where("app_project_type",APP_PROJECT_TYPE)
+                    ->get()->toArray();
                 break;
             case 13:
                 $result = [];
                 break;
             case 14:
                 $result = OfflineProducts::select('id','title','subtitle','describe','total_price','price','cover_img','image','video_url','str_time','is_del','is_show','describe_type','url','off_line_pay_type',
-                'column_id','cover_vertical_img as cover_images')->where(['id' => $relation_id])->get()->toArray();
+                'column_id','cover_vertical_img as cover_images')->where(['id' => $relation_id])
+                    ->where("app_project_type",APP_PROJECT_TYPE)->get()->toArray();
                 break;
             case 16:
                 $result[] = [
@@ -160,6 +163,7 @@ class Order extends Base
         $res = Order::where('created_at', '<', $past)
 //            ->where('created_at', '>', $subHour)
             ->where('status', 0)
+            ->where("app_project_type",APP_PROJECT_TYPE)
 //            ->where('pay_check',1)
             ->update([
                 'status' => 2
@@ -177,6 +181,7 @@ class Order extends Base
             ->where('o.activity_tag', '=', 'cytx')
             ->where('o.status', '=', 1)
             ->where('o.type', '=', 9)
+            ->where("o.app_project_type",APP_PROJECT_TYPE)
             ->where('cytx_job', '<>', -1)
             ->whereRaw(DB::raw(
                 'cytx_job =0 or (UNIX_TIMESTAMP(cytx_check_time)+cytx_job*600 <= UNIX_TIMESTAMP())'
@@ -209,6 +214,7 @@ class Order extends Base
             'relation_id'
         ])
             ->where('status', 1)
+            ->where("app_project_type",APP_PROJECT_TYPE)
             ->orderBy('total', 'desc')
             ->groupBy('relation_id')
             ->first();
@@ -231,6 +237,7 @@ class Order extends Base
             ->where('relation_id', '=', $live_id)
             ->where('type', '=', 3)
             ->where('status', '=', 1)
+            ->where("app_project_type",APP_PROJECT_TYPE)
             ->first();
         if ($check) {
             return ['code' => true, 'is_sub' => 1, 'p' => $time . $user_id];
@@ -293,7 +300,10 @@ class Order extends Base
             ->whereIn('type', [9, 10, 14, 15, 16])
             ->where('live_id', '>', 0)
             ->where('is_shill', '=', 0)
+            ->where("app_project_type",APP_PROJECT_TYPE)
             ->where('pay_price','>',1);
+
+
 
         if (!empty($params['id'] ?? 0)) {
             $query->where('id', '=', $params['id']);
@@ -326,7 +336,8 @@ class Order extends Base
         //直播标题
         if (!empty($params['title'] ?? '')) {
             $title = $params['title'];
-            $temp_id_list = Live::where('title','like',"%$title%")->pluck('id')->toArray();
+            $temp_id_list = Live::where('title','like',"%$title%")
+                ->where("app_project_type",APP_PROJECT_TYPE)->pluck('id')->toArray();
             $query->whereIn('live_id',$temp_id_list);
 //            $query->whereHas('live', function ($q) use ($title) {
 //                $q->where('title', 'like', "%$title%");
@@ -532,6 +543,7 @@ class Order extends Base
             ->where('o.id','>',341864)
             ->where('o.status','=',1)
             ->where('o.type','=',10)
+            ->where("o.app_project_type",APP_PROJECT_TYPE)
             ->where('o.pay_price','>',0.01);
 
         //推荐用户账号
@@ -587,6 +599,7 @@ class Order extends Base
             ->where('status', '=', 1)
             ->whereIn('type', [10,14,16])
             ->where('live_id', '>', 0)
+            ->where("app_project_type",APP_PROJECT_TYPE)
             ->where('is_shill', '=', 0);
 
         if (!empty($params['id'] ?? 0)) {
@@ -765,6 +778,7 @@ class Order extends Base
             ->where('status', '=', 1)
 //            ->where('live_id', '<>', 0)
             ->where('is_shill', '=', 0)
+            ->where("app_project_type",APP_PROJECT_TYPE)
             ->where('pay_price', '>', 0.01)
             ->select([
                 'id', 'type', 'relation_id', 'pay_time', 'price', 'user_id', 'pay_price', 'pay_type', 'ordernum',
@@ -1092,6 +1106,7 @@ class Order extends Base
             "user_id"=>$user_id,
             "relation_id"=>$live_id,
             "status"=>1,
+            "app_project_type"=>APP_PROJECT_TYPE,
         ])->value("id");
         $admin_id = DB::table('crm_live_order')
             ->where('sub_id','=',$subId)
