@@ -168,15 +168,16 @@ class LiveConsole extends Base
         if (!empty($params['password'] ?? '')) {
             $live_data['password'] = bcrypt(trim($params['password']));
         }
-        $live_data['title']     = $params['title'];
-        $live_data['describe']  = $params['describe'];
-        $live_data['cover_img'] = $params['cover_img'];
-        $live_data['msg']       = $params['msg'];
-        $live_data['content']   = $params['content'] ?? '';
-        $live_data['can_push']  = $params['can_push'] ?? 0;
-        $live_data['is_free']   = $params['is_free'];
-        $live_begin_at          = 0;
-        $live_end_at            = 0;
+        $live_data['title']            = $params['title'];
+        $live_data['describe']         = $params['describe'];
+        $live_data['cover_img']        = $params['cover_img'];
+        $live_data['msg']              = $params['msg'];
+        $live_data['content']          = $params['content'] ?? '';
+        $live_data['can_push']         = $params['can_push'] ?? 0;
+        $live_data['is_free']          = $params['is_free'];
+        $live_data['app_project_type'] = APP_PROJECT_TYPE;
+        $live_begin_at                 = 0;
+        $live_end_at                   = 0;
 
         if (empty($params['list'] ?? '')) {
             return ['code' => false, 'msg' => '直播时间信息错误'];
@@ -319,10 +320,11 @@ class LiveConsole extends Base
         }
 
         foreach ($params['list'] as &$v) {
-            $v['live_pid']   = $live_id;
-            $v['id']         = $live_id;
-            $v['user_id']    = $user_id;
-            $v['created_at'] = $v['updated_at'] = $now_date;
+            $v['app_project_type'] = APP_PROJECT_TYPE;
+            $v['live_pid']         = $live_id;
+            $v['id']               = $live_id;
+            $v['user_id']          = $user_id;
+            $v['created_at']       = $v['updated_at'] = $now_date;
         }
 
         $info_res = DB::table('nlsg_live_info')->insert($params['list']);
@@ -429,6 +431,7 @@ class LiveConsole extends Base
         $query = self::from('nlsg_live as l')
                      ->leftJoin('nlsg_user as u', 'l.user_id', '=', 'u.id')
                      ->where('l.user_id', '=', $user_id)
+                     ->where('l.app_project_type', '=', APP_PROJECT_TYPE)
                      ->where('l.is_del', '=', 0);
 
         $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content', 'l.twitter_money',
@@ -491,10 +494,12 @@ class LiveConsole extends Base
         $page = intval($params['page'] ?? 1);
         $size = intval($params['size'] ?? 10);
 
-        $query = self::from('nlsg_live as l')
+        $query = self::query()
+                     ->from('nlsg_live as l')
                      ->leftJoin('nlsg_user as u', 'l.user_id', '=', 'u.id')
                      ->where('l.user_id', '=', $user_id)
-                     ->where('l.is_del', '=', 0);
+                     ->where('l.is_del', '=', 0)
+                     ->where('l.app_project_type', '=', APP_PROJECT_TYPE);
 
         $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content', 'l.twitter_money',
                    'l.reason', 'l.check_time', 'l.price', 'l.playback_price', 'l.helper', 'l.is_free', 'l.is_show',
