@@ -86,6 +86,7 @@ class Works extends Base
             ->where('works.status', 4)
             ->where('works.type', 2)
             ->where('works.is_audio_book', $is_audio_book)
+            ->where('works.app_project_type','=',APP_PROJECT_TYPE)
             // ->where('info.status', 4)
             ->where(function ($query) use ($keywords) {
                 $query->orwhere('works.title', 'like', "%{$keywords}%");
@@ -128,6 +129,7 @@ class Works extends Base
             ->select('id', 'user_id', 'title', 'subscribe_num')
             ->where('id', $id)
             ->where(['type' => 2, 'status' => 4])
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->first();
         $is_sub = Subscribe::isSubscribe($user_id, $id, 2);
         $list['is_sub'] = $is_sub ? 1 : 0;
@@ -162,6 +164,7 @@ class Works extends Base
             ->where('is_free', 1)
             ->where('is_audio_book', 0)
             ->where('status', 4)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->limit(5)
             ->get();
         if ($works) {
@@ -184,6 +187,7 @@ class Works extends Base
             ->where('is_free', 1)
             ->where('is_audio_book', 1)
             ->where('status', 4)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->limit(5)
             ->get();
         if ($book) {
@@ -205,6 +209,7 @@ class Works extends Base
             ->where('is_free', 1)
             ->where('type', 2)
             ->where('status', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->limit(5)
             ->get();
         if ($lecture) {
@@ -411,17 +416,20 @@ class Works extends Base
         Works::where('status', 5)
             ->where('timing_online', 1)
             ->where('timing_time', '<=', Carbon::now()->toDateTimeString())
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->update(['status' => 4, 'online_time' => date('Y-m-d H:i:s')]);
 
         WorksInfo::where('status', 5)
             ->where('timing_online', 1)
             ->where('timing_time', '<=', Carbon::now()->toDateTimeString())
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->update(['status' => 4, 'online_time' => date('Y-m-d H:i:s')]);
 
         Column::where('status', 2)
             ->where('type', 2)
             ->where('timing_online', 1)
             ->where('timing_time', '<=', Carbon::now()->toDateTimeString())
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->update(['status' => 1, 'online_time' => date('Y-m-d H:i:s')]);
 
     }

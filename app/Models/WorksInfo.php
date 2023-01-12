@@ -37,7 +37,7 @@ class WorksInfo extends Base
             'callback_url3', 'view_num', 'duration', 'free_trial','rank','share_img','like_num','old_share_img'
         ])->where($where)->orderBy('rank',$order)->orderBy('id', $order);
         //->paginate($page_per_page)->toArray();
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         if ($page) {
             $works_data = $query->limit($size)->offset(($page - 1) * $size)->get()->toArray();
         } else {
