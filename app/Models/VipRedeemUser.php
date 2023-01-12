@@ -430,6 +430,7 @@ class VipRedeemUser extends Base
                     ->where('type', '=', 6)
                     ->where('status', '=', 1)
                     ->where('end_time', '>=', $now_date)
+                    ->where('app_project_type', '=', APP_PROJECT_TYPE)
                     ->first();
                 if (empty($check)) {
                     $add_sub_data[] = [
@@ -442,7 +443,8 @@ class VipRedeemUser extends Base
                         'updated_at' => $now_date,
                         'give' => 14,
                         'start_time' => $now_date,
-                        'end_time' => $end_date
+                        'end_time' => $end_date,
+                        'app_project_type' => APP_PROJECT_TYPE
                     ];
                 } else {
                     if(!in_array($activity_tag,["2021-11-1","2021-11-2",'backend_open_temp_360'])) {
@@ -457,7 +459,8 @@ class VipRedeemUser extends Base
                             'user_id' => $user_id,
                             'is_new_code' => 1,
                             'created_at' => $now_date,
-                            'updated_at' => $now_date
+                            'updated_at' => $now_date,
+                            'app_project_type' => APP_PROJECT_TYPE
                         ];
                     }
 
@@ -469,6 +472,7 @@ class VipRedeemUser extends Base
                     ->where('relation_id', '=', $v['id'])
                     ->where('type', '=', 2)
                     ->where('status', '=', 1)
+                    ->where('app_project_type', '=', APP_PROJECT_TYPE)
                     ->where('end_time', '>=', $now_date)
                     ->first();
                 if (empty($check)) {
@@ -482,7 +486,9 @@ class VipRedeemUser extends Base
                         'updated_at' => $now_date,
                         'give' => 14,
                         'start_time' => $now_date,
-                        'end_time' => $end_date
+                        'end_time' => $end_date,
+                        'app_project_type' => APP_PROJECT_TYPE
+
                     ];
                 } else {
                     if(!in_array($activity_tag,["2021-11-1","2021-11-2",'backend_open_temp_360'])) {
@@ -497,7 +503,8 @@ class VipRedeemUser extends Base
                             'user_id' => $user_id,
                             'is_new_code' => 1,
                             'created_at' => $now_date,
-                            'updated_at' => $now_date
+                            'updated_at' => $now_date,
+                            'app_project_type' => APP_PROJECT_TYPE
                         ];
                     }
 
