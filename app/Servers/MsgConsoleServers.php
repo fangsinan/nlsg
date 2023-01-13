@@ -28,7 +28,7 @@ class MsgConsoleServers
     public function jobList($params, $admin): LengthAwarePaginator
     {
         $query = Message::query();
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
 //        $query->with([
 //            'relationTypeInfo'
 //        ]);
@@ -176,7 +176,7 @@ class MsgConsoleServers
         } else {
             $params['timing_send_time'] = date('Y-m-d H:i:00');
         }
-
+        $params['app_project_type']  = APP_PROJECT_TYPE;
 
         $is_old = $params['id'] ?? 0;
 
