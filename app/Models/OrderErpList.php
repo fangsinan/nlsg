@@ -18,6 +18,7 @@ class OrderErpList extends Base
         $check_order = Order::query()
             ->where('id', '=', $order_id)
             ->where('status', '=', 1)
+            ->where('app_project_type', '=', APP_PROJECT_TYPE)
             ->whereIn('type', [14, 18])
             ->select(['id', 'pay_price'])
             ->first();
@@ -43,6 +44,7 @@ class OrderErpList extends Base
         $check_list = self::query()
             ->where('order_id', '=', $order_id)
             ->where('flag', '=', 1)
+            ->where('app_project_type', '=', APP_PROJECT_TYPE)
             ->first();
         if (!empty($check_list)) {
             return true;
