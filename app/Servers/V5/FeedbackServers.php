@@ -38,7 +38,8 @@ class FeedbackServers
                 'FeedbackType:id,name'
             ])
             ->select($select_array)
-            ->where('status', '=', 1);
+            ->where('status', '=', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE);
 
         if ($id) {
             $query->where('id', '=', $id);

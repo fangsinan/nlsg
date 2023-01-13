@@ -495,6 +495,9 @@ class MallGoods extends Base
 
     public function forYourReference($num, $user = [])
     {
+        if (empty($user['id'] ?? 0)){
+            return [];
+        }
         $kind = 5;//可能性
         $key = substr(time(), 9);
         $key = $key % $kind;

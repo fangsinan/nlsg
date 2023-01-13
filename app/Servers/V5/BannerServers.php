@@ -14,6 +14,7 @@ class BannerServers
     {
         $query = Banner::query()
                        ->whereIn('status', [1, 2])
+                       ->where('app_project_type', '=', APP_PROJECT_TYPE)
                        ->select([
                            'id', 'title', 'pic', 'url', 'h5_url', 'type', 'start_time', 'end_time',
                            'created_at', 'status', 'jump_type', 'obj_id', 'info_id'
@@ -88,12 +89,13 @@ class BannerServers
 
     public function add($params): array
     {
-        $type_list        = $this->selectData(['flag' => 'type', 'only_key' => true]);
-        $jump_type_list   = $this->selectData(['flag' => 'jump_type', 'only_key' => true]);
-        $jump_type_list   = array_merge($jump_type_list, [1]);
-        $params['h5_url'] = $params['url'] ?? '';
-
-        $validator = Validator::make(
+        $type_list                  = $this->selectData(['flag' => 'type', 'only_key' => true]);
+        $jump_type_list             = $this->selectData(['flag' => 'jump_type', 'only_key' => true]);
+        $jump_type_list             = array_merge($jump_type_list, [1]);
+        $params['h5_url']           = $params['url'] ?? '';
+        $params['app_project_type'] = APP_PROJECT_TYPE;
+        $params['version']          = '5.0.0';
+        $validator                  = Validator::make(
             $params,
             [
                 'title'      => 'bail|required',
@@ -144,6 +146,8 @@ class BannerServers
             $params['start_time'] = date('Y-m-d H:i:00', strtotime($params['start_time']));
             $params['end_time']   = date('Y-m-d H:i:59', strtotime($params['end_time']));
         }
+
+        $params['pic'] = str_replace('https://image.nlsgapp.com/','',$params['pic']);
 
         $params['status'] = 1;
 
