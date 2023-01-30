@@ -44,6 +44,7 @@ class LiveInfo extends Model
                 ->select('id', 'live_pid', 'user_id')
                 ->where('status', 1)
                 ->where('playback_url', '!=', '')
+                ->where('app_project_type','=',APP_PROJECT_TYPE)
                 ->orderBy('begin_at', 'desc')
                 ->limit(2)
                 ->get()

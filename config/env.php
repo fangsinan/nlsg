@@ -114,4 +114,6 @@ return [
     'XFXS_WECHAT_APP_ID'          => env('XFXS_WECHAT_APP_ID'),
     'XFXS_WECHAT_SECRET'          => env('XFXS_WECHAT_SECRET'),
 
+    //平台 1能量时光  2幸福学社
+    'APP_PROJECT_TYPE' => env('APP_PROJECT_TYPE'),
 ];

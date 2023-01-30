@@ -9,7 +9,7 @@ class ListsWork extends Model
     protected $table = 'nlsg_lists_work';
 
     protected $fillable = [
-        'lists_id', 'works_id', 'sort', 'state','type'
+        'lists_id', 'works_id', 'sort', 'state', 'type'
     ];
 
     /**
@@ -25,14 +25,15 @@ class ListsWork extends Model
 
         $lists = ListsWork::with(['lists' => function ($query) {
             $query->select('id', 'title', 'subtitle', 'cover');
-        }, 'works' => function ($query) {
+        }, 'works'                        => function ($query) {
             $query->select('id', 'user_id', 'title', 'cover_img');
-        }, 'works.user' => function ($query) {
+        }, 'works.user'                   => function ($query) {
             $query->select('id', 'username', 'nick_name');
         }])->whereIn('lists_id', $ids)
-            ->get()
-            ->toArray();
-        $arr = [];
+                          ->where('app_project_type', '=', APP_PROJECT_TYPE)
+                          ->get()
+                          ->toArray();
+        $arr   = [];
         foreach ($lists as $v) {
             $arr[$v['lists_id']][] = $v;
         }
@@ -41,17 +42,21 @@ class ListsWork extends Model
 
     public function lists()
     {
-        return $this->belongsToMany('App\Models\Lists', 'nlsg_lists_work', 'lists_id', 'works_id');
+        return $this->belongsToMany(
+            'App\Models\Lists', 'nlsg_lists_work', 'lists_id', 'works_id'
+        )->where('app_project_type', '=', APP_PROJECT_TYPE);
     }
 
     public function wiki()
     {
-        return $this->belongsTo('App\Models\Wiki', 'works_id', 'id');
+        return $this->belongsTo('App\Models\Wiki', 'works_id', 'id')
+                    ->where('app_project_type', '=', APP_PROJECT_TYPE);
     }
 
     public function works()
     {
-        return $this->belongsTo('App\Models\Works', 'works_id', 'id');
+        return $this->belongsTo('App\Models\Works', 'works_id', 'id')
+                    ->where('app_project_type', '=', APP_PROJECT_TYPE);
     }
 
     public function goods()

@@ -55,6 +55,7 @@ class IndexController extends ControllerBackend
             $lives = Live::where('user_id', $this->user['user_id'])
                 ->where('status', 4)
                 ->where('begin_at', '>=', '2021-05-12 00:00:00')
+                ->where('app_project_type','=',APP_PROJECT_TYPE)
                 ->get()
                 ->toArray();
 
@@ -232,7 +233,7 @@ class IndexController extends ControllerBackend
         if (!empty($classify)){
             $query->where('classify','=',$classify);
         }
-
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
         //非超管角色可看live
         $live_id_role = self::getLiveRoleIdList($this->user);
         if ($live_id_role !== null) {
@@ -891,6 +892,7 @@ class IndexController extends ControllerBackend
             ->where('pri_level', 1)
             ->where('privilege', 2)
             ->where('is_del', 0)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->get()
             ->toArray();
         return success($users);

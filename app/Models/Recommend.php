@@ -41,6 +41,7 @@ class Recommend extends Base
         $ids = Recommend::where('position', $position)
             ->where('type', $type)
             ->where('status', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('sort')
             ->orderBy('created_at', 'desc')
             ->pluck('relation_id')
@@ -124,6 +125,7 @@ class Recommend extends Base
         $ids = Recommend::where('position', 1)
                ->where('type', 10)
                ->where('status', 1)
+               ->where('app_project_type','=',APP_PROJECT_TYPE)
                ->orderBy('sort')
                ->orderBy('created_at', 'desc')
                ->pluck('relation_id')
@@ -159,6 +161,7 @@ class Recommend extends Base
         $ids = Recommend::where('position', $position)
             ->where('type', $type)
             ->where('status', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('sort')
             ->orderBy('created_at', 'desc')
             ->pluck('relation_id')
@@ -170,6 +173,7 @@ class Recommend extends Base
             'is_free', 'helper','hide_sub_count')
             ->whereIn('id', $ids)
             ->where('is_del', 0)
+            ->where('app_project_type', APP_PROJECT_TYPE)
             ->orderBy('created_at', 'desc')
             ->first();
         $list->live_length = strtotime($list->end_at)-strtotime($list->begin_at);
@@ -189,6 +193,7 @@ class Recommend extends Base
     {
         $channel = LiveInfo::where('live_pid', $list->id)
             ->where('status', 1)
+            ->where('app_project_type', APP_PROJECT_TYPE)
             ->orderBy('id', 'desc')
             ->first();
         if ($channel){

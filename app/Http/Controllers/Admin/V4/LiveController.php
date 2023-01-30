@@ -46,6 +46,7 @@ class LiveController extends Controller
     {
         $lists = Live::select('id', 'user_id', 'title', 'price', 'is_finish', 'finished_at', 'status', 'created_at')
             ->where('status', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('created_at', 'desc')
             ->paginate(10)
             ->toArray();

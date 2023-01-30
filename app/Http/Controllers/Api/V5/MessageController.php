@@ -147,6 +147,7 @@ class MessageController extends Controller
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->where('is_send', 3)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('id','desc')
             ->paginate()->toArray();
 
@@ -245,6 +246,7 @@ class MessageController extends Controller
             ->whereIn('type', MessageType::get_comment_msg_type())
             ->where('id', $id)
             ->where('receive_user', $user_id)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->first()->toArray();
 
         $send_user=$items['send_user'];
@@ -292,6 +294,7 @@ class MessageController extends Controller
             ->where('comment_id', $items['comment_id'])
             ->whereRaw("( (to_uid={$user_id} and from_uid={$send_user}) or (to_uid={$send_user} and from_uid={$user_id}) )")
             ->where('status', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->select('id', 'comment_id', 'from_uid', 'to_uid', 'content', 'created_at','reply_pid')
             ->with([
                 'from_user:id,nickname,headimg,is_author',
@@ -330,6 +333,7 @@ class MessageController extends Controller
             ->where('relation_id', $items['comment']['relation_id'])
             ->where('info_id', $items['comment']['info_id'])
             ->where('status', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->with(['user:id,nickname,headimg,is_author'])
             ->orderBy('id','asc')->get()->toArray();
 
@@ -396,6 +400,7 @@ class MessageController extends Controller
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->where('is_send', 3)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('id','desc')
             ->paginate()->toArray();
 
@@ -482,6 +487,7 @@ class MessageController extends Controller
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->where('is_send', 3)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('id','desc')
             ->paginate()->toArray();
 
@@ -590,6 +596,7 @@ class MessageController extends Controller
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->where('is_send', 3)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('id','desc')
             ->paginate()->toArray();
 
@@ -664,6 +671,7 @@ class MessageController extends Controller
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->where('is_send', 3)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('id','desc')
             ->paginate()->toArray();
 
@@ -733,6 +741,7 @@ class MessageController extends Controller
             ->whereIn('type', $type_arr)
             ->where('receive_user', $user_id)
             ->where('is_send', 3)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('id','desc')
             ->paginate()->toArray();
 

@@ -198,7 +198,7 @@ class SubscribeController extends ControllerBackend {
         }
 
         $live_query = Live::query()->where('status', 4);
-
+        $live_query->where('app_project_type','=',APP_PROJECT_TYPE);
         if (!empty($live_id)) {   //管理员看全部
             $live_query->where('id', $live_id);
         }

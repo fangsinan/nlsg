@@ -28,7 +28,10 @@ class LikeController extends Controller
             return error(1000, '参数不全');
         }
 
-        $list = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=> $this->user['id'], 'type'=>$type])->first();
+        $list = Like::where([
+            'comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=> $this->user['id'], 'type'=>$type,
+            'app_project_type'=>APP_PROJECT_TYPE,
+        ])->first();
         if (!empty($list)){
             return error(1000,'不要重复操作');
         }
@@ -80,7 +83,10 @@ class LikeController extends Controller
             return error(1000, '参数不全');
         }
 
-        $list = Like::where(['comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=> $this->user['id'], 'type'=>$type, 'status' => 1,])->first();
+        $list = Like::where([
+            'comment_type'=>$comment_type, 'relation_id'=> $id, 'user_id'=> $this->user['id'],
+            'type'=>$type, 'status' => 1,'app_project_type'=>APP_PROJECT_TYPE,
+            ])->first();
         if (!empty($list)){
             return error(1000,'不要重复操作');
         }
@@ -141,6 +147,7 @@ class LikeController extends Controller
             'user_id'=>$this->user['id'],
             'type'=>$type,
             'status' => 1,
+            'app_project_type'=>APP_PROJECT_TYPE,
         ])->first();
         $res = $query_res->update([
             "status" => 2,

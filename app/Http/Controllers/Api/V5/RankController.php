@@ -105,6 +105,7 @@ class RankController extends Controller
 
         $lists = Lists::select('id', 'title', 'num', 'cover')
             ->where('id', $lists_id)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('created_at', 'desc')
             ->first();
         if ( ! $lists) {
@@ -112,6 +113,7 @@ class RankController extends Controller
         }
         $works_id = ListsWork::where('lists_id', $lists->id)
             ->where('state', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('sort')
             ->orderBy('created_at', 'desc')
             ->pluck('works_id')
@@ -119,6 +121,7 @@ class RankController extends Controller
         $works = Works::with('user:id,nickname,headimg,teacher_title')
             ->whereIn('id', $works_id)
             ->whereIn('type', [2,3])
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->select('id', 'user_id', 'title', 'subtitle', 'cover_img', 'chapter_num', 'subscribe_num', 'is_free',
                 'price')
             ->orderByRaw('FIELD(id,'.implode(',', $works_id).')')

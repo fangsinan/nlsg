@@ -7,7 +7,10 @@ class ColumnWeekReward extends Base
     protected $table = 'nlsg_column_week_reward';
 
 
-    protected  $fillable = ['relation_id','user_id','is_get','is_end','end_time','os_type','week_id','speed_status','camp_id','week_num','prize_id'];
+    protected  $fillable = [
+        'relation_id','user_id','is_get','is_end','end_time','os_type','week_id',
+        'speed_status','camp_id','week_num','prize_id','app_project_type',
+    ];
 
 
 
@@ -57,6 +60,7 @@ class ColumnWeekReward extends Base
             'os_type'       => $os_type,
             'week_id'       => $weeks['id'],
             'prize_id'       => $prize['id'],
+            'app_project_type'=>APP_PROJECT_TYPE,
          ];
 
 

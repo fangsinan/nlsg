@@ -12,7 +12,7 @@ class CashData extends Base
         'default_account', 'is_pass', 'wx_account', 'WxNickName', 'app_wx_account', 'app_WxNickName',
         'balance2017_cash_time',
         'type', 'org_type', 'org_name', 'org_area', 'org_address', 'org_license_picture', 'bank_opening', 'bank_number',
-        'bank_permit_picture', 'log',
+        'bank_permit_picture', 'log','app_project_type',
     ];
 
     public function user()

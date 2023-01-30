@@ -10,7 +10,7 @@ class Comment extends Base
 {
     const DB_TABLE = 'nlsg_comment';
     protected $table = 'nlsg_comment';
-    protected $fillable = ['user_id', 'pid', 'relation_id', 'content', 'type', 'status', 'info_id'];
+    protected $fillable = ['user_id', 'pid', 'relation_id', 'content', 'type', 'status', 'info_id','app_project_type'];
 
     /**
      * 想法
@@ -52,6 +52,7 @@ class Comment extends Base
                 'share_num', 'like_num', 'reply_num', 'created_at', 'is_quality','is_top')
             ->where('relation_id', $id)
             ->where('type', $type)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->where('status', 1);
 
         if ($info_id) {
@@ -158,7 +159,7 @@ class Comment extends Base
         ])
             ->select('id', 'pid', 'user_id', 'relation_id', 'is_quality', 'content',
                 'forward_num', 'share_num', 'like_num', 'reply_num', 'reward_num', 'created_at', 'type')
-            ->where(['id' => $id, 'status' => 1])
+            ->where(['id' => $id, 'status' => 1,'app_project_type'=>APP_PROJECT_TYPE])
             ->first();
         if ( ! $comment) {
             return false;
@@ -198,6 +199,7 @@ class Comment extends Base
             ->select(['id', 'from_uid', 'to_uid', 'content', 'created_at'])
             ->where('comment_id', $id)
             ->where('status', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->paginate(10)
             ->toArray();
         if ($reply['data']) {
@@ -237,27 +239,33 @@ class Comment extends Base
 
     public function reward()
     {
-        return $this->hasMany(Order::class, 'relation_id', 'id');
+        return $this->hasMany(Order::class, 'relation_id', 'id')
+            ->where('app_project_type','=',APP_PROJECT_TYPE);
     }
 
     public function quote()
     {
-        return $this->hasOne(Comment::class, 'id', 'pid');
+        return $this->hasOne(Comment::class, 'id', 'pid')
+                    ->where('app_project_type','=',APP_PROJECT_TYPE);
     }
 
     public function reply()
     {
-        return $this->hasMany(CommentReply::class, 'comment_id', 'id');
+        return $this->hasMany(CommentReply::class, 'comment_id', 'id')
+                    ->where('app_project_type','=',APP_PROJECT_TYPE);
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id')
+                    ->where('app_project_type','=',APP_PROJECT_TYPE);
     }
 
     public function attach()
     {
-        return $this->hasMany(Attach::class, 'relation_id', 'id')->where('type', 1);
+        return $this->hasMany(Attach::class, 'relation_id', 'id')
+                    ->where('type', 1)
+                    ->where('app_project_type','=',APP_PROJECT_TYPE);
     }
 
     public static function convert($lists)
@@ -293,22 +301,26 @@ class Comment extends Base
 
     public function column()
     {
-        return $this->belongsTo(Column::class, 'relation_id', 'id');
+        return $this->belongsTo(Column::class, 'relation_id', 'id')
+                    ->where('app_project_type','=',APP_PROJECT_TYPE);
     }
 
     public function work()
     {
-        return $this->belongsTo(Works::class, 'relation_id', 'id');
+        return $this->belongsTo(Works::class, 'relation_id', 'id')
+                    ->where('app_project_type','=',APP_PROJECT_TYPE);
     }
 
     public function wiki()
     {
-        return $this->belongsTo(Wiki::class, 'relation_id', 'id');
+        return $this->belongsTo(Wiki::class, 'relation_id', 'id')
+                    ->where('app_project_type','=',APP_PROJECT_TYPE);
     }
 
     public function info()
     {
-        return $this->belongsTo(WorksInfo::class, 'info_id', 'id');
+        return $this->belongsTo(WorksInfo::class, 'info_id', 'id')
+                    ->where('app_project_type','=',APP_PROJECT_TYPE);
     }
 
 

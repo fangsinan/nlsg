@@ -79,9 +79,9 @@ class IndexController extends Controller
 
         $filed = ["id","title","icon_pic","jump_type","modular_type","sort","jump_url",'icon_mark','icon_mark_rang','lists_id'];
 
-        $head   = RecommendConfig::select($filed)->where(['show_position'=>1, 'is_show'=>1, ])->whereIn('version_show',$version_show)->OrderBy("sort",'asc')->get()->toArray();
-        $bottom = RecommendConfig::select($filed)->where(['show_position'=>3, 'is_show'=>1, ])->whereIn('version_show',$version_show)->OrderBy("sort",'asc')->get()->toArray();
-        $icon   = RecommendConfig::select($filed)->where(['show_position'=>2, 'is_show'=>1, ])->whereIn('version_show',$version_show)->OrderBy("sort",'asc')->get()->toArray();
+        $head   = RecommendConfig::select($filed)->where(['show_position'=>1, 'is_show'=>1,'app_project_type'=>APP_PROJECT_TYPE, ])->whereIn('version_show',$version_show)->OrderBy("sort",'asc')->get()->toArray();
+        $bottom = RecommendConfig::select($filed)->where(['show_position'=>3, 'is_show'=>1,'app_project_type'=>APP_PROJECT_TYPE, ])->whereIn('version_show',$version_show)->OrderBy("sort",'asc')->get()->toArray();
+        $icon   = RecommendConfig::select($filed)->where(['show_position'=>2, 'is_show'=>1,'app_project_type'=>APP_PROJECT_TYPE, ])->whereIn('version_show',$version_show)->OrderBy("sort",'asc')->get()->toArray();
         foreach ($bottom as &$value){
             if($value['modular_type'] == 2){ //icon
                 $value['icon'] = $icon;
@@ -139,7 +139,7 @@ class IndexController extends Controller
         $res["teacher_list"] = $recommendModel->getIndexRecommend(14, 35);
         //精品专题
         $res['special_list'] = $recommendModel->getIndexRecommend(15, 37);
- 
+
         //榜单
         $res['hot_list'] = $recommendModel->getIndexRecommend(11, 38,3);
 
@@ -194,7 +194,7 @@ class IndexController extends Controller
         }
 
         $user_id = $this->user['id'] ?? 0;
-        
+
 
         $recommendModel = new Recommend();
        $lists = $recommendModel->getLiveRecommend($user_id, 7, 1);
@@ -391,7 +391,7 @@ class IndexController extends Controller
                 'nlsg_tel' => ConfigModel::getData(64),
             ];
             return success($data);
-    
+
         }
 
 }

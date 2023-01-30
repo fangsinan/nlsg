@@ -114,7 +114,7 @@ class WechatPay extends Controller
 
 
         //支付处理正确-判断是否已处理过支付状态
-        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0])->first();
+        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0,'app_project_type' => APP_PROJECT_TYPE,])->first();
 
         if (!empty($orderInfo)) {
             $orderInfo = $orderInfo->toArray();
@@ -148,6 +148,7 @@ class WechatPay extends Controller
                     'client' => 1, //微信
                     'order_type' => 17, //360会员
                     'status' => 1,
+                    'app_project_type' => APP_PROJECT_TYPE,
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);
                 $Sy_Rst = true;
@@ -272,7 +273,7 @@ class WechatPay extends Controller
 
 
                             //查看当前有效用户
-                            $UserAttInfo = VipUser::where(['user_id' => $user_id, 'status' => 1, 'is_default' => 1])->first()->toArray();
+                            $UserAttInfo = VipUser::where(['user_id' => $user_id, 'status' => 1, 'is_default' => 1,])->first()->toArray();
 
                             $vip_id = $UserAttInfo['id'];
 
@@ -317,7 +318,7 @@ class WechatPay extends Controller
                         /*****************     开通360   有销讲老师的划分收益【】  ****************/
                         if (!empty($map) && (empty($sales_id) || $vip_order_type == 2)) {  //收益存在 并且 (销讲老师表id为空 或者 续费) 正常执行收益流程  vip_order_type1开通  2续费
                             //防止重复添加收入
-                            $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
+                            $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum'],'app_project_type'=>APP_PROJECT_TYPE];
                             $PrdInfo = PayRecordDetail::where($where)->first('id');
                             if (empty($PrdInfo)) {
                                 $pay_record_flag = 1;
@@ -359,7 +360,7 @@ class WechatPay extends Controller
                     if ($twitter_top[0] > 0) {
                         $twitter_top_vip_id = VipUser::where(['user_id' => $twitter_top[0], 'is_default' => 1, 'status' => 1])->first('id');
                         if ($twitter_top_vip_id){
-                            $top_map = array('user_id' => $twitter_top[0], "type" => 11, "ordernum" => $out_trade_no, 'price' => 0, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $twitter_top_vip_id->id);
+                            $top_map = array('user_id' => $twitter_top[0], "type" => 11, "ordernum" => $out_trade_no, 'price' => 0, "ctime" => $time, 'vip_id' => $vip_id, 'user_vip_id' => $twitter_top_vip_id->id,'app_project_type'=>APP_PROJECT_TYPE);
                             $top_Sy_Rst = PayRecordDetail::firstOrCreate($top_map);
                         }
                     }
@@ -425,7 +426,7 @@ class WechatPay extends Controller
 
 
         //支付处理正确-判断是否已处理过支付状态
-        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0])->first();
+        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0,'app_project_type'=>APP_PROJECT_TYPE])->first();
 
         if (!empty($orderInfo)) {
             $orderInfo = $orderInfo->toArray();
@@ -458,6 +459,7 @@ class WechatPay extends Controller
                     'client' => 1, //微信
                     'order_type' => 21, //
                     'status' => 1,
+                    'app_project_type'=>APP_PROJECT_TYPE,
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);
 
@@ -480,8 +482,7 @@ class WechatPay extends Controller
 //
 //                }else{
 //                }
-                $column_id = OfflineProducts::where(['id'=>$orderInfo['relation_id']])
-                ->value("column_id");
+                $column_id = OfflineProducts::where(['id'=>$orderInfo['relation_id']])->value("column_id");
                 $subscribe = [
                     'user_id' => $user_id, //会员id
                     'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
@@ -490,6 +491,7 @@ class WechatPay extends Controller
                     'order_id' => $orderId, //订单id
                     'relation_id' => $orderInfo['relation_id'],
                     'parent_column_id' => $column_id??0,
+                    'app_project_type'=>APP_PROJECT_TYPE,
                 ];
 
 
@@ -583,6 +585,7 @@ class WechatPay extends Controller
         Order::where(['id' => $orderInfo['id'] ])->update([
             'textbook_id'=> $textbook_id,
             'address_id'=>$address_id->id ?? 0,
+            'app_project_type'=>APP_PROJECT_TYPE,
         ]);
         //erp同步表
         OrderErpList::addList($orderInfo['id']);
@@ -596,6 +599,7 @@ class WechatPay extends Controller
                 'user_id'       => $user['id'],
 				'nickname'       => $user['nickname'],
                 'order_id'      => $order_id,
+                'app_project_type'      => APP_PROJECT_TYPE,
                 'message'     => "用户id：".$user['id']. "   手机号：".$user['phone'].'   昵称：'.$user['nickname'],
                 'created_at'    =>date('Y-m-d H:i:s', time())
             ]);
@@ -724,7 +728,7 @@ class WechatPay extends Controller
 
 
         //支付处理正确-判断是否已处理过支付状态
-        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0])->first();
+        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0,'app_project_type' =>APP_PROJECT_TYPE])->first();
 
         if (!empty($orderInfo)) {
             $orderInfo = $orderInfo->toArray();
@@ -774,7 +778,8 @@ class WechatPay extends Controller
                     'user_id' => $user_id, //会员id
                     'type' => $pay_type, //1：微信  2：支付宝
                     'order_type' => 16,//nlsg_pay_record表type 16直播
-                    'status' => 1
+                    'status' => 1,
+                    'app_project_type' => APP_PROJECT_TYPE,
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);
 
@@ -786,6 +791,7 @@ class WechatPay extends Controller
                     'order_id' => $orderId, //订单id
                     'relation_id' => $live_id,
                     'twitter_id' => $orderInfo['twitter_id'],
+                    'app_project_type' => APP_PROJECT_TYPE,
                 ];
 
                 $userdata = User::find($user_id);
@@ -809,6 +815,7 @@ class WechatPay extends Controller
                         'status' => 1,
                         'order_id' => $orderId, //订单id
                         'relation_id' => $liveData['relation_live'],
+                        'app_project_type' => APP_PROJECT_TYPE,
                     ];
                     Subscribe::firstOrCreate($subscribe);
                     Live::where('id', $liveData['relation_live'])->increment('order_num');
@@ -860,10 +867,10 @@ class WechatPay extends Controller
                     $liveCountDown['new_vip_uid'] = $twitter_id;
                     //固定收益50
                     $ProfitPrice = $liveData['twitter_money'];
-                    $map = array('user_id' => $twitter_id, "type" => 10, "ordernum" => $out_trade_no, 'price' => $ProfitPrice,);
+                    $map = array('user_id' => $twitter_id, "type" => 10, "ordernum" => $out_trade_no, 'price' => $ProfitPrice, 'app_project_type' => APP_PROJECT_TYPE,);
                     if (!empty($map)) {
                         //防止重复添加收入
-                        $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
+                        $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum'], 'app_project_type' => APP_PROJECT_TYPE,];
                         $PrdInfo = PayRecordDetail::where($where)->first();
                         if (empty($PrdInfo)) {
                             $pay_record_flag = 1;
@@ -982,6 +989,7 @@ class WechatPay extends Controller
             'order_id' =>$order['id'],
             'ordernum' =>$order['ordernum'],
             'is_zero' =>$order['is_zero']??1,
+            'app_project_type' =>APP_PROJECT_TYPE,
         ]);
         return ;
     }
@@ -1250,7 +1258,7 @@ class WechatPay extends Controller
         $pay_type = $data['pay_type'];
 
         //支付处理正确-判断是否已处理过支付状态
-        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0])->first();
+        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0, 'app_project_type' => APP_PROJECT_TYPE])->first();
         if (!empty($orderInfo)) {
             $orderInfo = $orderInfo->toArray();
             $starttime = strtotime(date('Y-m-d', $time));
@@ -1310,7 +1318,8 @@ class WechatPay extends Controller
                     'type' => $pay_type, //1：微信  2：支付宝
 //                    'client'         => $data['client'],            //app微信
                     'order_type' => $order_type, //1 专栏 2 会员  3充值  4财务打款 5 打赏
-                    'status' => 1                           //收入
+                    'status' => 1,                           //收入
+                    'app_project_type' => APP_PROJECT_TYPE,
                 ];
 
                 $recordRst = PayRecord::firstOrCreate($record);
@@ -1352,7 +1361,9 @@ class WechatPay extends Controller
 //                                $where = ['user_id'=>$twitter_id,'type'=>[1,2,3],'status'=>1];
 //                                $ProfitInfo = $AgentProfitObj->getOne($AgentProfitObj::$table,$where,['sum(price) price']);
 
-                                $ProfitInfoPrice = AgentProfitLog::where(['user_id' => $twitter_id, 'status' => 1])->wherIn('type', [1, 2, 3])->sum('price');
+                                $ProfitInfoPrice = AgentProfitLog::where(['user_id' => $twitter_id, 'status' => 1])
+                                    ->where('app_project_type',APP_PROJECT_TYPE)
+                                    ->wherIn('type', [1, 2, 3])->sum('price');
                                 if (empty($ProfitInfoPrice)) {
                                     $sumPrice = 0;
                                 } else {
@@ -1369,6 +1380,7 @@ class WechatPay extends Controller
                                     $LogData['num'] = 1;
                                     $LogData['price'] = $ColumnInfo['price'];
                                     $LogData['ctime'] = $time;
+                                    $LogData['app_project_type'] = APP_PROJECT_TYPE;
                                     AgentProfitLog::create($LogData);
                                     //$AgentProfitObj->add($AgentProfitObj::$table,$LogData); //添加记录
                                     $ProfitPrice = $ColumnInfo['price']; //返现处理
@@ -1430,7 +1442,7 @@ class WechatPay extends Controller
                 if (!empty($map) && $orderInfo['type'] != 18) {
                     //$PayRDObj = new PayRecordDetail();
                     //防止重复添加收入
-                    $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum']];
+                    $where = ['user_id' => $map['user_id'], 'type' => $map['type'], 'ordernum' => $map['ordernum'], 'app_project_type'=>APP_PROJECT_TYPE];
                     $PrdInfo = PayRecordDetail::where($where)->first();
                     if (empty($PrdInfo)) {
                         $pay_record_flag = 1;
@@ -1444,6 +1456,7 @@ class WechatPay extends Controller
 
                 $check_channel_works_list = ChannelWorksList::where('works_id', '=', $teacher_id)
                     ->where('type', '=', 1)
+                    ->where('app_project_type', '=', APP_PROJECT_TYPE)
                     ->first();
                 if (empty($check_channel_works_list)) {
                     $channel_works_list_id = 0;
@@ -1462,6 +1475,7 @@ class WechatPay extends Controller
                     'service_id' => $orderInfo['service_id'],
                     'channel_works_list_id' => $channel_works_list_id,
                     'parent_column_id' => $teacher_id,
+                    'app_project_type' => APP_PROJECT_TYPE,
                 ];
                 $subscribeRst = Subscribe::firstOrCreate($subscribe);
 
@@ -1802,7 +1816,7 @@ class WechatPay extends Controller
 
 
         //支付处理正确-判断是否已处理过支付状态
-        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0])->first();
+        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0,'app_project_type'=>APP_PROJECT_TYPE])->first();
 
         if (!empty($orderInfo)) {
             $orderInfo = $orderInfo->toArray();
@@ -1830,7 +1844,8 @@ class WechatPay extends Controller
                     'type' => $pay_type, //1：微信  2：支付宝
 //                    'client'         => $data['client'],          //微信
                     'order_type' => 5, //精品课
-                    'status' => 1                         //收入
+                    'status' => 1,                         //收入
+                    'app_project_type'=>APP_PROJECT_TYPE,
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);
 
@@ -1871,7 +1886,7 @@ class WechatPay extends Controller
         $pay_type = $data['pay_type'];
 
         //支付处理正确-判断是否已处理过支付状态
-        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0])->first();
+        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0,'app_project_type'=>APP_PROJECT_TYPE,])->first();
 
         if (!empty($orderInfo)) {
             $orderInfo = $orderInfo->toArray();
@@ -1903,7 +1918,8 @@ class WechatPay extends Controller
                     'type' => $pay_type, //1：微信  2：支付宝
                     //'client' => $data['client'], //app微信
                     'order_type' => 18, //能量币充值
-                    'status' => 1                   //收入
+                    'status' => 1,                   //收入
+                    'app_project_type'=>APP_PROJECT_TYPE,
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);
 
@@ -1952,7 +1968,7 @@ class WechatPay extends Controller
 
 
         //支付处理正确-判断是否已处理过支付状态
-        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0])->first();
+        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0,'app_project_type'=>APP_PROJECT_TYPE,])->first();
 
         if (!empty($orderInfo)) {
             $orderInfo = $orderInfo->toArray();
@@ -1978,7 +1994,8 @@ class WechatPay extends Controller
                     'user_id' => $user_id, //会员id
                     'type' => $pay_type, //1：微信  2：支付宝
                     'order_type' => 20,//nlsg_pay_record表type 16直播
-                    'status' => 1
+                    'status' => 1,
+                    'app_project_type'=>APP_PROJECT_TYPE,
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);
 
@@ -2032,7 +2049,7 @@ class WechatPay extends Controller
 
 
         //支付处理正确-判断是否已处理过支付状态
-        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0])->first();
+        $orderInfo = Order::select()->where(['ordernum' => $out_trade_no, 'status' => 0,'app_project_type'=>APP_PROJECT_TYPE,])->first();
 
         if (!empty($orderInfo)) {
             $orderInfo = $orderInfo->toArray();
@@ -2063,7 +2080,8 @@ class WechatPay extends Controller
                     'type' => $pay_type, //1：微信  2：支付宝
 //                    'client'         => $data['client'],          //微信
                     'order_type' => 23, //精品课
-                    'status' => 1                         //收入
+                    'status' => 1,                         //收入
+                    'app_project_type'=>APP_PROJECT_TYPE,
                 ];
                 $recordRst = PayRecord::firstOrCreate($record);
 
@@ -2080,6 +2098,7 @@ class WechatPay extends Controller
                         'relation_id' => $orderInfo['relation_id'],
                         'start_time' => date("Y-m-d H:i:s", $starttime),
                         'end_time' => date("Y-m-d H:i:s", $endtime),
+                        'app_project_type'=>APP_PROJECT_TYPE,
                     ];
 
                     $subscribeRst = Subscribe::firstOrCreate($subscribe);
@@ -2090,6 +2109,7 @@ class WechatPay extends Controller
                         'type'      => 8, //专题
                         'status'    => 1,
                         'relation_id' => $orderInfo['relation_id'],
+                        'app_project_type'=>APP_PROJECT_TYPE,
                     ])->update([
                         'end_time' => DB::raw("DATE_ADD(end_time, interval+1 year)"),
                         ]);

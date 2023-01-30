@@ -44,7 +44,7 @@ class LiveConsole extends Base
             return ['code' => false, 'msg' => '参数错误'];
         }
         $live = Live::whereId($params['id'])->where('user_id', $user_id)
-            ->first();
+                    ->first();
         if (empty($live)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
@@ -79,10 +79,10 @@ class LiveConsole extends Base
     {
         if ($user_id) {
             $check = LiveUserPrivilege::where('user_id', '=', $user_id)
-                ->where('pri_level', '=', 1)
-                ->where('privilege', '=', 2)
-                ->where('is_del', '=', 0)
-                ->first();
+                                      ->where('pri_level', '=', 1)
+                                      ->where('privilege', '=', 2)
+                                      ->where('is_del', '=', 0)
+                                      ->first();
             if ($check) {
                 return true;
             } else {
@@ -110,8 +110,8 @@ class LiveConsole extends Base
 
     public function add($params, $user_id)
     {
-        $now = time();
-        $now_date = date('Y-m-d H:i:s', $now);
+        $now        = time();
+        $now_date   = date('Y-m-d H:i:s', $now);
         $check_user = self::checkUserPrivilege($user_id);
         if ($check_user === false) {
             return ['code' => false, 'msg' => '无权限'];
@@ -136,7 +136,7 @@ class LiveConsole extends Base
             $live_data['price'] = 0;
         }
         $live_data['playback_price'] = $params['playback_price'] ?? 0;
-        $live_data['twitter_money'] = $params['twitter_money'] ?? 0;
+        $live_data['twitter_money']  = $params['twitter_money'] ?? 0;
 
         if (empty($params['title'] ?? '')) {
             return ['code' => false, 'msg' => '直播名称错误'];
@@ -168,15 +168,16 @@ class LiveConsole extends Base
         if (!empty($params['password'] ?? '')) {
             $live_data['password'] = bcrypt(trim($params['password']));
         }
-        $live_data['title'] = $params['title'];
-        $live_data['describe'] = $params['describe'];
-        $live_data['cover_img'] = $params['cover_img'];
-        $live_data['msg'] = $params['msg'];
-        $live_data['content'] = $params['content'] ?? '';
-        $live_data['can_push'] = $params['can_push'] ?? 0;
-        $live_data['is_free'] = $params['is_free'];
-        $live_begin_at = 0;
-        $live_end_at = 0;
+        $live_data['title']            = $params['title'];
+        $live_data['describe']         = $params['describe'];
+        $live_data['cover_img']        = $params['cover_img'];
+        $live_data['msg']              = $params['msg'];
+        $live_data['content']          = $params['content'] ?? '';
+        $live_data['can_push']         = $params['can_push'] ?? 0;
+        $live_data['is_free']          = $params['is_free'];
+        $live_data['app_project_type'] = APP_PROJECT_TYPE;
+        $live_begin_at                 = 0;
+        $live_end_at                   = 0;
 
         if (empty($params['list'] ?? '')) {
             return ['code' => false, 'msg' => '直播时间信息错误'];
@@ -244,17 +245,17 @@ class LiveConsole extends Base
 //                $temp_get_url = $this->getPushUrl(
 //                    rand(100, 999) . $user_id . $now, strtotime($temp_push_end_time)
 //                );
-                $temp_get_url = $this->getPushUrl(
+                $temp_get_url                        = $this->getPushUrl(
                     md5($user_id . $temp_push_end_time), strtotime($temp_push_end_time)
                 );
                 $params['list'][$k]['push_live_url'] = $temp_get_url['push_url'];
-                $params['list'][$k]['live_url'] = $temp_get_url['play_url'];
-                $params['list'][$k]['live_url_flv'] = $temp_get_url['play_url_flv'];
+                $params['list'][$k]['live_url']      = $temp_get_url['play_url'];
+                $params['list'][$k]['live_url_flv']  = $temp_get_url['play_url_flv'];
             }
         }
 
         $live_data['begin_at'] = $live_begin_at;
-        $live_data['end_at'] = $live_end_at;
+        $live_data['end_at']   = $live_end_at;
 
         DB::beginTransaction();
 
@@ -264,10 +265,10 @@ class LiveConsole extends Base
                 return ['code' => false, 'msg' => 'id错误'];
             }
             $live_data['updated_at'] = $now_date;
-            $check_live_type = LiveInfo::where('live_pid', '=', $params['id'])
-                ->where('end_at', '<', $now_date)
-                ->where('status', '=', 1)
-                ->first();
+            $check_live_type         = LiveInfo::where('live_pid', '=', $params['id'])
+                                               ->where('end_at', '<', $now_date)
+                                               ->where('status', '=', 1)
+                                               ->first();
             if ($check_live_type) {
                 $live_data['type'] = 2;
             } else {
@@ -286,14 +287,14 @@ class LiveConsole extends Base
             if (1) {
                 //直播只能单场,修改为删除所有已有直播场次
                 $info_del_res = LiveInfo::where('live_pid', '=', $params['id'])
-                    ->where('status', '=', 1)
-                    ->delete();
+                                        ->where('status', '=', 1)
+                                        ->delete();
             } else {
                 //删除未开始的直播
                 $info_del_res = LiveInfo::where('live_pid', '=', $params['id'])
-                    ->where('begin_at', '>', $now_date)
-                    ->where('status', '=', 1)
-                    ->delete();
+                                        ->where('begin_at', '>', $now_date)
+                                        ->where('status', '=', 1)
+                                        ->delete();
             }
 
             if ($info_del_res === false) {
@@ -301,7 +302,7 @@ class LiveConsole extends Base
                 return ['code' => false, 'msg' => '添加失败', 'ps' => __LINE__];
             }
         } else {
-            $live_data['status'] = 1;
+            $live_data['status']     = 1;
             $live_data['created_at'] = $live_data['updated_at'] = $now_date;
             //计算单场多场
             if (count($params['list']) > 1) {
@@ -319,10 +320,11 @@ class LiveConsole extends Base
         }
 
         foreach ($params['list'] as &$v) {
-            $v['live_pid'] = $live_id;
-            $v['id'] = $live_id;
-            $v['user_id'] = $user_id;
-            $v['created_at'] = $v['updated_at'] = $now_date;
+            $v['app_project_type'] = APP_PROJECT_TYPE;
+            $v['live_pid']         = $live_id;
+            $v['id']               = $live_id;
+            $v['user_id']          = $user_id;
+            $v['created_at']       = $v['updated_at'] = $now_date;
         }
 
         $info_res = DB::table('nlsg_live_info')->insert($params['list']);
@@ -333,7 +335,7 @@ class LiveConsole extends Base
 
         //写入权限表
         if (!empty($params['helper'])) {
-            $helper_list = explode(',', $params['helper']);
+            $helper_list      = explode(',', $params['helper']);
             $helper_user_list = User::whereIn('phone', $helper_list)->select(['id'])->get()->toArray();
             $helper_user_list = array_column($helper_user_list, 'id');
 
@@ -341,10 +343,10 @@ class LiveConsole extends Base
             foreach ($helper_user_list as $hv) {
                 $check_hl = LiveUserPrivilege::where('user_id', '=', $hv)->where('is_del', '=', 0)->first();
                 if (!$check_hl) {
-                    $temp_helper_add_data['user_id'] = $hv;
-                    $temp_helper_add_data['pri_level'] = 1;
+                    $temp_helper_add_data['user_id']    = $hv;
+                    $temp_helper_add_data['pri_level']  = 1;
                     $temp_helper_add_data['created_at'] = $now_date;
-                    $helper_add_data[] = $temp_helper_add_data;
+                    $helper_add_data[]                  = $temp_helper_add_data;
                 }
             }
             if ($helper_add_data) {
@@ -366,12 +368,12 @@ class LiveConsole extends Base
             return ['code' => false, 'msg' => '参数错误'];
         }
         $live = self::whereId($id)
-            ->where('user_id', $user_id)
-            ->select(['id', 'title', 'describe', 'cover_img', 'status', 'msg', 'content', 'created_at',
-                'twitter_money', 'reason', 'check_time', 'price', 'playback_price', 'helper', 'is_free',
-                'is_show', 'can_push', 'is_finish', 'user_id'])
-            ->with(['infoList', 'userInfo'])
-            ->first();
+                    ->where('user_id', $user_id)
+                    ->select(['id', 'title', 'describe', 'cover_img', 'status', 'msg', 'content', 'created_at',
+                              'twitter_money', 'reason', 'check_time', 'price', 'playback_price', 'helper', 'is_free',
+                              'is_show', 'can_push', 'is_finish', 'user_id'])
+                    ->with(['infoList', 'userInfo'])
+                    ->first();
         if (empty($live)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
@@ -383,7 +385,7 @@ class LiveConsole extends Base
     //todo 直播的相关统计
     public function liveStatistisc($live_id, $user_id)
     {
-        $live_info = LiveInfo::where('live_pid', '=', $live_id)->select(['id'])->get()->toArray();
+        $live_info    = LiveInfo::where('live_pid', '=', $live_id)->select(['id'])->get()->toArray();
         $live_info_id = array_column($live_info, 'id');
 
         return [
@@ -391,25 +393,25 @@ class LiveConsole extends Base
             ['key' => '观看人数', 'value' => LiveWatchRecord::where('live_id', '=', $live_id)->count()],
             ['key' => '打赏人数', 'value' => Order::where('type', '=', 5)->where('relation_id', '=', $live_id)->where('status', '=', 1)->count()],
             ['key' => '打赏金额', 'value' => Order::where('type', '=', 5)->where('relation_id', '=', $live_id)->where('status', '=', 1)->sum('price')],
-//            ['key' => '分销收入', 'value' => '100元'],
-//            ['key' => '报名收入', 'value' => '100元'],
-//            ['key' => '回放收入', 'value' => '100元'],
+            //            ['key' => '分销收入', 'value' => '100元'],
+            //            ['key' => '报名收入', 'value' => '100元'],
+            //            ['key' => '回放收入', 'value' => '100元'],
             ['key' => '报名流水', 'value' => Order::where('type', '=', 10)->where('relation_id', '=', $live_id)->where('status', '=', 1)->sum('price')],
-//            ['key' => '回放流水', 'value' => '100元'],
+            //            ['key' => '回放流水', 'value' => '100元'],
         ];
     }
 
     public function infoList()
     {
         return $this->hasMany('App\Models\LiveInfo', 'live_pid', 'id')
-            ->where('status', '=', 1)
-            ->select(['id', 'begin_at', 'end_at', 'length', 'live_pid', 'playback_url', 'is_finish']);
+                    ->where('status', '=', 1)
+                    ->select(['id', 'begin_at', 'end_at', 'length', 'live_pid', 'playback_url', 'is_finish']);
     }
 
     public function userInfo()
     {
         return $this->hasOne(User::class, 'id', 'user_id')
-            ->select(['id', 'nickname']);
+                    ->select(['id', 'nickname']);
     }
 
     public function list($params, $user_id)
@@ -421,19 +423,20 @@ class LiveConsole extends Base
         //list_flag = 3 待直播 status = 4  and info end_time > now
         //list_flag = 4 已结束 status = 4 and info end_time < now
 
-        $now = time();
+        $now      = time();
         $now_date = date('Y-m-d H:i:s', $now);
-        $page = intval($params['page'] ?? 1);
-        $size = intval($params['size'] ?? 10);
+        $page     = intval($params['page'] ?? 1);
+        $size     = intval($params['size'] ?? 10);
 
         $query = self::from('nlsg_live as l')
-            ->leftJoin('nlsg_user as u', 'l.user_id', '=', 'u.id')
-            ->where('l.user_id', '=', $user_id)
-            ->where('l.is_del', '=', 0);
+                     ->leftJoin('nlsg_user as u', 'l.user_id', '=', 'u.id')
+                     ->where('l.user_id', '=', $user_id)
+                     ->where('l.app_project_type', '=', APP_PROJECT_TYPE)
+                     ->where('l.is_del', '=', 0);
 
         $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content', 'l.twitter_money',
-            'l.reason', 'l.check_time', 'l.price', 'l.playback_price', 'l.helper', 'l.is_free', 'l.is_show', 'l.can_push',
-            'u.nickname', 'l.end_at', DB::raw('(SELECT count(1)*2 = SUM(`status`)
+                   'l.reason', 'l.check_time', 'l.price', 'l.playback_price', 'l.helper', 'l.is_free', 'l.is_show', 'l.can_push',
+                   'u.nickname', 'l.end_at', DB::raw('(SELECT count(1)*2 = SUM(`status`)
             from nlsg_live_info where live_pid = l.id) as all_pass_flag')];
 
         switch (intval($params['list_flag'] ?? 0)) {
@@ -445,15 +448,15 @@ class LiveConsole extends Base
                 break;
             case 3:
                 $query->where('l.status', '=', 4)
-                    ->where('l.end_at', '>', $now_date)
-                    ->whereRaw(
-                        '(SELECT count(1)*2 = SUM(`status`) from nlsg_live_info where live_pid = l.id) = 0'
-                    );
+                      ->where('l.end_at', '>', $now_date)
+                      ->whereRaw(
+                          '(SELECT count(1)*2 = SUM(`status`) from nlsg_live_info where live_pid = l.id) = 0'
+                      );
                 break;
             case 4:
                 $query->where(function ($query) use ($params, $now_date) {
                     $query->whereRaw('(l.status = 4 and l.end_at < "' . $now_date . '")')
-                        ->orWhereRaw('((SELECT count(1)*2 = SUM(`status`) from nlsg_live_info where live_pid = l.id) = 1)');
+                          ->orWhereRaw('((SELECT count(1)*2 = SUM(`status`) from nlsg_live_info where live_pid = l.id) = 1)');
                 });
                 break;
         }
@@ -491,14 +494,16 @@ class LiveConsole extends Base
         $page = intval($params['page'] ?? 1);
         $size = intval($params['size'] ?? 10);
 
-        $query = self::from('nlsg_live as l')
-            ->leftJoin('nlsg_user as u', 'l.user_id', '=', 'u.id')
-            ->where('l.user_id', '=', $user_id)
-            ->where('l.is_del', '=', 0);
+        $query = self::query()
+                     ->from('nlsg_live as l')
+                     ->leftJoin('nlsg_user as u', 'l.user_id', '=', 'u.id')
+                     ->where('l.user_id', '=', $user_id)
+                     ->where('l.is_del', '=', 0)
+                     ->where('l.app_project_type', '=', APP_PROJECT_TYPE);
 
         $fields = ['l.id', 'l.title', 'l.describe', 'l.cover_img', 'l.status', 'l.msg', 'l.content', 'l.twitter_money',
-            'l.reason', 'l.check_time', 'l.price', 'l.playback_price', 'l.helper', 'l.is_free', 'l.is_show',
-            'l.can_push', 'u.nickname', 'l.end_at', 'l.is_finish'];
+                   'l.reason', 'l.check_time', 'l.price', 'l.playback_price', 'l.helper', 'l.is_free', 'l.is_show',
+                   'l.can_push', 'u.nickname', 'l.end_at', 'l.is_finish'];
 
         switch (intval($params['list_flag'] ?? 0)) {
             case 1:
@@ -551,22 +556,22 @@ class LiveConsole extends Base
      */
     function getPushUrl($streamName, $time = null)
     {
-        $key = config('env.Live_API_KEY');
+        $key      = config('env.Live_API_KEY');
         $push_url = config('env.LIVE_PUSH_URL');
         $play_url = config('env.LIVE_PLAY_URL');
 
         if ($key && $time) {
-            $txTime = strtoupper(base_convert(($time), 10, 16));
+            $txTime   = strtoupper(base_convert(($time), 10, 16));
             $txSecret = md5($key . $streamName . $txTime);
-            $ext_str = "?" . http_build_query(array(
+            $ext_str  = "?" . http_build_query(array(
                     "txSecret" => $txSecret,
-                    "txTime" => $txTime
+                    "txTime"   => $txTime
                 ));
         }
 
         return [
-            'push_url' => "rtmp://" . $push_url . "/live/" . $streamName . (isset($ext_str) ? $ext_str : ""),
-            'play_url' => "http://" . $play_url . "/live/" . $streamName . '.m3u8' . (isset($ext_str) ? $ext_str : ""),
+            'push_url'     => "rtmp://" . $push_url . "/live/" . $streamName . (isset($ext_str) ? $ext_str : ""),
+            'play_url'     => "http://" . $play_url . "/live/" . $streamName . '.m3u8' . (isset($ext_str) ? $ext_str : ""),
             'play_url_flv' => "http://" . $play_url . "/live/" . $streamName . '.flv' . (isset($ext_str) ? $ext_str : ""),
         ];
     }
@@ -592,7 +597,7 @@ class LiveConsole extends Base
         }
 
         $user_info = User::whereId($user_id)->select(['phone'])->first();
-        $helper = explode(',', $live_info->helper);
+        $helper    = explode(',', $live_info->helper);
         if (empty($user_info) || empty($helper)) {
             return false;
         }
@@ -605,9 +610,9 @@ class LiveConsole extends Base
 
     public function changeInfoState($params, $user_id)
     {
-        $live_id = $params['live_id'] ?? 0;
+        $live_id      = $params['live_id'] ?? 0;
         $live_info_id = $params['live_info_id'] ?? 0;
-        $flag = $params['flag'] ?? 0;
+        $flag         = $params['flag'] ?? 0;
         if (empty($live_id) || empty($live_info_id) || empty($flag)) {
             return ['code' => false, 'msg' => '参数错误'];
         }
@@ -615,9 +620,9 @@ class LiveConsole extends Base
             return ['code' => false, 'msg' => '参数错误'];
         }
         $check = LiveInfo::whereId($live_info_id)
-            ->where('live_pid', $live_id)
-            ->where('user_id', $user_id)
-            ->first();
+                         ->where('live_pid', $live_id)
+                         ->where('user_id', $user_id)
+                         ->first();
         if (empty($check)) {
             return ['code' => false, 'msg' => '直播不存在'];
         }
@@ -628,18 +633,18 @@ class LiveConsole extends Base
         }
         switch ($flag) {
             case 'on':
-                $data['is_begin'] = 1;
+                $data['is_begin']     = 1;
                 $data['begin_status'] = 0;//socket推送状态
                 break;
             case 'off':
-                $data['is_begin'] = 0;
+                $data['is_begin']     = 0;
                 $data['begin_status'] = 1;//推送状态
                 break;
             case 'finish':
-                $data['is_begin'] = 0;
+                $data['is_begin']     = 0;
                 $data['begin_status'] = 1;//推送状态
-                $data['is_finish'] = 1;
-                $data['finished_at'] = date('Y-m-d H:i:s');
+                $data['is_finish']    = 1;
+                $data['finished_at']  = date('Y-m-d H:i:s');
                 break;
         }
 
@@ -652,14 +657,14 @@ class LiveConsole extends Base
         }
         if ($flag == 'finish') {
             $check_all_finish = LiveInfo::where('live_pid', $live_id)
-                ->where('status', 1)
-                ->where('is_finish', 0)
-                ->select(['id'])
-                ->first();
+                                        ->where('status', 1)
+                                        ->where('is_finish', 0)
+                                        ->select(['id'])
+                                        ->first();
 
             if (empty($check_all_finish)) {
                 $live_res = self::whereId($live_id)->update([
-                    'is_finish' => 1,
+                    'is_finish'   => 1,
                     'finished_at' => date('Y-m-d H:i:s')
                 ]);
                 if ($live_res === false) {
@@ -676,7 +681,7 @@ class LiveConsole extends Base
 
     public function begin($params)
     {
-        $live_id = $params['live_id'] ?? 0;
+        $live_id  = $params['live_id'] ?? 0;
         $job_type = $params['job_type'] ?? 0;
         if (empty($live_id) || empty($job_type)) {
             return ['code' => false, 'msg' => '参数错误'];
@@ -693,43 +698,43 @@ class LiveConsole extends Base
         switch (intval($job_type)) {
             case 1:
                 $res = LiveInfo::where('live_pid', '=', $live_id)
+                               ->update([
+                                   'is_begin'  => 1,
+                                   'is_finish' => 0
+                               ]);
+                Live::query()->where('id', '=', $live_id)
                     ->update([
-                        'is_begin' => 1,
-                        'is_finish' => 0
-                    ]);
-                Live::query()->where('id','=',$live_id)
-                    ->update([
-                        'sort'=>10
+                        'sort' => 10
                     ]);
                 break;
             case 2:
                 $res = LiveInfo::where('live_pid', '=', $live_id)
-                    ->update([
-                        'is_begin' => 0,
-                        'is_finish' => 0,
-                        'finished_at' => null
-                    ]);
+                               ->update([
+                                   'is_begin'    => 0,
+                                   'is_finish'   => 0,
+                                   'finished_at' => null
+                               ]);
                 Live::query()->where('id', '=', $live_id)
                     ->update([
-                        'is_finish' => 0,
+                        'is_finish'   => 0,
                         'finished_at' => null,
-                        'sort'=>20,
+                        'sort'        => 20,
                     ]);
                 break;
             case 3:
                 $res = LiveInfo::where('live_pid', '=', $live_id)
-                    ->update([
-                        'is_begin' => 0,
-                        'is_finish' => 1,
-                        'finished_at' => $now_date,
-                    ]);
+                               ->update([
+                                   'is_begin'    => 0,
+                                   'is_finish'   => 1,
+                                   'finished_at' => $now_date,
+                               ]);
 
                 Live::where('id', '=', $live_id)
                     ->update([
-                        'is_finish' => 1,
-                        'finished_at' => $now_date,
+                        'is_finish'          => 1,
+                        'finished_at'        => $now_date,
                         'virtual_online_num' => 0,
-                        'sort'=>30,
+                        'sort'               => 30,
                     ]);
                 break;
             default:
@@ -747,7 +752,7 @@ class LiveConsole extends Base
     public function LiveAutoConfig()
     {
         $date_begin = date('Y-m-d H:i:00');
-        $date_end = date('Y-m-d H:i:59');
+        $date_end   = date('Y-m-d H:i:59');
 
 //        $date_begin = '2021-07-01 00:00:00';
 //        $date_end = '2021-07-01 00:00:59';
@@ -763,8 +768,8 @@ and l.steam_begin_time <= '$date_end'";
 
         if (!empty($begin_list)) {
             foreach ($begin_list as $v) {
-                $temp = [];
-                $temp['live_id'] = $v->live_id;
+                $temp             = [];
+                $temp['live_id']  = $v->live_id;
                 $temp['job_type'] = 1;
                 $this->begin($temp);
             }
@@ -776,11 +781,11 @@ join nlsg_live_info as li on l.id = li.live_pid and li.task_id > 0 and li.is_beg
 where l.status = 4
 and l.steam_end_time >= '$date_begin'
 and l.steam_end_time <= '$date_end'";
-        $end_list = DB::select($end_list_sql);
+        $end_list     = DB::select($end_list_sql);
         if (!empty($end_list)) {
             foreach ($end_list as $v) {
-                $temp = [];
-                $temp['live_id'] = $v->live_id;
+                $temp             = [];
+                $temp['live_id']  = $v->live_id;
                 $temp['job_type'] = 3;
                 $this->begin($temp);
             }

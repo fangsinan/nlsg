@@ -49,6 +49,7 @@ class IndexController extends ControllerBackend
             ->select('id', 'relation_id', 'sort', 'created_at', 'status')
             ->where('position', 1)
             ->where('type', 2)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('sort', 'desc')
             ->get();
         return success($lists);
@@ -227,6 +228,7 @@ class IndexController extends ControllerBackend
             ->select('id', 'relation_id', 'sort', 'created_at', 'status')
             ->where('position', 1)
             ->where('type', 8)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('sort', 'desc')
             ->get();
 
@@ -262,6 +264,7 @@ class IndexController extends ControllerBackend
             ->select('id', 'relation_id', 'sort', 'created_at', 'status')
             ->where('position', 1)
             ->where('type', 5)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('sort', 'desc')
             ->get();
 
@@ -331,6 +334,7 @@ class IndexController extends ControllerBackend
                    ->select('id','relation_id','created_at')
                    ->where('type', 7)
                    ->where('position', 1)
+                   ->where('app_project_type','=',APP_PROJECT_TYPE)
                    ->paginate(10)
                    ->toArray();
         return success($lists);

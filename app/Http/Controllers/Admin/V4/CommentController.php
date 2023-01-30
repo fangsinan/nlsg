@@ -53,6 +53,9 @@ class CommentController extends Controller
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
             });
+
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
+
         $comments = $query->select('id', 'user_id', 'relation_id', 'info_id', 'content', 'type', 'created_at')
             ->orderBy('id', 'desc')
             ->paginate($size)

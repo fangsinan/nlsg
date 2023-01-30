@@ -90,7 +90,12 @@ class Column extends Base
         //是否购买
         $column['is_sub'] = Subscribe::isSubscribe($user_id,$column_id,$sub_type);
 
-        $collection = Collection::where(['type'=>$col_type,'user_id'=>$user_id,'relation_id'=>$column_id])->first();
+        $collection = Collection::query()
+                                ->where([
+                                    'type'=>$col_type,'user_id'=>$user_id,'relation_id'=>$column_id,
+                                    'app_project_type'=>APP_PROJECT_TYPE,
+                                ])
+                                ->first();
 
         //是否收藏
         $column['is_collection'] = $collection ? 1 : 0;
@@ -116,6 +121,7 @@ class Column extends Base
         $lists= $this->select('id','type','name', 'column_type', 'title','subtitle', 'message','price','index_pic', 'cover_pic','details_pic','info_num as chapter_num','is_free','is_start','cover_pic as cover_images','cover_pic as cover_img','classify_column_id','info_column_id')
             ->whereIn('id', $ids)
             ->where($where)
+            ->where("app_project_type",APP_PROJECT_TYPE)
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get()
@@ -199,7 +205,11 @@ class Column extends Base
             return ["data"=>[]];
         }
         $where = ["status" => 1,];
-        $field = ['id', 'name', 'title', 'subtitle', 'message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time','index_pic', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num', 'is_free', 'is_start','show_info_num'];
+        $field = [
+            'id', 'name', 'title', 'subtitle', 'message', 'column_type', 'user_id', 'message', 'original_price',
+            'price', 'online_time', 'works_update_time','index_pic', 'cover_pic', 'details_pic', 'subscribe_num',
+            'info_num', 'is_free', 'is_start','show_info_num'
+        ];
         $query = Column::select($field);
         foreach ($param_where as $key=>$val){
 //            if(count($val) !== 3 || empty($val[2])){
@@ -219,7 +229,10 @@ class Column extends Base
             }
 
         }
-       $list = $query->where($where)->orderBy('updated_at', 'desc')
+       $list = $query
+           ->where('app_project_type','=',APP_PROJECT_TYPE)
+           ->where($where)
+           ->orderBy('updated_at', 'desc')
             ->orderBy('sort', $order_str)->paginate($page)->toArray();
         return $list;
     }
@@ -340,7 +353,7 @@ class Column extends Base
     // 获取训练营第一章节id
     static function getFirstInfo($get_id){
 
-        $first_info_id = WorksInfo::select('id')->where(['column_id'=>$get_id,'type'=>1,'status'=>4 ])->orderBy('rank','asc')->first();
+        $first_info_id = WorksInfo::select('id')->where(['column_id'=>$get_id,'type'=>1,'status'=>4,'app_project_type'=>APP_PROJECT_TYPE ])->orderBy('rank','asc')->first();
         return  $first_info_id['id'] ?? 0;
     }
 

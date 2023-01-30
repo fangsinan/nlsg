@@ -12,7 +12,7 @@ class Banner extends Base
 
     protected $fillable = [
         'title', 'pic', 'url','h5_url','rank','type','start_time','end_time','page_view',
-        'status','jump_type','obj_id','info_id','show_type','version',
+        'status','jump_type','obj_id','info_id','show_type','version','app_project_type',
     ];
 
     /**
@@ -31,6 +31,7 @@ class Banner extends Base
             ->where('type', 1)
             ->where('start_time', '<=', $today)
             ->where('end_time', '>=', $today)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->whereIn('show_type', [0,$show_type])
             ->orderBy('rank')
             ->orderBy('created_at', 'desc')
@@ -63,6 +64,7 @@ class Banner extends Base
 
         $res['banner'] = Banner::where('type', '=', 51)
             ->where('status', '=', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('rank', 'asc')
             ->orderBy('id', 'desc')
             ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id','info_id'])
@@ -70,6 +72,7 @@ class Banner extends Base
             ->get();
         $res['recommend'] = Banner::where('type', '=', 52)
             ->where('status', '=', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('rank', 'asc')
             ->orderBy('id', 'desc')
             ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id','info_id'])
@@ -84,6 +87,7 @@ class Banner extends Base
             ->get();
         $res['hot_sale'] = Banner::where('type', '=', 53)
             ->where('status', '=', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('rank', 'asc')
             ->orderBy('id', 'desc')
             ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id','info_id'])
@@ -111,8 +115,10 @@ class Banner extends Base
         $now_date = date('Y-m-d H:i:s');
         $data = Banner::where('type', '=', $type)
             ->where('status', '=', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->where('start_time', '<=', $now_date)
             ->where('end_time', '>', $now_date)
+            ->where('app_project_type', '=', APP_PROJECT_TYPE)
             ->first();
         //1:h5(走url,其他都object_id)  2:商品  3:优惠券领取页面4精品课 5.讲座 6.听书 7 360  13活动开屏图
         $res = [];
@@ -134,6 +140,7 @@ class Banner extends Base
     {
         $res['index'] = Banner::where('type', '=', 71)
             ->where('status', '=', 1)
+            ->where('app_project_type', '=', APP_PROJECT_TYPE)
             ->orderBy('rank', 'asc')
             ->orderBy('id', 'desc')
             ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id'])
@@ -141,6 +148,7 @@ class Banner extends Base
 
         $res['home'] = Banner::where('type', '=', 72)
             ->where('status', '=', 1)
+            ->where('app_project_type', '=', APP_PROJECT_TYPE)
             ->orderBy('rank', 'asc')
             ->orderBy('id', 'desc')
             ->select(['id', 'title', 'pic', 'url', 'jump_type', 'obj_id'])
@@ -196,7 +204,9 @@ class Banner extends Base
         $now_date = date('Y-m-d H:i:s');
         $data = Banner::where('type', '=', $type)
             ->where('status', '=', 1)
-//            ->where('start_time', '<=', $now_date)
+            ->where('app_project_type', '=', APP_PROJECT_TYPE)
+
+            //            ->where('start_time', '<=', $now_date)
 //            ->where('end_time', '>', $now_date)
             ->get()->toArray();
         return $data;

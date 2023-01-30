@@ -36,6 +36,7 @@ class LiveWorks extends Base
                     if ($v['type'] == 1) {
                         $lists = Column::select('id', 'name as title', 'subtitle', 'original_price', 'price',
                             'cover_pic as cover_img')
+                            ->where('app_project_type','=',APP_PROJECT_TYPE)
                             ->where('id', $v['rid'])
                             ->where('type', 2)
                             ->where('status', 1)
@@ -45,6 +46,7 @@ class LiveWorks extends Base
                         $lists = Works::select('id', 'title', 'subtitle', 'cover_img', 'original_price', 'price')
                             ->where('id', $v['rid'])
                             ->where('status', 4)
+                            ->where('app_project_type','=',APP_PROJECT_TYPE)
                             ->first();
                         $lists->type = 2;
                     } elseif ($v['type'] == 3) {
@@ -65,6 +67,7 @@ class LiveWorks extends Base
                         $lists = OfflineProducts::select('id', 'title', 'subtitle', 'cover_img',
                             'image as cover_details', 'total_price as original_price', 'price')
                             ->where('id', $v['rid'])
+                            ->where('app_project_type','=',APP_PROJECT_TYPE)
                             ->first();
                         $lists->type = 5;
                     }

@@ -145,7 +145,7 @@ WHERE
                 $ip_str=str_replace(".","_",$val);
                 $push_key_name='111Productlivepush:'.$ip_str . ':' . $model->id;
                 $redis->setex($push_key_name,3600*5,$data);
-                
+
                 //删除购物车缓存
                 $cache_live_name = 'live_push_works_'.$live_id;
                 Cache::delete($cache_live_name);
@@ -226,6 +226,7 @@ WHERE
         $query->where('live_id', '=', $live_id)
             ->where('live_info_id', '=', $live_info_id)
             ->where('is_del', '=', 0)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->select([
                 'id', 'live_id', 'live_info_id', 'push_type',
                 'push_gid', 'click_num', 'close_num', 'is_push', 'push_at', 'is_done', 'done_at',
@@ -411,7 +412,6 @@ WHERE
                         'id'            => 999999,
                         'title'         => '幸福360会员',
                         'price'         => 360.00,
-                        'cover_img'     => '/live/recommend/360_xhc.png',
                         'cover_img'     => '/nlsg/works/20210105102849884378.png',
                         'cover_details' => '/live/recommend/360_tc.png',
                         'type'          => 4

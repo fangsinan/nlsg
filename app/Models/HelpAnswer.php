@@ -39,7 +39,6 @@ class HelpAnswer extends Base
             'keywordsBind:id,help_answer_id,keywords_id',
             'keywordsBind.keywords:id,keywords'
         ])->where("status",1)
-
             ->where(function ($query) use($operator,$question) {
                 if($operator == "like"){
                     $query->where("question",$operator,"%".$question."%");

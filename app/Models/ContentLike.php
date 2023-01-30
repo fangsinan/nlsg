@@ -19,11 +19,12 @@ class ContentLike extends Model
      * */
     public static function isLike($type=[],$rid=1,$uid=0,$info_id){
         $is_like = 0;
- 
+
         $res = self::where([
-            'relation_id' => $rid, 
+            'relation_id' => $rid,
             'info_id' => $info_id,
             'user_id' => $uid,
+            'app_project_type'=>APP_PROJECT_TYPE,
             ])->whereIn('type',$type)->first();
         if($res){
             $is_like = 1;
@@ -43,7 +44,8 @@ class ContentLike extends Model
         if (!in_array($type, [1, 2, 3, 4, 5,])) {
             return 0;
         }
-        $where = ['type' => $type, 'user_id' => $user_id, 'relation_id' => $target_id,'info_id'=>$info_id];
+        $where = ['type' => $type, 'user_id' => $user_id, 'relation_id' => $target_id,
+                  'info_id'=>$info_id,'app_project_type'=>APP_PROJECT_TYPE];
         $data = self::where($where)->first();
 
         if (!empty($data)) {

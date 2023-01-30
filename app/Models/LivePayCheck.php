@@ -25,6 +25,7 @@ class LivePayCheck extends Base
                      ->where('teacher_id', '=', $teacher_id)
                      ->where('user_id', '=', $user_id)
                      ->where('begin_at', '<=', $now)
+                     ->where('app_project_type', '=', APP_PROJECT_TYPE)
                      ->where(function ($q) use ($now) {
                          $q->where('protect_end_time', '>=', $now)
                            ->orWhereNull('protect_end_time');
@@ -66,11 +67,11 @@ class LivePayCheck extends Base
                             'user_id'     => $user_id,
                             'relation_id' => $live_id,
                             'status'      => 1,
-                        ],[
-                            'start_time'  => $now,
-                            'end_time'    => $now,
-                            'pay_time'    => $now,
-                            'remark'      => '基本库转入',
+                        ], [
+                            'start_time' => $now,
+                            'end_time'   => $now,
+                            'pay_time'   => $now,
+                            'remark'     => '基本库转入',
                         ]);
 
         LiveCountDown::query()

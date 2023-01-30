@@ -22,6 +22,7 @@ class Node extends Base
             ->where('pid', '=', $pid)
             ->where('status', '=', 1)
             ->where('is_menu', '=', $is_menu)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->select(['id', 'pid', 'name', 'path', 'is_menu', 'status', 'rank', DB::raw('0 as checked')])
             ->orderBy('rank')
             ->orderBy('id')
@@ -45,6 +46,7 @@ class Node extends Base
         $roleModel = new Role();
 
         $query = DB::table('nlsg_role_node as rn')
+                   ->where('rn.app_project_type','=',APP_PROJECT_TYPE)
             ->join('nlsg_node as n', 'rn.node_id', '=', 'n.id');
 
         $role_list = $roleModel->getAllRoleId(0, $role_id);
@@ -86,6 +88,7 @@ class Node extends Base
 
         $list = $query->where('is_menu', '=', 2)
             ->where('status', '=', 1)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('rank')
             ->orderBy('id')
             ->select(['id', 'pid', 'name', 'path'])

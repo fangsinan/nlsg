@@ -20,12 +20,14 @@ class Live extends Base
         $list = $this->select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'price', 'order_num')
             ->whereIn('id', $ids)
             ->where('is_del', 0)
+            ->where('app_project_type', APP_PROJECT_TYPE)
             ->orderBy('created_at', 'desc')
             ->first();
 
         if ($list) {
             $channel = LiveInfo::where('live_pid', $list->id)
                 ->where('status', 1)
+                ->where('app_project_type', APP_PROJECT_TYPE)
                 ->orderBy('id', 'desc')
                 ->first();
             $list['info_id'] = $channel->id;
@@ -38,6 +40,7 @@ class Live extends Base
     {
         $lists = $this->with('user')
             ->where('status', 4)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('begin_at', 'desc')
             ->get()
             ->toArray();
@@ -75,6 +78,7 @@ class Live extends Base
             ->where('status', 4)
             ->where('is_finish', 0)
             ->where('is_del', 0)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->orderBy('begin_at')
             ->limit(3)
             ->get()
@@ -182,7 +186,7 @@ class Live extends Base
     {
         $now_date = date('Y-m-d H:i:s');
 
-        $query = self::where('team_id', '=', $team_id)->where('status', '=', 4);
+        $query = self::where('team_id', '=', $team_id)->where('status', '=', 4)->where('app_project_type','=',APP_PROJECT_TYPE);
 
         if ($only_not_start == 1) {
             $query->where('team_end_time', '>', $now_date);
@@ -209,6 +213,7 @@ class Live extends Base
     {
         $res = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'user_id', 'price', 'created_at')
             ->where('status', 4)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->where('is_del', 0);
         if(!in_array($user_id,[158291,211370])){
             $res=$res->where('is_test', 0);
@@ -251,7 +256,7 @@ class Live extends Base
     }
 
 	public static function delOldZeroPosterShow($live_id = 0){
-		$query = self::query()->where('zero_poster_show','=',1);
+		$query = self::query()->where('zero_poster_show','=',1)->where('app_project_type','=',APP_PROJECT_TYPE);
 
 		if ($live_id > 0){
 			$query->where('id','<>',$live_id);

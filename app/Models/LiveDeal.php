@@ -18,7 +18,7 @@ class LiveDeal extends Base
      * 添加
      */
     public static function Add($data,$flag){
-
+        $data['app_project_type'] = APP_PROJECT_TYPE;
         if($flag){
             $rst = DB::table(self::DB_TABLE)->insert($data);
         }else{
