@@ -374,3 +374,140 @@ function checkDuplicateEntry($e){
         return false;
     }
 }
+
+
+/**
+ * @curl抓取页面数据
+ * @param $url 访问地址
+ * @param null $isPost 是否post
+ * @param null $data post数据
+ * @return array
+ */
+function curlPost($url, $data = [])
+{
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, $url);
+    //显示获取的头部信息必须为true否则无法看到cookie
+    //curl_setopt($curl, CURLOPT_HEADER, true);
+//        curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);// 模拟用户使用的浏览器
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // 对认证证书来源的检查
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false); // 从证书中检查SSL加密算法是否存在
+    @curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);// 使用自动跳转
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);// 获取的信息以文件流的形式返回
+    if (!empty($data)) {
+        curl_setopt($curl, CURLOPT_POST, 1);// 发送一个常规的Post请求
+        if (is_array($data)) {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));// Post提交的数据包
+        } else {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $data);// Post提交的数据包 可以是json数据
+        }
+    }
+    curl_setopt($curl, CURLOPT_COOKIESESSION, true); // 读取上面所储存的Cookie信息
+    curl_setopt($curl, CURLOPT_SSLVERSION, 1);
+    //curl_setopt($curl, CURLOPT_TIMEOUT, 30);// 设置超时限制防止死循环
+    //curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
+    //curl_setopt($curl, CURLOPT_HEADER, 0); // 显示返回的Header区域内容
+    $tmpInfo = curl_exec($curl);
+    curl_close($curl);
+    if (empty($tmpInfo)) {
+        return false;
+    }
+    return $tmpInfo;
+}
+
+function getParamsMap($items,$params=[]){
+
+    $map=[];
+    foreach ($items as $item) {
+
+        if (empty($item)) {
+            continue;
+        }
+
+        $get_val = [];//参数数组
+
+        if (is_string($item)) {
+            $field = $item;
+            $get_field = $item;
+            $op = 'eq';
+            if (isset($params[$get_field])) {
+                $get_val[] = $params[$get_field];
+            }
+        } elseif (is_array($item)) {
+
+            $field = $item[0];
+            if(empty($field)){
+                continue;
+            }
+            $get_field = [$item[0]];
+            //第二个筛选条件存在
+            if (!empty($item[1])) {
+                $op = $item[1];
+            }
+
+            //第三个获取数据的字段存在
+            if (isset($item[2])) {
+                if(is_array($item[2])){
+                    $get_field =  $item[2];
+                }else{
+                    $get_field = explode(',', $item[2]);
+                }
+            }
+
+            if (empty($op)) {
+                $op = 'eq';
+            }
+            //获取筛选数据
+            foreach ($get_field as $key) {
+                if (isset($params[$key])) {
+                    $get_val[] = $params[$key];
+                }
+            }
+        }
+
+        switch ($op) {
+            case 'like':
+                if (isset($get_val[0]))
+                {
+                    if ($get_val[0] !== '') {
+                        $map[] = [$field, 'like', "%$get_val[0]%"];
+                    }
+                }
+                break;
+            case 'auth':
+            case 'in':
+                break;
+            case 'between time':
+                if (!empty($get_val[0]) && !empty($get_val[1])) {
+                    if ($get_val[0] == $get_val[1]) {
+                        $get_val[0] = date('Y-m-d', strtotime($get_val[0])) . ' 00:00:00';
+                        $get_val[1] = date('Y-m-d', strtotime($get_val[1])) . ' 23:59:59';
+                    }
+                    $map[] = [$field, '>=', $get_val[0]];
+                    $map[] = [$field, '<=', $get_val[1]];
+
+                } elseif (!empty($get_val[0])) {
+                    $map[] = [$field, '>=', $get_val[0]];
+                } else {
+                    if (!empty($get_val[1])) {
+                        $get_val[1] = date('Y-m-d', strtotime($get_val[1])) . ' 23:59:59';
+                        $map[] = [$field, '<=', $get_val[1]];
+                    }
+                }
+                break;
+            case 'or':
+                break;
+            case 'raw':
+                break;
+            default:
+                if (isset($get_val[0]))
+                {
+                    if ($get_val[0] !== '') {
+                        $map[] = [$field, $op, $get_val[0]];
+                    }
+                }
+        }
+
+    }
+    return $map;
+}

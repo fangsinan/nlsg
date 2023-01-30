@@ -110,4 +110,8 @@ return [
     'TENCENT_SECRETID' => env('TENCENT_SECRETID'),
     'TENCENT_SECRETKEY' => env('TENCENT_SECRETKEY'),
 
+
+    'XFXS_WECHAT_APP_ID'          => env('XFXS_WECHAT_APP_ID'),
+    'XFXS_WECHAT_SECRET'          => env('XFXS_WECHAT_SECRET'),
+
 ];
