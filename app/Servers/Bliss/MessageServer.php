@@ -60,6 +60,7 @@ class MessageServer
     }
 
 
+
     /**
      * 发送消息
      */
@@ -99,6 +100,7 @@ class MessageServer
 
     /**
      * 定时发送站内信
+     * todo
      */
     public static function msg_send(){
 
@@ -125,6 +127,7 @@ class MessageServer
 
     /**
      * 定时发送微信模板消息
+     * todo
      */
     public static function wechat_msg_send()
     {
@@ -161,5 +164,19 @@ class MessageServer
             }
         }
     }
+
+    /**
+     * 消息列表
+     */
+    public static  function msg_search_list($user_id,$data=[]){
+
+        $query=MessageUserModel::query()
+            ->where('receive_user',$user_id)
+            ->orderBy('id','desc');
+
+        $list=$query->paginate(get_page_size($data));
+        return $list;
+    }
+
 
 }

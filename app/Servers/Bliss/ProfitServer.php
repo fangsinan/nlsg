@@ -3,9 +3,14 @@
 namespace App\Servers\Bliss;
 
 use App\Models\Bliss\AccountModel;
+use App\Models\Bliss\OrderModel;
 use App\Models\Bliss\ProfitLogModel;
 use App\Models\Bliss\ProfitModel;
+use App\Models\Bliss\UserModel;
+use App\Models\Bliss\VipUserBindModel;
+use App\Models\Bliss\VipUserModel;
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
@@ -23,6 +28,7 @@ class ProfitServer
 
     /**
      * 保存收益
+     *
      */
     public static function profit_add($order_id,$user_id){
 
@@ -126,22 +132,71 @@ class ProfitServer
      * 收益统计
      */
     public  function profit_statistics($user_id,$data=[]){
-        //已结算
-        //待结算
-        //未结算
-        //累计客户
-        //累计合伙人
-        //订单数
+
+        $UserModel=UserModel::query()->where('id',$user_id)->first();
+        if(!$UserModel){
+            return '客户不存在';
+        }
+
         return [
-            'settled_money'=>100,
-            'tobe_settled_money'=>100,
-            'unsettled_money'=>100,
-            'unsettled_count'=>100,
-            'tobe_settled_count'=>100,
-            'settled_count'=>100,
-            'order_count'=>100,
-            'customer_count'=>100,
-            'partner_count'=>100,
+
+            //已结算
+            'settled_money'=>ProfitModel::getQueryWhere([
+                ['created_at','>=','start_time'],
+                ['created_at','<=','end_time'],
+            ],$data)->whereIn('status',[2])->where('user_id',$user_id)->sum('profit'),
+
+            //待结算
+            'tobe_settled_money'=>ProfitModel::getQueryWhere([
+                ['created_at','>=','start_time'],
+                ['created_at','<=','end_time'],
+            ],$data)->whereIn('status',[0,1])->where('user_id',$user_id)->sum('profit'),
+
+            //不结算
+            'unsettled_money'=>ProfitModel::getQueryWhere([
+                ['created_at','>=','start_time'],
+                ['created_at','<=','end_time'],
+            ],$data)->whereIn('status',[3])->where('user_id',$user_id)->sum('profit'),
+
+            //不结算数量
+            'unsettled_count'=>ProfitModel::getQueryWhere([
+                ['created_at','>=','start_time'],
+                ['created_at','<=','end_time'],
+            ],$data)->whereIn('status',[3])->where('user_id',$user_id)->count(),
+
+            //待结算数量
+            'tobe_settled_count'=>ProfitModel::getQueryWhere([
+                ['created_at','>=','start_time'],
+                ['created_at','<=','end_time'],
+            ],$data)->whereIn('status',[0,1])->where('user_id',$user_id)->count(),
+
+            //已结算数量
+            'settled_count'=>ProfitModel::getQueryWhere([
+                ['created_at','>=','start_time'],
+                ['created_at','<=','end_time'],
+            ],$data)->whereIn('status',[2])->where('user_id',$user_id)->count(),
+
+            //订单数量
+            'order_count'=>OrderModel::getQueryWhere([
+                ['pay_time','>=','start_time'],
+                ['pay_time','<=','end_time'],
+            ],$data)->whereIn('status',[1])->where('user_id',$user_id)->count(),
+
+            //客户数量
+            'customer_count'=>VipUserBindModel::getQueryWhere([
+                ['begin_at','>=','start_time'],
+                ['begin_at','<=','end_time'],
+            ],$data)->whereIn('status',[1])->where('parent',$UserModel->phone)->count(),
+
+            //合伙人数量
+            'partner_count'=>VipUserBindModel::getQueryWhere([
+                ['VipUserBindModel.begin_at','>=','start_time'],
+                ['VipUserBindModel.begin_at','<=','end_time'],
+            ],$data)->from(VipUserBindModel::DB_TABLE.' as VipUserBindModel')
+                ->leftJoin(UserModel::DB_TABLE.' as UserModel','UserModel.phone','=','VipUserBindModel.son')
+                ->leftJoin(VipUserModel::DB_TABLE.' as VipUserModel','VipUserModel.user_id','=','UserModel.id')
+                ->whereIn('VipUserBindModel.status',[1])->where('VipUserModel.status',1)->where('VipUserBindModel.parent',$UserModel->phone)->count(),
+
         ];
     }
 
