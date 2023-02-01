@@ -887,7 +887,16 @@ class WechatPay extends Controller
 
 					// 下单记录王琨老师的直播
 					if( isset($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0 && $total_fee>=1){ //刷单用户排除 排除1元用户
-						self::PayTeacherLives($user_id,$liveData,$orderInfo,$bind_end);
+
+                        //免费观看时间
+                        if($total_fee==1){
+                            $show_end=date('Y-m-d 23:59:59', strtotime('+2 years'));
+                        }else{
+                            $show_end=date('Y-m-d 23:59:59', strtotime('+2 years'));
+                        }
+
+                        self::PayTeacherLives($user_id,$liveData,$orderInfo,$show_end);
+//						self::PayTeacherLives($user_id,$liveData,$orderInfo,$bind_end);
 					}
 
 					// 内容刷单记录
