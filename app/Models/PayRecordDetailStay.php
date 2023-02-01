@@ -22,6 +22,7 @@ class PayRecordDetailStay extends Base
             ->join('nlsg_mall_order as o', 's.ordernum', '=', 'o.ordernum')
             ->join('nlsg_mall_order_detail as d', 's.order_detail_id', '=', 'd.id')
             ->where('s.type', '=', 5)
+            ->where('s.app_project_type','=',APP_PROJECT_TYPE)
             ->where('o.status', '=', 30)
             ->where('receipt_at', '<=', $line)
             ->where('after_sale_used_num', '=', 0)
