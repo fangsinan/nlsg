@@ -101,16 +101,16 @@ class Subscribe extends Base
 
 
             switch ($type) {
-                case 1:
+                // case 1:
                 case 6:
                     $result = Column::find($target_id);
                     break;
                 case 2:
                     $result = Works::find($target_id);
                     break;
-                case 3:
-                    $result = Live::find($target_id);
-                    break;
+                // case 3:
+                //     $result = Live::find($target_id);
+                //     break;
             }
 
             if( !empty($result) ){
