@@ -72,7 +72,6 @@ class Subscribe extends Base
     static function isSubscribe ($user_id=0,$target_id=0,$type=0){
         $is_sub = 0;
 
-
         //会员都免费
         $level = User::getLevel($user_id);
 
@@ -99,35 +98,42 @@ class Subscribe extends Base
                 $is_sub = 1;
             }
 
-            //特殊 作品和讲座的情况下需要校验是否订阅专栏
-            if($is_sub==0 && in_array($type,[2,6])){
-                switch ($type) {
-                    case 1:
-                        $result = Column::find($target_id);
-                        break;
-                    case 2:
-                        $result = Works::find($target_id);
-                        break;
-                    case 3:
-                        $result = Live::find($target_id);
-                        break;
-                    case 6:
-                        $result = Column::find($target_id);
-                        break;
-                }
 
-                $id = Column::select('id')->where( [ 'user_id'=> $result['user_id'],'type'=> 1] )->first();
 
-                $sub_data = Subscribe::where([
-                    'relation_id'   => $id['id'],
-                    'type'          => 1,  //专栏
-                    'user_id'       => $user_id,
-                    'status'        =>1
-                    ])->where('end_time', '>', date('Y-m-d H:i:s'))->first();
-                if($sub_data){
+            switch ($type) {
+                case 1:
+                case 6:
+                    $result = Column::find($target_id);
+                    break;
+                case 2:
+                    $result = Works::find($target_id);
+                    break;
+                case 3:
+                    $result = Live::find($target_id);
+                    break;
+            }
+
+            if( !empty($result) ){
+                // 如果是老师本人查看  则为已购状态
+                if( $result['user_id'] == $user_id){
                     $is_sub = 1;
                 }
+
+                //特殊 作品和讲座的情况下需要校验是否订阅专栏
+                if($is_sub==0 && in_array($type,[2,6])){
+                    $id = Column::select('id')->where( [ 'user_id'=> $result['user_id'],'type'=> 1] )->first();
+                    $sub_data = Subscribe::where([
+                        'relation_id'   => $id['id'],
+                        'type'          => 1,  //专栏
+                        'user_id'       => $user_id,
+                        'status'        =>1
+                    ])->where('end_time', '>', date('Y-m-d H:i:s'))->first();
+                    if($sub_data){
+                        $is_sub = 1;
+                    }
+                }
             }
+
 
             //判断是否购买课程所对应的专题
             if($type == 2 && $is_sub==0){
