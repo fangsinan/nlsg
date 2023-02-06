@@ -91,7 +91,7 @@ class BannerServers
     {
         $type_list                  = $this->selectData(['flag' => 'type', 'only_key' => true]);
         $jump_type_list             = $this->selectData(['flag' => 'jump_type', 'only_key' => true]);
-        $jump_type_list             = array_merge($jump_type_list, [1,0]);
+        $jump_type_list             = array_merge($jump_type_list, [1, 0]);
         $params['h5_url']           = $params['url'] ?? '';
         $params['app_project_type'] = APP_PROJECT_TYPE;
         $params['version']          = '5.0.0';
@@ -104,13 +104,13 @@ class BannerServers
                 'jump_type'  => 'bail|required|in:' . implode(',', $jump_type_list),
                 'start_time' => 'exclude_unless:type,61|required|date|size:19',
                 'end_time'   => 'exclude_unless:type,61|required|date|size:19',
-//                'obj_id'     => [
-//                    function ($attribute, $value, $fail) use ($params) {
-//                        if (!in_array($params['jump_type'], [1, 13]) && empty($value)) {
-//                            $fail($attribute . ' 不能为空.');
-//                        }
-//                    }
-//                ],
+                //                'obj_id'     => [
+                //                    function ($attribute, $value, $fail) use ($params) {
+                //                        if (!in_array($params['jump_type'], [1, 13]) && empty($value)) {
+                //                            $fail($attribute . ' 不能为空.');
+                //                        }
+                //                    }
+                //                ],
                 'id'         => [
                     function ($attribute, $value, $fail) {
                         if ($value > 0) {
@@ -147,8 +147,8 @@ class BannerServers
             $params['end_time']   = date('Y-m-d H:i:59', strtotime($params['end_time']));
         }
 
-        if ($params['end_time'] < $params['start_time']){
-            return ['code'=>false,'msg'=>'结束时间必须大于开始时间'];
+        if ($params['end_time'] < $params['start_time']) {
+            return ['code' => false, 'msg' => '结束时间必须大于开始时间'];
         }
 
         $params['pic'] = str_replace('https://image.nlsgapp.com/', '', $params['pic']);
@@ -234,6 +234,7 @@ class BannerServers
 
         if ($params['flag'] === 'type') {
             $type_array = [
+                ['key' => 0, 'value' => '首页'],
                 ['key' => 1, 'value' => '首页'],
                 ['key' => 51, 'value' => '商城首页轮播'],
                 ['key' => 52, 'value' => '分类下方推荐位'],
