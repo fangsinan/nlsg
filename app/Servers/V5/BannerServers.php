@@ -104,13 +104,13 @@ class BannerServers
                 'jump_type'  => 'bail|required|in:' . implode(',', $jump_type_list),
                 'start_time' => 'exclude_unless:type,61|required|date|size:19',
                 'end_time'   => 'exclude_unless:type,61|required|date|size:19',
-                'obj_id'     => [
-                    function ($attribute, $value, $fail) use ($params) {
-                        if (!in_array($params['jump_type'], [1, 13]) && empty($value)) {
-                            $fail($attribute . ' 不能为空.');
-                        }
-                    }
-                ],
+//                'obj_id'     => [
+//                    function ($attribute, $value, $fail) use ($params) {
+//                        if (!in_array($params['jump_type'], [1, 13]) && empty($value)) {
+//                            $fail($attribute . ' 不能为空.');
+//                        }
+//                    }
+//                ],
                 'id'         => [
                     function ($attribute, $value, $fail) {
                         if ($value > 0) {
