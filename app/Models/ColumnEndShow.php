@@ -10,7 +10,7 @@ class ColumnEndShow extends Base
 
     // 允许批量赋值
     protected  $fillable = ['relation_id','user_id','is_letter','letter_at','is_cer','cer_at',];
-    
+
     static function EndShow($uid,$col_id){
 
         $res = ["id"=>0,"is_letter"=>0,"is_cer"=>0,"cer_is_show"=>0];
@@ -55,11 +55,14 @@ class ColumnEndShow extends Base
 
             // 是否有资格领取  学完 并且结营  如果状态为学完的周 与 总周数 相同则学完
             $res['cer_is_show'] = 0;
-            $info_count = WorksInfo::where([
+            $info_query = WorksInfo::where([
                 "column_id"=>$col['info_column_id'],
                 "status"=>4,
                 'app_project_type'=>APP_PROJECT_TYPE,
-            ])->count();
+            ]);
+            $info_ids = $info_query->pluck("id")->toArray();
+            $info_count = $info_query->count();
+
 
             $his_count = History::where([
                 "relation_type" => 5,
@@ -67,7 +70,7 @@ class ColumnEndShow extends Base
                 "user_id" => $uid,
                 "is_end" => 1,
                 'app_project_type'=>APP_PROJECT_TYPE,
-            ])->count();
+            ])->whereIn('info_id',$info_ids)->count();
 
             if( $info_count == $his_count ){
                 $res['cer_is_show'] = 1;
