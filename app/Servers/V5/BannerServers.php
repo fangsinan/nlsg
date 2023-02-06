@@ -103,7 +103,7 @@ class BannerServers
                 'type'       => 'bail|required|in:' . implode(',', $type_list),
                 'jump_type'  => 'bail|required|in:' . implode(',', $jump_type_list),
                 'start_time' => 'exclude_unless:type,61|required|date|size:19',
-                'end_time'   => 'exclude_unless:type,61|required|date|size:19|gt:start_time',
+                'end_time'   => 'exclude_unless:type,61|required|date|size:19',
                 'obj_id'     => [
                     function ($attribute, $value, $fail) use ($params) {
                         if (!in_array($params['jump_type'], [1, 13]) && empty($value)) {
@@ -145,6 +145,10 @@ class BannerServers
         if ($params['type'] == 61) {
             $params['start_time'] = date('Y-m-d H:i:00', strtotime($params['start_time']));
             $params['end_time']   = date('Y-m-d H:i:59', strtotime($params['end_time']));
+        }
+
+        if ($params['end_time'] < $params['start_time']){
+            return ['code'=>false,'msg'=>'结束时间必须大于开始时间'];
         }
 
         $params['pic'] = str_replace('https://image.nlsgapp.com/', '', $params['pic']);
