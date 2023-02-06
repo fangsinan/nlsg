@@ -13,12 +13,12 @@ class BannerServers
     public function list($params): LengthAwarePaginator
     {
         $query = Banner::query()
-                       ->whereIn('status', [1, 2])
-                       ->where('app_project_type', '=', APP_PROJECT_TYPE)
-                       ->select([
-                           'id', 'title', 'pic', 'url', 'h5_url', 'type', 'start_time', 'end_time',
-                           'created_at', 'status', 'jump_type', 'obj_id', 'info_id'
-                       ]);
+            ->whereIn('status', [1, 2])
+            ->where('app_project_type', '=', APP_PROJECT_TYPE)
+            ->select([
+                         'id', 'title', 'pic', 'url', 'h5_url', 'type', 'start_time', 'end_time',
+                         'created_at', 'status', 'jump_type', 'obj_id', 'info_id'
+                     ]);
 
         HelperService::queryWhen(
             $query,
@@ -147,18 +147,20 @@ class BannerServers
             $params['end_time']   = date('Y-m-d H:i:59', strtotime($params['end_time']));
         }
 
-        $params['pic'] = str_replace('https://image.nlsgapp.com/','',$params['pic']);
+        $params['pic'] = str_replace('https://image.nlsgapp.com/', '', $params['pic']);
 
         $params['status'] = 1;
 
+        $params['obj_id'] = empty($params['obj_id']) ? 0 : $params['obj_id'];
+
         if ($params['id'] ?? 0) {
             $res = Banner::query()
-                         ->find($params['id'])
-                         ->update($params);
+                ->find($params['id'])
+                ->update($params);
 
         } else {
             $res = Banner::query()
-                         ->insert($params);
+                ->insert($params);
         }
 
         if ($res) {
