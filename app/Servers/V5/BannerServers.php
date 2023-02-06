@@ -91,7 +91,7 @@ class BannerServers
     {
         $type_list                  = $this->selectData(['flag' => 'type', 'only_key' => true]);
         $jump_type_list             = $this->selectData(['flag' => 'jump_type', 'only_key' => true]);
-        $jump_type_list             = array_merge($jump_type_list, [1]);
+        $jump_type_list             = array_merge($jump_type_list, [1,0]);
         $params['h5_url']           = $params['url'] ?? '';
         $params['app_project_type'] = APP_PROJECT_TYPE;
         $params['version']          = '5.0.0';
