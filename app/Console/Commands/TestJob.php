@@ -44,46 +44,76 @@ class TestJob extends Command
      */
     public function handle()
     {
-        $task = $this->argument('task')??'';
-        if(empty($task)){
-            echo 'task参数错误';die;
-        }
-        switch ($task){
-            case 'unbind':
-                $this->unbind();
-                break;
-            case 'again_bind':
-                $this->again_bind();
-                break;
-            default:
-                echo 'task参数错误';die;
-        }
-        $this->unbind();
+//        $this->expressList();
+//        $task = $this->argument('task')??'';
+//        if(empty($task)){
+//            echo 'task参数错误';die;
+//        }
+//        switch ($task){
+//            case 'unbind':
+//                $this->unbind();
+//                break;
+//            case 'again_bind':
+//                $this->again_bind();
+//                break;
+//            default:
+//                echo 'task参数错误';die;
+//        }
+//        $this->unbind();
     }
 
-    public function unbind(){
+    public function expressList()
+    {
+        $host    = "https://jisukdcx.market.alicloudapi.com";
+        $path    = "/express/type";
+        $method  = "GET";
+        $appcode = "cc703c76da5b4b15bb6fc4aa0c0febf9";
+        $headers = array();
+        array_push($headers, "Authorization:APPCODE " . $appcode);
+        $querys = "";
+        $bodys  = "";
+        $url    = $host . $path;
+
+
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_FAILONERROR, false);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HEADER, true);
+        if (1 == strpos("$" . $host, "https://")) {
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        }
+        $res = curl_exec($curl);
+        dd($res);
+    }
+
+    public function unbind()
+    {
 
         $page = (int)$this->argument('page');
-        if(empty($page)){
-            $page=1;
+        if (empty($page)) {
+            $page = 1;
         }
 
         $batch = (int)$this->argument('batch');
-        if(empty($batch)){
-            $batch=1;
+        if (empty($batch)) {
+            $batch = 1;
         }
 
-        $XiaoeTechServers=new XiaoeTechServers();
+        $XiaoeTechServers = new XiaoeTechServers();
 
-        $list=DB::table('nlsg_xe_unbind')->where('batch_number',$batch)->orderBy('id','asc')->forPage($page,10000)->get();
+        $list = DB::table('nlsg_xe_unbind')->where('batch_number', $batch)->orderBy('id', 'asc')->forPage($page, 10000)->get();
 
-        foreach ($list as $k=>$user){
-            if($user->status !=1){
+        foreach ($list as $k => $user) {
+            if ($user->status != 1) {
                 $res = $XiaoeTechServers->distributor_member_change($user->sub_user_id);
-                if(checkRes($res)){
-                    DB::table('nlsg_xe_unbind')->where('id',$user->id)->update(['status'=>1]);
-                }else{
-                    DB::table('nlsg_xe_unbind')->where('id',$user->id)->update(['status'=>2,'remark'=>$res]);
+                if (checkRes($res)) {
+                    DB::table('nlsg_xe_unbind')->where('id', $user->id)->update(['status' => 1]);
+                } else {
+                    DB::table('nlsg_xe_unbind')->where('id', $user->id)->update(['status' => 2, 'remark' => $res]);
                 }
                 var_dump($res);
             }
@@ -92,20 +122,21 @@ class TestJob extends Command
         }
     }
 
-    function again_bind(){
+    function again_bind()
+    {
 
         $page = (int)$this->argument('page');
-        if(empty($page)){
-            $page=1;
+        if (empty($page)) {
+            $page = 1;
         }
-        $XiaoeTechServers=new XiaoeTechServers();
-        $list=DB::table('nlsg_xe_distributor_customer')->where('status',0)
-            ->where('bind_time','>=','2022-12-27 12:00:00')
-            ->orderBy('xe_user_id','desc')->forPage($page,10000)->get();
-        foreach ($list as $k=>$user){
+        $XiaoeTechServers = new XiaoeTechServers();
+        $list             = DB::table('nlsg_xe_distributor_customer')->where('status', 0)
+                              ->where('bind_time', '>=', '2022-12-27 12:00:00')
+                              ->orderBy('xe_user_id', 'desc')->forPage($page, 10000)->get();
+        foreach ($list as $k => $user) {
             var_dump($k);
-            var_dump($user->xe_user_id,$user->sub_user_id);
-            $res=$XiaoeTechServers->distributor_member_bind($user->xe_user_id,$user->sub_user_id);
+            var_dump($user->xe_user_id, $user->sub_user_id);
+            $res = $XiaoeTechServers->distributor_member_bind($user->xe_user_id, $user->sub_user_id);
             var_dump($res);
         }
     }
