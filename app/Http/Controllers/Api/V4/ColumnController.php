@@ -17,6 +17,7 @@ use App\Models\UserFollow;
 use App\Models\Works;
 use App\Models\WorksInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ColumnController extends Controller
 {
@@ -203,7 +204,7 @@ class ColumnController extends Controller
         if(!empty($this->user['is_test_pay'])){
             $is_test=[0,1];
         }
-        
+
         $field = ['id', 'name', 'title', 'subtitle', 'message', 'column_type', 'user_id', 'message', 'original_price', 'price', 'online_time', 'works_update_time','index_pic', 'cover_pic', 'details_pic', 'subscribe_num', 'info_num', 'is_free', 'is_start','show_info_num'];
         $list = Column::select($field)->where([
             "status" => 1,
@@ -652,6 +653,12 @@ class ColumnController extends Controller
         $user = User::find($column['user_id']);
         $column['title'] = $user['honor'] ?? '';
 
+        $column['poster'] =[];
+        $PosterArr= DB::table('nlsg_poster')->where(['type'=>4,'relation_id'=>$column_id,"status"=>1])->pluck('image')->toArray();
+        if(!empty($PosterArr)){
+            $column['poster']=$PosterArr;
+        }
+
         return $this->success([
             'column_info' => $column,
         ]);
@@ -821,7 +828,7 @@ class ColumnController extends Controller
 //        $works_data['history_count'] = round($hisCount/$works_data['info_num']*100);
 
 
-        
+
         $column_data['history_count'] = 0;
         $info_num  = $column_data['type'] == 3 ? $column_data['show_info_num']:$column_data['info_num'];
         if ($info_num > 0) {
