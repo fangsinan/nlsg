@@ -267,6 +267,12 @@ class BannerServers
             return array_column($jump_type_array, 'key');
         }
 
+        $jump_type_array = [
+            ['key' => 2, 'value' => '商品', 'mrt_search_data' => 122],
+            ['key' => 4, 'value' => '课程', 'mrt_search_data' => 101],
+            ['key' => 5, 'value' => '讲座', 'mrt_search_data' => 111],
+            ['key' => 8, 'value' => '直播', 'mrt_search_data' => 131],
+        ];
         return $jump_type_array;
 
     }
