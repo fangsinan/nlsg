@@ -69,7 +69,7 @@ class BannerServers
 
         $query->orderBy('id', 'desc');
 
-        $jump_type = $this->selectData(['flag' => 'jump_type', 'only_key' => false]);
+        $jump_type = $this->selectData(['flag' => 'jump_type', 'only_key' => false, 'is_select_list' => false]);
 
         $list = $query->paginate($params['size'] ?? 10);
 
@@ -89,8 +89,8 @@ class BannerServers
 
     public function add($params): array
     {
-        $type_list                  = $this->selectData(['flag' => 'type', 'only_key' => true]);
-        $jump_type_list             = $this->selectData(['flag' => 'jump_type', 'only_key' => true]);
+        $type_list                  = $this->selectData(['flag' => 'type', 'only_key' => true, 'is_select_list' => false]);
+        $jump_type_list             = $this->selectData(['flag' => 'jump_type', 'only_key' => true, 'is_select_list' => false]);
         $jump_type_list             = array_merge($jump_type_list, [1, 0]);
         $params['h5_url']           = $params['url'] ?? '';
         $params['app_project_type'] = APP_PROJECT_TYPE;
@@ -267,14 +267,17 @@ class BannerServers
             return array_column($jump_type_array, 'key');
         }
 
-        $jump_type_array = [
-            ['key' => 2, 'value' => '商品', 'mrt_search_data' => 122],
-            ['key' => 4, 'value' => '课程', 'mrt_search_data' => 101],
-            ['key' => 5, 'value' => '讲座', 'mrt_search_data' => 111],
-            ['key' => 8, 'value' => '直播', 'mrt_search_data' => 131],
-        ];
-        return $jump_type_array;
+        $is_select_list = $params['is_select_list'] ?? true;
+        if ($is_select_list) {
+            $jump_type_array = [
+                ['key' => 2, 'value' => '商品', 'mrt_search_data' => 122],
+                ['key' => 4, 'value' => '课程', 'mrt_search_data' => 101],
+                ['key' => 5, 'value' => '讲座', 'mrt_search_data' => 111],
+                ['key' => 8, 'value' => '直播', 'mrt_search_data' => 131],
+            ];
+        }
 
+        return $jump_type_array;
     }
 
 
