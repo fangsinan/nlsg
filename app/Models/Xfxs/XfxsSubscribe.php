@@ -3,6 +3,7 @@
 namespace App\Models\Xfxs;
 
 
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Models\Base;
 class XfxsSubscribe extends Base
@@ -14,50 +15,6 @@ class XfxsSubscribe extends Base
     }
     protected $fillable = ['user_id','pay_time','type','order_id','status','give','remark',
         'start_time','end_time', 'relation_id', 'service_id','channel_works_list_id','is_flag','twitter_id' ];
-
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id', 'id');
-    }
-
-    public function twitterUser()
-    {
-        return $this->hasOne(User::class, 'id','twitter_id');
-    }
-
-    public function live()
-    {
-        return $this->belongsTo(Live::class, 'relation_id', 'id')->where('status',4);
-    }
-
-
-    public function order()
-    {
-        return $this->belongsTo(Order::class, 'order_id', 'id')->where('status',1)->where( 'type', 10);
-    }
-
-    public function historyInfo(){
-        return $this->hasOne(History::class,'user_id','user_id');
-    }
-
-    //关联信息
-    public function subWorksInfo(){
-        return $this->hasOne(Works::class,'id','relation_id');
-    }
-
-    public function subColumnInfo(){
-        return $this->hasOne(Column::class,'id','relation_id');
-    }
-
-    public function subOfflineInfo(){
-        return $this->hasOne(OfflineProducts::class,'id','relation_id');
-    }
-
-    public function subLiveInfo(){
-        return $this->hasOne(Live::class,'id','relation_id');
-    }
-
 
     /**
      * $user_id  登录者用户
