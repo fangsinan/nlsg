@@ -41,6 +41,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Predis\Client;
 use App\Models\PayIncome;
+use App\Models\Xfxs\XfxsOrder;
+use App\Models\Xfxs\XfxsSubscribe;
+use App\Models\Xfxs\XfxsVip;
 
 class WechatPay extends Controller
 {
@@ -89,6 +92,12 @@ class WechatPay extends Controller
             return self::PayColumn($data);
         } elseif ($data['attach'] == 19) { //处理专题
             return self::PayLists($data);
+        } elseif ($data['attach'] == 101) {
+            //幸福学社101课程
+            return self::xsWorksOrderPaySuccess($data);
+        } elseif ($data['attach'] == 102) {
+            //幸福学社102合伙人
+            return self::xsVipOrderPaySuccess($data);
         }
     }
 
@@ -2040,10 +2049,6 @@ class WechatPay extends Controller
         }
     }
 
-
-
-
-
     //专题
     public static function PayLists($data)
     {
@@ -2154,4 +2159,223 @@ class WechatPay extends Controller
     }
 
 
+    //⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇幸福学社⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇
+    public function xsVipOrderPaySuccess($data): bool
+    {
+        $now_date       = date('Y-m-d H:i:s');
+        $now            = time();
+        $out_trade_no   = $data['out_trade_no'];
+        $total_fee      = $data['total_fee'];
+        $transaction_id = $data['transaction_id'];
+        $pay_type       = $data['pay_type'];
+        $date_format    = 'Y-m-d 23:59:59';
+
+        $orderInfo = XfxsOrder::query()
+            ->where('ordernum', '=', $out_trade_no)
+            ->first();
+
+        if (!$orderInfo) {
+            return false;
+        }
+
+        $orderInfo = $orderInfo->toArray();
+
+        if ($orderInfo['status'] == 1) {
+            return true;
+        }
+
+        $userInfo = User::query()
+            ->where('id', '=', $orderInfo['user_id'])
+            ->select(['id', 'phone'])
+            ->first()
+            ->toArray();
+        $vipInfo  = XfxsVip::query()
+            ->where('user_id', '=', $orderInfo['user_id'])
+            ->where('status', '=', 1)
+            ->first();
+
+        DB::beginTransaction();
+
+        $order_update_arr = [
+            'status'    => 1,
+            'pay_time'  => $now_date,
+            'pay_price' => $total_fee,
+            'pay_type'  => $pay_type,
+        ];
+
+        $order_res = XfxsOrder::query()
+            ->where('ordernum', '=', $out_trade_no)
+            ->update($order_update_arr);
+
+        if (!$order_res) {
+            DB::rollBack();
+            return false;
+        }
+
+        $pay_record_arr = [
+            'ordernum'         => $out_trade_no, //订单编号
+            'price'            => $total_fee, //支付金额
+            'transaction_id'   => $transaction_id, //流水号
+            'user_id'          => $userInfo['id'], //会员id
+            'type'             => $pay_type, //1：微信  2：支付宝
+            'client'           => 1, //微信
+            'order_type'       => 101, //学社合伙人
+            'status'           => 1,
+            'app_project_type' => 2,
+        ];
+
+        $record_res = PayRecord::query()->firstOrCreate($pay_record_arr);
+
+        if (!$record_res) {
+            DB::rollBack();
+            return false;
+        }
+
+        $twitter_info = [];
+        if ($orderInfo['twitter_id']) {
+            $twitter_info = XfxsVip::query()
+                ->where('user_id', '=', $orderInfo['twitter_id'])
+                ->where('status', '=', 1)
+                ->select([
+                             'id', 'username', 'user_id'
+                         ])
+                ->first();
+            if ($twitter_info) {
+                $twitter_info = $twitter_info->toArray();
+            }
+        }
+
+
+        if ($vipInfo) {
+            //续费
+            $vip_res = XfxsVip::query()
+                ->where('id', '=', $vipInfo['id'])
+                ->update([
+                             'expire_time'       => date(
+                                 $date_format,
+                                 strtotime("+1 years", strtotime($vipInfo->expire_time))
+                             ),
+                             'end_time_msg_flag' => 0,
+                         ]);
+
+        } else {
+            //开通
+            $vip_res = XfxsVip::query()
+                ->insert([
+                             'user_id'           => $userInfo['id'],
+                             'username'          => $userInfo['phone'],
+                             'level'             => 1,
+                             'inviter'           => $twitter_info['user_id'] ?? 0,
+                             'inviter_vip_id'    => $twitter_info['id'] ?? 0,
+                             'start_time'        => $now_date,
+                             'expire_time'       => date($date_format, strtotime("+1 years", $now)),
+                             'status'            => 1,
+                             'order_id'          => $orderInfo['id'],
+                             'end_time_msg_flag' => 0,
+                         ]);
+
+            if ($twitter_info) {
+                $record_stay_res = PayRecordDetailStay::query()
+                    ->insert([
+                                 'type'             => 101,
+                                 'ordernum'         => $out_trade_no,
+                                 'user_id'          => $twitter_info['user_id'],
+                                 'price'            => XfxsVip::NEW_TWITTER_PRICE,
+                                 'ctime'            => $now,
+                                 'app_project_type' => APP_PROJECT_TYPE
+                             ]);
+                if (!$record_stay_res) {
+                    DB::rollBack();
+                    return false;
+                }
+            }
+        }
+        if (!$vip_res) {
+            DB::rollBack();
+            return false;
+        }
+
+        DB::commit();
+        return true;
+    }
+
+    //课程订单支付成功回调
+    public function xsWorksOrderPaySuccess($data): bool
+    {
+        $now_date = date('Y-m-d H:i:s');
+        $now      = time();
+
+        $orderInfo = XfxsOrder::query()
+            ->where('ordernum', '=', $data['out_trade_no'])
+            ->first();
+
+        if (!$orderInfo) {
+            return false;
+        }
+
+        $userInfo = User::query()
+            ->where('id', '=', $orderInfo['user_id'])
+            ->select(['id', 'phone'])
+            ->first()
+            ->toArray();
+
+        DB::beginTransaction();
+
+        $order_update_arr = [
+            'status'    => 1,
+            'pay_time'  => $now_date,
+            'pay_price' => $data['total_fee'],
+            'pay_type'  => $data['pay_type'],
+        ];
+
+        $order_res = XfxsOrder::query()
+            ->where('ordernum', '=', $data['out_trade_no'])
+            ->update($order_update_arr);
+
+        if (!$order_res) {
+            DB::rollBack();
+            return false;
+        }
+
+        $pay_record_arr = [
+            'ordernum'         => $data['out_trade_no'], //订单编号
+            'price'            => $data['total_fee'], //支付金额
+            'transaction_id'   => $data['transaction_id'], //流水号
+            'user_id'          => $userInfo['id'], //会员id
+            'type'             => $data['pay_type'], //1：微信  2：支付宝
+            'client'           => 1, //微信
+            'order_type'       => 102, //学社合伙人
+            'status'           => 1,
+            'app_project_type' => 2,
+        ];
+
+        $record_res = PayRecord::query()->firstOrCreate($pay_record_arr);
+
+        if (!$record_res) {
+            DB::rollBack();
+            return false;
+        }
+
+        $sub_res = XfxsSubscribe::query()
+            ->insert([
+                         'type'             => 2,
+                         'user_id'          => $userInfo['id'],
+                         'relation_id'      => $orderInfo['relation_id'],
+                         'order_id'         => $orderInfo['id'],
+                         'start_time'       => $now_date,
+                         'end_time'         => date('Y-m-d 23:59:59', strtotime("+1 years", $now)),
+                         'pay_time'         => $now_date,
+                         'status'           => 1,
+                         'app_project_type' => 2,
+                     ]);
+        if (!$sub_res) {
+            DB::rollBack();
+            return false;
+        }
+
+        DB::commit();
+        return true;
+
+    }
+    //⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆幸福学社⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆
 }
