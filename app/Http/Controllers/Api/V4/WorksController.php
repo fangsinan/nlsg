@@ -681,6 +681,13 @@ class WorksController extends Controller
             $first_info_id = WorksInfo::select('id')->where(['pid'=>$works_id,'type'=>2,'status'=>4 ])->orderBy('rank','asc')->first();
             $works_data['teacher_book_first_info_id'] = $first_info_id['id'] ?? 0;
         }
+
+        $works_data['poster'] =[];
+        $PosterArr= DB::table('nlsg_poster')->where(['type'=>3,'relation_id'=>$works_id,"status"=>1,'app_project_type'=>1])->pluck('image')->toArray();
+        if(!empty($PosterArr)){
+            $works_data['poster']=$PosterArr;
+        }
+
         $res = [
             'column_info'  => $column,
             'works_data'   => $works_data,
