@@ -33,6 +33,7 @@ use App\Models\VipRedeemUser;
 use App\Models\VipUser;
 use App\Models\VipUserBind;
 use App\Models\Works;
+use App\Servers\Bliss\MessageServer;
 use App\Servers\Bliss\ProfitServer;
 use App\Servers\ImGroupServers;
 use App\Servers\JobServers;
@@ -2281,6 +2282,9 @@ class WechatPay extends Controller
                     DB::rollBack();
                     return false;
                 }
+
+                MessageServer::send_msg($twitter_info['user_id'],'invitation_customer_succ',$orderInfo['user_id']);
+
             }
         }
         if (!$vip_res) {
@@ -2365,6 +2369,9 @@ class WechatPay extends Controller
             DB::rollBack();
             return false;
         }
+
+        //\App\Servers\Bliss\MessageServer::send_msg
+        MessageServer::send_msg($orderInfo['user_id'],'buy_course',$orderInfo['relation_id']);
 
         DB::commit();
         return true;
