@@ -123,6 +123,7 @@ class MallAddress extends Base
                 ->where('status', '=', 1)
                 ->where('textbook_id', '<>', 0)
                 ->where('address_id', '=', 0)
+                ->where('created_at','>','2022-04-01 00:00:00')
                 ->pluck('id')
                 ->toArray();
 

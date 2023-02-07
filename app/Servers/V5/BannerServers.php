@@ -13,12 +13,12 @@ class BannerServers
     public function list($params): LengthAwarePaginator
     {
         $query = Banner::query()
-                       ->whereIn('status', [1, 2])
-                       ->where('app_project_type', '=', APP_PROJECT_TYPE)
-                       ->select([
-                           'id', 'title', 'pic', 'url', 'h5_url', 'type', 'start_time', 'end_time',
-                           'created_at', 'status', 'jump_type', 'obj_id', 'info_id'
-                       ]);
+            ->whereIn('status', [1, 2])
+            ->where('app_project_type', '=', APP_PROJECT_TYPE)
+            ->select([
+                         'id', 'title', 'pic', 'url', 'h5_url', 'type', 'start_time', 'end_time',
+                         'created_at', 'status', 'jump_type', 'obj_id', 'info_id'
+                     ]);
 
         HelperService::queryWhen(
             $query,
@@ -69,7 +69,7 @@ class BannerServers
 
         $query->orderBy('id', 'desc');
 
-        $jump_type = $this->selectData(['flag' => 'jump_type', 'only_key' => false]);
+        $jump_type = $this->selectData(['flag' => 'jump_type', 'only_key' => false, 'is_select_list' => false]);
 
         $list = $query->paginate($params['size'] ?? 10);
 
@@ -89,9 +89,9 @@ class BannerServers
 
     public function add($params): array
     {
-        $type_list                  = $this->selectData(['flag' => 'type', 'only_key' => true]);
-        $jump_type_list             = $this->selectData(['flag' => 'jump_type', 'only_key' => true]);
-        $jump_type_list             = array_merge($jump_type_list, [1]);
+        $type_list                  = $this->selectData(['flag' => 'type', 'only_key' => true, 'is_select_list' => false]);
+        $jump_type_list             = $this->selectData(['flag' => 'jump_type', 'only_key' => true, 'is_select_list' => false]);
+        $jump_type_list             = array_merge($jump_type_list, [1, 0]);
         $params['h5_url']           = $params['url'] ?? '';
         $params['app_project_type'] = APP_PROJECT_TYPE;
         $params['version']          = '5.0.0';
@@ -104,13 +104,13 @@ class BannerServers
                 'jump_type'  => 'bail|required|in:' . implode(',', $jump_type_list),
                 'start_time' => 'exclude_unless:type,61|required|date|size:19',
                 'end_time'   => 'exclude_unless:type,61|required|date|size:19',
-                'obj_id'     => [
-                    function ($attribute, $value, $fail) use ($params) {
-                        if (!in_array($params['jump_type'], [1, 13]) && empty($value)) {
-                            $fail($attribute . ' 不能为空.');
-                        }
-                    }
-                ],
+                //                'obj_id'     => [
+                //                    function ($attribute, $value, $fail) use ($params) {
+                //                        if (!in_array($params['jump_type'], [1, 13]) && empty($value)) {
+                //                            $fail($attribute . ' 不能为空.');
+                //                        }
+                //                    }
+                //                ],
                 'id'         => [
                     function ($attribute, $value, $fail) {
                         if ($value > 0) {
@@ -147,18 +147,24 @@ class BannerServers
             $params['end_time']   = date('Y-m-d H:i:59', strtotime($params['end_time']));
         }
 
-        $params['pic'] = str_replace('https://image.nlsgapp.com/','',$params['pic']);
+        if ($params['end_time'] < $params['start_time']) {
+            return ['code' => false, 'msg' => '结束时间必须大于开始时间'];
+        }
+
+        $params['pic'] = str_replace('https://image.nlsgapp.com/', '', $params['pic']);
 
         $params['status'] = 1;
 
+        $params['obj_id'] = empty($params['obj_id']) ? 0 : $params['obj_id'];
+
         if ($params['id'] ?? 0) {
             $res = Banner::query()
-                         ->find($params['id'])
-                         ->update($params);
+                ->find($params['id'])
+                ->update($params);
 
         } else {
             $res = Banner::query()
-                         ->insert($params);
+                ->insert($params);
         }
 
         if ($res) {
@@ -248,20 +254,30 @@ class BannerServers
 
 
         $jump_type_array = [
-//            ['key' => 1, 'value' => 'H5', 'mrt_search_data' => 0],
-['key' => 2, 'value' => '商品', 'mrt_search_data' => 122],
-['key' => 4, 'value' => '课程', 'mrt_search_data' => 101],
-['key' => 5, 'value' => '讲座', 'mrt_search_data' => 111],
-['key' => 8, 'value' => '直播', 'mrt_search_data' => 131],
-//            ['key' => 13, 'value' => 'APP内部H5', 'mrt_search_data' => 0],
+            ['key' => 0, 'value' => '首页', 'mrt_search_data' => 0],
+            ['key' => 1, 'value' => '网页', 'mrt_search_data' => 0],
+            ['key' => 2, 'value' => '商品', 'mrt_search_data' => 122],
+            ['key' => 4, 'value' => '课程', 'mrt_search_data' => 101],
+            ['key' => 5, 'value' => '讲座', 'mrt_search_data' => 111],
+            ['key' => 8, 'value' => '直播', 'mrt_search_data' => 131],
+            //            ['key' => 13, 'value' => 'APP内部H5', 'mrt_search_data' => 0],
         ];
 
         if ($params['only_key'] ?? false) {
             return array_column($jump_type_array, 'key');
         }
 
-        return $jump_type_array;
+        $is_select_list = $params['is_select_list'] ?? true;
+        if ($is_select_list) {
+            $jump_type_array = [
+                ['key' => 2, 'value' => '商品', 'mrt_search_data' => 122],
+                ['key' => 4, 'value' => '课程', 'mrt_search_data' => 101],
+                ['key' => 5, 'value' => '讲座', 'mrt_search_data' => 111],
+                ['key' => 8, 'value' => '直播', 'mrt_search_data' => 131],
+            ];
+        }
 
+        return $jump_type_array;
     }
 
 

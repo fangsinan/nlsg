@@ -225,11 +225,7 @@ class LiveConsoleServers
                             $rst=true;
 
                             foreach ($data as $k=>$v) {
-                                $table_fix = "nlsg";
-                                if(!empty($v["app_project_type"]) && $v["app_project_type"] == 2){
-                                    $table_fix = "xfxs";
-                                }
-                                $rst = DB::table($table_fix."_live_login")->insert($v);
+                                $rst = DB::table("nlsg_live_login")->insert($v);
                                 if ($rst === false) {
                                     DB::rollBack();
                                     $inser_rst=1;

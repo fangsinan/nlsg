@@ -531,7 +531,9 @@ class IncomeController extends Controller
         $channel = $request->input('channel', 0);//ali  |  WeChat
         $os_type = $request->input('os_type', 1);//  1 安卓 2ios 3微信
 
-
+        if($amount>500){
+            return $this->error(0,'每次申请限额500元，可申请多次');
+        }
         $withdrawalInfo=PayIncome::query()->where(['user_id'=>$user_id,'status'=>1])->first();
         if(!empty($withdrawalInfo)){
             return $this->error(0,'此账号被锁定提现,请联系客服');
