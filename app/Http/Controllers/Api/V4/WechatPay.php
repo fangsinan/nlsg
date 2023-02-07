@@ -1734,6 +1734,14 @@ class WechatPay extends Controller
                         }
                     } else {
                         $is_sub = Subscribe::isSubscribe($twitter_id, $works_id, 2);
+                        //增加2980客户分享权益 推荐返佣课程  精品课：9天智慧父母训练营尝鲜课(微信群上课)
+                        if($is_sub==0 && isset($orderInfo['type']) && $orderInfo['type']==9 && in_array($works_id,[699])){
+                            $RST_XLY=DB::table('crm_camp_order')->where('column_id','=','638')
+                                ->where('refund_status','=',0)->where('user_id','=',$twitter_id)->first();
+                            if(!empty($RST_XLY)){
+                                $is_sub=1;
+                            }
+                        }
                         if ($is_sub) {
                             $WorksInfo = Works::find($works_id);
                             $ProfitPrice = $WorksInfo['twitter_price'];
