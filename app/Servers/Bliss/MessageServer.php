@@ -60,11 +60,10 @@ class MessageServer
     }
 
 
-
     /**
      * 发送消息
      */
-    public static function send_msg($uid,$name,$relation_id){
+    public static function send_msg($uid,$name,$relation_id=0,$param=[]){
 
         //获取消息模板
         $MessageModel=MessageModel::query()->where('name',$name)->first();
@@ -77,9 +76,11 @@ class MessageServer
             $MessageUserModel = new MessageUserModel();
             $MessageUserModel->receive_user=$uid;
             $MessageUserModel->relation_id=$relation_id;
+            $MessageUserModel->name=$MessageModel->name;
             $MessageUserModel->type=$MessageModel->type;
             $MessageUserModel->message_id=$MessageModel->id;
             $MessageUserModel->message=$MessageModel->message;
+            $MessageUserModel->param=json_encode($param);
             $MessageUserModel->save();
         }
 
@@ -89,8 +90,10 @@ class MessageServer
             $MessageWechatModel = new MessageWechatModel();
             $MessageWechatModel->message_id=$MessageModel->id;
             $MessageWechatModel->type=$MessageModel->type;
+            $MessageWechatModel->name=$MessageModel->name;
             $MessageWechatModel->receive_user=$uid;
             $MessageWechatModel->relation_id=$relation_id;
+            $MessageWechatModel->param=json_encode($param);
             $MessageWechatModel->template_param=$MessageModel->wechat;
             $MessageWechatModel->save();
         }
@@ -100,7 +103,7 @@ class MessageServer
 
     /**
      * 定时发送站内信
-     * todo
+     * todo 定时任务
      */
     public static function msg_send(){
 
@@ -127,7 +130,7 @@ class MessageServer
 
     /**
      * 定时发送微信模板消息
-     * todo
+     * todo 定时任务
      */
     public static function wechat_msg_send()
     {
@@ -172,11 +175,24 @@ class MessageServer
 
         $query=MessageUserModel::query()
             ->where('receive_user',$user_id)
+            ->whereIn('status',[1,2])
             ->orderBy('id','desc');
 
         $list=$query->paginate(get_page_size($data));
+
+        foreach ($list->items() as &$item){
+            //格式化时间
+            $item->title='合伙人系统消息';
+            $item->format_time=friendly_date(strtotime($item->created_at));
+            if($item->param){
+                $param=json_decode($item->param,true);
+                if(is_array($param)){
+                    $item->param=$param;
+                }
+            }
+        }
+
         return $list;
     }
-
 
 }

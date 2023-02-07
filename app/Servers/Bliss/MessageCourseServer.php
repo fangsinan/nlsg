@@ -41,6 +41,15 @@ class MessageCourseServer
      */
     public function get_msg_param($msg){
 
+        if($msg->param){
+            $param_arr=json_decode($msg->param,true);
+            if(is_array($param_arr)){
+                foreach ($param_arr as $k=>$v){
+                    $this->$k=$v;
+                }
+            }
+        }
+
         $msg_name=$msg->name;
         if($msg_name){
             $this->$msg_name;
@@ -72,8 +81,16 @@ class MessageCourseServer
      */
     public  function get_template_param($msg){
 
-        $msg_name=$msg->name;
+        if($msg->param){
+            $param_arr=json_decode($msg->param,true);
+            if(is_array($param_arr)){
+                foreach ($param_arr as $k=>$v){
+                    $this->$k=$v;
+                }
+            }
+        }
 
+        $msg_name=$msg->name;
         if($msg_name){
             $this->$msg_name;
         }
