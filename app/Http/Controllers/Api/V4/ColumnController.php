@@ -654,7 +654,7 @@ class ColumnController extends Controller
         $column['title'] = $user['honor'] ?? '';
 
         $column['poster'] =[];
-        $PosterArr= DB::table('nlsg_poster')->where(['type'=>4,'relation_id'=>$column_id,"status"=>1])->pluck('image')->toArray();
+        $PosterArr= DB::table('nlsg_poster')->where(['type'=>4,'relation_id'=>$column_id,"status"=>1,'app_project_type'=>1])->pluck('image')->toArray();
         if(!empty($PosterArr)){
             $column['poster']=$PosterArr;
         }

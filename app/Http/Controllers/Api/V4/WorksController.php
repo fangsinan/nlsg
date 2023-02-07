@@ -683,7 +683,7 @@ class WorksController extends Controller
         }
 
         $works_data['poster'] =[];
-        $PosterArr= DB::table('nlsg_poster')->where(['type'=>3,'relation_id'=>$works_id,"status"=>1])->pluck('image')->toArray();
+        $PosterArr= DB::table('nlsg_poster')->where(['type'=>3,'relation_id'=>$works_id,"status"=>1,'app_project_type'=>1])->pluck('image')->toArray();
         if(!empty($PosterArr)){
             $works_data['poster']=$PosterArr;
         }
