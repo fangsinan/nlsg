@@ -33,6 +33,7 @@ use App\Models\VipRedeemUser;
 use App\Models\VipUser;
 use App\Models\VipUserBind;
 use App\Models\Works;
+use App\Servers\Bliss\ProfitServer;
 use App\Servers\ImGroupServers;
 use App\Servers\JobServers;
 use App\Servers\MallOrderServers;
@@ -2275,15 +2276,7 @@ class WechatPay extends Controller
                          ]);
 
             if ($twitter_info) {
-                $record_stay_res = PayRecordDetailStay::query()
-                    ->insert([
-                                 'type'             => 101,
-                                 'ordernum'         => $out_trade_no,
-                                 'user_id'          => $twitter_info['user_id'],
-                                 'price'            => XfxsVip::NEW_TWITTER_PRICE,
-                                 'ctime'            => $now,
-                                 'app_project_type' => APP_PROJECT_TYPE
-                             ]);
+                $record_stay_res = ProfitServer::profit_add($orderInfo['id'], $twitter_info['user_id']);
                 if (!$record_stay_res) {
                     DB::rollBack();
                     return false;
