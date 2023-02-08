@@ -100,6 +100,9 @@ class WechatPay extends Controller
         } elseif ($data['attach'] == 102) {
             //幸福学社102合伙人
             return self::xsVipOrderPaySuccess($data);
+        } elseif ($data['attach'] == 103) {
+            //幸福学社103合伙人
+            return self::campOrderPaySuccess($data);
         }
     }
 
@@ -2385,5 +2388,151 @@ class WechatPay extends Controller
         return true;
 
     }
+
+
+
+    //训练营订单支付成功回调
+    public function campOrderPaySuccess($data): bool
+    {
+        //课程购买之后永久有效
+        // $data = [
+        //     'out_trade_no'   => '23020300168934422764401',
+        //     'total_fee'      => 100,
+        //     'transaction_id' => '12312312123131',
+        //     'pay_type'       => 1,
+        // ];
+        $out_trade_no = $data['out_trade_no'];
+        $orderInfo = XfxsOrder::query()
+            ->where('ordernum', '=', $out_trade_no)
+            ->where('status', '=', 0)
+            ->first();
+
+        if (!$orderInfo) {
+            return false;
+        }
+        $orderInfo = $orderInfo->toArray();
+
+
+        $userInfo = User::query()
+            ->where('id', '=', $orderInfo['user_id'])
+            ->select(['id', 'phone'])
+            ->first()
+            ->toArray();
+
+        $date = date('Y-m-d H:i:s');
+
+        DB::beginTransaction();
+
+        $order_update_arr = [
+            'status'    => 1,
+            'pay_time'  => $date,
+            'pay_price' => $data['total_fee'],
+            'pay_type'  => $data['pay_type'],
+        ];
+
+        $order_res = XfxsOrder::query()
+            ->where('ordernum', '=', $out_trade_no)
+            ->update($order_update_arr);
+
+        if (!$order_res) {
+            DB::rollBack();
+            return false;
+        }
+
+        $pay_record_arr = [
+            'ordernum'         => $data['out_trade_no'], //订单编号
+            'price'            => $data['total_fee'], //支付金额
+            'transaction_id'   => $data['transaction_id'], //流水号
+            'user_id'          => $userInfo['id'], //会员id
+            'type'             => $data['pay_type'], //1：微信  2：支付宝
+            'client'           => 1, //微信
+            'order_type'       => 102, //学社合伙人
+            'status'           => 1,
+            'app_project_type' => 2,
+        ];
+
+        $record_res = PayRecord::query()->firstOrCreate($pay_record_arr);
+
+        if (!$record_res) {
+            DB::rollBack();
+            return false;
+        }
+
+        $sub_res = DB::table('xfxs_subscribe')->insert([
+            'type'             => 2,
+            'user_id'          => $userInfo['id'],
+            'relation_id'      => $orderInfo['relation_id'],
+            'order_id'         => $orderInfo['id'],
+            'start_time'       => $date,
+            'end_time'         => date('Y-m-d 23:59:59', strtotime("+1 years", time())),
+            'pay_time'         => $date,
+            'status'           => 1,
+            'app_project_type' => 2,
+        ]);
+        if (!$sub_res) {
+            DB::rollBack();
+            return false;
+        }
+
+
+        // 添加xs_vip
+        $vip_res = self::InsertVip($userInfo['id'],$orderInfo['id'],$userInfo['phone']);
+        if (!$vip_res) {
+            DB::rollBack();
+            return false;
+        }
+
+        DB::commit();
+        return true;
+
+    }
+
+    // 开通/续费 合伙人VIP
+    public static function InsertVip($uid,$oid,$phone){
+
+        $now_date       = date('Y-m-d H:i:s');
+        $now            = time();
+        $date_format    = 'Y-m-d 23:59:59';
+
+        $vipInfo  = XfxsVip::query()
+            ->where('user_id', '=', $uid)
+            ->where('status', '=', 1)
+            ->first();
+
+        if ($vipInfo) {
+            //续费
+            $vip_res = XfxsVip::query()
+                ->where('id', '=', $vipInfo['id'])
+                ->update([
+                    'expire_time'       => date(
+                        $date_format,
+                        strtotime("+1 years", strtotime($vipInfo->expire_time))
+                    ),
+                    'end_time_msg_flag' => 0,
+                ]);
+
+        } else {
+            //开通
+            $vip_res = XfxsVip::query()
+                ->insert([
+                    'user_id'           => $uid,
+                    'username'          => $phone,
+                    'level'             => 1,
+                    'inviter'           => $twitter_info['user_id'] ?? 0,
+                    'inviter_vip_id'    => $twitter_info['id'] ?? 0,
+                    'start_time'        => $now_date,
+                    'expire_time'       => date($date_format, strtotime("+1 years", $now)),
+                    'status'            => 1,
+                    'order_id'          => $oid,
+                    'end_time_msg_flag' => 0,
+                ]);
+
+        }
+
+        return $vip_res;
+    }
+
+
+
     //⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆幸福学社⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆
 }
