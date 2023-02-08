@@ -14,7 +14,7 @@ class BannerServers
     {
         $query = Banner::query()
             ->whereIn('status', [1, 2])
-            ->where('app_project_type', '=', APP_PROJECT_TYPE)
+//            ->where('app_project_type', '=', APP_PROJECT_TYPE)
             ->select([
                          'id', 'title', 'pic', 'url', 'h5_url', 'type', 'start_time', 'end_time',
                          'created_at', 'status', 'jump_type', 'obj_id', 'info_id'
@@ -93,7 +93,7 @@ class BannerServers
         $jump_type_list             = $this->selectData(['flag' => 'jump_type', 'only_key' => true, 'is_select_list' => false]);
         $jump_type_list             = array_merge($jump_type_list, [1, 0]);
         $params['h5_url']           = $params['url'] ?? '';
-        $params['app_project_type'] = APP_PROJECT_TYPE;
+//        $params['app_project_type'] = APP_PROJECT_TYPE;
         $params['version']          = '5.0.0';
         $validator                  = Validator::make(
             $params,
