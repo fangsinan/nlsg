@@ -103,6 +103,9 @@ class WechatPay extends Controller
         } elseif ($data['attach'] == 103) {
             //幸福学社103合伙人
             return self::campOrderPaySuccess($data);
+        } elseif ($data['attach'] == 104) {
+            //幸福学社103合伙人
+            return self::XfxsReward($data);
         }
     }
 
@@ -2533,6 +2536,66 @@ class WechatPay extends Controller
     }
 
 
+    //幸福学社打赏
+    public static function XfxsReward($data)
+    {
+        $now_date = date('Y-m-d H:i:s');
+        $now      = time();
+
+        $orderInfo = XfxsOrder::query()
+            ->where('ordernum', '=', $data['out_trade_no'])
+            ->first();
+
+        if (!$orderInfo) {
+            return false;
+        }
+
+        $userInfo = User::query()
+            ->where('id', '=', $orderInfo['user_id'])
+            ->select(['id', 'phone'])
+            ->first()
+            ->toArray();
+
+        DB::beginTransaction();
+
+        $order_update_arr = [
+            'status'    => 1,
+            'pay_time'  => $now_date,
+            'pay_price' => $data['total_fee'],
+            'pay_type'  => $data['pay_type'],
+        ];
+
+        $order_res = XfxsOrder::query()
+            ->where('ordernum', '=', $data['out_trade_no'])
+            ->update($order_update_arr);
+
+        if (!$order_res) {
+            DB::rollBack();
+            return false;
+        }
+
+        $pay_record_arr = [
+            'ordernum'         => $data['out_trade_no'], //订单编号
+            'price'            => $data['total_fee'], //支付金额
+            'transaction_id'   => $data['transaction_id'], //流水号
+            'user_id'          => $userInfo['id'], //会员id
+            'type'             => $data['pay_type'], //1：微信  2：支付宝
+            'client'           => 1, //微信
+            'order_type'       => 104, //学社合伙人
+            'status'           => 1,
+            'app_project_type' => 2,
+        ];
+
+        $record_res = PayRecord::query()->firstOrCreate($pay_record_arr);
+
+        if (!$record_res) {
+            DB::rollBack();
+            return false;
+        }
+
+        DB::commit();
+        return true;
+    }
 
     //⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆幸福学社⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆
 }
