@@ -106,6 +106,9 @@ class WechatPay extends Controller
         } elseif ($data['attach'] == 104) {
             //幸福学社103合伙人
             return self::XfxsReward($data);
+        } elseif ($data['attach'] == 105) {
+            //幸福学社103合伙人
+            return self::XfxsLive($data);
         }
     }
 
@@ -2595,6 +2598,147 @@ class WechatPay extends Controller
 
         DB::commit();
         return true;
+    }
+
+    public static function XfxsLive($data)
+    {
+        $time = time();
+        $out_trade_no = $data['out_trade_no'];
+        $total_fee = $data['total_fee'];
+        $transaction_id = $data['transaction_id'];
+        $pay_type = $data['pay_type'];
+
+
+        //支付处理正确-判断是否已处理过支付状态
+        $orderInfo = XfxsOrder::select()->where(['ordernum' => $out_trade_no, 'status' => 0,])->first();
+
+        if (!empty($orderInfo)) {
+            $orderInfo = $orderInfo->toArray();
+
+            DB::beginTransaction();
+            try {
+                $orderId = $orderInfo['id'];
+                $live_id = $orderInfo['relation_id'];
+                //更新订单状态
+
+                $user_id = $orderInfo['user_id']; //用户
+                //更新订单状态
+                $data1 = [
+                    'status' => 1,
+                    'pay_time' => date("Y-m-d H:i:s", $time),
+                    'pay_price' => $total_fee,
+                    'pay_type' => $pay_type,
+                    'channel_show' => 1, //默认渠道显示
+                ];
+                $orderRst = XfxsOrder::where(['ordernum' => $out_trade_no])->update($data1);
+                if (!$orderRst) {
+                    DB::rollBack();
+                    return false;
+                }
+
+
+                //添加支付记录
+                $record = [
+                    'ordernum' => $out_trade_no, //订单编号
+                    'price' => $total_fee, //支付金额
+                    'transaction_id' => $transaction_id, //流水号
+                    'user_id' => $user_id, //会员id
+                    'type' => $pay_type, //1：微信  2：支付宝
+                    'order_type' => 16,//nlsg_pay_record表type 16直播
+                    'status' => 1,
+                    'app_project_type' => 2,
+                ];
+                $recordRst = PayRecord::firstOrCreate($record);
+                if (!$recordRst) {
+                    DB::rollBack();
+                    return false;
+                }
+                $subscribe = [
+                    'user_id' => $user_id, //会员id
+                    'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
+                    'type' => 3, //直播
+                    'status' => 1,
+                    'order_id' => $orderId, //订单id
+                    'relation_id' => $live_id,
+                    'twitter_id' => $orderInfo['twitter_id'],
+                    'app_project_type' => APP_PROJECT_TYPE,
+                ];
+
+                $userdata = User::find($user_id);
+                $subscribeRst=true;
+                if($userdata['is_test_pay']==0){ //测试用户不添加订阅记录
+                    $subscribeRst = XfxsSubscribe::firstOrCreate($subscribe);
+                    if (!$subscribeRst) {
+                        DB::rollBack();
+                        return false;
+                    }
+                    Live::where('id', $live_id)->increment('order_num');
+                    //按渠道更新预约人数
+                    LiveStatistics::countsJob($live_id,1,$orderInfo['twitter_id']);
+
+
+                }
+                //                $subscribeRst = Subscribe::firstOrCreate($subscribe);
+
+                $liveData = Live::find($live_id);
+
+                if ($liveData['relation_live'] > 0) {
+                    $subscribe = [
+                        'user_id' => $user_id, //会员id
+                        'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
+                        'type' => 3, //直播
+                        'status' => 1,
+                        'order_id' => $orderId, //订单id
+                        'relation_id' => $liveData['relation_live'],
+                        'app_project_type' => APP_PROJECT_TYPE,
+                    ];
+
+                    XfxsSubscribe::firstOrCreate($subscribe);
+                    Live::where('id', $liveData['relation_live'])->increment('order_num');
+                }
+
+                //21-03-22 补充的课程
+                if (in_array($liveData['user_id'] ?? 0, [161904, 250550, 423403])) {
+                    XfxsSubscribe::appendSub([$user_id], 1);
+                }
+
+
+                DB::commit();
+
+                // 下单记录王琨老师的直播
+                if( isset($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0 && $total_fee>=1){ //刷单用户排除 排除1元用户
+
+                    //免费观看时间
+                    if($total_fee==1){
+                        $show_end=date('Y-m-d 23:59:59', strtotime('+2 years'));
+                    }else{
+                        $show_end=date('Y-m-d 23:59:59', strtotime('+2 years'));
+                    }
+
+                    self::PayTeacherLives($user_id,$liveData,$orderInfo,$show_end);
+                    //						self::PayTeacherLives($user_id,$liveData,$orderInfo,$bind_end);
+                }
+
+                // 内容刷单记录
+                self::PayTestLog($orderId,$userdata);
+
+                //9.9刷单推送
+                if (!empty($orderInfo['remark']) && $orderInfo['remark'] > 0) {
+                    self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $orderInfo['remark'], $orderId, 1);
+                }
+
+                return true;
+
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return false;
+            }
+
+        } else {
+            //订单状态已更新，直接返回
+            return true;
+        }
     }
 
     //⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆幸福学社⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆
