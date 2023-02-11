@@ -2697,10 +2697,10 @@ class WechatPay extends Controller
                     Live::where('id', $liveData['relation_live'])->increment('order_num');
                 }
 
-                //21-03-22 补充的课程
-                if (in_array($liveData['user_id'] ?? 0, [161904, 250550, 423403])) {
-                    XfxsSubscribe::appendSub([$user_id], 1);
-                }
+                // //21-03-22 补充的课程
+                // if (in_array($liveData['user_id'] ?? 0, [161904, 250550, 423403])) {
+                //     XfxsSubscribe::appendSub([$user_id], 1);
+                // }
 
 
                 DB::commit();
