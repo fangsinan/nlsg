@@ -283,22 +283,22 @@ class CytxUserPhoneChange extends Command
 
         //23.02.06 吴秀娟提交   绑定到
         if (0) {
-            $list = DB::select('select * from w_linshi_huiyu_vip_bind where id between 34822 and 35015');
+            $list = DB::select('select * from w_linshi_huiyu_vip_bind where id between 35016 and 35464');
 
-            $vs = new VipServers();
+//            $vs = new VipServers();
 
             foreach ($list as $v) {
                 //查询son是不是合伙人 不是开通
-                $check_son = VipUser::query()
-                    ->where('username', '=', $v->son)
-                    ->where('level', '=', 2)
-                    ->where('status', '=', 1)
-                    ->where('is_default', '=', 1)
-                    ->first();
-
-                if (!$check_son) {
-                    $vs->createVip_2(['phone' => $v->son], 1);
-                }
+//                $check_son = VipUser::query()
+//                    ->where('username', '=', $v->son)
+//                    ->where('level', '=', 2)
+//                    ->where('status', '=', 1)
+//                    ->where('is_default', '=', 1)
+//                    ->first();
+//
+//                if (!$check_son) {
+//                    $vs->createVip_2(['phone' => $v->son], 1);
+//                }
 
                 //绑定
                 $today = date('Y-m-d H:i:s');
@@ -312,7 +312,7 @@ class CytxUserPhoneChange extends Command
                     ->where('status', '=', 1)
                     ->select(['id', 'parent', 'son', 'remark'])
                     ->first();
-
+                echo $v->son.'--开始';
                 if (empty($get_vip_bind)) {
 
                     DB::beginTransaction();
@@ -327,7 +327,7 @@ class CytxUserPhoneChange extends Command
                                      'begin_at'     => $begin_at,
                                      'end_at'       => $end_at,
                                      'status'       => 1,
-                                     'remark'       => '230206吴秀娟提交:' . $v->id,
+                                     'remark'       => '230213吴秀娟提交:' . $v->id,
                                      'column_name'  => $v->column_name,
                                      'channel_name' => 2,
                                  ]);
