@@ -7,6 +7,7 @@ use App\Models\Bliss\OrderModel;
 use App\Models\Bliss\ProfitLogModel;
 use App\Models\Bliss\ProfitModel;
 use App\Models\Bliss\UserModel;
+use App\Models\Bliss\VipGroupModel;
 use App\Models\Bliss\VipUserBindModel;
 use App\Models\Bliss\VipUserModel;
 use App\Models\Order;
@@ -18,44 +19,58 @@ use Predis\Client;
 
 class ProfitServer
 {
-    /**
-     * 收益结算提现
-     * todo 定时任务
-     */
-    public static function profit_settle(){
 
-    }
 
     /**
      * 保存收益
-     *
      */
-    public static function profit_add($order_id,$user_id){
+    public static function profit_add($order_id, $user_id)
+    {
 
-        $Order=Order::query()->where('id',$order_id)->first();
-        if(!$Order){
+        $Order = OrderModel::query()->where('id', $order_id)->where('status',1)->where('is_shill',0)->first();
+        if (!$Order) {
             return '订单不存在';
         }
-        $ProfitModel=ProfitModel::query()->where('order_id',$order_id)->first();
-        if($ProfitModel){
+
+        //判断是否是合伙人
+        $VipUserModel=VipUserModel::query()->where('user_id',$user_id)->where('status',1)->first();
+        if(!$VipUserModel){
+            return '合伙人用户不存在';
+        }
+
+        $VipGroupModel=VipGroupModel::query()->where('id',$VipUserModel->group_id)->first();
+        if(!$VipGroupModel){
+            return '合伙人分组不存在';
+        }
+
+        $profit=$VipGroupModel->price;
+        if(empty($profit)){
+            return '收益为空';
+        }
+
+        $ProfitModel = ProfitModel::query()->where('order_id', $order_id)->first();
+        if ($ProfitModel) {
             return '收益已发放';
         }
-        $ProfitModel =new ProfitModel();
-        $ProfitModel->user_id=$user_id;
-        $ProfitModel->order_id=$order_id;
-        $ProfitModel->source_user_id=$Order->user_id;
-        $ProfitModel->profit=77400;
-        $ProfitModel->plan_settle_time=date("Y-m-d H:i:s",strtotime("+30 day"));
+
+        $ProfitModel = new ProfitModel();
+        $ProfitModel->user_id = $user_id;
+        $ProfitModel->order_id = $order_id;
+        $ProfitModel->source_user_id = $Order->user_id;
+        $ProfitModel->profit = $profit;
+        $ProfitModel->plan_settle_time = date("Y-m-d H:i:s", strtotime("+30 day"));//计划结算时间
         $ProfitModel->save();
 
         //保存日志
         $ProfitLogModel = new ProfitLogModel();
-        $ProfitLogModel->order_id=$order_id;
-        $ProfitLogModel->user_id=$user_id;
-        $ProfitLogModel->money=$ProfitModel->profit;
-        $ProfitLogModel->type=1;//类型 1收益 2提现
-        $ProfitLogModel->remark='成功推广商品';
+        $ProfitLogModel->order_id = $order_id;
+        $ProfitLogModel->user_id = $user_id;
+        $ProfitLogModel->money = $ProfitModel->profit;
+        $ProfitLogModel->type = 1;//类型 1收益 2提现
+        $ProfitLogModel->remark = '成功推广商品';
         $ProfitLogModel->save();
+
+        MessageServer::send_msg($ProfitLogModel->user_id, 'profit', $order_id, ['money' => $ProfitModel->profit]);
 
         return true;
     }
