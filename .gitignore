@@ -11,3 +11,4 @@ vendor/mews/captcha/.gitignore
 storage/logs
 apidoc
 .env
+vendor20230214/
