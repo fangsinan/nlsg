@@ -209,6 +209,7 @@ class IndexController extends ControllerBackend
         $start = $request->get('start');
         $end = $request->get('end');
         $is_zero = $request->get('is_zero',0);
+        $app_project_type = $request->get('app_project_type',0);
 
         $classify = $request->input('classify','');
 
@@ -228,6 +229,10 @@ class IndexController extends ControllerBackend
 
         if ($is_zero){
             $query->where('is_zero','=',$is_zero);
+        }
+
+        if ($app_project_type){
+            $query->where('app_project_type','=',$app_project_type);
         }
 
         if (!empty($classify)){
@@ -264,7 +269,8 @@ class IndexController extends ControllerBackend
             $query->where('id', '>', 51);
         }
         $lists = $query->select('id', 'user_id', 'title', 'price','classify',
-            'order_num', 'status', 'steam_begin_time as begin_at', 'cover_img','is_zero')
+                                'details_img','app_project_type','order_num', 'status',
+                                'steam_begin_time as begin_at', 'cover_img','is_zero')
             ->where('is_del', 0)
             ->orderBy('sort', 'asc')
             ->orderBy('id', 'desc')
@@ -567,6 +573,8 @@ class IndexController extends ControllerBackend
             $hide_sub_count  = $input['hide_sub_count'] ?? 0;
             $is_zero = $input['is_zero'] ?? 1;
             $zero_poster_show = (int)($input['zero_poster_show'] ?? 0);
+            $details_img = $input['details_img'] ?? '';
+            $app_project_type = $input['app_project_type'] ?? 1;
 
     		$cover_vertical_img = !empty($input['cover_vertical_img']) ? covert_img($input['cover_vertical_img']) : '';
 
@@ -641,6 +649,8 @@ class IndexController extends ControllerBackend
                 'hide_sub_count'=>$hide_sub_count,
                 'is_zero'=>$is_zero,
                 'zero_poster_show'=>$zero_poster_show,
+                'details_img'=>$details_img,
+                'app_project_type'=>$app_project_type,
     		];
 
     		$lcModel            = new LiveConsole();
