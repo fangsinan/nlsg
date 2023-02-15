@@ -1071,7 +1071,7 @@ class IndexController extends ControllerBackend
     			->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at','service_type',
     				'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test','bgp_id',
     				'steam_end_time', 'steam_begin_time','pre_push_time','classify','valid_time_range','cover_vertical_img',
-                    'hide_sub_count','is_zero','zero_poster_show'
+                    'hide_sub_count','is_zero','zero_poster_show','app_project_type','details_img'
     			)
     //            ->with(['livePoster'])
     			->where('id', $id)->first();
