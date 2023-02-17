@@ -140,6 +140,7 @@ class OrderController extends Controller
 
     }
 
+    // api/v5/order/xfxs_free_order?type=4&relation_id=2&live_id=907&os_type=1
     // 直播间免费刷单
     public function freeOrder(Request $request){
 
@@ -151,8 +152,6 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return $this->error(0,$validator->messages()->first());
         }
-        $this->user['nickname'] = 'as';
-        $this->user['id'] = '211172';
 
         // orderType 101课程  102合伙人 103 训练营  104 直播打赏  105 直播预约 106 线下产品
         // redisType 16 360会员  14 线下课  18 训练营  11 直播间
