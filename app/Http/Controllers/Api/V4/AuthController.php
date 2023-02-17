@@ -68,7 +68,10 @@ class AuthController extends Controller
 //        $dont_check_phone = array_merge($dont_check_phone,$dont_check_phone_2);
 
         $check_easy_code = User::query()->where('phone', '=', $phone)
-            ->where('is_code_login', '>', 0)
+            ->where(function ($q) {
+                $q->where('is_code_login', '>', 0)
+                    ->orWhere('is_test_pay', '=', 1);
+            })
             ->select(['id', 'phone', 'is_code_login'])
             ->first();
 
@@ -270,7 +273,10 @@ class AuthController extends Controller
         }
 
         $check_easy_code = User::query()->where('phone', '=', $phone)
-            ->where('is_code_login', '>', 0)
+            ->where(function ($q) {
+                $q->where('is_code_login', '>', 0)
+                    ->orWhere('is_test_pay', '=', 1);
+            })
             ->select(['id', 'phone', 'is_code_login'])
             ->first();
 
@@ -689,7 +695,10 @@ class AuthController extends Controller
 //        $dont_check_phone = array_merge($dont_check_phone,$dont_check_phone_2);
 
         $check_easy_code = User::query()->where('phone', '=', $phone)
-            ->where('is_code_login', '>', 0)
+            ->where(function ($q) {
+                $q->where('is_code_login', '>', 0)
+                    ->orWhere('is_test_pay', '=', 1);
+            })
             ->select(['id', 'phone', 'is_code_login'])
             ->first();
 
