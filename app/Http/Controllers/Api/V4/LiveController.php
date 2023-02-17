@@ -333,6 +333,15 @@ class LiveController extends Controller
             ->where('is_finish', 0)
             ->where('is_del', 0);
 
+
+
+        //  测试用户可以看两个平台直播  主播可以看自己的直播
+        if(empty($this->user['is_test_pay'])){
+            $query->where(function ($query)use($uid){
+                $query->where('app_project_type','=',APP_PROJECT_TYPE)
+                    ->Orwhere('user_id', $uid);;
+            });
+        }
         // 不查询测试直播的情况下
         // 需要查询当前用户是否管理员  单独查询管理员的
         if($is_test == 0 && !empty($this->user['phone'])){
