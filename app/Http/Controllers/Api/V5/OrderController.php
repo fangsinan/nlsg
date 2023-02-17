@@ -4,13 +4,17 @@
 namespace App\Http\Controllers\Api\V5;
 
 
+use App\Http\Controllers\Api\V4\WechatPay;
 use App\Http\Controllers\Controller;
 use App\Models\Lists;
+use App\Models\Live;
 use App\Models\MallAddress;
 use App\Models\MallOrder;
 use App\Models\Order;
 use App\Models\OrderErpList;
+use App\Models\Xfxs\XfxsOrder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 
 /**
@@ -63,7 +67,7 @@ class OrderController extends Controller
             //同时添加推送队列
             OrderErpList::query()
                 ->firstOrCreate(['order_id' => $order_id,'flag'=>1]);
-            
+
             return $this->success((object)[]);
 
         }
@@ -136,4 +140,89 @@ class OrderController extends Controller
 
     }
 
+    // 直播间免费刷单
+    public function freeOrder(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'type' => 'required|numeric',
+            'relation_id' => 'required|numeric',
+            'live_id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $this->error(0,$validator->messages()->first());
+        }
+        $this->user['nickname'] = 'as';
+        $this->user['id'] = '211172';
+
+        // orderType 101课程  102合伙人 103 训练营  104 直播打赏  105 直播预约 106 线下产品
+        // redisType 16 360会员  14 线下课  18 训练营  11 直播间
+        $type = $request->input("type");
+        $relation_id = $request->input("relation_id");
+        $live_id = $request->input("live_id");
+        $os_type = $request->input("os_type");
+        $user_id = $this->user['id'] ?? 0;
+        // 客户端根据socket 跳转类型
+        // 1 :  跳转专栏
+        // 2 :  跳转精品课
+        // 3 :  跳转商品
+        // 7 :  跳转讲座
+        // 8 :  跳转听书
+        // 10 :  跳转第三方链接
+        //
+        // 4 :  支付订单弹窗 线下产品门票
+        // 6：360会员
+        // 9： 直播
+        // 11：训练营
+        //
+        // 12：二维码
+
+        $redis_relation_id = $relation_id;
+        switch ($type){
+            case 11:  //训练营
+                $redis_type = 18;
+                $order_type = 103;
+                break;
+            case 9:  //  直播
+                $redis_type = 11;
+                $order_type = 105;
+                $relation_live = Live::where("id",$relation_id)->first();
+                $redis_relation_id = $relation_live['title'];
+                break;
+            case 4:  //线下课
+                $redis_type = 14;
+                $order_type = 106;
+                break;
+            default:
+
+                $redis_type = 0;
+                $order_type = 0;
+                break;
+        }
+        if($order_type == 0){
+            return $this->success();
+        }
+
+        $live = Live::where('id',$live_id)->first();
+
+        if(!empty($live)&&$live['app_project_type'] == 2){
+            $ordernum = MallOrder::createOrderNumber($user_id, 3);
+             $res = XfxsOrder::firstOrCreate([
+                 'ordernum' => $ordernum,
+                 'type' => $type,
+                 'user_id' => $user_id,
+                 'relation_id' => $relation_id,
+                 'cost_price' => '0.01',
+                 'price' => '0.01',
+                 'ip' => $this->getIp($request),
+                 'os_type' => $os_type,
+                 'live_id' => $live_id ?? 0,
+                 'pay_type' => 5,
+                 'activity_tag' => $activity_tag ?? '',
+             ]);
+            // 添加redis
+            WechatPay::LiveRedis($redis_type,$redis_relation_id, $this->user['nickname'], $live_id);
+        }
+
+        return $this->success();
+    }
 }
