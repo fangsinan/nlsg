@@ -335,7 +335,7 @@ class LiveController extends Controller
 
 
 
-        //  测试用户可以看两个平台直播  主播可以看自己的直播
+        //  如果测试用户 可不做校验直接展示两个平台的直播  主播可以看自己的直播
         if(empty($this->user['is_test_pay'])){
             $query->where(function ($query)use($uid){
                 $query->where('app_project_type','=',APP_PROJECT_TYPE)
