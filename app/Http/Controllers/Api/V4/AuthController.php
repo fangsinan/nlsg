@@ -81,19 +81,17 @@ class AuthController extends Controller
             }
         } elseif ($check_easy_code) {
             switch (intval($check_easy_code->is_code_login)) {
-                case 1:
-                    if (intval($code) !== 6666) {
-                        return error(400, '验证码错误', $sclass);
-                    }
-                    break;
                 case 2:
                     $temp_code = substr($phone, -4);
                     if (intval($code) !== intval($temp_code)) {
-                        return error(400, '验证码错误', $sclass);
+                        return error(400, '验证码错误', (object)[]);
                     }
                     break;
                 default:
-                    return error(400, '验证码错误', $sclass);
+                    if (intval($code) !== 6666) {
+                        return error(400, '验证码错误', (object)[]);
+                    }
+                    break;
             }
         } else {
             $res = Redis::get($phone);
@@ -288,19 +286,17 @@ class AuthController extends Controller
             }
         } elseif ($check_easy_code) {
             switch ((int)$check_easy_code->is_code_login) {
-                case 1:
-                    if ((int)$code !== 6666) {
-                        return error(400, '验证码错误', (object)[]);
-                    }
-                    break;
                 case 2:
                     $temp_code = substr($phone, -4);
-                    if ((int)$code !== (int)$temp_code) {
+                    if (intval($code) !== intval($temp_code)) {
                         return error(400, '验证码错误', (object)[]);
                     }
                     break;
                 default:
-                    return error(400, '验证码错误', (object)[]);
+                    if (intval($code) !== 6666) {
+                        return error(400, '验证码错误', (object)[]);
+                    }
+                    break;
             }
         } else {
             $res = Redis::get($phone);
