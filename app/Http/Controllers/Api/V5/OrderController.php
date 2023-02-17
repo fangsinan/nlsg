@@ -201,6 +201,8 @@ class OrderController extends Controller
                  'type' => $type,
                  'user_id' => $user_id,
                  'relation_id' => $relation_id,
+                 'status' => 1,
+                 'pay_price' => '0.01',
                  'cost_price' => '0.01',
                  'price' => '0.01',
                  'ip' => $this->getIp($request),
