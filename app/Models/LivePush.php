@@ -39,7 +39,7 @@ class LivePush extends Base
             return ['code' => false, 'msg' => '时间错误'];
         }
 
-        if ( ! in_array($push_type, [1, 2, 3, 4, 6, 7, 8, 9, 10, 11 ,12])) {
+        if ( ! in_array($push_type, [1, 2, 3, 4, 6, 7, 8, 9, 10, 11 ,12,13])) {
             return ['code' => false, 'msg' => '类型错误'];
         }
 
