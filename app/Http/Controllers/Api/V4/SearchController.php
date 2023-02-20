@@ -13,6 +13,7 @@ use App\Models\OfflineProducts;
 use App\Models\Search;
 use App\Models\Wiki;
 use App\Models\Works;
+use App\Models\Xfxs\XfxsVip;
 use Illuminate\Http\Request;
 
 class SearchController extends Controller
@@ -448,6 +449,12 @@ class SearchController extends Controller
             $res['live'] = Live::search($keywords,$user_id,$app_project_type);
             $res['live_urls'] = LiveUrl::search($keywords);
             $res['camps'] = Column::search($keywords,3,$app_project_type);
+            $res['xfxs_vip']['res'] = [];
+            if($app_project_type == 2){
+                // 幸福学社合伙人
+                $res['xfxs_vip']['res'][] = ['id'=>1,'type' => 106, 'text'=>'幸福学社合伙人','img'=>'/nlsg/works/20210105102849884378.png','price'=>XfxsVip::NEW_PRICE];
+            }
+
         }
 
 
