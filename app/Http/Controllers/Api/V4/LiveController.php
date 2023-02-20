@@ -2217,7 +2217,7 @@ class LiveController extends Controller
 
                 case 2:
                 case 8:
-                    $Info = Works::select('id','title as name','price','subtitle','details_pic as img','user_id','details_pic as image')->where(['id'=>$res['push_gid'],'status'=>4])->first();
+                    $Info = Works::select('id','title as name','price','subtitle','detail_img as img','user_id','detail_img as image')->where(['id'=>$res['push_gid'],'status'=>4])->first();
                     break;
                 case 3:
                     $Info = MallGoods::select('id','name','price','subtitle','picture as img','picture as image')->where(['id'=>$res['push_gid'],'status'=>2])->first();
@@ -2257,6 +2257,17 @@ class LiveController extends Controller
                         'subtitle'  =>'',
                         'image' =>$qr_code['qr_url'], //方图
                         'img'   =>$qr_code['qr_url']  //长图
+                    ];
+                    break;
+                case 13:
+
+                    $Info=[
+                        'id'=>1,
+                        'name'=>'幸福学社合伙人',
+                        'price'=>2580,
+                        'subtitle'=>'',
+                        'image'=>'/nlsg/works/20201124144228445465.png', //方图
+                        'img'=>'/nlsg/works/20201124144228445466.png'  //长图
                     ];
                     break;
             }
