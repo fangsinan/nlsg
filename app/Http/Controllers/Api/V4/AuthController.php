@@ -796,6 +796,7 @@ class AuthController extends Controller
             'sex' => $user->sex,
             'is_community_admin' => $user->is_community_admin,
             'children_age' => 10,//$user->children_age,
+            'is_test_pay' => $user->is_test_pay,
         ];
     }
 
