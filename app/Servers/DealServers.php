@@ -30,7 +30,7 @@ class DealServers
 
     //获取成交订单
     //https://app.v4.api.nlsgapp.com/api/admin_v4/deal/get_order_info?live_id=199
-    //http://127.0.0.1:8000/api/admin_v4/deal/get_order_info?live_id=177
+    //http://123.56.92.249:8091/api/admin_v4/deal/get_order_info?live_id=795
     public static function getOrderInfo($data,$live_id,$crontab=0)
     {
 
@@ -59,6 +59,8 @@ class DealServers
                     return ['status' => 1, 'data' => [], 'msg' => '没有直播间开播'];
                 }
             }else{
+                //零元购订单抓取
+                $is_free=Live::query()->where(['id'=>$live_id])->first()->is_free;
                 /*$LiveOrderObj = Order::query()->where('pay_time', '>', $now . ' 00:00:00')
                     ->where(['type' => 14, 'status' => 1, 'is_deal' => 0])->select(['live_id'])->where('pay_price', '>', 1)
                     ->groupBy('live_id')->get()->toArray() ?: [];
@@ -315,7 +317,12 @@ class DealServers
                 $sub_live_pay_price=9.9; //抖音默认9.9
             }else if(!empty($subLiveInfo->order_id)) { //有订单
                 $SubOrder = Order::where(['id' => $subLiveInfo->order_id])->first();
-                $sub_live_pay_price = $SubOrder->pay_price;
+                // $sub_live_pay_price = $SubOrder->pay_price;
+				if(empty($SubOrder)){ //零元购查询不到订单
+					$sub_live_pay_price=0;
+				}else {
+					$sub_live_pay_price = $SubOrder->pay_price;
+				}
             }
         }
 
@@ -354,9 +361,16 @@ class DealServers
             }else if(!empty($subLiveInfo->order_id)) { //有订单
                 //鉴别是否为李婷老师
                 $SubOrder = Order::where(['id' => $subLiveInfo->order_id])->first();
-                if(in_array($SubOrder->twitter_id,$arr)) {
-                    $qd = 2;
-                }
+                // if(in_array($SubOrder->twitter_id,$arr)) {
+                //     $qd = 2;
+                // }
+				if(empty($SubOrder)){ //零元购订单
+					$qd = 4;
+				}else {
+					if (in_array($SubOrder->twitter_id, $arr)) {
+						$qd = 2;
+					}
+				}
             }else if(!empty($subLiveInfo->twitter_id)){
                 if(in_array($subLiveInfo->twitter_id,$arr)) { //李婷
                     $qd = 2;
