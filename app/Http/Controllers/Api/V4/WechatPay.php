@@ -701,6 +701,8 @@ class WechatPay extends Controller
             $res = $nickname . ':您已购买' . $data['name'];
         } else if ($type == 11) { //购买9.9直播间
             $res = $nickname . ':您已订阅' . $relation_id;
+        } else if ($type == 101) { //购买9.9直播间
+            $res = $res = $nickname . ':您已成功购买' . $live_num . '个幸福合伙人';
         }
         Redis::rpush($key, $res);
 

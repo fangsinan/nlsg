@@ -182,9 +182,9 @@ class OrderController extends Controller
                 $redis_type = 14;
                 $order_type = 106;
                 break;
-            case 4:  //线下课
-                $redis_type = 14;
-                $order_type = 106;
+            case 13:  //线下课
+                $redis_type = 101;
+                $order_type = 102;
                 break;
             default:
 
