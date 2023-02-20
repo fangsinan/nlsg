@@ -209,11 +209,11 @@ class Live extends Base
 
     }
 
-    static function search($keywords,$user_id=0)
+    static function search($keywords,$user_id=0,$app_project_type)
     {
         $res = Live::select('id', 'title', 'describe', 'cover_img', 'begin_at', 'end_at', 'user_id', 'price', 'created_at')
             ->where('status', 4)
-            ->where('app_project_type','=',APP_PROJECT_TYPE)
+            ->where('app_project_type','=',$app_project_type)
             ->where('is_del', 0);
         if(!in_array($user_id,[158291,211370])){
             $res=$res->where('is_test', 0);

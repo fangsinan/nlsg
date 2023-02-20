@@ -73,7 +73,7 @@ class Works extends Base
 
     }
 
-    static function search($keywords, $is_audio_book)
+    static function search($keywords, $is_audio_book,$app_project_type)
     {
         $worksObj = new Works();
         $infoObj = new WorksInfo();
@@ -86,7 +86,7 @@ class Works extends Base
             ->where('works.status', 4)
             ->where('works.type', 2)
             ->where('works.is_audio_book', $is_audio_book)
-            ->where('works.app_project_type','=',APP_PROJECT_TYPE)
+            ->where('works.app_project_type','=',$app_project_type)
             // ->where('info.status', 4)
             ->where(function ($query) use ($keywords) {
                 $query->orwhere('works.title', 'like', "%{$keywords}%");

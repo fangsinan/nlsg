@@ -432,11 +432,11 @@ class SearchController extends Controller
             //搜索专栏
             $res['column'] = ['res' => [], 'count'=> 0 ];//Column::search($keywords,1);
             //课程
-            $res['works'] = Works::search($keywords,0);
+            $res['works'] = Works::search($keywords,0,$app_project_type);
             //讲座
             $res['lecture'] = Column::search($keywords,2);
             //听书
-            $res['listen_book'] = Works::search($keywords,1);
+            $res['listen_book'] = Works::search($keywords,1,$app_project_type);
             //百科
             $res['Wiki'] = Wiki::search($keywords);
             //用户
@@ -445,7 +445,7 @@ class SearchController extends Controller
             //线下门票
             $res['products'] = OfflineProducts::search($keywords);
             $res['vip']['res'][] = ['id'=>1,'type' => 6, 'text'=>'幸福360会员','img'=>'/nlsg/works/20210105102849884378.png','price'=>360.00];
-            $res['live'] = Live::search($keywords,$user_id);
+            $res['live'] = Live::search($keywords,$user_id,$app_project_type);
             $res['live_urls'] = LiveUrl::search($keywords);
             $res['camps'] = Column::search($keywords,3,$app_project_type);
         }
