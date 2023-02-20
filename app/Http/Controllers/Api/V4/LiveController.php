@@ -333,6 +333,15 @@ class LiveController extends Controller
             ->where('is_finish', 0)
             ->where('is_del', 0);
 
+
+
+        //  如果测试用户 可不做校验直接展示两个平台的直播  主播可以看自己的直播
+        if(empty($this->user['is_test_pay'])){
+            $query->where(function ($query)use($uid){
+                $query->where('app_project_type','=',APP_PROJECT_TYPE)
+                    ->Orwhere('user_id', $uid);;
+            });
+        }
         // 不查询测试直播的情况下
         // 需要查询当前用户是否管理员  单独查询管理员的
         if($is_test == 0 && !empty($this->user['phone'])){
@@ -830,7 +839,7 @@ class LiveController extends Controller
         }
         $list = LiveInfo::with([
             'user:id,nickname,headimg,intro,honor',
-            'live:id,title,price,user_id,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num,classify',
+            'live:id,title,price,user_id,cover_img,content,twitter_money,is_free,playback_price,is_show,helper,msg,describe,can_push,password,is_finish,virtual_online_num,classify,app_project_type',
             'live.livePoster'=>function($q){
                 $q->where('status','=',1);
             }
