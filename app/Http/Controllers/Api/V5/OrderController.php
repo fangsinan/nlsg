@@ -161,7 +161,7 @@ class OrderController extends Controller
         $user_id = $this->user['id'] ?? 0;
         // $type 客户端根据socket 跳转类型
         // 1:  跳转专栏    2:  跳转精品课      3:  跳转商品   7:  跳转讲座   8:  跳转听书
-        // 10: 跳转第三方链接   4: 线下产品门票   6：360会员    9： 直播   11：训练营 12：二维码   13
+        // 10: 跳转第三方链接   4: 线下产品门票   6：360会员    9： 直播   11：训练营 12：二维码   13幸福合伙人
 
 
         // orderType 101课程  102合伙人 103 训练营  104 直播打赏  105 直播预约 106 线下产品
@@ -202,7 +202,7 @@ class OrderController extends Controller
             $ordernum = MallOrder::createOrderNumber($user_id, 3);
              $res = XfxsOrder::firstOrCreate([
                  'ordernum' => $ordernum,
-                 'type' => $type,
+                 'type' => $order_type,
                  'user_id' => $user_id,
                  'relation_id' => $relation_id,
                  'status' => 1,
