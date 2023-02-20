@@ -140,7 +140,7 @@ class Column extends Base
 
 
 
-    static function search($keywords,$type){
+    static function search($keywords,$type,$app_project_type=1){
         $columnObj = new Column();
         $userObj = new User();
 
@@ -149,6 +149,7 @@ class Column extends Base
             ->leftJoin($userObj->getTable().' as user', 'column.user_id', '=', 'user.id')
             ->where('column.type',$type)
             ->where('column.status',1)
+            ->where('column.app_project_type',$app_project_type)
             ->whereIn('column.is_start',[0,1])
             ->where(function ($query)use($keywords){
                 $query->orWhere('column.title','LIKE',"%$keywords%");

@@ -417,6 +417,7 @@ class SearchController extends Controller
         $keywords = $request->input('keywords','');
         $user_id = $request->input('user_id',0);
         $flag = $request->input('flag','');
+        $app_project_type = $request->input('app_project_type',1);
 
         if($keywords === ''){
             return $this->error(0,'关键字为空');
@@ -446,7 +447,7 @@ class SearchController extends Controller
             $res['vip']['res'][] = ['id'=>1,'type' => 6, 'text'=>'幸福360会员','img'=>'/nlsg/works/20210105102849884378.png','price'=>360.00];
             $res['live'] = Live::search($keywords,$user_id);
             $res['live_urls'] = LiveUrl::search($keywords);
-            $res['camps'] = Column::search($keywords,3);
+            $res['camps'] = Column::search($keywords,3,$app_project_type);
         }
 
 
