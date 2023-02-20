@@ -452,7 +452,7 @@ class SearchController extends Controller
             $res['xfxs_vip']['res'] = [];
             if($app_project_type == 2){
                 // 幸福学社合伙人
-                $res['xfxs_vip']['res'][] = ['id'=>1,'type' => 106, 'text'=>'幸福学社合伙人','img'=>'/nlsg/works/20210105102849884378.png','price'=>XfxsVip::NEW_PRICE];
+                $res['xfxs_vip']['res'][] = ['id'=>1,'type' => 13, 'text'=>'幸福学社合伙人','img'=>'/nlsg/works/20210105102849884378.png','price'=>XfxsVip::NEW_PRICE];
             }
 
         }
