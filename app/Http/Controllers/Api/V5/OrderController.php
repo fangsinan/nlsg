@@ -200,21 +200,31 @@ class OrderController extends Controller
 
         if(!empty($live)&&$live['app_project_type'] == 2){
             $ordernum = MallOrder::createOrderNumber($user_id, 3);
-             $res = XfxsOrder::firstOrCreate([
-                 'ordernum' => $ordernum,
+             $res = XfxsOrder::where([
                  'type' => $order_type,
                  'user_id' => $user_id,
                  'relation_id' => $relation_id,
                  'status' => 1,
-                 'pay_price' => '0.01',
-                 'cost_price' => '0.01',
-                 'price' => '0.01',
-                 'ip' => $this->getIp($request),
-                 'os_type' => $os_type,
                  'live_id' => $live_id ?? 0,
-                 'pay_type' => 5,
-                 'activity_tag' => $activity_tag ?? '',
-             ]);
+             ])->OrderBy("id","desc")->first();
+             if(!empty($res) && (time() - strtotime($res['created_at']) < 10)){
+                 return $this->error(0,'操作太频繁');
+             }
+            $res = XfxsOrder::firstOrCreate([
+                'ordernum' => $ordernum,
+                'type' => $order_type,
+                'user_id' => $user_id,
+                'relation_id' => $relation_id,
+                'status' => 1,
+                'pay_price' => '0.01',
+                'cost_price' => '0.01',
+                'price' => '0.01',
+                'ip' => $this->getIp($request),
+                'os_type' => $os_type,
+                'live_id' => $live_id ?? 0,
+                'pay_type' => 5,
+                'activity_tag' => $activity_tag ?? '',
+            ]);
             // 添加redis
             WechatPay::LiveRedis($redis_type,$redis_relation_id, $this->user['nickname'], $live_id);
         }
