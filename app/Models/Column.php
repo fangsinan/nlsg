@@ -147,11 +147,13 @@ class Column extends Base
         $query = DB::table($columnObj->getTable(), 'column')->
         select('column.id', 'column.name', 'user_id', 'subtitle', 'original_price', 'price', 'cover_pic')
             ->leftJoin($userObj->getTable().' as user', 'column.user_id', '=', 'user.id');
-        if($type == 3 || $type == 4){
-            $query->whereIn('column.type',[3,4]);
-        }else{
-            $query->where('column.type',$type);
-        }
+        // if($type == 3 || $type == 4){
+        //     $query->whereIn('column.type',[3,4]);
+        // }else{
+        //
+        // }
+        //只能推送父类
+        $query->where('column.type',$type);
 
         $query->where('column.status',1)
             ->where('column.app_project_type',$app_project_type)

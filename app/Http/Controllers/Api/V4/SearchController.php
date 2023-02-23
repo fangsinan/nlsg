@@ -448,7 +448,7 @@ class SearchController extends Controller
             $res['vip']['res'][] = ['id'=>1,'type' => 6, 'text'=>'幸福360会员','img'=>'/nlsg/works/20210105102849884378.png','price'=>360.00];
             $res['live'] = Live::search($keywords,$user_id,$app_project_type);
             $res['live_urls'] = LiveUrl::search($keywords);
-            $res['camps'] = Column::search($keywords,3,$app_project_type);
+            $res['camps'] = Column::search($keywords,4,$app_project_type);
             $res['xfxs_vip']['res'] = [];
             if($app_project_type == 2){
                 // 幸福学社合伙人
