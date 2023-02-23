@@ -144,11 +144,16 @@ class Column extends Base
         $columnObj = new Column();
         $userObj = new User();
 
-        $res = DB::table($columnObj->getTable(), 'column')->
+        $query = DB::table($columnObj->getTable(), 'column')->
         select('column.id', 'column.name', 'user_id', 'subtitle', 'original_price', 'price', 'cover_pic')
-            ->leftJoin($userObj->getTable().' as user', 'column.user_id', '=', 'user.id')
-            ->where('column.type',$type)
-            ->where('column.status',1)
+            ->leftJoin($userObj->getTable().' as user', 'column.user_id', '=', 'user.id');
+        if($type == 3 || $type == 4){
+            $query->whereIn('column.type',[3,4]);
+        }else{
+            $query->where('column.type',$type);
+        }
+
+        $query->where('column.status',1)
             ->where('column.app_project_type',$app_project_type)
             ->whereIn('column.is_start',[0,1])
             ->where(function ($query)use($keywords){
@@ -156,7 +161,8 @@ class Column extends Base
                 $query->orWhere('column.name','LIKE',"%$keywords%");
                 $query->orWhere('column.subtitle','LIKE',"%$keywords%");
                 $query->orWhere('user.nickname','LIKE',"%$keywords%");
-            })->paginate(100)->toArray();
+            });
+            $res = $query->paginate(100)->toArray();
             //->get();
         return ['res' => $res['data'], 'count'=> $res['total'] ];
 //        return ['res' => $res, 'count'=> $res->count() ];
