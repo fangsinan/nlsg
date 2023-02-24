@@ -257,8 +257,7 @@ class Comment extends Base
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id')
-                    ->where('app_project_type','=',APP_PROJECT_TYPE);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function attach()
