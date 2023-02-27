@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V4;
 
 use App\Http\Controllers\Controller;
 use App\Models\Column;
+use App\Models\ConfigModel;
 use App\Models\Live;
 use App\Models\LiveUrl;
 use App\Models\MallGoods;
@@ -452,7 +453,10 @@ class SearchController extends Controller
             $res['xfxs_vip']['res'] = [];
             if($app_project_type == 2){
                 // 幸福学社合伙人
-                $res['xfxs_vip']['res'][] = ['id'=>1,'type' => 13, 'text'=>'幸福学社合伙人','img'=>'/nlsg/works/20210105102849884378.png','price'=>XfxsVip::NEW_PRICE];
+                $value = ConfigModel::getData(90);
+                $vip = json_decode($value,true);
+                $vip['type'] = 13;
+                $res['xfxs_vip']['res'][] = $vip;
             }
 
         }

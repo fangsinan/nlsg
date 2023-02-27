@@ -2261,14 +2261,11 @@ class LiveController extends Controller
                     break;
                 case 13:
 
-                    $Info=[
-                        'id'=>1,
-                        'name'=>'幸福学社合伙人',
-                        'price'=>2580,
-                        'subtitle'=>'',
-                        'image'=>'/nlsg/works/20201124144228445465.png', //方图
-                        'img'=>'/nlsg/works/20201124144228445466.png'  //长图
-                    ];
+
+                    $value = ConfigModel::getData(90);
+
+                    $Info=json_decode($value,true);
+
                     break;
             }
             if(!empty($Info)){
