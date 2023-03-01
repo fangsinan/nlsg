@@ -533,6 +533,7 @@ class LiveController extends Controller
                 ->select('id', 'live_pid', 'user_id')
                 ->where('status', 1)
                 ->where('playback_url', '!=', '')
+                ->where('app_project_type', APP_PROJECT_TYPE)
                 ->orderBy('begin_at', 'desc')
                 ->paginate(10)
                 ->toArray();
@@ -618,6 +619,7 @@ class LiveController extends Controller
             ->select('id', 'user_id', 'live_pid', 'begin_at', 'end_at', 'is_begin', 'is_finish')
             ->where('status', 1)
             ->where('live_pid', $id)
+            ->where('app_project_type', APP_PROJECT_TYPE)
             ->orderBy('begin_at', 'desc')
             ->paginate(10)
             ->toArray();
