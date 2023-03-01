@@ -864,6 +864,7 @@ class XiaoeTechServers
                     }
 
                 } catch (\Exception $e) {
+
                     if(!checkDuplicateEntry($e)){
                         return $e->getMessage();
                     }
