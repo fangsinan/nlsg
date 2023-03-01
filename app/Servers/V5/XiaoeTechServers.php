@@ -823,7 +823,7 @@ class XiaoeTechServers
 
                     for ($i = 2; $i <= $total_page; $i++) {
                         var_dump($i);
-                        Redis::rpush($redis_page_index_key, json_encode(['batch_number' => $batch_number, 'xe_user_id' => $xe_user_id, 'page_index' => $i]));
+                        Redis::rpush($redis_page_index_key, json_encode(['is_fast'=>$is_fast,'customer_number'=>$customer_number,'batch_number' => $batch_number, 'xe_user_id' => $xe_user_id, 'page_index' => $i]));
                     }
                 }
 
