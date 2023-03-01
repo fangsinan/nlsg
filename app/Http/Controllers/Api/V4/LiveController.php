@@ -331,8 +331,7 @@ class LiveController extends Controller
             ->where('begin_at','>', $day_time)
             ->where('status', 4)
             ->where('is_finish', 0)
-            ->where('is_del', 0)
-            ->where('app_project_type', APP_PROJECT_TYPE);
+            ->where('is_del', 0);
 
 
 
