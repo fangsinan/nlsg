@@ -750,16 +750,17 @@ class XiaoeTechServers
         for ($i = 1; $i <= 50; $i++) {
 
             $page_index_json = Redis::lpop($redis_page_index_key);
-            if ($page_index_json) {
-                $page_index_arr = json_decode($page_index_json, true);
-                $xe_user_id = $page_index_arr['xe_user_id'] ?? 0;
-                $page_index = $page_index_arr['page_index'] ?? 0;
-                $is_fast = $page_index_arr['is_fast'] ?? 0;
-                $customer_number = $page_index_arr['customer_number'] ?? 0;
-                $batch_number = $page_index_arr['batch_number'] ?? 0;
-            } else {
+
+            if (!$page_index_json) {
                 return false;
             }
+
+            $page_index_arr = json_decode($page_index_json, true);
+            $xe_user_id = $page_index_arr['xe_user_id'] ?? 0;
+            $page_index = $page_index_arr['page_index'] ?? 0;
+            $is_fast = $page_index_arr['is_fast'] ?? 0;
+            $customer_number = $page_index_arr['customer_number'] ?? 0;
+            $batch_number = $page_index_arr['batch_number'] ?? 0;
 
             if (empty($xe_user_id)) {
                 return false;
@@ -786,17 +787,6 @@ class XiaoeTechServers
                 if(isset($res['body']['data']['list'])){
                     $page_count=count($res['body']['data']['list']);
                 }
-                DB::table('nlsg_xe_log')->insert([
-                    'url' => 'xe.distributor.member.sub_customer',
-                    'line' => $res['body']['code'],
-                    'file' => $page_count,
-                    'parameter' => json_encode($paratms),
-                    'message' => $res['body']['data']['count']??0,
-                    'batch_number' => $batch_number,
-                    'page_index' => $page_index,
-                    'xe_user_id' => $xe_user_id,
-                    'created_at' => date('Y-m-d H:i:s', time())
-                ]);
 
                 if ($res['body']['code'] != 0) {
 
@@ -845,6 +835,20 @@ class XiaoeTechServers
             }
 
             foreach ($return_list as $customer) {
+
+                if(!$is_fast){
+
+                    DB::table('nlsg_xe_log')->insert([
+                        'url' => $xe_user_id,
+                        'xe_user_id' => $customer['sub_user_id']??'',
+                        'file' => $page_count??0,
+                        'line'=>$res['body']['data']['count']??0,
+                        'parameter' => json_encode($customer),
+                        'batch_number' => $batch_number,
+                        'page_index' => $page_index,
+                        'created_at' => date('Y-m-d H:i:s', time())
+                    ]);
+                }
 
                 try {
 
