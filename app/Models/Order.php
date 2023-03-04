@@ -83,7 +83,13 @@ class Order extends Base
         //校验下单用户是否关注
         $is_sub = Subscribe::isSubscribe($user_id, $target_id, $type);
         if ($is_sub) {
-            return ['code' => 0, 'msg' => '您已订阅过'];
+            $add_data = [];
+            $add_data['type'] = $type;
+            $add_data['relation_id'] = $target_id;
+            $add_data['user_id'] = $user_id;
+            $add_data['created_at'] = date('Y-m-d H:i:s');
+            DB::table('nlsg_subscribe_log')->insert($add_data);
+            return ['code' => 0, 'msg' => '您已订阅过，客服会再次联系您听课'];
         }
 
         //推客是否订阅
