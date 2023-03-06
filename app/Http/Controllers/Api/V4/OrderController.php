@@ -279,7 +279,7 @@ class OrderController extends Controller
 
         $os_type = !empty($params['os_type']) ? intval($params['os_type']) : 1;
         $live_id = !empty($params['live_id']) ? intval($params['live_id']) : 0;
-        $user_id = 211172;//$this->user['id'] ?? 0;
+        $user_id = $this->user['id'] ?? 0;
 
         //虚拟用户
         if($os_type ==3 && (empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2) ){
