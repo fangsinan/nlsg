@@ -414,6 +414,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
         Route::post('order/create_products_order', 'OrderController@createProductsOrder'); //线下课
 
         Route::post('order/create_teacher_order', 'OrderController@createTeacherOrder');
+        Route::post('order/create_free_camp', 'OrderController@campFreeOrder');
 
 
 
