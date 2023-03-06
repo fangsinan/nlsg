@@ -326,6 +326,7 @@ class OrderController extends Controller
             'user_id' => $user_id,
             'relation_id' => $column_id,
             'cost_price' => $column_data->price,
+            'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
             'remark' => "免费训练营",
             'status' => 1,
             'price' => $column_data->price,
