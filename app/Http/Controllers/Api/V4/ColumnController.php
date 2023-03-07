@@ -977,11 +977,11 @@ class ColumnController extends Controller
     }
 
 
-    // api/v4/column/get_works_info  在学列表
+    // api/v4/column/get_works_info  获取章节
     public function getWorksInfo(Request $request) {
         $info_id = $request->input('info_id', 0);
         $info = WorksInfo::select([
-            "id","title","camp_id", "type","share_img","section", "introduce","view_num","online_time",
+            "id","id as works_info_id","title","camp_id", "type","share_img","section", "introduce","view_num","online_time",
             "rank","free_trial","duration", "size","like_num",
         ])->find($info_id);
 
