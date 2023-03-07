@@ -118,7 +118,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
     Route::get('column/get_recommend', 'ColumnController@getRecommend');
     Route::get('column/get_lecture_list', 'ColumnController@getLectureList');
     Route::get('column/get_lecture_study_list', 'ColumnController@LectureStudyList');
-
+    Route::get('column/get_works_info', 'ColumnController@getWorksInfo');
 
     //课程
     Route::get('works/get_works_detail', 'WorksController@getWorksDetail');
