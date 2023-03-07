@@ -502,8 +502,13 @@ class AuthController extends Controller
 		$user = User::where('phone', $phone)->first();
 		if (!$user) { //没有此手机号，直接绑定
 			User::where('id', $user_id)->update(['phone' => $phone]);
-			$arra['id'] = $user_id;
-			$arra['data'] = [];
+//			$arra['id'] = $user_id;
+//			$arra['data'] = [];
+            $user=User::where('id', $user_id)->first();
+            $token = auth('api')->login($user);
+            $data = $this->get_data($user, $token);
+            $arra['id'] = $user->id;
+            $arra['data'] = $data;
 		} else { //号码已存在
 			$wechatObj=User::where('id', $user_id)->first();//获取当前用户微信信息
 			User::where('id', $user_id)->update(['wxopenid' => '','unionid'=>'']); //清空微信信息
