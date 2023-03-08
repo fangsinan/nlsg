@@ -1156,6 +1156,11 @@ class LiveController extends Controller
             $is_push_goods = empty($push_gid) ? 0 : 1;
         }
 
+        $InfoRst = LivePush::where(['live_info_id'=>$id, 'push_type'=>9])->first();
+        if(!empty($InfoRst)){
+            $is_push_goods=1;
+        }
+
         $data = [
             'info' => $list,
             'live_son_flag_num' => $live_son_flag_num,
