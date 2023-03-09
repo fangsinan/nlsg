@@ -26,6 +26,7 @@ use App\Models\VipUser;
 use App\Models\VipUserBind;
 use App\Models\Works;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 
 /**
@@ -203,7 +204,6 @@ class OrderController extends Controller
         }else if ($column_data['type'] == 3 || $column_data['type'] == 4) { // 训练营类型
             $sub_type = 7;
             $coupon_type = 8;
-
             //训练营单独限制其下单业务
             $checkAddOrder = Order::CheckAddOrder($column_id,18,$this->user,$os_type,$live_id);
             if($checkAddOrder['code'] !== true){
@@ -267,6 +267,103 @@ class OrderController extends Controller
         $order = Order::firstOrCreate($data);
 
         return $this->success($order['id']);
+    }
+
+    // 免费订阅
+    public function campFreeOrder(Request $request)
+    {
+
+        $params = $request->input();
+        $column_id = !empty($params['column_id']) ? intval($params['column_id']) : 0;
+        $tweeter_code = !empty($params['inviter']) ? intval($params['inviter']) : 0;
+
+        $os_type = !empty($params['os_type']) ? intval($params['os_type']) : 1;
+        $live_id = !empty($params['live_id']) ? intval($params['live_id']) : 0;
+        $user_id = $this->user['id'] ?? 0;
+
+        //虚拟用户
+        if($os_type ==3 && (empty($this->user['phone']) || substr($this->user['phone'],0,1) == 2) ){
+            return error(4000, '请修改手机号');
+        }
+
+        //$column_id 专栏信息
+        $column_data = Column::select("*")
+            ->where(["id" => $column_id,"is_free"=>1])
+            ->whereIn("type",[3,4])
+            ->first();
+
+        if (empty($column_data)) {
+            return $this->error(0, '训练营信息错误');
+        }
+        $sub_type = 7;
+        $is_sub = Subscribe::isSubscribe($user_id, $column_id, $sub_type);
+        if ($is_sub) {
+            return ['code' => 0, 'msg' => '您已订阅过'];
+        }
+
+        //检测下单参数有效性
+        $checked = $this->addOrderCheck($user_id, $tweeter_code, $column_id, $sub_type);
+
+        if ($checked['code'] == 0) {
+            return $this->error(0, $checked['msg']);
+        }
+        // 校验推客id是否有效
+        $tweeter_code = $checked['tweeter_code'];
+        $type = 18;
+
+        // 添加订单
+        $live_admin_id = Order::getAdminIDByLiveID($user_id,$live_id);
+        $ordernum = MallOrder::createOrderNumber($user_id, 3);
+
+        $time = time();
+        $starttime = strtotime(date('Y-m-d', $time));
+        $endtime = strtotime(date('Y', $starttime) + 1 . '-' . date('m-d', $starttime)) + 86400; //到期日期
+        DB::beginTransaction();
+
+        $order = Order::firstOrCreate([
+            'ordernum' => $ordernum,
+            'type' => $type,
+            'user_id' => $user_id,
+            'relation_id' => $column_id,
+            'cost_price' => $column_data->price,
+            'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
+            'remark' => "免费训练营",
+            'status' => 1,
+            'price' => $column_data->price,
+            'twitter_id' => $tweeter_code,
+            'ip' => $this->getIp($request),
+            'os_type' => $os_type,
+            'live_id' => $live_id ?? 0,
+            'activity_tag' => $activity_tag ?? '',
+            'live_admin_id'=>$live_admin_id??0,
+        ]);
+        if (!$order) {
+            DB::rollBack();
+            return $this->error(0, '订阅错误');
+        }
+        $time = time();
+        $starttime = strtotime(date('Y-m-d', $time));
+        $endtime = strtotime(date('Y', $starttime) + 1 . '-' . date('m-d', $starttime)) + 86400; //到期日期
+        // 添加订阅
+        $subscribeRst = Subscribe::firstOrCreate([
+            'user_id' => $user_id, //会员id
+            'pay_time' => date("Y-m-d H:i:s", $time), //支付时间
+            'type' => $sub_type,
+            'order_id' => $order['id'], //订单id
+            'status' => 1,
+            'start_time' => date("Y-m-d H:i:s", $starttime),
+            'end_time' => date("Y-m-d H:i:s", $endtime),
+            'relation_id' => $column_id,
+            'app_project_type' => APP_PROJECT_TYPE,
+        ]);
+
+        if (!$subscribeRst) {
+            DB::rollBack();
+            return $this->error(0, '订阅错误');
+        }
+
+        DB::commit();
+        return $this->success();
     }
 
 

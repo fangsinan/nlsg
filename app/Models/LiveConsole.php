@@ -734,7 +734,8 @@ class LiveConsole extends Base
                         'is_finish'          => 1,
                         'finished_at'        => $now_date,
                         'virtual_online_num' => 0,
-                        'sort'               => 30,
+//                        'sort'               => 30,
+                        'sort'               => 20,  //防止直播结束被沉底
                     ]);
                 break;
             default:

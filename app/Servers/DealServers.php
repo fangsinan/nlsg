@@ -152,7 +152,6 @@ class DealServers
             $SubInfo=self::getFirstSub($val->user_id);
             //处理渠道
             $QdInfo=self::getQd($val->user_id,$val->live_id);
-
             if(!empty($val->internal_remarks)){ //用户
                 $nickname=$val->internal_remarks;
             }else{
@@ -219,6 +218,9 @@ class DealServers
             Order::where(['ordernum' => $val->ordernum])->update($pro_map);
         }
 
+//        echo '<pre>';
+//        var_dump($map);
+//        exit;
         DB::beginTransaction();
         try {
             $DealAddRst = LiveDeal::Add($map, true);
@@ -306,6 +308,7 @@ class DealServers
 
         //第一优先级订阅表
         $subLiveInfo=Subscribe::query()->where(['user_id'=>$user_id,'type'=>3,'status'=>1])->first();
+
         if(!empty($subLiveInfo)){
             $sub_live_id=$subLiveInfo->relation_id;
             if(!empty($subLiveInfo->pay_time)){
