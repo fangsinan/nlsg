@@ -2,6 +2,8 @@
 
 namespace App\Servers\V5;
 
+use App\Models\Bliss\VipUserBindModel;
+use App\Models\Bliss\VipUserModel;
 use App\Models\User;
 use App\Models\XiaoeTech\XeDistributor;
 use App\Models\XiaoeTech\XeDistributorCustomer;
@@ -692,6 +694,74 @@ class XiaoeTechServers
 
         }
     }
+    /**
+     * 获取客户详情列表
+     * 五分钟一次 todo
+     */
+    public function sync_distributor_info($is_init = 0)
+    {
+        if (!$this->access_token) {
+            return $this->err_msg;
+        }
+
+        $redis_page_index_key = 'sync_distributor_info_user_ids';
+
+        if ($is_init) {
+            $user_id_list = XeDistributor::query()->where('status', 1)->pluck('xe_user_id')->toArray();
+            if (empty($user_id_list)) {
+                return false;
+            }
+            Redis::del($redis_page_index_key);
+            foreach ($user_id_list as $user_id) {
+                Redis::rpush($redis_page_index_key, $user_id);
+            }
+            return false;
+        }
+
+        for ($i = 1; $i <= 10000; $i++) {
+
+            var_dump($i);
+            $user_id = Redis::lpop($redis_page_index_key);
+            if (empty($user_id)) {
+                return false;
+            }
+
+            $paratms = [
+                'user_id' => $user_id,
+                'access_token' => $this->get_token(),
+            ];
+
+            $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.info.get/1.0.0', $paratms);
+            var_dump($res);
+
+            if ($res['body']['code'] != 0) {
+                if ($res['body']['code'] == 2008) {
+                    $this->get_token(1);
+                }
+
+                $this->err_msg = $res['body']['msg'];
+                return $res['body']['msg'];
+            }
+
+            $data = $res['body']['data'] ?? [];
+
+            if($data){
+
+                $XeDistributor=XeDistributor::query()->where('xe_user_id',$user_id)->first();
+                if($XeDistributor){
+                    $XeDistributor->group_id=$data['group_id'];
+                    $XeDistributor->group_name=$data['group_name'];
+                    $XeDistributor->level=$data['level'];
+                    $XeDistributor->xe_parent_user_id=$data['parent_user_id'];
+                    $XeDistributor->total_amount=$data['total_amount'];
+                    $XeDistributor->underling_number=$data['underling_number'];
+                    $XeDistributor->save();
+                }
+            }
+
+        }
+    }
+
 
     /**
      * 推广员客户列表
@@ -933,6 +1003,7 @@ class XiaoeTechServers
         $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.sub_customer/1.0.0', $paratms);
         return $res['body'];
     }
+
 
     /**
      * 同步订单详情
@@ -1524,5 +1595,309 @@ class XiaoeTechServers
 
         curl_close($ch);
         return $result;
+    }
+
+
+    /**
+     * 同步小鹅数据到幸福学社
+     */
+    public function sync_xe_xfxs($type)
+    {
+
+        switch ($type) {
+
+            case 'add_vip_user':
+                $list = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
+                    ->select('XeDistributor.id', 'XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeUser.xe_user_id', 'XeUser.user_id')
+                    ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
+                    ->where('XeDistributor.status', 1)
+                    ->where('XeDistributor.remark', '<>', '小鹅通合伙人同步')
+                    ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
+                    ->get()->toArray();
+                foreach ($list as $k => $distributor) {
+
+                    $id = $distributor['id'];
+                    $xe_user_id = $distributor['xe_user_id'];
+                    $phone = $distributor['phone'];
+                    $phone_collect = $distributor['phone_collect'];
+                    $base_phone = $phone ? $phone : $phone_collect;
+
+                    var_dump($k);
+                    var_dump($base_phone);
+
+                    if (empty($base_phone)) {
+                        continue;
+                    }
+
+                    $XeUser = XeUser::query()->where('xe_user_id', $xe_user_id)->first();
+                    if (!$XeUser) {
+                        continue;
+                    }
+
+                    if ($phone) {
+                        $User = User::query()->where('phone', $phone)->first();
+                    }
+
+                    if (empty($User) && $phone_collect) {
+                        $User = User::query()->where('phone', $phone_collect)->first();
+                    }
+
+
+                    if (empty($User)) {
+
+                        $User = new User();
+                        $User->phone = $base_phone;
+                        $User->intro = '幸福学社合伙人';
+                        $User->app_project_type = 2;
+                        $User->xfxs_login = 1;
+                        $User->nickname = $distributor['nickname'];
+                        $User->save();
+                    }
+
+                    $XeUser->user_id = $User->id;
+                    $XeUser->save();
+
+                    $VipUserModel = VipUserModel::query()->where('user_id', $User->id)->where('status', 1)->first();
+                    if ($VipUserModel) {
+
+                        //如果合伙人的登录账号和用户的手机不一致 修改合伙人的登录账号
+                        if ($VipUserModel->username != $User->phone) {
+                            $VipUserModel->username = $User->phone;
+                            $VipUserModel->save();
+                        }
+
+                        XeDistributor::query()->where('id', $id)->update(['user_id' => $User->id, 'remark' => '小鹅通合伙人同步']);
+
+                    } else {
+
+                        //首先查询2580订单的支付时间为合伙人的开始时间 剩余的开始时间定为2023-01-01
+                        $XeOrder = XeOrder::query()->where([
+                            'xe_user_id' => $xe_user_id,
+                            'goods_name' => '幸福学社合伙人',
+                            'goods_original_total_price' => 258000,
+                            'pay_state' => 1,
+                            'order_state' => 4,
+                        ])->first();
+
+                        if ($XeOrder) {
+                            $start_time = $XeOrder->pay_state_time;
+                        } else {
+                            $start_time = '2023-01-01 00:00:00';
+                        }
+
+                        $expire_time = date('Y-m-d 23:59:59', strtotime("+1 years", strtotime($start_time)));
+
+                        $VipUserModel = new VipUserModel();
+                        $VipUserModel->user_id = $User->id;
+                        $VipUserModel->username = $User->phone;
+                        $VipUserModel->level = 1;
+                        $VipUserModel->start_time = $start_time;
+                        $VipUserModel->expire_time = $expire_time;
+                        $VipUserModel->channel = '小鹅通合伙人';
+                        $VipUserModel->remark = '小鹅通合伙人';
+                        $VipUserModel->save();
+
+                        XeDistributor::query()->where('id', $id)->update(['user_id' => $User->id, 'remark' => '小鹅通合伙人同步']);
+                    }
+
+                }
+
+                break;
+
+            case 'add_vip_user_inviter':
+
+                $list = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
+                    ->select('XeDistributor.id', 'XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeUser.xe_user_id', 'XeUser.user_id')
+                    ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
+                    ->where('XeDistributor.status', 1)
+                    ->where('XeDistributor.remark', '=', '小鹅通合伙人同步')
+                    ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
+                    ->get()->toArray();
+                //根据订单的分享人来同步合伙人的上级推广员
+                foreach ($list as $k => $distributor) {
+
+                    var_dump($k);
+                    $xe_user_id = $distributor['xe_user_id'];
+                    $user_id = $distributor['user_id'];
+
+                    if (empty($user_id)) {
+                        continue;
+                    }
+
+                    $XeUser = XeUser::query()->where('xe_user_id', $xe_user_id)->first();
+                    if (!$XeUser) {
+                        continue;
+                    }
+
+                    $User = User::query()->where('id', $user_id)->first();
+                    if (!$User) {
+                        continue;
+                    }
+
+                    $VipUserModel = VipUserModel::query()->where('user_id', $user_id)->where('status', 1)->first();
+                    if (!$VipUserModel) {
+                        continue;
+                    }
+
+                    $XeOrder = XeOrder::query()->where([
+                        'xe_user_id' => $xe_user_id,
+                        'goods_name' => '幸福学社合伙人',
+                        'goods_original_total_price' => 258000,
+                        'pay_state' => 1,
+                        'order_state' => 4,
+                    ])->first();
+
+                    if ($XeOrder && $XeOrder->share_user_id) {
+
+                        $ShareXeDistributor = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
+                            ->select('XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeUser.xe_user_id', 'XeUser.user_id')
+                            ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
+                            ->where('XeUser.user_id', '>', 0)
+                            ->where('XeDistributor.status', 1)
+                            ->where('XeDistributor.xe_user_id', $XeOrder->share_user_id)
+                            ->first();
+
+                        if ($ShareXeDistributor) {
+
+                            $ShareVipUserModel = VipUserModel::query()->where('user_id', $ShareXeDistributor->user_id)->where('status', 1)->first();
+
+
+                            if ($ShareVipUserModel) {
+                                $VipUserModel->inviter = $ShareVipUserModel->user_id;
+                                $VipUserModel->inviter_vip_id = $ShareVipUserModel->id;
+                                $VipUserModel->save();
+
+
+                                $VipUserBindModel = VipUserBindModel::query()
+                                    ->where('status', 1)
+                                    ->where('parent', $ShareVipUserModel->username)
+                                    ->where('son', $VipUserModel->username)->first();
+
+                                var_dump($ShareVipUserModel->username);
+                                var_dump($VipUserModel->username);
+
+                                if (!$VipUserBindModel) {
+
+                                    //创建新的关系保护
+                                    $VipUserBindModel = new VipUserBindModel();
+                                    $VipUserBindModel->parent = $ShareVipUserModel->username;
+                                    $VipUserBindModel->son = $VipUserModel->username;
+                                    $VipUserBindModel->life = 2;
+                                    $VipUserBindModel->begin_at = $VipUserModel->start_time;
+                                    $VipUserBindModel->end_at = $VipUserModel->expire_time;
+                                    $VipUserBindModel->channel = 6;
+                                    $VipUserBindModel->remark = '小鹅通合伙人同步';
+                                    $VipUserBindModel->save();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                break;
+
+            case 'rpush_vip_user_bind':
+                //同步小鹅通客户关系表
+                $list = XeDistributorCustomer::query()->from(XeDistributorCustomer::DB_TABLE . ' as XeDistributorCustomer')
+                    ->select(
+                        'XeDistributorCustomer.id', 'XeDistributorCustomer.sub_user_id', 'XeDistributorCustomer.xe_user_id', 'XeDistributorCustomer.bind_time', 'XeDistributorCustomer.expired_at',
+                        'XeUser.phone', 'XeUser.phone_collect',
+                        'SubXeUser.phone as sub_phone', 'SubXeUser.phone_collect as sub_phone_collect', 'SubXeUser.nickname'
+                    )
+                    ->leftJoin(XeUser::DB_TABLE . ' as SubXeUser', 'SubXeUser.xe_user_id', 'XeDistributorCustomer.sub_user_id')
+                    ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributorCustomer.xe_user_id')
+                    ->leftJoin(XeDistributor::DB_TABLE . ' as XeDistributor', 'XeDistributor.xe_user_id', 'XeDistributorCustomer.xe_user_id')
+                    ->where('XeDistributorCustomer.status', 1)
+                    ->where('XeDistributor.status', 1)
+                    ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
+                    ->orderBy('XeDistributorCustomer.id', 'asc')
+                    ->forPage(1, 10)
+                    ->get()->toArray();
+
+                $redis_page_index_key = 'xe_distributor_customer_xfxs_bind_user';
+
+                foreach ($list as $k => $XeDistributorCustomer) {
+                    var_dump($k);
+                    $json_str = json_encode($XeDistributorCustomer);
+                    Redis::rpush($redis_page_index_key, $json_str);
+                }
+
+                break;
+
+            case 'lpop_vip_user_bind':
+
+                $flag = True;
+
+                while ($flag) {
+
+                    $data = Redis::lpop('xe_distributor_customer_xfxs_bind_user');
+
+                    if ($data) {
+                        $jsonArr = json_decode($data, true);
+                        if (!$jsonArr) {
+                            continue;
+                        }
+
+                        $id = $jsonArr['id'];
+                        $bind_time = $jsonArr['bind_time'];
+                        $expired_at = $jsonArr['expired_at'];
+                        $nickname = $jsonArr['nickname'];
+
+                        $phone = $jsonArr['phone'] ?? '';
+                        $phone_collect = $jsonArr['phone_collect'] ?? '';
+                        $phone = $phone ? $phone : $phone_collect;
+
+                        $sub_phone = $jsonArr['sub_phone'] ?? '';
+                        $sub_phone_collect = $jsonArr['sub_phone_collect'] ?? '';
+                        $sub_phone = $sub_phone ? $sub_phone : $sub_phone_collect;
+
+                        $VipUserBindModel = VipUserBindModel::query()
+                            ->where('status', 1)
+                            ->where('son', $sub_phone)->first();
+
+                        var_dump($id);
+                        var_dump($sub_phone);
+
+                        if (!$VipUserBindModel) {
+
+                            $User = User::query()->where('phone', $sub_phone)->first();
+                            if (empty($User)) {
+                                $User = new User();
+                                $User->phone = $sub_phone;
+                                $User->intro = '幸福学社客户';
+                                $User->app_project_type = 2;
+                                $User->xfxs_login = 1;
+                                $User->nickname = $nickname;
+                                $User->save();
+                            }
+
+                            //创建新的关系保护
+                            $VipUserBindModel = new VipUserBindModel();
+                            $VipUserBindModel->parent = $phone;
+                            $VipUserBindModel->son = $sub_phone;
+                            $VipUserBindModel->life = 2;
+                            $VipUserBindModel->begin_at = $bind_time;
+                            $VipUserBindModel->end_at = $expired_at;
+                            $VipUserBindModel->channel = 7;
+                            $VipUserBindModel->remark = '小鹅通关系保护同步';
+                            $VipUserBindModel->save();
+
+                        }
+
+                        XeDistributorCustomer::query()->where('id', $id)->update(['remark' => '小鹅通关系保护同步']);
+
+                    } else {
+
+                        $flag = false;
+
+                    }
+
+                }
+
+                break;
+        }
+
+        return true;
+
     }
 }
