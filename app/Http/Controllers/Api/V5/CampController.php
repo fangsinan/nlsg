@@ -47,6 +47,7 @@ class CampController extends Controller
     {
         //排序
         $order_str = $request->input('order') ??"desc";
+        $version = $request->input('version');
 
         $uid = $this->user['id'] ?? 0;
         $columnObj = new Column();
@@ -66,14 +67,28 @@ class CampController extends Controller
                             ['is_test','In',$is_test],
                         ],$order_str);
         //非我的订阅 显示父类 不显示订阅训练营所属的父类
-        $list = $columnObj->getColumn([
-                        ['type','=',4],
-                        ['status','=',1],
-                        ['is_test','In',$is_test],
 
-            // ['is_starwt','=',0],
-                // ['id','NotIn',$relation_id],
-                    ],$order_str);
+        //非我的订阅
+        $where = [
+            ['type','=',4],
+            ['status','=',1],
+            ['is_test','In',$is_test],
+        ];
+
+        if (isset($version) && version_compare($version, "5.1.8", '>=')) {
+            //当实际版本小于储存版本 不显示免费训练营
+            $where[] = ['is_free','=',0];
+        }
+        $list = $columnObj->getColumn($where,$order_str);
+
+        // $list = $columnObj->getColumn([
+        //                 ['type','=',4],
+        //                 ['status','=',1],
+        //                 ['is_test','In',$is_test],
+        //
+        //     // ['is_starwt','=',0],
+        //         // ['id','NotIn',$relation_id],
+        //             ],$order_str);
 
         $new_res = [
             "my_list"=>$my_list['data'],
