@@ -75,10 +75,11 @@ class CampController extends Controller
             ['is_test','In',$is_test],
         ];
 
-        if (isset($version) && version_compare($version, "5.1.8", '>=')) {
+        if (isset($version) && version_compare($version, "5.1.8", '<')) {
             //当实际版本小于储存版本 不显示免费训练营
             $where[] = ['is_free','=',0];
         }
+
         $list = $columnObj->getColumn($where,$order_str);
 
         // $list = $columnObj->getColumn([
