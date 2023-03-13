@@ -1040,7 +1040,9 @@ class Order extends Base
 
         //  虚拟用户校验的类型
         if( isset($order_type) && in_array($order_type,[10, 14, 16]) ){
-            if($os_type ==3 && (empty($phone) || substr($phone,0,1) == 2) ){
+            // if($os_type ==3 && (empty($phone) || substr($phone,0,1) == 2) ){
+            //所有的下单都会检验
+            if( (empty($phone) || substr($phone,0,1) == 2) ){
                 return ['code'=>4000, 'msg'=>'请修改手机号'];
             }
         }
