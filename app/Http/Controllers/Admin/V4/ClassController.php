@@ -1090,7 +1090,9 @@ class ClassController extends ControllerBackend
             ->select('id', 'user_id', 'name', 'title', 'subtitle', 'subscribe_num', 'message', 'status',
                 'original_price', 'price', 'cover_pic','info_num',
                 'details_pic', 'created_at', 'timing_online', 'timing_time')
-            ->where('id', $id)->first();
+            ->where('id', $id)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
+            ->first();
         return success($list);
     }
 
@@ -1131,6 +1133,7 @@ class ClassController extends ControllerBackend
             'timing_online', 'created_at')
             ->where('column_id', $id)
             ->where('status', '>', 0)
+            ->where('app_project_type','=',APP_PROJECT_TYPE)
             ->paginate(10)
             ->toArray();
         return success($lists);
