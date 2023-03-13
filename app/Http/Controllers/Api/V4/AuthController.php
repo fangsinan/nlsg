@@ -1132,7 +1132,9 @@ class AuthController extends Controller
             'id' => 0,
             'token' => ''
         ];
-
+        if (!$unionid) {
+            return error(1000, '微信信息不能为空', $data);
+        }
         if (!$phone) {
             return error(1000, '手机号不能为空', $data);
         }
