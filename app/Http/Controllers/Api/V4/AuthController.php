@@ -9,9 +9,11 @@ use App\Models\Message\Message;
 use App\Models\User;
 use App\Models\UserInvite;
 use App\Models\BackendUser;
+use App\Models\VipUser;
 use AppleSignIn\ASDecoder;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use PHPUnit\Util\Exception;
 
@@ -214,6 +216,11 @@ class AuthController extends Controller
             return error(1000, '微信还未绑定', (object)[]);
         }
 
+        // 是否需要绑定手机号
+        if( (empty($user->phone) || substr($user->phone,0,1) == 2) ){
+            return error(1001, '请绑定手机号', (object)[]);
+
+        }
         $token = auth('api')->login($user);
 //        $data = [
 //            'id' => $user->id,
@@ -1110,6 +1117,69 @@ class AuthController extends Controller
         }
         Redis::del($phone);
         return success();
+    }
+
+
+
+
+    //用户手机号为2的 修改操作
+    public function changePhone(Request $request)
+    {
+        $unionid = $request->input('unionid');
+        $phone = $request->input('phone');
+        $code = $request->input('code');
+        $data = [
+            'id' => 0,
+            'token' => ''
+        ];
+
+        if (!$phone) {
+            return error(1000, '手机号不能为空', $data);
+        }
+        if (!$code) {
+            return error(1000, '验证码不能为空', $data);
+        }
+
+        $dont_check_phone = ConfigModel::getData(35, 1);
+        $dont_check_phone = explode(',', $dont_check_phone);
+        if (in_array($phone, $dont_check_phone)) {
+            if (intval($code) !== 6666) {
+                return error(400, '验证码错误', $data);
+            }
+        } else {
+            $res = Redis::get($phone);
+            if (!$res) {
+                return error(1000, '验证码已过期', $data);
+            }
+
+            if ($code !== $res) {
+                return error(1000, '验证码错误', $data);
+            }
+        }
+
+        // 2开头的手机号才进行修改
+        $unionid_user = User::where('unionid', $unionid)->first();
+        if( !(empty($unionid_user->phone) || substr($unionid_user->phone,0,1) == 2) ){
+            return error(1000, '用户信息错误', $data);
+        }
+
+        $list = User::where('phone', $phone)->first();
+        if ($list) {
+            return error(1000, '该手机号码已存在', $data);
+        }
+
+        //修改
+        $res = User::where('id', $unionid_user->id)->update(['phone' => $phone]);
+        if (!$res) {
+            return error(1000, '绑定失败', $data);
+
+        }
+        Redis::del($phone);
+        $token = auth('api')->login($unionid_user);;
+        $data = $this->get_data($unionid_user, $token);
+
+        return success($data);
+
     }
 
 }
