@@ -1171,7 +1171,7 @@ class AuthController extends Controller
         }
 
         //修改
-        $res = User::where('id', $unionid_user->id)->update(['phone' => $phone]);
+        $res = User::where('id', $unionid_user->id)->update(['phone' => $phone,'is_wx'=>1]);
         if (!$res) {
             return error(1000, '绑定失败', $data);
 
