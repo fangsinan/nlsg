@@ -87,6 +87,11 @@ class MallTwitter extends Base
                 // }
                 $url = 'activeConsulting?share=1&id=' . $gid . '&inviter=' . $twitter.'&live_id='.$live_id.'&live_info_id='.$live_info_id;
 
+                $is_free  = Column::where("id",$gid)->value("is_free");
+                if($is_free == 1){
+                    $url = 'appv4/videoPlay?share=1&dId=' . $gid . '&inviter=' . $twitter.'&info_id='.$info_id.'&relationType=5';
+                }
+
                 break;
             case 22: //三八邀请app注册
                 $url = '';
