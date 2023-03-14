@@ -215,9 +215,10 @@ class AuthController extends Controller
         if (!$user) {
             return error(1000, '微信还未绑定', (object)[]);
         }
+        $os_type = !empty($input['os_type']) ? intval($input['os_type']) : 1;
 
         // 是否需要绑定手机号
-        if( (empty($user->phone) || substr($user->phone,0,1) == 2) ){
+        if( $os_type != 3 && (empty($user->phone) || substr($user->phone,0,1) == 2) ){
             return error(1001, '请绑定手机号', (object)[]);
 
         }
