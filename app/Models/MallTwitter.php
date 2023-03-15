@@ -89,7 +89,11 @@ class MallTwitter extends Base
 
                 $temp_work = Column::find($gid);
                 if($temp_work['is_free'] == 1 && !empty($temp_work['classify_column_id'])){
-                    $url = 'appv4/videoPlay?share=1&dId=' . $gid . '&inviter=' . $twitter.'&info_id='.$info_id.'&relationType=5';
+                    if(!empty($info_id)){
+                        $url = 'appv4/videoPlay?share=1&dId=' . $gid . '&inviter=' . $twitter.'&info_id='.$info_id.'&relationType=5';
+                    }else{
+                        $url = 'appv4/lecture-introduce?type=2&id=' . $gid . '&inviter=' . $twitter;
+                    }
                 }
 
                 break;
