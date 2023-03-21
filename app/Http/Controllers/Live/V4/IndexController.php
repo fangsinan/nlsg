@@ -238,7 +238,7 @@ class IndexController extends ControllerBackend
         if (!empty($classify)){
             $query->where('classify','=',$classify);
         }
-        $query->where('app_project_type','=',APP_PROJECT_TYPE);
+        // $query->where('app_project_type','=',APP_PROJECT_TYPE);
         //非超管角色可看live
         $live_id_role = self::getLiveRoleIdList($this->user);
         if ($live_id_role !== null) {
