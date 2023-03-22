@@ -90,6 +90,23 @@ class Kernel extends ConsoleKernel
             $servers->Statistics();
         })->everyFiveMinutes()->runInBackground();//每5分同步发送到达量
 
+
+        $schedule->command('command:CrontabOnlineUserRedis')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        $schedule->command('command:CrontabOnlineUser')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        $schedule->command('command:CrontabJoinRedis')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        $schedule->command('command:CrontabCommentRedis')
+            ->everyMinute()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+        $schedule->command('command:CrontabGiftRedis')
+            ->everyFiveMinutes()->withoutOverlapping(1)
+            ->runInBackground()->onOneServer();
+
         //im社群的发送任务
 //        $schedule->command('imJob')
 //            ->everyMinute()->withoutOverlapping(2)
@@ -212,21 +229,7 @@ class Kernel extends ConsoleKernel
 //            LiveConsoleServers::CrontabGiftRedis();//直播打赏入库
 //        })->everyFiveMinutes()->runInBackground();//每5分
 
-        $schedule->command('command:CrontabOnlineUserRedis')
-            ->everyMinute()->withoutOverlapping(1)
-            ->runInBackground()->onOneServer();
-        $schedule->command('command:CrontabOnlineUser')
-            ->everyMinute()->withoutOverlapping(1)
-            ->runInBackground()->onOneServer();
-        $schedule->command('command:CrontabJoinRedis')
-            ->everyMinute()->withoutOverlapping(1)
-            ->runInBackground()->onOneServer();
-        $schedule->command('command:CrontabCommentRedis')
-            ->everyMinute()->withoutOverlapping(1)
-            ->runInBackground()->onOneServer();
-        $schedule->command('command:CrontabGiftRedis')
-            ->everyFiveMinutes()->withoutOverlapping(1)
-            ->runInBackground()->onOneServer();
+
 
 
 
