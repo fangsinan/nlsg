@@ -238,7 +238,7 @@ class IndexController extends ControllerBackend
         if (!empty($classify)){
             $query->where('classify','=',$classify);
         }
-        $query->where('app_project_type','=',APP_PROJECT_TYPE);
+        // $query->where('app_project_type','=',APP_PROJECT_TYPE);
         //非超管角色可看live
         $live_id_role = self::getLiveRoleIdList($this->user);
         if ($live_id_role !== null) {
@@ -667,6 +667,7 @@ class IndexController extends ControllerBackend
     		$live_info_data['end_at']         = $end_at;
     		$live_info_data['playback_url']   = $playback_url;
     		$live_info_data['back_video_url'] = $back_video_url;
+    		$live_info_data['app_project_type'] = $app_project_type;
 
     		if (!empty($input['id'])) {
     		    if ($zero_poster_show == 1){

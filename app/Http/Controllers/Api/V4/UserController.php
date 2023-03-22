@@ -506,6 +506,12 @@ class UserController extends Controller
         if (!$input['nickname']) {
             return $this->error(1000, '昵称不能为空');
         }
+
+        if(!empty($input['headimg'])){
+            $input['headimg'] = str_replace("http://nlsgapp.oss-cn-beijing.aliyuncs.com","",$input['headimg']);
+            $input['headimg'] = str_replace("https://image.nlsgapp.com","",$input['headimg']);
+        }
+
         $res = User::where('id', $this->user['id'])->update([
             'nickname' => $input['nickname'],
             'headimg' => $input['headimg'] ?? '',
