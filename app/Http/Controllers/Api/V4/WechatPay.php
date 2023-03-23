@@ -695,6 +695,12 @@ class WechatPay extends Controller
 				case 30: //45天精英少年成长计划 399
 					$res = $nickname . ':您已支付' . $live_num . '套 45天精英少年成长计划';
 					break;
+                case 32: //51戈壁亲子成长探索之旅·全款
+                    $res = $nickname . ':您已支付' . $live_num . '单 51戈壁亲子成长探索之旅·全款';
+                    break;
+                case 33: //51戈壁亲子成长探索之旅·众筹金
+                    $res = $nickname . ':您已支付' . $live_num . '单 51戈壁亲子成长探索之旅·众筹金';
+                    break;
             }
         } else if ($type == 18) {
             $data = Column::find($relation_id);
