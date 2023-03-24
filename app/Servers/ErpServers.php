@@ -774,7 +774,7 @@ class ErpServers
     {
         $page     = 1;
         $size     = 50;
-        $end_date = date('Y-m-d 23:59:59', strtotime('-2 days'));
+        $end_date = date('Y-m-d 23:59:59', strtotime('-1 days'));
 
         $expressCompany = ExpressCompany::where('status', '=', 1)
             ->select(['id', 'erp_type_id'])
