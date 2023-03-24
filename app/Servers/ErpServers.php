@@ -774,9 +774,8 @@ class ErpServers
     {
         $page     = 1;
         $size     = 50;
-        $end_date = date('Y-m-d 23:59:59', strtotime('-1 days'));
 
-        $expressCompany = ExpressCompany::where('status', '=', 1)
+        $expressCompany = ExpressCompany::query()->where('status', '=', 1)
             ->select(['id', 'erp_type_id'])
             ->get()->toArray();
         $expressCompany = array_column($expressCompany, 'id', 'erp_type_id');
@@ -786,7 +785,6 @@ class ErpServers
         while (true) {
             $list = MallOrder::query()
                 ->where('created_at', '>=', '2023-02-01 00:00:00')
-                ->where('created_at', '<=', $end_date)
                 ->where('status', '=', 10)
                 ->where('is_stop', '=', 0)
                 ->where('is_del', '=', 0)
