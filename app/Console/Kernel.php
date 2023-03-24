@@ -191,6 +191,7 @@ class Kernel extends ConsoleKernel
             ->runInBackground()->onOneServer();
 
         $schedule->command('command:ErpTradeQuery')->dailyAt('00:10');
+        $schedule->command('command:ErpTradeQueryMall')->twiceDaily(2,15);
 
 //        $schedule->command('command:erpJob')
 //            ->everyMinute()->withoutOverlapping(1)

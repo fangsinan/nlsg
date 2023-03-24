@@ -38,10 +38,10 @@ class ErpServers
         $list = MallOrder::whereIn('id', $id)
             ->with(['orderDetails', 'orderDetails.skuInfo', 'orderDetails.goodsInfo', 'userInfo'])
             ->select([
-                'id', 'ordernum', 'pay_price', 'price', 'user_id', 'order_type', 'status',
-                'pay_time', 'pay_type', 'messages', 'remark', 'post_type', 'freight',
-                'address_id', 'address_history', 'created_at', 'updated_at', 'is_stop', 'stop_at'
-            ])
+                         'id', 'ordernum', 'pay_price', 'price', 'user_id', 'order_type', 'status',
+                         'pay_time', 'pay_type', 'messages', 'remark', 'post_type', 'freight',
+                         'address_id', 'address_history', 'created_at', 'updated_at', 'is_stop', 'stop_at'
+                     ])
             ->get();
 
         $trade_list = [];
@@ -138,9 +138,9 @@ class ErpServers
         $res = $this->pushOrderJob($trade_list);
 
         DB::table('wwwww')->insert([
-            'vv' => json_encode($res),
-            't'  => json_encode($trade_list),
-        ]);
+                                       'vv' => json_encode($res),
+                                       't'  => json_encode($trade_list),
+                                   ]);
 
         if ($res['code'] != true) {
             $error_message = json_decode($res['msg'], true);
@@ -308,8 +308,8 @@ class ErpServers
                     if (!empty($send_data['num']) && isset($express_info_id)) {
                         $order_express_info_res = Order::query()->where('ordernum', '=', $v['tid'])
                             ->update([
-                                'express_info_id' => $express_info_id
-                            ]);
+                                         'express_info_id' => $express_info_id
+                                     ]);
                     } else {
                         $order_express_info_res = true;
                     }
@@ -400,8 +400,8 @@ class ErpServers
 //                if ($res['code']) {
                 MallErpList::whereIn('id', $id_list)
                     ->update([
-                        'flag' => 2
-                    ]);
+                                 'flag' => 2
+                             ]);
 //                }
             }
         }
@@ -419,14 +419,14 @@ class ErpServers
 
             $list_query = OrderErpList::query()
                 ->with([
-                    'orderInfo:id,type,live_num,user_id,status,ordernum,pay_price,created_at,pay_time,express_info_id,textbook_id,address_id,is_shill',
-                    'orderInfo.addressInfo:id,name,phone,details,user_id,province,city,area',
-                    'orderInfo.textbookInfo:id,erp_sku,title,sub_title,price',
-                    'orderInfo.user:id,nickname,phone',
-                    'orderInfo.addressInfo.area_province:id,fullname',
-                    'orderInfo.addressInfo.area_city:id,fullname',
-                    'orderInfo.addressInfo.area_area:id,fullname',
-                ])
+                           'orderInfo:id,type,live_num,user_id,status,ordernum,pay_price,created_at,pay_time,express_info_id,textbook_id,address_id,is_shill',
+                           'orderInfo.addressInfo:id,name,phone,details,user_id,province,city,area',
+                           'orderInfo.textbookInfo:id,erp_sku,title,sub_title,price',
+                           'orderInfo.user:id,nickname,phone',
+                           'orderInfo.addressInfo.area_province:id,fullname',
+                           'orderInfo.addressInfo.area_city:id,fullname',
+                           'orderInfo.addressInfo.area_area:id,fullname',
+                       ])
                 ->where('flag', '=', 1)
                 ->whereHas('orderInfo', function ($q) {
                     $q->where('textbook_id', '>', 0)
@@ -561,8 +561,8 @@ class ErpServers
                     Order::query()
                         ->where('id', '=', $v->order_id)
                         ->update([
-                            'address_id' => $temp_address->id
-                        ]);
+                                     'address_id' => $temp_address->id
+                                 ]);
                 }
             }
         }
@@ -627,12 +627,12 @@ class ErpServers
         while (true) {
             $list = (new erpOrderServers())->list(
                 [
-                    'send_status'     => 1,
-                    'shill_status'    => 1,
-                    'order_info_flag' => 'push_erp',
-                    'page'            => $page,
-                    'size'            => 20,
-                    'created_at'      => "$begin_date,$end_date",
+                    'send_status' => 1,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    'shill_status' => 1,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            'order_info_flag' => 'push_erp',
+                    'page'        => $page,
+                    'size'        => 20,
+                    'created_at'  => "$begin_date,$end_date",
                 ], 0, 1
             );
 
@@ -709,8 +709,8 @@ class ErpServers
                         if ($express_info_id) {
                             Order::query()->where('id', '=', $value['id'])
                                 ->update([
-                                    'express_info_id' => $express_info_id
-                                ]);
+                                             'express_info_id' => $express_info_id
+                                         ]);
                             break;
                         }
                     }
@@ -767,6 +767,71 @@ class ErpServers
 //            DB::commit();
 //            dd($log);
 //        }
+
+    }
+
+    public function tradeQueryMall()
+    {
+        $page     = 1;
+        $size     = 50;
+
+        $expressCompany = ExpressCompany::query()->where('status', '=', 1)
+            ->select(['id', 'erp_type_id'])
+            ->get()->toArray();
+        $expressCompany = array_column($expressCompany, 'id', 'erp_type_id');
+
+        $mallOrderServers = new MallOrderServers();
+
+        while (true) {
+            $list = MallOrder::query()
+                ->where('created_at', '>=', '2023-02-01 00:00:00')
+                ->where('status', '=', 10)
+                ->where('is_stop', '=', 0)
+                ->where('is_del', '=', 0)
+                ->select(['id', 'ordernum'])
+                ->limit($size)
+                ->offset(($page - 1) * $size)
+                ->get();
+
+            $page++;
+
+            if ($list->isEmpty()) {
+                break;
+            }
+
+            $list = $list->toArray();
+
+            foreach ($list as $v) {
+
+                $to_check = $this->tradeQueryJob($v['ordernum']);
+
+                if (empty($to_check['trades'])) {
+                    continue;
+                }
+
+                foreach ($to_check['trades'] as $tc_value) {
+                    $send_data_temp = [];
+
+                    foreach ($tc_value['goods_list'] as $gl) {
+                        $temp_details_id         = explode('_', $gl['src_oid']);
+                        $send_data               = [];
+                        $send_data['express_id'] = $expressCompany[$tc_value['logistics_type']] ?? 0;
+                        if (!$send_data['express_id']) {
+                            continue;
+                        }
+                        $send_data['num']             = $tc_value['logistics_no'];
+                        $send_data['order_id']        = $v['id'];
+                        $send_data['order_detail_id'] = $temp_details_id[1] ?? 0;
+                        $send_data_temp[]             = $send_data;
+                    }
+                    $mallOrderServers->send($send_data_temp);
+                }
+                sleep(1);
+            }
+        }
+
+        return 0;
+
 
     }
 
