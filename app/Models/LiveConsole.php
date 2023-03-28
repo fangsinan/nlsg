@@ -573,7 +573,9 @@ class LiveConsole extends Base
             'push_url'     => "rtmp://" . $push_url . "/live/" . $streamName . (isset($ext_str) ? $ext_str : ""),
             'play_url'     => "http://" . $play_url . "/live/" . $streamName . '.m3u8' . (isset($ext_str) ? $ext_str : ""),
             'play_url_flv' => "http://" . $play_url . "/live/" . $streamName . '.flv' . (isset($ext_str) ? $ext_str : ""),
+            'webrtc_url'   => "webrtc://" . $play_url . "/live/" . $streamName  . (isset($ext_str) ? $ext_str : ""),
         ];
+        // webrtc://play.livenew.nlsgapp.com/live/e8273e711811a9c9541b562129f73b06?txSecret=2fc020c7d644a94ec31ef9c25c46d93f&txTime=6425B1FF
     }
 
     /*****************************直播画面页部分***************************************/

@@ -725,6 +725,7 @@ class IndexController extends ControllerBackend
     		$update_live_info_data['push_live_url'] = $temp_get_url['push_url'];
     		$update_live_info_data['live_url']      = $temp_get_url['play_url'];
     		$update_live_info_data['live_url_flv']  = $temp_get_url['play_url_flv'];
+    		$update_live_info_data['webrtc_url']  = $temp_get_url['webrtc_url'];
     		LiveInfo::query()->where('live_pid', '=', $live_info_data['live_pid'])
     			->update($update_live_info_data);
 
