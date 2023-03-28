@@ -55,7 +55,7 @@ class IndexController extends ControllerBackend
             $lives = Live::where('user_id', $this->user['user_id'])
                 ->where('status', 4)
                 ->where('begin_at', '>=', '2021-05-12 00:00:00')
-                ->where('app_project_type','=',APP_PROJECT_TYPE)
+                // ->where('app_project_type','=',APP_PROJECT_TYPE)
                 ->get()
                 ->toArray();
 
