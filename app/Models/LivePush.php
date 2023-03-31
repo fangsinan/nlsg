@@ -18,9 +18,9 @@ use Predis\Client;
 class LivePush extends Base
 {
     protected $table = 'nlsg_live_push';
-   protected $fillable = [
-       'id', 'live_id', 'live_info_id','user_id','push_type', 'push_gid','is_push','is_done','push_at', 'done_at'
-   ];
+    protected $fillable = [
+        'id', 'live_id', 'live_info_id','user_id','push_type', 'push_gid','is_push','is_done','push_at', 'done_at'
+    ];
     public function add($params, $user_id)
     {
         $live_id = $params['live_id'] ?? 0;
@@ -81,31 +81,31 @@ class LivePush extends Base
         $send_timestamp = strtotime($push_at) + 4;
 
         $check_sql = "select * from (
-SELECT
-	id,
-	live_id,
-	live_info_id,
-	push_at,
-	UNIX_TIMESTAMP( push_at ) + length AS s_end,
-	UNIX_TIMESTAMP( push_at ) AS s_begin
-FROM
-	nlsg_live_push
-WHERE
-	live_id = $live_id
-	AND live_info_id = $live_info_id
-	AND is_push = 1) as a
-	where s_begin  <= $send_timestamp
-	and s_end > $send_timestamp limit 1";
+        SELECT
+        id,
+        live_id,
+        live_info_id,
+        push_at,
+        UNIX_TIMESTAMP( push_at ) + length AS s_end,
+        UNIX_TIMESTAMP( push_at ) AS s_begin
+        FROM
+        nlsg_live_push
+        WHERE
+        live_id = $live_id
+        AND live_info_id = $live_info_id
+        AND is_push = 1) as a
+        where s_begin  <= $send_timestamp
+        and s_end > $send_timestamp limit 1";
         $check_push = DB::select($check_sql);
 
         if (empty($params['id'] ?? 0)) {
-            if ( ! empty($check_push)) {
-                return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
-            }
+        if ( ! empty($check_push)) {
+        return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
+        }
         } else {
-            if ($params['id'] != $check_push->id) {
-                return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
-            }
+        if ($params['id'] != $check_push->id) {
+        return ['code' => false, 'msg' => '所选时间已有推送内容,请更换时间.'];
+        }
         }
          ****/
         if (empty($params['id'] ?? 0)) {
@@ -352,7 +352,6 @@ WHERE
                 }
             }
         }
-
         $data = $this->getWorksList($live_id);
         foreach ($data as $k=>$v){
             if(empty($v)){
