@@ -15,6 +15,7 @@ use App\Models\XiaoeTech\XeUserJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
+use function Symfony\Component\String\b;
 
 class XiaoeTechServers
 {
@@ -817,7 +818,7 @@ class XiaoeTechServers
 
         $redis_page_index_key = 'xe_sync_distributor_customer_list_page_index';
 
-        for ($i = 1; $i <= 50; $i++) {
+        for ($i = 1; $i <= 100; $i++) {
 
             $page_index_json = Redis::lpop($redis_page_index_key);
 
@@ -853,10 +854,13 @@ class XiaoeTechServers
             try {
 
                 $res = self::curlPost('https://api.xiaoe-tech.com/xe.distributor.member.sub_customer/1.0.0', $paratms);
+
                 $page_count=0;
                 if(isset($res['body']['data']['list'])){
                     $page_count=count($res['body']['data']['list']);
                 }
+
+                var_dump($page_count);
 
                 if ($res['body']['code'] != 0) {
 
@@ -1607,431 +1611,575 @@ class XiaoeTechServers
         switch ($type) {
 
             case 'rpush_add_vip_user':
-
-                $redis_key='xe_distributor_to_vip_user';
-
-                $list = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
-                    ->select('XeDistributor.id', 'XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeUser.xe_user_id', 'XeUser.user_id')
-                    ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
-                    ->where('XeDistributor.status', 1)
-//                    ->where('XeDistributor.remark', '<>', '小鹅通合伙人同步')
-//                    ->where('XeDistributor.xe_user_id', '=', 'u_63984805c89c0_FvfntFaB3t')
-                    ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
-                    ->get()->toArray();
-
-                foreach ($list as $k => $distributor) {
-                    var_dump($k);
-                    $json_str = json_encode($distributor);
-                    Redis::rpush($redis_key, $json_str);
-                }
-
+                self::rpush_add_vip_user();
                 break;
+
             case 'lpop_add_vip_user':
-
-                $redis_key='xe_distributor_to_vip_user';
-                $flag = True;
-
-                while ($flag) {
-
-                    $data = Redis::lpop($redis_key);
-
-                    var_dump($data);
-
-                    if ($data) {
-
-                        $distributor = json_decode($data, true);
-                        if (!$distributor) {
-                            continue;
-                        }
-
-                        $id = $distributor['id'];
-                        $xe_user_id = $distributor['xe_user_id'];
-                        $phone = $distributor['phone'];
-                        $phone_collect = $distributor['phone_collect'];
-                        $base_phone = $phone ? $phone : $phone_collect;
-
-                        var_dump($base_phone);
-
-                        if (empty($base_phone)) {
-                            continue;
-                        }
-
-                        $XeUser = XeUser::query()->where('xe_user_id', $xe_user_id)->first();
-                        if (!$XeUser) {
-                            continue;
-                        }
-
-                        if ($phone) {
-                            $User = User::query()->where('phone', $phone)->first();
-                        }
-
-                        if (empty($User) && $phone_collect) {
-                            $User = User::query()->where('phone', $phone_collect)->first();
-                        }
-
-                        if ($User) {
-
-                            $User->xfxs_login = 1;
-                            $User->save();
-                        }else{
-
-                            $User = new User();
-                            $User->phone = $base_phone;
-                            $User->intro = '幸福学社合伙人';
-                            $User->app_project_type = 2;
-                            $User->xfxs_login = 1;
-                            $User->nickname = $distributor['nickname'];
-                            $User->save();
-                        }
-
-                        $XeUser->user_id = $User->id;
-                        $XeUser->save();
-
-                        $VipUserModel = VipUserModel::query()->where('user_id', $User->id)->where('status', 1)->first();
-
-                        if ($VipUserModel) {
-
-                            //如果合伙人的登录账号和用户的手机不一致 修改合伙人的登录账号
-                            if ($VipUserModel->username != $User->phone) {
-                                $VipUserModel->username = $User->phone;
-                                $VipUserModel->save();
-                            }
-
-                            XeDistributor::query()->where('id', $id)->update(['user_id' => $User->id, 'remark' => '小鹅通合伙人同步']);
-
-                        } else {
-
-                            //首先查询2580订单的支付时间为合伙人的开始时间 剩余的开始时间定为2023-01-01
-                            $XeOrder = XeOrder::query()->where([
-                                'xe_user_id' => $xe_user_id,
-                                'goods_name' => '幸福学社合伙人',
-                                'goods_original_total_price' => 258000,
-                                'pay_state' => 1,
-                                'order_state' => 4,
-                            ])->first();
-
-                            if ($XeOrder) {
-                                $start_time = $XeOrder->pay_state_time;
-                            } else {
-                                $start_time = '2023-01-01 00:00:00';
-                            }
-
-                            $expire_time = date('Y-m-d 23:59:59', strtotime("+1 years", strtotime($start_time)));
-
-                            $VipUserModel = new VipUserModel();
-                            $VipUserModel->user_id = $User->id;
-                            $VipUserModel->username = $User->phone;
-                            $VipUserModel->level = 1;
-                            $VipUserModel->start_time = $start_time;
-                            $VipUserModel->expire_time = $expire_time;
-                            $VipUserModel->channel = '小鹅通合伙人';
-                            $VipUserModel->remark = '小鹅通合伙人';
-                            $VipUserModel->save();
-
-                            XeDistributor::query()->where('id', $id)->update(['user_id' => $User->id, 'remark' => '小鹅通合伙人同步']);
-
-                        }
-
-                    } else {
-                        $flag = false;
-                    }
-                }
-
+                self::lpop_add_vip_user();
                 break;
+
             case 'rpush_add_vip_user_inviter':
-
-                $redis_key='xe_distributor_to_vip_user_inviter';
-                $list = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
-                    ->select('XeDistributor.id', 'XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeDistributor.xe_user_id', 'XeDistributor.user_id')
-                    ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
-                    ->where('XeDistributor.status', 1)
-                    ->where('XeDistributor.remark', '=', '小鹅通合伙人同步')
-                    ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
-                    ->get()->toArray();
-
-                //根据订单的分享人来同步合伙人的上级推广员
-                foreach ($list as $k => $distributor) {
-                    var_dump($k);
-                    $json_str = json_encode($distributor);
-                    Redis::rpush($redis_key, $json_str);
-                }
-
+                self::rpush_add_vip_user_inviter();
                 break;
 
             case 'lpop_add_vip_user_inviter':
-
-                $redis_key='xe_distributor_to_vip_user_inviter';
-                $flag = True;
-
-                while ($flag) {
-
-                    $data = Redis::lpop($redis_key);
-
-                    var_dump($data);
-
-                    if ($data) {
-
-                        $distributor = json_decode($data, true);
-                        if (!$distributor) {
-                            continue;
-                        }
-
-                        $xe_user_id = $distributor['xe_user_id'];
-                        $user_id = $distributor['user_id'];
-
-                        if (empty($user_id)) {
-                            continue;
-                        }
-
-                        $XeUser = XeUser::query()->where('xe_user_id', $xe_user_id)->first();
-                        if (!$XeUser) {
-                            continue;
-                        }
-
-                        $User = User::query()->where('id', $user_id)->first();
-                        if (!$User) {
-                            continue;
-                        }
-
-                        $VipUserModel = VipUserModel::query()->where('user_id', $user_id)->where('status', 1)->first();
-                        if (!$VipUserModel) {
-                            continue;
-                        }
-
-                        $XeOrder = XeOrder::query()->where([
-                            'xe_user_id' => $xe_user_id,
-                            'goods_name' => '幸福学社合伙人',
-                            'goods_original_total_price' => 258000,
-                            'pay_state' => 1,
-                            'order_state' => 4,
-                        ])->first();
-
-                        if ($XeOrder && $XeOrder->share_user_id) {
-
-                            $ShareXeDistributor = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
-                                ->select('XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeUser.xe_user_id', 'XeUser.user_id')
-                                ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
-                                ->where('XeUser.user_id', '>', 0)
-                                ->where('XeDistributor.status', 1)
-                                ->where('XeDistributor.xe_user_id', $XeOrder->share_user_id)
-                                ->first();
-
-                            if ($ShareXeDistributor) {
-
-                                $ShareVipUserModel = VipUserModel::query()->where('user_id', $ShareXeDistributor->user_id)->where('status', 1)->first();
-
-
-                                if ($ShareVipUserModel) {
-
-                                    $VipUserModel->inviter = $ShareVipUserModel->user_id;
-                                    $VipUserModel->inviter_vip_id = $ShareVipUserModel->id;
-                                    $VipUserModel->save();
-
-
-                                    $VipUserBindModel = VipUserBindModel::query()
-                                        ->where('status', 1)
-                                        ->where('son', $VipUserModel->username)->first();
-
-
-                                    if (!$VipUserBindModel) {
-
-                                        var_dump($ShareVipUserModel->username);
-                                        var_dump($VipUserModel->username);
-
-                                        //创建新的关系保护
-                                        $VipUserBindModel = new VipUserBindModel();
-                                        $VipUserBindModel->parent = $ShareVipUserModel->username;
-                                        $VipUserBindModel->son = $VipUserModel->username;
-                                        $VipUserBindModel->life = 2;
-                                        $VipUserBindModel->begin_at = $VipUserModel->start_time;
-                                        $VipUserBindModel->end_at = $VipUserModel->expire_time;
-                                        $VipUserBindModel->channel = 6;
-                                        $VipUserBindModel->remark = '小鹅通合伙人同步';
-                                        $VipUserBindModel->save();
-
-                                    }
-                                }
-                            }
-                        }
-
-
-                    } else {
-                        $flag = false;
-                    }
-                }
+                self::lpop_add_vip_user_inviter();
                 break;
+
             case 'rpush_vip_user_bind':
-                try {
-
-                   $page=Redis::get('rpush_vip_user_bind_page');
-                   if(!$page){
-                       $page=1;
-                   }
-
-                    Redis::set('rpush_vip_user_bind_page',$page+1);
-
-                    //同步小鹅通客户关系表
-                    $list = XeDistributorCustomer::query()->from(XeDistributorCustomer::DB_TABLE . ' as XeDistributorCustomer')
-                        ->select(
-                            'XeDistributorCustomer.id', 'XeDistributorCustomer.sub_user_id', 'XeDistributorCustomer.xe_user_id', 'XeDistributorCustomer.bind_time', 'XeDistributorCustomer.expired_at',
-                            'XeUser.phone', 'XeUser.phone_collect',
-                            'SubXeUser.phone as sub_phone', 'SubXeUser.phone_collect as sub_phone_collect', 'SubXeUser.nickname'
-                        )
-                        ->leftJoin(XeUser::DB_TABLE . ' as SubXeUser', 'SubXeUser.xe_user_id', 'XeDistributorCustomer.sub_user_id')
-                        ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributorCustomer.xe_user_id')
-                        ->leftJoin(XeDistributor::DB_TABLE . ' as XeDistributor', 'XeDistributor.xe_user_id', 'XeDistributorCustomer.xe_user_id')
-                        ->where('XeDistributorCustomer.status', 1)
-                        ->where('XeDistributorCustomer.expired_at', '>',times())
-                        ->where('XeDistributor.status', 1)
-                        ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
-                        ->whereRaw("(SubXeUser.phone<>'' or SubXeUser.phone_collect<>'')")
-                        ->orderBy('XeDistributorCustomer.id', 'asc')
-                        ->forPage($page, 50000)
-                        ->get()->toArray();
-
-                    $redis_page_index_key = 'xe_distributor_customer_xfxs_bind_user';
-
-                    foreach ($list as $k => $XeDistributorCustomer) {
-                        var_dump($page.'-'.$k);
-                        $json_str = json_encode($XeDistributorCustomer);
-                        Redis::rpush($redis_page_index_key, $json_str);
-                    }
-                } catch (\Exception $e) {
-                    var_dump($e->getMessage());
-                    die;
-                }
+                self::rpush_vip_user_bind();
                 break;
 
             case 'rpush_one_vip_user_bind':
-                try {
-
-                    $page=1;
-
-                    //同步小鹅通客户关系表
-                    $list = XeDistributorCustomer::query()->from(XeDistributorCustomer::DB_TABLE . ' as XeDistributorCustomer')
-                        ->select(
-                            'XeDistributorCustomer.id', 'XeDistributorCustomer.sub_user_id', 'XeDistributorCustomer.xe_user_id', 'XeDistributorCustomer.bind_time', 'XeDistributorCustomer.expired_at',
-                            'XeUser.phone', 'XeUser.phone_collect',
-                            'SubXeUser.phone as sub_phone', 'SubXeUser.phone_collect as sub_phone_collect', 'SubXeUser.nickname'
-                        )
-                        ->leftJoin(XeUser::DB_TABLE . ' as SubXeUser', 'SubXeUser.xe_user_id', 'XeDistributorCustomer.sub_user_id')
-                        ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributorCustomer.xe_user_id')
-                        ->leftJoin(XeDistributor::DB_TABLE . ' as XeDistributor', 'XeDistributor.xe_user_id', 'XeDistributorCustomer.xe_user_id')
-                        ->where('XeDistributorCustomer.xe_user_id', 'u_639c4ff0939b2_atuFeEwxYx')
-                        ->where('XeDistributorCustomer.status', 1)
-                        ->where('XeDistributorCustomer.expired_at', '>',times())
-                        ->where('XeDistributor.status', 1)
-                        ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
-                        ->whereRaw("(SubXeUser.phone<>'' or SubXeUser.phone_collect<>'')")
-                        ->orderBy('XeDistributorCustomer.id', 'asc')
-                        ->forPage($page, 50000)
-                        ->get()->toArray();
-
-                    $redis_page_index_key = 'xe_distributor_customer_xfxs_bind_user';
-
-                    foreach ($list as $k => $XeDistributorCustomer) {
-                        var_dump($page.'-'.$k);
-                        $json_str = json_encode($XeDistributorCustomer);
-                        Redis::rpush($redis_page_index_key, $json_str);
-                    }
-                } catch (\Exception $e) {
-                    var_dump($e->getMessage());
-                    die;
-                }
+                self::rpush_one_vip_user_bind();
                 break;
 
             case 'lpop_vip_user_bind':
 
-                $flag = True;
+                self::lpop_vip_user_bind();
+                break;
 
-                while ($flag) {
-
-                    $data = Redis::lpop('xe_distributor_customer_xfxs_bind_user');
-                    var_dump($data);
-                    if ($data) {
-
-                        $jsonArr = json_decode($data, true);
-                        if (!$jsonArr) {
-                            continue;
-                        }
-
-                        $id = $jsonArr['id'];
-                        $bind_time = $jsonArr['bind_time'];
-                        $expired_at = $jsonArr['expired_at'];
-                        $nickname = $jsonArr['nickname'];
-
-                        $phone = $jsonArr['phone'] ?? '';
-                        $phone_collect = $jsonArr['phone_collect'] ?? '';
-                        $phone = $phone ? $phone : $phone_collect;
-
-                        $sub_phone = $jsonArr['sub_phone'] ?? '';
-                        $sub_phone_collect = $jsonArr['sub_phone_collect'] ?? '';
-                        $sub_phone = $sub_phone ? $sub_phone : $sub_phone_collect;
-
-                        $VipUserBindModel = VipUserBindModel::query()
-                            ->where('status', 1)
-                            ->where('son', $sub_phone)->first();
-
-                        var_dump($id);
-                        var_dump($sub_phone);
-
-                        $User = User::query()->where('phone', $sub_phone)->first();
-                        if($User){
-                            $User->xfxs_login = 1;
-                            $User->save();
-                        }
-
-                        try {
-
-                            if (!$VipUserBindModel) {
-
-                                if (empty($User)) {
-                                    $User = new User();
-                                    $User->phone = $sub_phone;
-                                    $User->intro = '幸福学社客户';
-                                    $User->app_project_type = 2;
-                                    $User->xfxs_login = 1;
-                                    $User->nickname = $nickname;
-                                    $User->save();
-                                }
-
-                                //创建新的关系保护
-                                $VipUserBindModel = new VipUserBindModel();
-                                $VipUserBindModel->parent = $phone;
-                                $VipUserBindModel->son = $sub_phone;
-                                $VipUserBindModel->life = 2;
-                                $VipUserBindModel->begin_at = $bind_time;
-                                $VipUserBindModel->end_at = $expired_at;
-                                $VipUserBindModel->channel = 7;
-                                $VipUserBindModel->remark = '小鹅通关系保护同步';
-                                $VipUserBindModel->save();
-
-                            }
-
-                            XeDistributorCustomer::query()->where('id', $id)->update(['remark' => '小鹅通关系保护同步']);
-
-                        } catch (\Exception $e) {
-                            var_dump( $e->getMessage());
-                            XeDistributorCustomer::query()->where('id', $id)->update(['remark' => $e->getMessage()]);
-
-//                            if (!checkDuplicateEntry($e)) {
-//                                return ['code' => false, 'msg' => $e->getMessage()];
-//                            }
-
-                        }
-
-                    } else {
-
-                        $flag = false;
-
-                    }
-
-                }
-
+            case 'clear_vip':
+                self::clear_vip();
                 break;
         }
 
         return true;
+    }
 
+
+    public static function rpush_add_vip_user(){
+
+        self::set_distributor_base_phone();
+
+        $redis_key = 'xe_distributor_to_vip_user';
+
+        $list = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
+            ->select('XeDistributor.group_id','XeDistributor.id', 'XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeUser.xe_user_id', 'XeUser.user_id')
+            ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
+            ->where('XeDistributor.status', 1)
+//            ->where('XeDistributor.base_phone', 15188768848)
+            ->where('XeDistributor.group_id','<>', 59524)
+            ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
+            ->get()->toArray();
+
+        foreach ($list as $k => $distributor) {
+            var_dump($k);
+            $json_str = json_encode($distributor);
+            Redis::rpush($redis_key, $json_str);
+        }
+
+    }
+
+    public static function lpop_add_vip_user(){
+
+        $redis_key = 'xe_distributor_to_vip_user';
+
+        $flag = True;
+
+        while ($flag) {
+
+            $data = Redis::lpop($redis_key);
+
+            var_dump($data);
+
+            if ($data) {
+
+                $distributor = json_decode($data, true);
+                if (!$distributor) {
+                    continue;
+                }
+
+                $group_id = 1;
+                $xe_group_id = $distributor['group_id'];
+                $id = $distributor['id'];
+                $xe_user_id = $distributor['xe_user_id'];
+                $phone = $distributor['phone'];
+                $phone_collect = $distributor['phone_collect'];
+                $base_phone = $phone ? $phone : $phone_collect;
+
+                //59524 9.9分销分组 不是合伙人
+                if($xe_group_id==59524){
+                    continue;
+                }
+
+                switch ($xe_group_id){
+                    case 57419:
+                        $group_id=2;
+                        break;
+                    case 59607:
+                        $group_id=3;
+                        break;
+                }
+
+                var_dump($base_phone);
+
+                if (empty($base_phone)) {
+                    continue;
+                }
+
+                $XeUser = XeUser::query()->where('xe_user_id', $xe_user_id)->first();
+                if (!$XeUser) {
+                    continue;
+                }
+
+                if ($phone) {
+                    $User = User::query()->where('phone', $phone)->first();
+                }
+
+                if (empty($User) && $phone_collect) {
+                    $User = User::query()->where('phone', $phone_collect)->first();
+                }
+
+                if ($User) {
+
+                    $User->xfxs_login = 1;
+                    $User->save();
+
+                } else {
+
+                    $User = new User();
+                    $User->phone = $base_phone;
+                    $User->intro = '幸福学社合伙人';
+                    $User->app_project_type = 2;
+                    $User->xfxs_login = 1;
+                    $User->nickname = $distributor['nickname'];
+                    $User->save();
+                }
+
+                $XeUser->user_id = $User->id;
+                $XeUser->save();
+
+                $VipUserModel = VipUserModel::query()->where('user_id', $User->id)->where('status', 1)->first();
+
+                if ($VipUserModel) {
+
+                    $VipUserModel->group_id=$group_id;
+
+                    //如果合伙人的登录账号和用户的手机不一致 修改合伙人的登录账号
+                    if ($VipUserModel->username != $User->phone) {
+                        $VipUserModel->username = $User->phone;
+                    }
+
+                    $VipUserModel->save();
+
+                    XeDistributor::query()->where('id', $id)->update(['user_id' => $User->id, 'remark' => '小鹅通合伙人更新-'.$VipUserModel->id.'-'.$User->phone]);
+
+                } else {
+
+                    //首先查询2580订单的支付时间为合伙人的开始时间 剩余的开始时间定为2023-01-01
+                    $XeOrder = XeOrder::query()->where([
+                        'xe_user_id' => $xe_user_id,
+                        'goods_name' => '幸福学社合伙人',
+                        'goods_original_total_price' => 258000,
+                        'pay_state' => 1,
+                        'order_state' => 4,
+                    ])->first();
+
+                    if ($XeOrder) {
+                        $start_time = $XeOrder->pay_state_time;
+                    } else {
+                        $start_time = '2023-01-01 00:00:00';
+                    }
+
+                    $expire_time = date('Y-m-d 23:59:59', strtotime("+1 years", strtotime($start_time)));
+
+                    $VipUserModel = new VipUserModel();
+                    $VipUserModel->group_id = $group_id;
+                    $VipUserModel->user_id = $User->id;
+                    $VipUserModel->username = $User->phone;
+                    $VipUserModel->level = 1;
+                    $VipUserModel->start_time = $start_time;
+                    $VipUserModel->expire_time = $expire_time;
+                    $VipUserModel->channel = '小鹅通合伙人';
+                    $VipUserModel->remark = '小鹅通合伙人';
+                    $VipUserModel->save();
+
+                    XeDistributor::query()->where('id', $id)->update(['user_id' => $User->id, 'remark' => '小鹅通合伙人同步-'.$VipUserModel->id.'-'.$User->phone]);
+
+                }
+
+            } else {
+
+                $flag = false;
+
+            }
+        }
+    }
+
+    public static function rpush_add_vip_user_inviter(){
+
+        $redis_key = 'xe_distributor_to_vip_user_inviter';
+        self::set_distributor_base_phone();
+
+        $list = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
+            ->select('XeDistributor.base_phone','XeDistributor.id', 'XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeDistributor.xe_user_id', 'XeDistributor.user_id')
+            ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
+            ->where('XeDistributor.status', 1)
+            ->where('XeDistributor.group_id','<>', 59524)
+            ->where('XeDistributor.base_phone','<>', '')
+            ->get()->toArray();
+
+        //根据订单的分享人来同步合伙人的上级推广员
+        foreach ($list as $k => $distributor) {
+            var_dump($k);
+            $json_str = json_encode($distributor);
+            Redis::rpush($redis_key, $json_str);
+        }
+    }
+
+    public static function lpop_add_vip_user_inviter(){
+
+        $redis_key = 'xe_distributor_to_vip_user_inviter';
+
+        $flag = True;
+
+        while ($flag) {
+
+            $data = Redis::lpop($redis_key);
+
+            var_dump($data);
+
+            if ($data) {
+
+                $distributor = json_decode($data, true);
+                if (!$distributor) {
+                    continue;
+                }
+
+                $xe_user_id = $distributor['xe_user_id'];
+                $user_id = $distributor['user_id'];
+                if (empty($user_id)) {
+                    continue;
+                }
+                $base_phone = $distributor['base_phone'];
+
+
+                $XeUser = XeUser::query()->where('xe_user_id', $xe_user_id)->first();
+                if (!$XeUser) {
+                    continue;
+                }
+
+                $User = User::query()->where('phone', $base_phone)->first();
+                if (!$User) {
+                    continue;
+                }
+
+                $VipUserModel = VipUserModel::query()->where('username', $base_phone)->where('status', 1)->first();
+                if (!$VipUserModel) {
+                    continue;
+                }
+
+                $XeOrder = XeOrder::query()->where([
+                    'xe_user_id' => $xe_user_id,
+                    'goods_name' => '幸福学社合伙人',
+                    'goods_original_total_price' => 258000,
+                    'pay_state' => 1,
+                    'order_state' => 4,
+                ])->first();
+
+                if ($XeOrder && $XeOrder->share_user_id) {
+
+                    $ShareXeDistributor = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
+                        ->select('XeDistributor.base_phone','XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeUser.xe_user_id', 'XeUser.user_id')
+                        ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
+                        ->where('XeUser.user_id', '>', 0)
+                        ->where('XeDistributor.status', 1)
+                        ->where('XeDistributor.group_id','<>', 59524)
+                        ->where('XeDistributor.xe_user_id', $XeOrder->share_user_id)
+                        ->where('XeDistributor.base_phone','<>', '')
+                        ->first();
+
+                    if ($ShareXeDistributor) {
+
+                        $ShareVipUserModel = VipUserModel::query()->where('username', $ShareXeDistributor->base_phone)->where('status', 1)->first();
+
+                        if ($ShareVipUserModel) {
+
+                            $VipUserModel->inviter = $ShareVipUserModel->user_id;
+                            $VipUserModel->inviter_vip_id = $ShareVipUserModel->id;
+                            $VipUserModel->save();
+
+
+                            $VipUserBindModel = VipUserBindModel::query()
+                                ->where('status', 1)
+                                ->where('son', $VipUserModel->username)->first();
+
+
+                            if (!$VipUserBindModel) {
+
+                                var_dump($ShareVipUserModel->username);
+                                var_dump($VipUserModel->username);
+
+                                //创建新的关系保护
+                                $VipUserBindModel = new VipUserBindModel();
+                                $VipUserBindModel->parent = $ShareVipUserModel->username;
+                                $VipUserBindModel->son = $VipUserModel->username;
+                                $VipUserBindModel->life = 2;
+                                $VipUserBindModel->begin_at = $VipUserModel->start_time;
+                                $VipUserBindModel->end_at = $VipUserModel->expire_time;
+                                $VipUserBindModel->channel = 6;
+                                $VipUserBindModel->remark = '小鹅通合伙人同步';
+                                $VipUserBindModel->save();
+
+                            }
+                        }
+                    }
+                }
+
+
+            } else {
+                $flag = false;
+            }
+        }
+    }
+
+    public static function rpush_vip_user_bind(){
+
+        try {
+
+            $page = Redis::get('rpush_vip_user_bind_page');
+            if (!$page) {
+                $page = 1;
+            }
+
+            Redis::set('rpush_vip_user_bind_page', $page + 1);
+
+            //同步小鹅通客户关系表
+            $list = XeDistributorCustomer::query()->from(XeDistributorCustomer::DB_TABLE . ' as XeDistributorCustomer')
+                ->select(
+                    'XeDistributorCustomer.id', 'XeDistributorCustomer.sub_user_id', 'XeDistributorCustomer.xe_user_id', 'XeDistributorCustomer.bind_time', 'XeDistributorCustomer.expired_at',
+                    'XeUser.phone', 'XeUser.phone_collect',
+                    'SubXeUser.phone as sub_phone', 'SubXeUser.phone_collect as sub_phone_collect', 'SubXeUser.nickname'
+                )
+                ->leftJoin(XeUser::DB_TABLE . ' as SubXeUser', 'SubXeUser.xe_user_id', 'XeDistributorCustomer.sub_user_id')
+                ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributorCustomer.xe_user_id')
+                ->leftJoin(XeDistributor::DB_TABLE . ' as XeDistributor', 'XeDistributor.xe_user_id', 'XeDistributorCustomer.xe_user_id')
+                ->where('XeDistributorCustomer.status', 1)
+                ->where('XeDistributorCustomer.expired_at', '>', times())
+                ->where('XeDistributor.status', 1)
+                ->where('XeDistributor.group_id','<>', 59524)
+
+
+                //                        ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
+//                        ->whereRaw("(SubXeUser.phone<>'' or SubXeUser.phone_collect<>'')")
+                ->orderBy('XeDistributorCustomer.id', 'desc')
+                ->forPage($page, 50000)
+                ->get()->toArray();
+
+            $redis_page_index_key = 'xe_distributor_customer_xfxs_bind_user';
+
+            foreach ($list as $k => $XeDistributorCustomer) {
+                var_dump($page . '-' . $k);
+                $json_str = json_encode($XeDistributorCustomer);
+                Redis::rpush($redis_page_index_key, $json_str);
+            }
+
+        } catch (\Exception $e) {
+            var_dump($e->getMessage());
+            die;
+        }
+    }
+
+    public static function rpush_one_vip_user_bind(){
+        try {
+
+            $xe_user_id='u_5d538b27472fb_gbuhCZK6To';
+            $k=0;
+
+            //同步小鹅通客户关系表
+            $list = XeDistributorCustomer::query()->from(XeDistributorCustomer::DB_TABLE . ' as XeDistributorCustomer')
+                ->select(
+                    'XeDistributorCustomer.id', 'XeDistributorCustomer.sub_user_id', 'XeDistributorCustomer.xe_user_id', 'XeDistributorCustomer.bind_time', 'XeDistributorCustomer.expired_at',
+                    'XeUser.phone', 'XeUser.phone_collect',
+                    'SubXeUser.phone as sub_phone', 'SubXeUser.phone_collect as sub_phone_collect', 'SubXeUser.nickname'
+                )
+                ->leftJoin(XeUser::DB_TABLE . ' as SubXeUser', 'SubXeUser.xe_user_id', 'XeDistributorCustomer.sub_user_id')
+                ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributorCustomer.xe_user_id')
+                ->leftJoin(XeDistributor::DB_TABLE . ' as XeDistributor', 'XeDistributor.xe_user_id', 'XeDistributorCustomer.xe_user_id')
+                ->where('XeDistributorCustomer.xe_user_id', $xe_user_id)
+//                        ->where('XeDistributorCustomer.xe_user_id', '<>',$xe_user_id)
+                ->where('XeDistributorCustomer.status', 1)
+                ->where('XeDistributorCustomer.expired_at', '>', times())
+                ->where('XeDistributor.status', 1)
+                ->where('XeDistributor.group_id','<>', 59524)
+
+//                        ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
+//                        ->whereRaw("(SubXeUser.phone<>'' or SubXeUser.phone_collect<>'')")
+                ->orderBy('XeDistributorCustomer.id', 'asc')
+                ->chunk(50000, function ($list)use(&$k){
+
+                    $redis_page_index_key = 'xe_distributor_customer_xfxs_bind_user';
+                    foreach ($list as $XeDistributorCustomer) {
+                        $k++;
+                        var_dump( $k);
+                        $json_str = json_encode($XeDistributorCustomer);
+                        Redis::rpush($redis_page_index_key, $json_str);
+                    }
+
+                });
+
+
+        } catch (\Exception $e) {
+            var_dump($e->getMessage());
+            die;
+        }
+    }
+
+    public static function lpop_vip_user_bind(){
+
+        $flag = True;
+
+        while ($flag) {
+
+            $data = Redis::lpop('xe_distributor_customer_xfxs_bind_user');
+
+            var_dump($data);
+
+            if ($data) {
+
+                $jsonArr = json_decode($data, true);
+                if (!$jsonArr) {
+                    continue;
+                }
+
+                $id = $jsonArr['id'];
+                $bind_time = $jsonArr['bind_time'];
+                $expired_at = $jsonArr['expired_at'];
+                $nickname = $jsonArr['nickname'];
+
+                $phone = $jsonArr['phone'] ?? '';
+                $phone_collect = $jsonArr['phone_collect'] ?? '';
+                $phone = $phone ? $phone : $phone_collect;
+                if(empty($phone)){
+                    XeDistributorCustomer::query()->where('id', $id)->update(['remark' => '合伙人手机号不存在']);
+                    continue;
+                }
+
+                $sub_phone = $jsonArr['sub_phone'] ?? '';
+                $sub_phone_collect = $jsonArr['sub_phone_collect'] ?? '';
+                $sub_phone = $sub_phone ? $sub_phone : $sub_phone_collect;
+                if(empty($sub_phone)){
+                    XeDistributorCustomer::query()->where('id', $id)->update(['remark' => '客户手机号不存在']);
+                    continue;
+                }
+
+                try {
+
+                    $User = User::query()->where('phone', $sub_phone)->first();
+                    if ($User) {
+                        $User->xfxs_login = 1;
+                        $User->save();
+                    }
+
+                    $VipUserBindModel = VipUserBindModel::query()
+                        ->where('status', 1)
+                        ->where('son', $sub_phone)->first();
+
+                    if($VipUserBindModel){
+
+                        if($VipUserBindModel->parent==$phone){
+                            XeDistributorCustomer::query()->where('id', $id)->update(['parent_phone'=>$phone,'son_phone'=>$sub_phone,'remark' => '小鹅通关系保护同步']);
+                        }else{
+                            XeDistributorCustomer::query()->where('id', $id)->update(['parent_phone'=>$phone,'son_phone'=>$sub_phone,'remark' => '已被保护']);
+                        }
+
+                    }else{
+
+                        if (empty($User)) {
+                            $User = new User();
+                            $User->phone = $sub_phone;
+                            $User->intro = '幸福学社客户';
+                            $User->app_project_type = 2;
+                            $User->xfxs_login = 1;
+                            $User->nickname = $nickname;
+                            $User->save();
+                        }
+
+                        //创建新的关系保护
+                        $VipUserBindModel = new VipUserBindModel();
+                        $VipUserBindModel->parent = $phone;
+                        $VipUserBindModel->son = $sub_phone;
+                        $VipUserBindModel->life = 2;
+                        $VipUserBindModel->begin_at = $bind_time;
+                        $VipUserBindModel->end_at = $expired_at;
+                        $VipUserBindModel->channel = 7;
+                        $VipUserBindModel->remark = '小鹅通关系保护同步';
+                        $VipUserBindModel->save();
+
+                        XeDistributorCustomer::query()->where('id', $id)->update(['parent_phone'=>$phone,'son_phone'=>$sub_phone,'remark' => '小鹅通关系保护同步']);
+
+                    }
+
+                } catch (\Exception $e) {
+
+                    var_dump($e->getMessage());
+                    XeDistributorCustomer::query()->where('id', $id)->update(['remark' => $e->getMessage()]);
+
+                }
+
+            } else {
+
+                $flag = false;
+
+            }
+
+        }
+    }
+
+
+    public static function set_distributor_base_phone()
+    {
+
+        //同步手机号
+        $list = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
+            ->select('XeDistributor.id', 'XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeUser.xe_user_id', 'XeUser.user_id')
+            ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
+            ->where('XeDistributor.status', 1)
+            ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
+            ->where('base_phone', '')
+            ->get();
+
+        foreach ($list as $k => $XeDistributor) {
+            var_dump($k);
+            $phone = $XeDistributor->phone ? $XeDistributor->phone : $XeDistributor->phone_collect;
+            $XeDistributor->base_phone = $phone;
+            $XeDistributor->save();
+
+        }
+    }
+
+
+    //清除9.9分销 合伙人
+    public static function clear_vip(){
+
+        self::set_distributor_base_phone();
+
+        //同步手机号
+        $list = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
+            ->select('XeDistributor.base_phone','XeDistributor.id', 'XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeUser.xe_user_id', 'XeUser.user_id')
+            ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
+            ->where('XeDistributor.status', 1)
+            ->where('XeDistributor.group_id','=', 59524)
+            ->where('XeDistributor.group_name','=', '9.9分销')
+            ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
+            ->where('base_phone','<>','')
+            ->get();
+
+        foreach ($list as $k=>$XeDistributor){
+
+            $phone=$XeDistributor->base_phone;
+
+            if($phone){
+                $VipUserModel=VipUserModel::query()->where('username',$phone)->where('status',1)->first();
+                if($VipUserModel){
+                    $VipUserModel->status=2;
+                    $VipUserModel->remark='9.9分销取消合伙人身份';
+                    $VipUserModel->save();
+                    var_dump('9.9分销取消合伙人身份');
+                }
+            }
+
+        }
     }
 }
