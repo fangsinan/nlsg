@@ -352,8 +352,14 @@ WHERE
                 }
             }
         }
+
         $data = $this->getWorksList($live_id);
-        return $data;
+        foreach ($data as $k=>$v){
+            if(empty($v)){
+                unset($data[$k]);
+            }
+        }
+        return array_values($data);
     }
 
     public function getWorksList($live_id = 0)
