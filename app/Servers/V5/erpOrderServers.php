@@ -13,6 +13,12 @@ use Illuminate\Support\Facades\DB;
 class erpOrderServers
 {
     public function list($params, $is_excel = 0,$role_id=0) {
+
+        DB::table('wwwww')->insert([
+            'vv'=>'erpOrderServers::list',
+            't'=>$is_excel.':'.$role_id
+                                   ]);
+
         $search_relation_id = [7, 8, 10];
         $size               = $params['size'] ?? 10;
         $ordernum           = $params['ordernum'] ?? '';
