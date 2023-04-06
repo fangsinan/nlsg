@@ -15,4 +15,9 @@ class FeedbackType extends Base
     {
         return $this->hasMany(FeedbackNew::class,'type','id');
     }
+
+    //获取意见反馈的类型
+    public static function getFeedbackType($type){
+        return  FeedbackType::where(['type'=>$type])->get();
+    }
 }
