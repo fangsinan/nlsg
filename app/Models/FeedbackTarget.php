@@ -12,7 +12,7 @@ class FeedbackTarget extends Base
         'type',
         'live_id',
         'target_id',
-        'content_id',
+        'comment_id',
     ];
 
 
