@@ -207,10 +207,7 @@ class HelpController extends Controller
     /**
      *  {get} api/v5/help/report 举报功能
      * @apiVersion 4.0.0
-     * @apiParam {string} type 10:使用建议 11:内容漏缺 12:购物相关 13:物流配送 14:客服体验 15:节约相关
-     * @apiParam {string} content 内容  不能大于200字
-     * @apiParam {string} pic  图片url(数组格式)
-     * @apiGroup Api
+     * @apiParam {string} type help/get_report_type 获取到的id
      */
     public function report(Request $request)
     {
