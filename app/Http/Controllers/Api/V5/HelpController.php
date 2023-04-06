@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
 use App\Models\FeedbackNew;
+use App\Models\FeedbackTarget;
 use App\Models\FeedbackType;
 use App\Models\HelpAnswer;
 use App\Models\Talk;
@@ -149,8 +150,10 @@ class HelpController extends Controller
      * /api/v5/help/get_feedback_type  提意见类型
      */
     function getFeedBackType(){
-        $types =  FeedbackType::where(['type'=>1])->get();
-        return $this->success($types);
+        return $this->success(FeedbackType::getFeedbackType(1));
+
+        // $types =  FeedbackType::where(['type'=>1])->get();
+        // return $this->success($types);
     }
 
 
@@ -195,5 +198,60 @@ class HelpController extends Controller
 
     }
 
+    /**
+     * /api/v5/help/get_report_type  提意见类型
+     */
+    function getReportType(){
+        return $this->success(FeedbackType::getFeedbackType(3));
+    }
+    /**
+     *  {get} api/v5/help/report 举报功能
+     * @apiVersion 4.0.0
+     * @apiParam {string} type 10:使用建议 11:内容漏缺 12:购物相关 13:物流配送 14:客服体验 15:节约相关
+     * @apiParam {string} content 内容  不能大于200字
+     * @apiParam {string} pic  图片url(数组格式)
+     * @apiGroup Api
+     */
+    public function report(Request $request)
+    {
+        $input = $request->all();
+        if (empty($input['live_id'])) {
+            return $this->error(1000, '直播ID不能为空');
+        }
+
+        if (empty($input['type'])) {
+            return $this->error(1000, '举报类型不能为空');
+        }
+
+        if (empty($input['user_id'])) {
+            return $this->error(1000, '举报用户不能为空');
+        }
+
+        if (empty($input['content_id'])) {
+            return $this->error(1000, '举报评论ID不能为空');
+        }
+
+        $edit = [
+            'type'    => $input['type'],
+            'user_id' => $this->user['id']??211172,
+            'os_type' => $input['os_type']??1,
+            'picture' => $input['pic']??'',
+            'live_id' => $input['live_id'],
+            'content' => $input['content']??'',
+        ];
+
+        $target_id = FeedbackTarget::insertGetId([
+            'type'          => 1,
+            'live_id'       => $input['live_id'],
+            'target_id'     => $input['user_id'],
+            'content_id'    => $input['content_id'],
+        ]);
+
+        $edit['target'] = $target_id;
+
+        FeedbackNew::create($edit);
+
+        return $this->success();
+    }
 
 }

@@ -650,6 +650,9 @@ Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
         Route::any('vip/get_son_list', 'VipController@getVipSonList');
         //幸福学社刷单
         Route::get('order/xfxs_free_order', 'OrderController@freeOrder');
+        //举报反馈
+        Route::any('help/get_report_type', 'HelpController@getReportType');
+        Route::any('help/report', 'HelpController@report');
     });
     //训练营
     Route::any('camp/get_camp_list', 'CampController@getCampList');//->middleware('replaceNull');
