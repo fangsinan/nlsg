@@ -248,7 +248,7 @@ class HelpController extends Controller
         $edit['target'] = $target_id;
 
         FeedbackNew::create($edit);
-        Message::pushMessage(0,$this->user['id'],'SYS_USER_SEND_HELP',[]);
+        Message::pushMessage(0,$this->user['id'],'SYS_FEEDBACK_REPORT',[]);
 
         return $this->success();
     }
