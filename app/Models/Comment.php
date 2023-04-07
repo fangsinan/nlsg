@@ -14,7 +14,7 @@ class Comment extends Base
 
     /**
      * 想法
-     * @param  int  $type  类型 1.专栏 2.讲座 3.听书 4.精品课
+     * @param  int  $type  类型 1.专栏 2.讲座 3.听书 4.精品课  6.训练营
      */
     public function getIndexComment($id, $type = 1, $uid = 0, $order = 1, $self = false, $info_id = 0)
     {
@@ -38,7 +38,7 @@ class Comment extends Base
             $like_type = 3;
         }
 
-        $order = $order == 1 ? 'reply_num' : 'created_at';
+        $orderBy = $order == 1 ? 'reply_num' : 'created_at';
         $query = Comment::with([
             'user:id,nickname,headimg,is_author', 'quote:id,pid,content', 'attach:id,relation_id,img',
             'reply' => function ($query) {
@@ -63,15 +63,19 @@ class Comment extends Base
             $q->where('id', '>', 0);
         });
 
-        $lists = $query
-            ->when($self, function ($query) use ($res) {
+        $query->when($self, function ($query) use ($res) {
                 return $query->where('user_id', $res['user_id']);
-            })
-//            ->orderBy($order, 'desc')
-            ->orderBy('is_top', 'desc')
-            ->orderBy('reply_num', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10)
+            });
+
+        if ($type == 6 && $order==2) { //训练营最新评论排序
+            $query->orderBy('created_at', 'desc');
+        }else {
+//            ->orderBy($orderBy, 'desc')
+            $query->orderBy('is_top', 'desc')
+                ->orderBy('reply_num', 'desc')
+                ->orderBy('created_at', 'desc');
+        }
+        $lists=$query->paginate(10)
             ->toArray();
 
         if ($lists['data']) {
