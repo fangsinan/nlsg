@@ -454,10 +454,9 @@ class LivePush extends Base
                 if(!empty($res)){
                     $res['push_id'] = $v['id'];
                     $res['is_sell_short'] = $v['is_sell_short'];
-                }
-                if(!empty($res)){
                     $data[] = $res;
                 }
+
             }
             $expire_num = CacheTools::getExpire('live_push_works');
             Cache::put($cache_live_name, $data, $expire_num);
