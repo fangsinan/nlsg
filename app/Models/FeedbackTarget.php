@@ -14,7 +14,7 @@ class FeedbackTarget extends Base
         'type',
         'live_id',
         'target_id',
-        'comment_id',
+        'comment',
     ];
 
     public function user(): HasOne

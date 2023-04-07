@@ -88,7 +88,7 @@ class FeedbackServers
             $targetArrs = FeedbackTarget::query()
                 ->with([
                     'user:id,phone,nickname,headimg',
-                    'liveComment:id,content',
+                    // 'liveComment:id,content',
                     'live:id,title'
                 ])
                 ->select("*")
@@ -104,7 +104,7 @@ class FeedbackServers
 
             //举报用
             $v->target_live     = $new_target[$v['target']]['live']??'';
-            $v->target_comment  = $new_target[$v['target']]['live_comment']??'';
+            $v->target_comment  = $new_target[$v['target']]['comment']??'';
             $v->target_user     = $new_target[$v['target']]['user']??'';
         }
 

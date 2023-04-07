@@ -224,8 +224,8 @@ class HelpController extends Controller
             return $this->error(1000, '举报用户不能为空');
         }
 
-        if (empty($input['comment_id'])) {
-            return $this->error(1000, '举报评论ID不能为空');
+        if (empty($input['live_comment'])) {
+            return $this->error(1000, '举报评论不能为空');
         }
 
         $edit = [
@@ -241,7 +241,7 @@ class HelpController extends Controller
             'type'          => 1,
             'live_id'       => $input['live_id'],
             'target_id'     => $input['user_id'],
-            'comment_id'    => $input['comment_id'],
+            'comment'       => $input['live_comment'],
         ]);
 
         $edit['target'] = $target_id;
