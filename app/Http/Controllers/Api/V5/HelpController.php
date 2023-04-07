@@ -7,6 +7,7 @@ use App\Models\FeedbackNew;
 use App\Models\FeedbackTarget;
 use App\Models\FeedbackType;
 use App\Models\HelpAnswer;
+use App\Models\Message\Message;
 use App\Models\Talk;
 use App\Models\TalkList;
 use App\Models\TalkUserStatistics;
@@ -230,7 +231,7 @@ class HelpController extends Controller
 
         $edit = [
             'type'    => $input['type'],
-            'user_id' => $this->user['id']??211172,
+            'user_id' => $this->user['id']??0,
             'os_type' => $input['os_type']??1,
             'picture' => $input['pic']??'',
             'live_id' => $input['live_id'],
@@ -247,6 +248,7 @@ class HelpController extends Controller
         $edit['target'] = $target_id;
 
         FeedbackNew::create($edit);
+        Message::pushMessage(0,$this->user['id'],'SYS_USER_SEND_HELP',[]);
 
         return $this->success();
     }
