@@ -220,6 +220,7 @@ class FeedbackServers
     public function templateList($params, $admin): LengthAwarePaginator
     {
         $id = $params['id'] ?? 0;
+        $type = $params['type'] ?? 1;
 
         $query = FeedbackReplyTemplate::query()
             ->where('status', '<>', 3)
@@ -227,6 +228,9 @@ class FeedbackServers
 
         if ($id) {
             $query->where('id', '=', $id);
+        }
+        if(!empty($type)){
+            $query->where('type', '=', $type);
         }
 
         //名称,状态,创建时间范围
