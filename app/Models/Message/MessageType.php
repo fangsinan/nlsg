@@ -158,8 +158,8 @@ class MessageType extends Base
                     break;
                 case 'SYS_FEEDBACK_REPORT':
                     // 举报
-                    $message = ['content'=>$res['message'],'source'=>'举报通知','type'=>'举报通知','amount'=>0,'time'=>$time];
-                    $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
+                    // $message = ['content'=>$res['message'],'source'=>'举报通知','type'=>'举报通知','amount'=>0,'time'=>$time];
+                    // $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
                     break;
             }
         // }
