@@ -36,6 +36,7 @@ class FeedbackNew extends Base
         'reply_at',
         'del_at',
         'del_by',
+        'target',
     ];
 
 

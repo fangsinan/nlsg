@@ -6,6 +6,7 @@ namespace App\Servers\V5;
 
 use App\Models\FeedbackNew;
 use App\Models\FeedbackReplyTemplate;
+use App\Models\FeedbackTarget;
 use App\Models\FeedbackType;
 use App\Models\HelpAnswer;
 use App\Models\HelpAnswerKeywords;
@@ -27,6 +28,7 @@ class FeedbackServers
         $reply_end   = $params['reply_end'] ?? '';
         $os_type     = $params['os_type'] ?? 0;
         $type        = $params['type'] ?? 0;
+        $get_feedback_type       = $params['get_feedback_type'] ?? 1;  // 1反馈 2帮助问题类型 3直播举报
 
         $select_array = [
             '*', DB::raw('if(reply_admin_id>0,1,0) as is_reply')
@@ -71,17 +73,43 @@ class FeedbackServers
 
         if ($type) {
             $query->where('type', '=', $type);
+        }else{
+            $types = FeedbackType::where("type",$get_feedback_type)->pluck("id")->toArray();
+            $query->whereIn('type', $types);
         }
 
 
         $res = $query->orderBy('id', 'desc')
             ->paginate($params['size'] ?? 10);
 
-//        if ($id) {
+        if($get_feedback_type == 3){
+            // 获取额外的举报信息
+            $target_ids = $query->pluck("target")->toArray();
+            $targetArrs = FeedbackTarget::query()
+                ->with([
+                    'user:id,phone,nickname,headimg',
+                    // 'liveComment:id,content',
+                    'live:id,title'
+                ])
+                ->select("*")
+                ->whereIn('id', $target_ids)->get()->toArray();
+            $new_target =[];
+            foreach ($targetArrs as $k=>$v){
+                $new_target[$v['id']] =$v;
+            }
+        }
+
         foreach ($res as $v) {
             $v->picture = explode(',', $v->picture);
+
+            //举报用
+            $v->target_live     = $new_target[$v['target']]['live']??'';
+            $v->target_comment  = $new_target[$v['target']]['comment']??'';
+            $v->target_user     = $new_target[$v['target']]['user']??'';
         }
-//        }
+
+
+
 
         return $res;
     }
