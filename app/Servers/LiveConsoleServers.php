@@ -535,6 +535,7 @@ class LiveConsoleServers
                 $UpUserId=$val['id'];
                 if($param==1){
                     $dataArr[$key]=[
+                        'userId'=>$UpUserId,
                         'phone'=>$phone,
                         'rst'=>$UserRst,
                         'data'=>$data,
