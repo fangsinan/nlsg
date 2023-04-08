@@ -16,6 +16,7 @@ use App\Models\RecommendConfig;
 use App\Models\User;
 use App\Models\Versions;
 use App\Models\Works;
+use App\Servers\LiveConsoleServers;
 use App\Servers\StatisticsServers;
 use App\Servers\V5\JpushService;
 use EasyWeChat\Factory;
@@ -27,6 +28,18 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 
 class IndexController extends Controller
 {
+
+    /**
+     *手机号归属地查询
+     */
+    public function phoneRegion(Request $request)
+    {
+
+        $data=LiveConsoleServers::getPhoneRegion(1);
+
+
+        return $this->success($data);
+    }
 
     /**
      * @api {get} api/v4/index/get_top_img  各个列表头图

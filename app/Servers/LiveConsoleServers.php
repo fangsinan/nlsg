@@ -448,7 +448,9 @@ class LiveConsoleServers
         $key_name='11API_PhoneRegion:'.date('md_Hi',$time);
         $flag=$Redis->EXISTS($key_name);
         if($flag==1) { //存在返回1
-            return ;
+            if($param!=1) {
+                return [];
+            }
         }
         $Redis->setex($key_name,60,1);//1分钟
 
@@ -466,7 +468,7 @@ class LiveConsoleServers
         if(empty($RedisUserId)){
             $userInfo = User::query()->select(['id'])->where('created_at','>',$day_time)->orderBy('id','asc')->first();
             if(empty($userInfo)){
-                return ;
+                return [];
             }
             $RedisUserId=$userInfo['id'];
             $Redis->setex($redis_user_id_key,86400,$userInfo['id']);//1天
