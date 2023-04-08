@@ -441,7 +441,7 @@ class LiveConsoleServers
 
         $redisConfig = config('database.redis.default');
         $Redis = new Client($redisConfig);
-        $Redis->select(0);
+        $Redis->select(2);
 
         $time=time();
         $key_name='11API_PhoneRegion:'.date('md_Hi',$time);
