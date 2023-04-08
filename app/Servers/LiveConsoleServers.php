@@ -436,7 +436,7 @@ class LiveConsoleServers
     }
 
     //抓取手机号地区
-    public static function getPhoneRegion()
+    public static function getPhoneRegion($param=0)
     {
 
         $redisConfig = config('database.redis.default');
@@ -482,9 +482,10 @@ class LiveConsoleServers
 //        $query->dd(); //dd 阻断流程
 //        $query->dump();
         $list=$query->get()->toArray() ?: [];
-        echo '<pre>';
+//        echo '<pre>';
 //        var_dump($list);
 //        exit;
+        $dataArr=[];
         if (!empty($list)) {
             $UpUserId=0;
             foreach ($list as $key => $val) {
@@ -531,10 +532,21 @@ class LiveConsoleServers
                 }
                 $UserRst=User::query()->where('id', $val['id'])->update($data);
                 $UpUserId=$val['id'];
-                echo ($key+1).':'.$phone.' - '.$UserRst.'<br>';
+                if($param==1){
+                    $dataArr[$key]=[
+                        'phone'=>$phone,
+                        'rst'=>$UserRst,
+                        'data'=>$data,
+                    ];
+                }else{
+                    echo ($key+1).':'.$phone.' - '.$UserRst.'<br>';
+                }
             }
             if(!empty($UpUserId)) {
                 $Redis->setex($redis_user_id_key, 86400, $UpUserId);//1天
+            }
+            if($param==1){
+                return $dataArr;
             }
         }
 
