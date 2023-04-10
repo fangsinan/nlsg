@@ -1642,36 +1642,46 @@ class XiaoeTechServers
             case 'clear_vip':
                 self::clear_vip();
                 break;
+
+            case 'set_distributor_base_phone':
+                self::set_distributor_base_phone();
+                break;
         }
 
         return true;
     }
 
-
+    //php artisan TestJobb rpush_add_vip_user
     public static function rpush_add_vip_user(){
+
+        var_dump('rpush_add_vip_user');
 
         self::set_distributor_base_phone();
 
         $redis_key = 'xe_distributor_to_vip_user';
 
         $list = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
-            ->select('XeDistributor.group_id','XeDistributor.id', 'XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeUser.xe_user_id', 'XeUser.user_id')
+            ->select('XeDistributor.base_phone','XeDistributor.group_id','XeDistributor.id', 'XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeUser.xe_user_id', 'XeUser.user_id')
             ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
             ->where('XeDistributor.status', 1)
 //            ->where('XeDistributor.base_phone', 15188768848)
             ->where('XeDistributor.group_id','<>', 59524)
-            ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
+            ->where('XeDistributor.remark','=', '')
+            ->where('XeDistributor.base_phone','<>', '')
             ->get()->toArray();
 
         foreach ($list as $k => $distributor) {
             var_dump($k);
+            var_dump($distributor);
             $json_str = json_encode($distributor);
             Redis::rpush($redis_key, $json_str);
         }
-
     }
 
+    //php artisan TestJobb lpop_add_vip_user
     public static function lpop_add_vip_user(){
+
+        var_dump('lpop_add_vip_user');
 
         $redis_key = 'xe_distributor_to_vip_user';
 
@@ -1694,9 +1704,8 @@ class XiaoeTechServers
                 $xe_group_id = $distributor['group_id'];
                 $id = $distributor['id'];
                 $xe_user_id = $distributor['xe_user_id'];
-                $phone = $distributor['phone'];
-                $phone_collect = $distributor['phone_collect'];
-                $base_phone = $phone ? $phone : $phone_collect;
+
+                $base_phone = $distributor['base_phone'];
 
                 //59524 9.9分销分组 不是合伙人
                 if($xe_group_id==59524){
@@ -1723,13 +1732,7 @@ class XiaoeTechServers
                     continue;
                 }
 
-                if ($phone) {
-                    $User = User::query()->where('phone', $phone)->first();
-                }
-
-                if (empty($User) && $phone_collect) {
-                    $User = User::query()->where('phone', $phone_collect)->first();
-                }
+                $User = User::query()->where('phone', $base_phone)->first();
 
                 if ($User) {
 
@@ -1750,16 +1753,11 @@ class XiaoeTechServers
                 $XeUser->user_id = $User->id;
                 $XeUser->save();
 
-                $VipUserModel = VipUserModel::query()->where('user_id', $User->id)->where('status', 1)->first();
+                $VipUserModel = VipUserModel::query()->where('username', $base_phone)->where('status', 1)->first();
 
                 if ($VipUserModel) {
 
                     $VipUserModel->group_id=$group_id;
-
-                    //如果合伙人的登录账号和用户的手机不一致 修改合伙人的登录账号
-                    if ($VipUserModel->username != $User->phone) {
-                        $VipUserModel->username = $User->phone;
-                    }
 
                     $VipUserModel->save();
 
@@ -1792,7 +1790,7 @@ class XiaoeTechServers
                     $VipUserModel->start_time = $start_time;
                     $VipUserModel->expire_time = $expire_time;
                     $VipUserModel->channel = '小鹅通合伙人';
-                    $VipUserModel->remark = '小鹅通合伙人';
+                    $VipUserModel->remark = '小鹅通合伙人'.date('Y-m-d');
                     $VipUserModel->save();
 
                     XeDistributor::query()->where('id', $id)->update(['user_id' => $User->id, 'remark' => '小鹅通合伙人同步-'.$VipUserModel->id.'-'.$User->phone]);
@@ -1807,17 +1805,23 @@ class XiaoeTechServers
         }
     }
 
+    //php artisan TestJobb rpush_add_vip_user_inviter
     public static function rpush_add_vip_user_inviter(){
 
+        var_dump('rpush_add_vip_user_inviter');
+
         $redis_key = 'xe_distributor_to_vip_user_inviter';
+
         self::set_distributor_base_phone();
 
         $list = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
             ->select('XeDistributor.base_phone','XeDistributor.id', 'XeUser.phone', 'XeUser.phone_collect', 'XeUser.nickname', 'XeDistributor.xe_user_id', 'XeDistributor.user_id')
             ->leftJoin(XeUser::DB_TABLE . ' as XeUser', 'XeUser.xe_user_id', 'XeDistributor.xe_user_id')
+            ->leftJoin(VipUserModel::DB_TABLE.' as VipUserModel','VipUserModel.username','=','XeDistributor.base_phone')
             ->where('XeDistributor.status', 1)
             ->where('XeDistributor.group_id','<>', 59524)
             ->where('XeDistributor.base_phone','<>', '')
+            ->where('VipUserModel.remark','=', '小鹅通合伙人'.date('Y-m-d'))
             ->get()->toArray();
 
         //根据订单的分享人来同步合伙人的上级推广员
@@ -1828,7 +1832,10 @@ class XiaoeTechServers
         }
     }
 
+    //php artisan TestJobb lpop_add_vip_user_inviter
     public static function lpop_add_vip_user_inviter(){
+
+        var_dump('lpop_add_vip_user_inviter');
 
         $redis_key = 'xe_distributor_to_vip_user_inviter';
 
@@ -1959,10 +1966,6 @@ class XiaoeTechServers
                 ->where('XeDistributorCustomer.expired_at', '>', times())
                 ->where('XeDistributor.status', 1)
                 ->where('XeDistributor.group_id','<>', 59524)
-
-
-                //                        ->whereRaw("(XeUser.phone<>'' or XeUser.phone_collect<>'')")
-//                        ->whereRaw("(SubXeUser.phone<>'' or SubXeUser.phone_collect<>'')")
                 ->orderBy('XeDistributorCustomer.id', 'desc')
                 ->forPage($page, 50000)
                 ->get()->toArray();
@@ -2141,14 +2144,13 @@ class XiaoeTechServers
             ->get();
 
         foreach ($list as $k => $XeDistributor) {
-            var_dump($k);
+//            var_dump($k);
             $phone = $XeDistributor->phone ? $XeDistributor->phone : $XeDistributor->phone_collect;
             $XeDistributor->base_phone = $phone;
             $XeDistributor->save();
 
         }
     }
-
 
     //清除9.9分销 合伙人
     public static function clear_vip(){

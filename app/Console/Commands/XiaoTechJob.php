@@ -53,6 +53,15 @@ class XiaoTechJob extends Command
                 //查询最新的推广员客户
                 $XiaoeTechServers->sync_fast_distributor_customer_list();
                 break;
+
+            case 'sync_xe_xfxs':
+
+                //小鹅通合伙人同步幸福学社
+                XiaoeTechServers::rpush_add_vip_user();
+                XiaoeTechServers::lpop_add_vip_user();
+                XiaoeTechServers::rpush_add_vip_user_inviter();
+                XiaoeTechServers::lpop_add_vip_user_inviter();
+                break;
         }
 //        $XiaoeTechServers->sync_distributor_customer_list(0);
 
