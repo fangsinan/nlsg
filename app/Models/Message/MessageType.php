@@ -153,6 +153,7 @@ class MessageType extends Base
                         'content'=>$relation_data['content'],
                         'reply'=>$relation_data['reply_content'],
                         'reply_at'=>$relation_data['reply_at'],
+                        'type_name'=>$relation_data['type_name'],
                     ];
                     $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
                     break;

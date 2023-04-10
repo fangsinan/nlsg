@@ -203,6 +203,8 @@ class FeedbackServers
                 ->toArray();
 
             foreach ($fb_list as $fb_v) {
+                
+                $fb_v['type_name'] = FeedbackType::where('id', $fb_v['type'])->value("name");
                 $fb_v['open_type']     = 3;
                 $fb_v['relation_type'] = 181;
                 Message::pushMessage(
