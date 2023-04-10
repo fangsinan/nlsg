@@ -146,14 +146,18 @@ class MessageType extends Base
                     $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
                     break;
                 case 'SYS_FEEDBACK_REPLY':
+                    $type_name = '';
+                    if(!empty($relation_data['type_name']) && $relation_data['feedbackType'] == 3) {
+                        $type_name = $relation_data['type_name'];
+                    }
                     $message = [
                         'nickname'=>$relation_data['user_info']['nickname'],
                         'user_id'=>$relation_data['user_id'],
                         'created_at'=>$relation_data['created_at'],
-                        'content'=>$relation_data['content'],
+                        'content'=>$type_name.$relation_data['content'],
                         'reply'=>$relation_data['reply_content'],
                         'reply_at'=>$relation_data['reply_at'],
-                        'type_name'=>$relation_data['type_name'],
+                        'feedbackType'=>$relation_data['feedbackType'],
                     ];
                     $res['message'] = json_encode($message,JSON_UNESCAPED_UNICODE);
                     break;
