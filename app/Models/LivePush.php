@@ -352,13 +352,13 @@ class LivePush extends Base
                 }
             }
         }
-        $data = $this->getWorksList($live_id);
-        foreach ($data as $k=>$v){
-            if(empty($v)){
-                unset($data[$k]);
-            }
-        }
-        return array_values($data);
+        // foreach ($data as $k=>$v){
+        //     if(empty($v)){
+        //         unset($data[$k]);
+        //     }
+        // }
+        // return array_values($data);
+        return $this->getWorksList($live_id);
     }
 
     public function getWorksList($live_id = 0)
@@ -454,9 +454,9 @@ class LivePush extends Base
                 if(!empty($res)){
                     $res['push_id'] = $v['id'];
                     $res['is_sell_short'] = $v['is_sell_short'];
+                    $data[] = $res;
                 }
 
-                $data[] = $res ?? [];
             }
             $expire_num = CacheTools::getExpire('live_push_works');
             Cache::put($cache_live_name, $data, $expire_num);

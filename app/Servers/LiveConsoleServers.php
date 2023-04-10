@@ -436,18 +436,21 @@ class LiveConsoleServers
     }
 
     //抓取手机号地区
-    public static function getPhoneRegion()
+    //https://app.v4.api.nlsgapp.com/api/v4/index/phoneRegion
+    public static function getPhoneRegion($param=0)
     {
 
         $redisConfig = config('database.redis.default');
         $Redis = new Client($redisConfig);
-        $Redis->select(0);
+        $Redis->select(2);
 
         $time=time();
         $key_name='11API_PhoneRegion:'.date('md_Hi',$time);
         $flag=$Redis->EXISTS($key_name);
         if($flag==1) { //存在返回1
-            return ;
+            if($param!=1) {
+                return [];
+            }
         }
         $Redis->setex($key_name,60,1);//1分钟
 
@@ -465,7 +468,7 @@ class LiveConsoleServers
         if(empty($RedisUserId)){
             $userInfo = User::query()->select(['id'])->where('created_at','>',$day_time)->orderBy('id','asc')->first();
             if(empty($userInfo)){
-                return ;
+                return [];
             }
             $RedisUserId=$userInfo['id'];
             $Redis->setex($redis_user_id_key,86400,$userInfo['id']);//1天
@@ -482,9 +485,10 @@ class LiveConsoleServers
 //        $query->dd(); //dd 阻断流程
 //        $query->dump();
         $list=$query->get()->toArray() ?: [];
-        echo '<pre>';
+//        echo '<pre>';
 //        var_dump($list);
 //        exit;
+        $dataArr=[];
         if (!empty($list)) {
             $UpUserId=0;
             foreach ($list as $key => $val) {
@@ -531,10 +535,22 @@ class LiveConsoleServers
                 }
                 $UserRst=User::query()->where('id', $val['id'])->update($data);
                 $UpUserId=$val['id'];
-                echo ($key+1).':'.$phone.' - '.$UserRst.'<br>';
+                if($param==1){
+                    $dataArr[$key]=[
+                        'userId'=>$UpUserId,
+                        'phone'=>$phone,
+                        'rst'=>$UserRst,
+                        'data'=>$data,
+                    ];
+                }else{
+                    echo ($key+1).':'.$phone.' - '.$UserRst.'<br>';
+                }
             }
             if(!empty($UpUserId)) {
                 $Redis->setex($redis_user_id_key, 86400, $UpUserId);//1天
+            }
+            if($param==1){
+                return $dataArr;
             }
         }
 

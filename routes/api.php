@@ -33,6 +33,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
+    //手机号归属地查询
+    Route::get('index/phoneRegion', 'IndexController@phoneRegion');
 
     /**   5.0 API  START   ***/
 

@@ -58,13 +58,15 @@ class FeedbackServers
         }
 
         if ($reply_begin && date('Y-m-d H:i:s', strtotime($reply_begin)) == $reply_begin) {
-            $query->where('reply_admin_id', '>', 0)
-                ->where('reply_at', '>=', $reply_begin);
+            $query->where('created_at', '>=', $reply_begin);
+                // $query->where('reply_admin_id', '>', 0)
+                // ->where('reply_at', '>=', $reply_begin);
         }
 
         if ($reply_end && date('Y-m-d H:i:s', strtotime($reply_end)) == $reply_end) {
-            $query->where('reply_admin_id', '>', 0)
-                ->where('reply_at', '<=', $reply_end);
+            $query->where('created_at', '<=', $reply_end);
+            // $query->where('reply_admin_id', '>', 0)
+                // ->where('reply_at', '<=', $reply_end);
         }
 
         if ($os_type) {
@@ -220,6 +222,7 @@ class FeedbackServers
     public function templateList($params, $admin): LengthAwarePaginator
     {
         $id = $params['id'] ?? 0;
+        $type = $params['type'] ?? 1;
 
         $query = FeedbackReplyTemplate::query()
             ->where('status', '<>', 3)
@@ -227,6 +230,9 @@ class FeedbackServers
 
         if ($id) {
             $query->where('id', '=', $id);
+        }
+        if(!empty($type)){
+            $query->where('type', '=', $type);
         }
 
         //名称,状态,创建时间范围
