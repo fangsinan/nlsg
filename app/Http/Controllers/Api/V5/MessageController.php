@@ -694,6 +694,7 @@ class MessageController extends Controller
                     'reply'=>$msg_arr['reply']??'',
                     'reply_at'=>$msg_arr['reply_at']??'',
                     'nickname'=>$msg_arr['nickname']??'',
+                    'feedbackType'=>$msg_arr['feedbackType']??'',
                     'created_at'=>date('Y年m月d日H:i',strtotime($msg_arr['created_at'])),
                 ];
 
