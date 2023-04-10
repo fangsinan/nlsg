@@ -1651,8 +1651,10 @@ class XiaoeTechServers
         return true;
     }
 
-
+    //php artisan TestJobb rpush_add_vip_user
     public static function rpush_add_vip_user(){
+
+        var_dump('rpush_add_vip_user');
 
         self::set_distributor_base_phone();
 
@@ -1674,10 +1676,12 @@ class XiaoeTechServers
             $json_str = json_encode($distributor);
             Redis::rpush($redis_key, $json_str);
         }
-
     }
 
+    //php artisan TestJobb lpop_add_vip_user
     public static function lpop_add_vip_user(){
+
+        var_dump('lpop_add_vip_user');
 
         $redis_key = 'xe_distributor_to_vip_user';
 
@@ -1785,7 +1789,7 @@ class XiaoeTechServers
                     $VipUserModel->level = 1;
                     $VipUserModel->start_time = $start_time;
                     $VipUserModel->expire_time = $expire_time;
-                    $VipUserModel->channel = '小鹅通合伙人'.date('Y-m-d');
+                    $VipUserModel->channel = '小鹅通合伙人';
                     $VipUserModel->remark = '小鹅通合伙人'.date('Y-m-d');
                     $VipUserModel->save();
 
@@ -1801,9 +1805,13 @@ class XiaoeTechServers
         }
     }
 
+    //php artisan TestJobb rpush_add_vip_user_inviter
     public static function rpush_add_vip_user_inviter(){
 
+        var_dump('rpush_add_vip_user_inviter');
+
         $redis_key = 'xe_distributor_to_vip_user_inviter';
+
         self::set_distributor_base_phone();
 
         $list = XeDistributor::query()->from(XeDistributor::DB_TABLE . ' as XeDistributor')
@@ -1813,7 +1821,7 @@ class XiaoeTechServers
             ->where('XeDistributor.status', 1)
             ->where('XeDistributor.group_id','<>', 59524)
             ->where('XeDistributor.base_phone','<>', '')
-            ->where('VipUserModel.remark','=', '小鹅通合伙人2023-04-07')
+            ->where('VipUserModel.remark','=', '小鹅通合伙人'.date('Y-m-d'))
             ->get()->toArray();
 
         //根据订单的分享人来同步合伙人的上级推广员
@@ -1824,7 +1832,10 @@ class XiaoeTechServers
         }
     }
 
+    //php artisan TestJobb lpop_add_vip_user_inviter
     public static function lpop_add_vip_user_inviter(){
+
+        var_dump('lpop_add_vip_user_inviter');
 
         $redis_key = 'xe_distributor_to_vip_user_inviter';
 
@@ -1927,7 +1938,6 @@ class XiaoeTechServers
             } else {
                 $flag = false;
             }
-
         }
     }
 
@@ -2138,14 +2148,13 @@ class XiaoeTechServers
             ->get();
 
         foreach ($list as $k => $XeDistributor) {
-            var_dump($k);
+//            var_dump($k);
             $phone = $XeDistributor->phone ? $XeDistributor->phone : $XeDistributor->phone_collect;
             $XeDistributor->base_phone = $phone;
             $XeDistributor->save();
 
         }
     }
-
 
     //清除9.9分销 合伙人
     public static function clear_vip(){

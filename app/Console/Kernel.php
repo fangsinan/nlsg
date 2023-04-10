@@ -494,6 +494,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('XiaoTechJob sync_distributor_customer_list 1 0')->dailyAt('22:00')->runInBackground()->onOneServer()->withoutOverlapping();
         $schedule->command('XiaoTechJob sync_distributor_customer_list 0 1')->everyMinute()->runInBackground()->onOneServer()->withoutOverlapping();//每分钟执行一次
 
+        $schedule->command('XiaoTechJob sync_xe_xfxs 0 0')->dailyAt('0:01')->runInBackground()->onOneServer()->withoutOverlapping();//每小时执行一次
+
     }
 
     /**
