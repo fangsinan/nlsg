@@ -696,8 +696,16 @@ class MessageController extends Controller
                     'nickname'=>$msg_arr['nickname']??'',
                     'created_at'=>date('Y年m月d日H:i',strtotime($msg_arr['created_at'])),
                 ];
-                $items['message']['title']='您的反馈已收到回复';
-                $items['message']['message']='亲爱的'.$msg_arr['nickname'].":您于".date('Y年m月d日H:i',strtotime($msg_arr['created_at']))."提交的反馈，我们已经收到。";
+
+
+                $reply_con = '反馈';
+                if(!empty($msg_arr['feedbackType']) && $msg_arr['feedbackType'] == 3){
+                    $reply_con = '举报内容';
+                }
+
+
+                $items['message']['title']='您的'.$reply_con.'已收到回复';
+                $items['message']['message']='亲爱的'.$msg_arr['nickname'].":您于".date('Y年m月d日H:i',strtotime($msg_arr['created_at']))."提交的".$reply_con."，我们已经收到。";
             }
 
         }
