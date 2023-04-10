@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Servers\V5\XiaoeTechServers;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class XiaoTechJob extends Command
 {
@@ -61,6 +62,12 @@ class XiaoTechJob extends Command
                 XiaoeTechServers::lpop_add_vip_user();
                 XiaoeTechServers::rpush_add_vip_user_inviter();
                 XiaoeTechServers::lpop_add_vip_user_inviter();
+
+                DB::table('xfsx_time_task_log')->insert([
+                    'signature'           =>  'command:sync_xe_xfxs ',
+                    'created_at'    =>  date('Y-m-d H:i:s', time())
+                ]);
+
                 break;
         }
 //        $XiaoeTechServers->sync_distributor_customer_list(0);
