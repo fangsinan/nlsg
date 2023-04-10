@@ -58,7 +58,7 @@ class FeedbackServers
         }
 
         if ($reply_begin && date('Y-m-d H:i:s', strtotime($reply_begin)) == $reply_begin) {
-            $query->where('created_ast', '>=', $reply_begin);
+            $query->where('created_at', '>=', $reply_begin);
                 // $query->where('reply_admin_id', '>', 0)
                 // ->where('reply_at', '>=', $reply_begin);
         }
