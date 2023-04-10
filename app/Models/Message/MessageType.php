@@ -148,7 +148,7 @@ class MessageType extends Base
                 case 'SYS_FEEDBACK_REPLY':
                     $type_name = '';
                     if(!empty($relation_data['type_name']) && $relation_data['feedbackType'] == 3) {
-                        $type_name = $relation_data['type_name'];
+                        $type_name = "【".$relation_data['type_name']."】 ";
                     }
                     $message = [
                         'nickname'=>$relation_data['user_info']['nickname'],
