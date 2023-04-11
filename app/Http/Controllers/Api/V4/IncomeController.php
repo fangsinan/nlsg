@@ -407,7 +407,7 @@ class IncomeController extends Controller
         $type = $request->input('type', 0); //1微信  2支付宝
         $user_id = $this->user['id'] ?? 0;
 
-        $CashInfo = CashData::where(['user_id'=> $user_id,'is_pass'=>1])->first('id');
+        $CashInfo = CashData::where(['user_id'=> $user_id,'is_pass'=>1,'is_del'=>1])->first('id');
         //已通过审核
         if (empty($CashInfo)) {
             return $this->error(0,'认证未通过审核不能绑定');
