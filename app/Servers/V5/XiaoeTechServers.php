@@ -910,19 +910,19 @@ class XiaoeTechServers
 
             foreach ($return_list as $customer) {
 
-                if(!$is_fast){
-
-                    DB::table('nlsg_xe_log')->insert([
-                        'url' => $xe_user_id,
-                        'xe_user_id' => $customer['sub_user_id']??'',
-                        'file' => $page_count??0,
-                        'line'=>$res['body']['data']['count']??0,
-                        'parameter' => json_encode($customer),
-                        'batch_number' => $batch_number,
-                        'page_index' => $page_index,
-                        'created_at' => date('Y-m-d H:i:s', time())
-                    ]);
-                }
+//                if(!$is_fast){
+//
+//                    DB::table('nlsg_xe_log')->insert([
+//                        'url' => $xe_user_id,
+//                        'xe_user_id' => $customer['sub_user_id']??'',
+//                        'file' => $page_count??0,
+//                        'line'=>$res['body']['data']['count']??0,
+//                        'parameter' => json_encode($customer),
+//                        'batch_number' => $batch_number,
+//                        'page_index' => $page_index,
+//                        'created_at' => date('Y-m-d H:i:s', time())
+//                    ]);
+//                }
 
                 try {
 
