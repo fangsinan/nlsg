@@ -22,6 +22,15 @@ class MallRefundRecord extends Base
 
     protected $table = 'nlsg_mall_refund_record';
 
+    protected $fillable = [
+        'service_num', 'order_id', 'order_detail_id', 'refund_id', 'refund_fee', 'type', 'pay_type',
+        'status', 'refund_sub_at', 'user_id', 'picture', 'pass_at', 'refund_at', 'check_at',
+        'receive_at', 'succeed_at', 'num', 'cost_price', 'refe_price', 'price', 'reason_id',
+        'description', 'return_address_id', 'is_check_reject', 'check_reject_at', 'check_remark',
+        'is_authenticate_reject', 'authenticate_reject_at', 'authenticate_remark', 'user_cancel',
+        'user_cancel_time', 'express_info_id', 'run_refund',
+        ];
+
     public function goodsList($params, $user)
     {
         $begin_date = $this->getAfterSalesbeginDate(1);
