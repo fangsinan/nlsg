@@ -902,7 +902,7 @@ class WechatPay extends Controller
                     if (!empty($orderInfo['remark']) && $orderInfo['remark'] > 0) {
                         self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $orderInfo['remark'], $orderId, 1);
                     }
-                    
+
 					// 下单记录王琨老师的直播
 					if( isset($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0 && $total_fee>=1){ //刷单用户排除 排除1元用户
 
