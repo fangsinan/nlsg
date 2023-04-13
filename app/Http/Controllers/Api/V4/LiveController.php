@@ -1725,9 +1725,10 @@ class LiveController extends Controller
                 $bind_end=date('Y-m-d 23:59:59', strtotime('+3 months'));
                 $order['is_zero'] = 2;// 0元购订单
                 $live_data['begin_at'] = date($live_data['begin_at'],strtotime('+3 months'));
-                if(isset($this->user['is_test_pay']) && $this->user['is_test_pay']==0){
-                    WechatPay::PayTeacherLives($this->user['id'],$live_data,$order,$bind_end);
-                }
+                //2023.04.13 确认0元购不享受1元和49.9元观看权限
+//                if(isset($this->user['is_test_pay']) && $this->user['is_test_pay']==0){
+//                    WechatPay::PayTeacherLives($this->user['id'],$live_data,$order,$bind_end);
+//                }
                 WechatPay::LiveRedis(11, "0元购直播间", $user['nickname'],$input['from_live_info_id']??0);
             }else{
 
