@@ -898,27 +898,29 @@ class WechatPay extends Controller
                 if ($orderRst && $recordRst && $subscribeRst && $userRst && $Profit_Rst) {
                     DB::commit();
 
+                    //9.9刷单推送
+                    if (!empty($orderInfo['remark']) && $orderInfo['remark'] > 0) {
+                        self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $orderInfo['remark'], $orderId, 1);
+                    }
+                    
 					// 下单记录王琨老师的直播
 					if( isset($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0 && $total_fee>=1){ //刷单用户排除 排除1元用户
 
                         //免费观看时间
                         if($total_fee==1){
-                            $show_end=date('Y-m-d 23:59:59', strtotime('+2 years'));
+                            $live_type=2; //1元课
+                            $show_end=date('Y-m-d 23:59:59', strtotime('+3 months'));
                         }else{
-                            $show_end=date('Y-m-d 23:59:59', strtotime('+2 years'));
+                            $live_type=1; //49元课
+                            $show_end=date('Y-m-d 23:59:59', strtotime('+1 years'));
                         }
 
-                        self::PayTeacherLives($user_id,$liveData,$orderInfo,$show_end);
+                        self::PayTeacherLives($user_id,$liveData,$orderInfo,$show_end,$live_type);
 //						self::PayTeacherLives($user_id,$liveData,$orderInfo,$bind_end);
 					}
 
 					// 内容刷单记录
 					self::PayTestLog($orderId,$userdata);
-
-                    //9.9刷单推送
-                    if (!empty($orderInfo['remark']) && $orderInfo['remark'] > 0) {
-                        self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $orderInfo['remark'], $orderId, 1);
-                    }
 
 					//SMS_211275363
 					//短信
@@ -995,7 +997,7 @@ class WechatPay extends Controller
             return true;
         }
     }
-    static function PayTeacherLives($user_id,$liveData,$order,$bind_end=''){
+    static function PayTeacherLives($user_id,$liveData,$order,$bind_end='',$live_type=1){
         if(empty($user_id) || empty($liveData) || empty($order)){
             return ;
         }
@@ -1011,6 +1013,7 @@ class WechatPay extends Controller
             'order_id' =>$order['id'],
             'ordernum' =>$order['ordernum'],
             'is_zero' =>$order['is_zero']??1,
+            'live_type' =>$live_type,
             'app_project_type' =>APP_PROJECT_TYPE,
         ]);
         return ;
