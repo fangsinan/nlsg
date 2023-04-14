@@ -471,7 +471,7 @@ class LiveConsoleServers
                 return [];
             }
             $RedisUserId=$userInfo['id'];
-            $Redis->setex($redis_user_id_key,86400,$userInfo['id']);//1天
+            $Redis->setex($redis_user_id_key,3600,$userInfo['id']);//1天
         }
 
         $query = User::query()->select(['id','phone','nickname','province','city','created_at'])
@@ -547,11 +547,21 @@ class LiveConsoleServers
                 }
             }
             if(!empty($UpUserId)) {
-                $Redis->setex($redis_user_id_key, 86400, $UpUserId);//1天
+                $Redis->setex($redis_user_id_key, 3600, $UpUserId);//1天
             }
             if($param==1){
                 return $dataArr;
             }
+        }else{
+            $userInfo = User::query()->select(['id','phone','nickname','province','city','created_at'])
+                ->where('created_at', '>', '2015-01-01')
+                ->where('phone','like' , "1%")->where('ref',0)->where('status',1)->where('is_robot',0)->where('province','')->whereRaw(DB::raw('length(phone) =11'))
+                ->orderBy('id','asc')->first()
+            ;
+            if(empty($userInfo)){
+                return [];
+            }
+            $Redis->setex($redis_user_id_key,3600,$userInfo['id']-1);//1天
         }
 
     }
