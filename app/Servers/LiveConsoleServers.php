@@ -466,12 +466,13 @@ class LiveConsoleServers
         $redis_user_id_key='11API_PhoneRegion:UserId'.date('md',$time);
         $RedisUserId=$Redis->get($redis_user_id_key);
         if(empty($RedisUserId)){
+            //获取当天未识别的id
             $userInfo = User::query()->select(['id'])->where('created_at','>',$day_time)->orderBy('id','asc')->first();
             if(empty($userInfo)){
                 return [];
             }
             $RedisUserId=$userInfo['id'];
-            $Redis->setex($redis_user_id_key,3600,$userInfo['id']);//1天
+            $Redis->setex($redis_user_id_key,3600,$userInfo['id']);//1小时
         }
 
         $query = User::query()->select(['id','phone','nickname','province','city','created_at'])
@@ -547,21 +548,30 @@ class LiveConsoleServers
                 }
             }
             if(!empty($UpUserId)) {
-                $Redis->setex($redis_user_id_key, 3600, $UpUserId);//1天
+                $Redis->setex($redis_user_id_key, 3600, $UpUserId);//1小时
             }
             if($param==1){
                 return $dataArr;
             }
         }else{
-            $userInfo = User::query()->select(['id','phone','nickname','province','city','created_at'])
-                ->where('created_at', '>', '2015-01-01')
-                ->where('phone','like' , "1%")->where('ref',0)->where('status',1)->where('is_robot',0)->where('province','')->whereRaw(DB::raw('length(phone) =11'))
-                ->orderBy('id','asc')->first()
-            ;
-            if(empty($userInfo)){
-                return [];
+            //防止当天没有未识别客户，但是免登录客户在当天之前注册，后面绑定手机号，注册时间在今天之前。
+            $redis_user_id_one_key='11API_PhoneRegion:UserId_One_'.date('md',$time);
+            $RedisUserIdOne=$Redis->get($redis_user_id_one_key);
+            if(empty($RedisUserIdOne) || time()>$RedisUserIdOne){
+
+                $userInfo = User::query()->select(['id','phone','nickname','province','city','created_at'])
+                    ->where('created_at', '>', '2015-01-01')
+                    ->where('phone','like' , "1%")->where('ref',0)->where('status',1)->where('is_robot',0)->where('province','')->whereRaw(DB::raw('length(phone) =11'))
+                    ->orderBy('id','asc')->first()
+                ;
+                $Redis->setex($redis_user_id_one_key,7200,$time+3600);//1小时
+                if(empty($userInfo)){
+                    return [];
+                }
+                $Redis->setex($redis_user_id_key,3600,$userInfo['id']-1);//1天
+
             }
-            $Redis->setex($redis_user_id_key,3600,$userInfo['id']-1);//1天
+
         }
 
     }
