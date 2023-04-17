@@ -918,7 +918,6 @@ class WechatPay extends Controller
                         self::PayTeacherLives($user_id,$liveData,$orderInfo,$show_end,$live_type);
 //						self::PayTeacherLives($user_id,$liveData,$orderInfo,$bind_end);
 					}
-
 					// 内容刷单记录
 					self::PayTestLog($orderId,$userdata);
 

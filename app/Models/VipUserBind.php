@@ -85,6 +85,7 @@ class VipUserBind extends Base
                         DB::table('nlsg_vip_user_bind')->insert($map);
                         $map = [];
                     }
+
                     //确保数据开始时间随机
                     $RandNum=rand(32400, 86400); //上午九点至晚24点间随机时间
                     $DayTime= strtotime(date('Y-m-d'))+$RandNum; //当天随机时间戳
