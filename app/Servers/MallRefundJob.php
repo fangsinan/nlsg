@@ -116,6 +116,7 @@ class MallRefundJob
         $list = MallRefundRecord::from('nlsg_mall_refund_record as mrr')
             ->join('nlsg_mall_order as mo', 'mrr.order_id', '=', 'mo.id')
             ->join('nlsg_pay_record as pr', 'pr.ordernum', '=', 'mo.ordernum')
+            ->where('mrr.status','=',40)
             ->where('mrr.run_refund', '=', 1)
             ->where('pr.order_type', '=', 10)
             ->limit(100)
