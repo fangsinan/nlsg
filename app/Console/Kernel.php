@@ -57,25 +57,41 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
+//        $schedule->call(function () {
+//            LiveConsoleServers::CrontabOnlineUserRedis();//直播间在线人数存入redis
+//        })->everyMinute()->runInBackground();//每分
+
+        //withoutOverlapping 多少分钟内不会重复执行  默认24小时
+        //php artisan command:LiveOnline 1
+        ////直播间在线人数存入redis
+        $schedule->command('command:LiveOnline 1')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
+        //直播间在线人数入库
+        $schedule->command('command:LiveOnline 2')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
+        //加入直播间记录入库
+        $schedule->command('command:LiveOnline 3')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
+        //评论入库
+        $schedule->command('command:LiveOnline 4')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
+        //直播打赏入库
+        $schedule->command('command:LiveOnline 5')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
+        //直播自动开始结束和人数
+        $schedule->command('command:LiveOnline 6')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
+
+        //抓取微信公众号关注用户
+        $schedule->command('command:LiveOnline 11')->everyMinute()->between('09:40', '20:50')->withoutOverlapping(2)->runInBackground()->onOneServer();
+        ////识别手机号归属地
+        $schedule->command('command:LiveOnline 21')->everyFiveMinutes()->withoutOverlapping(6)->runInBackground()->onOneServer();
+
         $schedule->call(function () {
-		   LiveConsoleServers::CrontabOnlineUserRedis();//直播间在线人数存入redis
-	    })->everyMinute()->runInBackground();//每分
+            // WechatServersNew::CeshiTemplate();//加入测试数据
+        })->dailyAt('14:03');
+        $schedule->call(function () {
+            // WechatServersNew::TemplateLive(1); //测试发送
+        })->dailyAt('14:03');
 
-	    $schedule->call(function () {
-		   LiveConsoleServers::CrontabOnlineUser();//直播间在线人数入库
-	    })->everyMinute()->runInBackground();//每分
+        $schedule->call(function () {
+            // WechatServersNew::TemplateLive();
+        })->dailyAt('17:50');
 
-		$schedule->call(function () {
-		   LiveConsoleServers::CrontabJoinRedis();//加入直播间记录入库
-		})->everyMinute()->runInBackground();//每分
-
-		$schedule->call(function () {
-		   LiveConsoleServers::CrontabCommentRedis();//评论入库
-		})->everyMinute()->runInBackground();//每分
-
-	    $schedule->call(function () {
-		   LiveConsoleServers::CrontabGiftRedis();//直播打赏入库
-	    })->everyFiveMinutes()->runInBackground();//每5分
 
 		$schedule->call(function () {
 			JpushService::TimedPush();
@@ -85,31 +101,11 @@ class Kernel extends ConsoleKernel
 			$servers->Statistics();
 		})->everyFiveMinutes()->runInBackground();//每5分同步发送到达量
 
-		$schedule->call(function () {
-		    $m = new LiveConsole();
-		    $m->LiveAutoConfig();//直播自动开始结束和人数
-		})->everyMinute()->runInBackground();//每分
-
-		// $schedule->call(function () {
-		// 	LiveConsoleServers::getPhoneRegion();//识别手机号归属地
-		// })->everyFiveMinutes()->runInBackground();//每五分钟
 
 		//微信小程序获取access_token
 		$schedule->command('command:WeChatTools')->everyFiveMinutes()->withoutOverlapping(5)->runInBackground()->onOneServer();
 
-		$schedule->call(function () {
-			WechatServersNew::GetOpenId(); //抓取微信公众号关注用户
-		})->everyMinute()->between('09:40', '20:50')->runInBackground();//每分钟执行一次
 
-		$schedule->call(function () {
-			// WechatServersNew::CeshiTemplate();//加入测试数据
-			// WechatServersNew::TemplateLive(1); //测试发送
-		})->dailyAt('14:03');
-
-		$schedule->call(function () {
-			// WechatServersNew::TemplateLive();
-		})->dailyAt('17:50');
-		
 	    // $schedule->call(function () {
 		   //  WechatServers::SetAccessToken(); //生成token
 	    // })->everyFiveMinutes()->runInBackground();//每5分
@@ -244,7 +240,7 @@ class Kernel extends ConsoleKernel
             //抓取直播间成交订单
             DealServers::getOrderInfo([], 0, 1);
         })->everyTenMinutes()->between('21:52', '23:52')->runInBackground();//10分钟执行一次
-		
+
 		$schedule->call(function () {
 		    //抓取直播间成交订单 白天抓取遗漏订单
 		    DealServers::getOrderInfo([], 0, 1);
@@ -278,19 +274,19 @@ class Kernel extends ConsoleKernel
 		$schedule->command('command:DouDianOrder 3')
 		    ->everyMinute()->withoutOverlapping(2)
 		    ->runInBackground()->onOneServer();
-			
+
 		$schedule->command('command:DouDianOrder 1')
 			->everyMinute()->runInBackground()->onOneServer();
 		$schedule->command('command:DouDianOrder 2')
-			->everyMinute()->runInBackground()->onOneServer();  
-			
+			->everyMinute()->runInBackground()->onOneServer();
+
 		$schedule->command('command:DouDianOrderDecrypt')
 		    ->everyFiveMinutes()->withoutOverlapping(1)
 		    ->runInBackground()->onOneServer();
 		$schedule->command('command:DouDianProduct')
 		    ->everyFifteenMinutes()->withoutOverlapping(1)
 		    ->runInBackground()->onOneServer();
-		
+
 		//vip_bind的source补全
 		$schedule->command('command:VipUserBindSource')
 		    ->everyFiveMinutes()->withoutOverlapping(3)
@@ -346,9 +342,9 @@ class Kernel extends ConsoleKernel
 		//获取推广员客户
 		$schedule->command('XiaoTechJob sync_distributor_customer_list 1 0')->dailyAt('10:00')->runInBackground()->onOneServer()->withoutOverlapping();
 		$schedule->command('XiaoTechJob sync_distributor_customer_list 0 1')->everyMinute()->runInBackground()->onOneServer()->withoutOverlapping();//每分钟执行一次
-		
+
 		$schedule->command('command:ErpTradeQueryMall')->twiceDaily(2,15);
-		
+
 		$schedule->command('XiaoTechJob sync_xe_xfxs 0 0')->dailyAt('0:01')->runInBackground()->onOneServer()->withoutOverlapping();//每小时执行一次
         /*------不常用--------*/
 
@@ -367,20 +363,20 @@ class Kernel extends ConsoleKernel
 		$schedule->command('command:CrontabGiftRedis')
 		    ->everyFiveMinutes()->withoutOverlapping(1)
 		    ->runInBackground()->onOneServer();*/
-			
+
 		// $schedule->command('command:DouDianOrder 1')
 		//     ->everyFiveMinutes()->withoutOverlapping(5)
 		//     ->runInBackground()->onOneServer();
 		// $schedule->command('command:DouDianOrder 2')
 		//     ->everyFiveMinutes()->withoutOverlapping(5)
 		//     ->runInBackground()->onOneServer();
-		
+
 		//查询最新的推广员客户
 		// $schedule->call(function () {
 		//     $servers = new XiaoeTechServers();
 		//     $servers->sync_fast_distributor_customer_list();
 		// })->between('8:00', '23:00')->everyThirtyMinutes()->runInBackground();
-		
+
         //https://laravelacademy.org/post/8484.html
         /*$schedule->call(function () {
             //抓取腾讯IM图片到阿里云
