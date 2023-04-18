@@ -2351,8 +2351,17 @@ class LiveController extends Controller
 //                }
             }
 
+        }else if($relation_type == 7){
+            if(!empty($relation_id)){
+                $relation_id = $relation_id;
+            }
+            //order 准确查询
+            if(!empty($order_id)){  //付费
+                $order = Order::where(['id'=>$order_id])->first();
+                $relation_id = $order['relation_id'];
+            }
         }else{
-            //目前除了直播 其他不需要根据各个具体产品返二维码
+            //目前除了直播 线下课 其他不需要根据各个具体产品返二维码
             $relation_id = 0;
         }
 
