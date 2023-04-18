@@ -77,7 +77,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:LiveOnline 6')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
 
         //抓取微信公众号关注用户
-        $schedule->command('command:LiveOnline 11')->everyMinute()->between('09:40', '20:50')->withoutOverlapping(2)->runInBackground()->onOneServer();
+//        $schedule->command('command:LiveOnline 11')->everyMinute()->between('09:40', '20:50')->withoutOverlapping(2)->runInBackground()->onOneServer();
         ////识别手机号归属地
         $schedule->command('command:LiveOnline 21')->everyFiveMinutes()->withoutOverlapping(6)->runInBackground()->onOneServer();
 
@@ -154,37 +154,23 @@ class Kernel extends ConsoleKernel
         })->everyMinute()->runInBackground();//每分
 
 		//开通课程与直播
-		$schedule->command('command:subListClose')
-		    ->everyMinute()->withoutOverlapping(1)
-		    ->runInBackground()->onOneServer();
+		$schedule->command('command:subListClose')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
 		//关闭课程与直播
-		$schedule->command('command:subListOpen')
-		    ->everyMinute()->withoutOverlapping(1)
-		    ->runInBackground()->onOneServer();
+		$schedule->command('command:subListOpen')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
 
 		//vip新增课程追加订阅
-		$schedule->command('command:VipWorksListAppendSub')
-			->everyFiveMinutes()->withoutOverlapping(1)
-			->runInBackground()->onOneServer();
+		$schedule->command('command:VipWorksListAppendSub')->everyFiveMinutes()->withoutOverlapping(1)->runInBackground()->onOneServer();
 
 		//order表推送到erp
-		$schedule->command('command:ErpOrderPush')
-			->everyMinute()->withoutOverlapping(1)
-			->runInBackground()->onOneServer();
+		$schedule->command('command:ErpOrderPush')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
 
-		$schedule->command('command:ErpOrderAddAddress')
-			->everyMinute()->withoutOverlapping(1)
-			->runInBackground()->onOneServer();
+		$schedule->command('command:ErpOrderAddAddress')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
 
 		//mall order表推送到erp
-		$schedule->command('command:ErpMallOrderPush')
-			->everyMinute()->withoutOverlapping(1)
-			->runInBackground()->onOneServer();
+		$schedule->command('command:ErpMallOrderPush')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
 
 		//erp物流回写
-		$schedule->command('command:ErpQuery')
-			->everyMinute()->withoutOverlapping(1)
-			->runInBackground()->onOneServer();
+		$schedule->command('command:ErpQuery')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
 		$schedule->command('command:ErpTradeQuery')->dailyAt('00:10');
 
         //队列消息发送
@@ -205,9 +191,7 @@ class Kernel extends ConsoleKernel
 		$schedule->call(function () {
 		    MallRefundJob::shillJob(2);
 		})->everyFiveMinutes()->runInBackground();
-		$schedule->command('command:shillJob')
-		    ->everyMinute()->withoutOverlapping(1)
-		    ->runInBackground()->onOneServer();
+		$schedule->command('command:shillJob')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
 
 		//商城订单退款处理
 		$schedule->call(function () {
@@ -266,31 +250,19 @@ class Kernel extends ConsoleKernel
 			$UserWechatServers->set_wechat_user_id();
 		})->between('00:10', '06:00')->everyTenMinutes();
 
-		$schedule->command('imJob_1')
-		    ->everyMinute()->withoutOverlapping(2)
-		    ->runInBackground()->onOneServer();
+		$schedule->command('imJob_1')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
 
 		//抖音订单测试部分
-		$schedule->command('command:DouDianOrder 3')
-		    ->everyMinute()->withoutOverlapping(2)
-		    ->runInBackground()->onOneServer();
+		$schedule->command('command:DouDianOrder 3')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
 
-		$schedule->command('command:DouDianOrder 1')
-			->everyMinute()->runInBackground()->onOneServer();
-		$schedule->command('command:DouDianOrder 2')
-			->everyMinute()->runInBackground()->onOneServer();
+		$schedule->command('command:DouDianOrder 1')->everyMinute()->runInBackground()->onOneServer();
+		$schedule->command('command:DouDianOrder 2')->everyMinute()->runInBackground()->onOneServer();
 
-		$schedule->command('command:DouDianOrderDecrypt')
-		    ->everyFiveMinutes()->withoutOverlapping(1)
-		    ->runInBackground()->onOneServer();
-		$schedule->command('command:DouDianProduct')
-		    ->everyFifteenMinutes()->withoutOverlapping(1)
-		    ->runInBackground()->onOneServer();
+		$schedule->command('command:DouDianOrderDecrypt')->everyFiveMinutes()->withoutOverlapping(1)->runInBackground()->onOneServer();
+		$schedule->command('command:DouDianProduct')->everyFifteenMinutes()->withoutOverlapping(1)->runInBackground()->onOneServer();
 
 		//vip_bind的source补全
-		$schedule->command('command:VipUserBindSource')
-		    ->everyFiveMinutes()->withoutOverlapping(3)
-		    ->runInBackground()->onOneServer();
+		$schedule->command('command:VipUserBindSource')->everyFiveMinutes()->withoutOverlapping(3)->runInBackground()->onOneServer();
 
 		//小鹅通 订单
 		$schedule->call(function () {
