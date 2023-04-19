@@ -436,7 +436,7 @@ class LiveConsoleServers
     }
 
     //抓取手机号地区
-    //https://app.v4.api.nlsgapp.com/api/v4/index/phoneRegion
+    //#*/3 * * * * /usr/bin/curl https://app.v4.api.nlsgapp.com/api/v4/index/phoneRegion
     public static function getPhoneRegion($param=0)
     {
 
