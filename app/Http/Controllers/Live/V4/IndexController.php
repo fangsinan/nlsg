@@ -576,6 +576,7 @@ class IndexController extends ControllerBackend
             $details_img = $input['details_img'] ?? '';
             $app_project_type = $input['app_project_type'] ?? 1;
             $qr_type = $input['qr_type'] ?? 0;
+            $qr_code      = $input['qr_code'] ?? '';
 
     		$cover_vertical_img = !empty($input['cover_vertical_img']) ? covert_img($input['cover_vertical_img']) : '';
 
@@ -596,6 +597,10 @@ class IndexController extends ControllerBackend
     		if (empty($classify)) {
     			return error(1000, '请选择类型');
     		}
+
+            if (!empty($qr_code) && empty($qr_type)){
+                return $this->error(1000,'选择二维码必须选择对应的类型');
+            }
 
     		if (!empty($steam_begin_time)) {
     			$Y = substr($steam_begin_time, 0, 1);
@@ -620,7 +625,7 @@ class IndexController extends ControllerBackend
     		}
 
     		$is_test      = (int)($input['is_test'] ?? 0);
-    		$qr_code      = $input['qr_code'] ?? '';
+
     		$channel_show = $input['channel_show'] ?? [];
 
     		$data = [
