@@ -2323,6 +2323,19 @@ class LiveController extends Controller
         $order_id = $request->input('order_id')??0;
         $is_wechat = $request->input('is_wechat')??0;
         $user_id = $this->user['id']??0;
+
+        //如果是群二维码  直接返回
+        $res = Qrcodeimg::select("id","qr_url")->where([
+            'relation_type' => $relation_type,
+            'relation_id'   => $relation_id,
+            'status'        => 1,
+            'img_type'      => 2,
+            'app_project_type'   => APP_PROJECT_TYPE,
+        ])->first();
+        if(!empty($res)){
+            return success($res);
+        }
+
         if($relation_type == 3){
 
             // 绑定默认客服不弹二维码
@@ -2331,7 +2344,7 @@ class LiveController extends Controller
                 "status"    => 1,
             ])->value("id");
             if(!empty($waiter_id)){
-                return success((object)[] );
+                return success( (object)[] );
             }
 
             //relation_type=3时    免费传relation_id=live_id   付费传order_id
@@ -2369,6 +2382,7 @@ class LiveController extends Controller
             'relation_type' => $relation_type,
             'relation_id'   => $relation_id,
             'status'   => 1,
+            'img_type'      => 1,
             'app_project_type'   => APP_PROJECT_TYPE,
         ])->first();
 
