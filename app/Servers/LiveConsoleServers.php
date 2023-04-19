@@ -560,8 +560,8 @@ class LiveConsoleServers
             if(empty($RedisUserIdOne) || time()>$RedisUserIdOne){
 
                 $userInfo = User::query()->select(['id','phone','nickname','province','city','created_at'])
-                    ->where('created_at', '>', '2015-01-01')
                     ->where('phone','like' , "1%")->where('ref',0)->where('status',1)->where('is_robot',0)->where('province','')->whereRaw(DB::raw('length(phone) =11'))
+//                    ->where('created_at', '>', '2015-01-01')
                     ->orderBy('id','asc')->first()
                 ;
                 $Redis->setex($redis_user_id_one_key,7200,$time+3600);//1小时
