@@ -2329,7 +2329,7 @@ class LiveController extends Controller
             'relation_type' => $relation_type,
             'relation_id'   => $relation_id,
             'status'        => 1,
-            'img_type'      => 2,
+            'qr_type'      => 2,
             'app_project_type'   => APP_PROJECT_TYPE,
         ])->first();
         if(!empty($res)){
@@ -2382,7 +2382,7 @@ class LiveController extends Controller
             'relation_type' => $relation_type,
             'relation_id'   => $relation_id,
             'status'   => 1,
-            'img_type'      => 1,
+            'qr_type'      => 1,
             'app_project_type'   => APP_PROJECT_TYPE,
         ])->first();
 
