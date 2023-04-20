@@ -444,8 +444,8 @@ class LiveConsoleServers
         $Redis = new Client($redisConfig);
         $Redis->select(2);
 
-        $time=time();
-        $key_name='11API_PhoneRegion:'.date('md_Hi',$time);
+        $StrtoTimeNow=time();
+        $key_name='11API_PhoneRegion:'.date('md_Hi',$StrtoTimeNow);
         $flag=$Redis->EXISTS($key_name);
         if($flag==1) { //存在返回1
             if($param!=1) {
@@ -463,7 +463,7 @@ class LiveConsoleServers
 
         $day_time=date('Y-m-d');
 
-        $redis_user_id_key='11API_PhoneRegion:UserId'.date('md',$time);
+        $redis_user_id_key='11API_PhoneRegion:UserId'.date('md',$StrtoTimeNow);
         $RedisUserId=$Redis->get($redis_user_id_key);
         if(empty($RedisUserId)){
             //获取当天未识别的id
@@ -516,7 +516,7 @@ class LiveConsoleServers
 //                var_dump(curl_exec($curl));
                 $result = curl_exec($curl);
                 $result = json_decode($result, true);
-                $time=date('Y-m-d H:i:s');
+                $DateTime=date('Y-m-d H:i:s');
                 if (!empty($result) && $result['showapi_res_body']['ret_code'] == 0) { //返回为json串  查询成功
                     $arr = [
                         'province' => empty($result['showapi_res_body']['prov']) ? '未知' : $result['showapi_res_body']['prov'],
@@ -525,13 +525,13 @@ class LiveConsoleServers
                     $data = [
                         'province' => $arr['province'],
                         'city' => $arr['city'],
-                        'updated_at' => $time,
+                        'updated_at' => $DateTime,
                     ];
                 } else {
                     $data = [
                         'province' => $result['showapi_res_body']['remark'],
                         'city' => '-1',
-                        'updated_at' => $time,
+                        'updated_at' => $DateTime,
                     ];
                 }
                 $UserRst=User::query()->where('id', $val['id'])->update($data);
@@ -555,21 +555,25 @@ class LiveConsoleServers
             }
         }else{
             //防止当天没有未识别客户，但是免登录客户在当天之前注册，后面绑定手机号，注册时间在今天之前。
-            $redis_user_id_one_key='11API_PhoneRegion:UserId_One_'.date('md',$time);
+            $redis_user_id_one_key='11API_PhoneRegion:UserId_One_'.date('md',$StrtoTimeNow);
             $RedisUserIdOne=$Redis->get($redis_user_id_one_key);
-            if(empty($RedisUserIdOne) || time()>$RedisUserIdOne){
+            $StartTime=strtotime($day_time);
+            $EndTime=$StartTime+3600*7;
+            if($StrtoTimeNow>$StartTime && $StrtoTimeNow<$EndTime) { //凌晨到7点  扫描行太多执行慢只在凌晨跑以往的数据
 
-                $userInfo = User::query()->select(['id','phone','nickname','province','city','created_at'])
-                    ->where('phone','like' , "1%")->where('ref',0)->where('status',1)->where('is_robot',0)->where('province','')->whereRaw(DB::raw('length(phone) =11'))
+                if (empty($RedisUserIdOne) || $StrtoTimeNow > $RedisUserIdOne) {
+
+                    $userInfo = User::query()->select(['id', 'phone', 'nickname', 'province', 'city', 'created_at'])
+                        ->where('phone', 'like', "1%")->where('ref', 0)->where('status', 1)->where('is_robot', 0)->where('province', '')->whereRaw(DB::raw('length(phone) =11'))
 //                    ->where('created_at', '>', '2015-01-01')
-                    ->orderBy('id','asc')->first()
-                ;
-                $Redis->setex($redis_user_id_one_key,7200,$time+3600);//1小时
-                if(empty($userInfo)){
-                    return [];
-                }
-                $Redis->setex($redis_user_id_key,3600,$userInfo['id']-1);//1天
+                        ->orderBy('id', 'asc')->first();
+                    $Redis->setex($redis_user_id_one_key, 3600 *2, $StrtoTimeNow + 3600);//1小时
+                    if (empty($userInfo)) {
+                        return [];
+                    }
+                    $Redis->setex($redis_user_id_key, 3600, $userInfo['id'] - 1);//1天
 
+                }
             }
 
         }
