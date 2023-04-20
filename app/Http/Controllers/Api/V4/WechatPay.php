@@ -665,8 +665,8 @@ class WechatPay extends Controller
 				case 14: //5天学习力诊断课
 				    $res = $nickname . ':您已支付' . $live_num . '单 5天学习力诊断课';
 				    break;
-                case 21: //超级记忆线上训练营
-                    $res = $nickname . ':您已支付' . $live_num . '单 超级记忆线上训练营';
+                case 21: //超级记忆力（亲子）训练营
+                    $res = $nickname . ':您已支付' . $live_num . '单 超级记忆力（亲子）训练营';
                     break;
                 case 22: //学习力规划实操课（小学版）
                     $res = $nickname . ':您已支付' . $live_num . '单 学习力规划实操课（小学版）';
@@ -918,6 +918,7 @@ class WechatPay extends Controller
                         self::PayTeacherLives($user_id,$liveData,$orderInfo,$show_end,$live_type);
 //						self::PayTeacherLives($user_id,$liveData,$orderInfo,$bind_end);
 					}
+
 					// 内容刷单记录
 					self::PayTestLog($orderId,$userdata);
 
