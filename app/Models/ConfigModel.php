@@ -188,9 +188,10 @@ class ConfigModel extends Base
 
 
     public static function crontabJobStatus(){
-        $res = self::query()->where('id','=',86)->value('value');
-        if ($res !== '1'){
-            exit('定时任务关闭');
-        }
+
+        // $res = self::query()->where('id','=',86)->value('value');
+        // if ($res !== '1'){
+        //     exit('定时任务关闭');
+        // }
     }
 }
