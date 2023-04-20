@@ -112,24 +112,24 @@ class Kernel extends ConsoleKernel
 
 
 		//⬇⬇⬇⬇xe_user_job⬇⬇⬇⬇
-	   $schedule->command('command:XeUserJob 1')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 10')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 11')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 12')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 13')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 14')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 15')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 16')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 17')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 20')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 21')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 22')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 23')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 24')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 25')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 26')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 27')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
-	   $schedule->command('command:XeUserJob 30')->everyMinute()->withoutOverlapping(3)->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 1')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 10')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 11')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 12')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 13')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 14')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 15')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 16')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 17')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 20')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 21')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 22')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 23')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 24')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 25')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 26')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 27')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
+//	   $schedule->command('command:XeUserJob 30')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
 		//⬆⬆⬆⬆xe_user_job⬆⬆⬆⬆
 
         // $schedule->command('inspire')->hourly();
