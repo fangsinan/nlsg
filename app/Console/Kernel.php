@@ -77,21 +77,20 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:LiveOnline 6')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
 
         //抓取微信公众号关注用户
-//        $schedule->command('command:LiveOnline 11')->everyMinute()->between('09:40', '20:50')->withoutOverlapping(2)->runInBackground()->onOneServer();
+//        $schedule->command('command:LiveOnline 11')->everyMinute()->between('08:40', '17:50')->withoutOverlapping(2)->runInBackground()->onOneServer();
         ////识别手机号归属地
         $schedule->command('command:LiveOnline 21')->everyFiveMinutes()->withoutOverlapping(6)->runInBackground()->onOneServer();
 
         $schedule->call(function () {
-            // WechatServersNew::CeshiTemplate();//加入测试数据
-        })->dailyAt('14:03');
+//             WechatServersNew::CeshiTemplate();//加入测试数据
+        })->dailyAt('09:19');
         $schedule->call(function () {
-            // WechatServersNew::TemplateLive(1); //测试发送
-        })->dailyAt('14:03');
+//             WechatServersNew::TemplateLive(1); //测试发送
+        })->dailyAt('09:25');
 
         $schedule->call(function () {
-            // WechatServersNew::TemplateLive();
-        })->dailyAt('17:50');
-
+//            WechatServersNew::TemplateLive();
+        })->dailyAt('10:01');
 
 		$schedule->call(function () {
 			JpushService::TimedPush();
@@ -109,7 +108,6 @@ class Kernel extends ConsoleKernel
 	    // $schedule->call(function () {
 		   //  WechatServers::SetAccessToken(); //生成token
 	    // })->everyFiveMinutes()->runInBackground();//每5分
-
 
 		//⬇⬇⬇⬇xe_user_job⬇⬇⬇⬇
 //	   $schedule->command('command:XeUserJob 1')->everyMinute()->withoutOverlapping(3)->between('00:10', '06:00')->runInBackground()->onOneServer();
@@ -250,8 +248,6 @@ class Kernel extends ConsoleKernel
 			$UserWechatServers->set_wechat_user_id();
 		})->between('00:10', '06:00')->everyTenMinutes();
 
-		$schedule->command('imJob_1')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
-
 		//抖音订单测试部分
 		$schedule->command('command:DouDianOrder 3')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
 
@@ -318,7 +314,30 @@ class Kernel extends ConsoleKernel
 		$schedule->command('command:ErpTradeQueryMall')->twiceDaily(2,15);
 
 		$schedule->command('XiaoTechJob sync_xe_xfxs 0 0')->dailyAt('0:01')->runInBackground()->onOneServer()->withoutOverlapping();//每小时执行一次
+
+        //⬇⬇⬇⬇xe_user_job⬇⬇⬇⬇ 自有平台同步新增关系保护到小鹅通
+        $schedule->command('command:XeUserJob 1')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 10')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 11')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 12')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 13')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 14')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 15')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 16')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 17')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 20')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 21')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 22')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 23')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 24')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 25')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 26')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 27')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        $schedule->command('command:XeUserJob 30')->everyMinute()->between('00:10', '06:00')->withoutOverlapping(3)->runInBackground()->onOneServer();
+        //⬆⬆⬆⬆xe_user_job⬆⬆⬆⬆
         /*------不常用--------*/
+
+//        $schedule->command('imJob_1')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
 
 		/*$schedule->command('command:CrontabOnlineUserRedis')
 		    ->everyMinute()->withoutOverlapping(1)
