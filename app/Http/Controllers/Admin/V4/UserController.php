@@ -79,6 +79,8 @@ class UserController extends ControllerBackend
                 $query->where('is_pass', $status);
             });
 
+        $query->where('app_project_type','=',APP_PROJECT_TYPE);
+
         $lists = $query
             ->select('id', 'user_id', 'truename', 'idcard_cover', 'reason','zfb_account', 'idcard', 'created_at', 'is_pass')
             ->orderBy('created_at', 'desc')
