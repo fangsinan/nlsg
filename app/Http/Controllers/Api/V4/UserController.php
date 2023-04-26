@@ -1679,7 +1679,75 @@ class UserController extends Controller
     }
 
 
+    //新用户奖励弹窗
+    public function userNewReward(){
 
+        $id = 211172;//$this->user['id'];
+        $user = User::where('id',$id)->first();
+        //查看是否领取奖励  已经领取  不发送
+        if($user['is_reward'] == 3 || $user['is_reward'] == 4){
+            return  success([]);
+        }
+
+        //大于三天后不返回奖励
+        $user_ctime = strtotime("+3 day",strtotime($user['created_at']));
+        if(time() > $user_ctime){
+            //未发送消息
+            if($user['is_reward'] == 0){
+                // 发送消息
+                // Message->
+                User::where("id",$id)->update(['is_reward' => 1,]);
+            }
+            return success([]);
+        }
+        $works_id = explode(',',ConfigModel::getData(91));
+        $works = Works::select([
+            "id","title","cover_img","detail_img"
+        ])->where("app_project_type",APP_PROJECT_TYPE)->whereIn("id",$works_id)->get()->toArray();
+
+        return success($works);
+    }
+
+
+    // 领取新用户奖励
+    public function userReceive(){
+        $id = $this->user['id'];
+        $user = User::where('id',$id)->first();
+        //查看是否领取奖励  已经领取
+        if($user['is_reward'] == 3 || $user['is_reward'] == 4){
+            return success();
+        }
+
+        // 领取操作
+        $works_id = explode(',',ConfigModel::getData(91));
+        $subs = Subscribe::where([
+            "user_id"=>$id,
+            "status"=>1,
+            "type"=>2,
+        ])->whereIn("relation_id",$works_id)->pluck("relation_id")->toArray();
+        // 只添加未开通课程
+        $adds = array_diff($works_id,$subs);
+        if(empty($adds)){
+            return success();
+        }
+        foreach($adds as $val){
+            Subscribe::create([
+                'user_id' => $id, //会员id
+                'type' => 2, //作品
+                'status' => 1,
+                'relation_id' => $val, //精品课
+                'give' => 10, //新用户登录奖励
+                'start_time' => date("Y-m-d H:i:s", time()),
+                'end_time' => date("Y-m-d H:i:s", time()),
+            ]);
+        }
+        User::where("id",$id)->update(['is_reward' => 3,]);
+        // 发送消息
+        // Messages->
+        // 发送完消息
+        User::where("id",$id)->update(['is_reward' => 4,]);
+        return success();
+    }
 
 
 }
