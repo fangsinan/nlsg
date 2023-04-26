@@ -1682,7 +1682,7 @@ class UserController extends Controller
     //新用户奖励弹窗
     public function userNewReward(){
 
-        $id = 211172;//$this->user['id'];
+        $id = $this->user['id'];
         $user = User::where('id',$id)->first();
         //查看是否领取奖励  已经领取  不发送
         if($user['is_reward'] == 3 || $user['is_reward'] == 4){
