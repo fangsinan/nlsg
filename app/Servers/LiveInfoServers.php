@@ -107,7 +107,15 @@ class LiveInfoServers {
                 $v->son_flag = $v->twitterUser->getLName->son_flag ?? '';
 //                unset($v->UserInfo,$v->twitterUser);
             }
-            $custom = collect(['live_user_id' => $check_live_id->user_id]);
+
+            $live_user_id_check = 0;
+            $live_user_id = $check_live_id->user_id ?? 0;
+            if (in_array($live_user_id,[161904,185689,167861,214932,172661,187586])){
+                $live_user_id_check = 1;
+            }
+
+            $custom = collect(['live_user_id' => $live_user_id,'live_user_id_check' => $live_user_id_check]);
+            
             return $custom->merge($res);
         }
 
