@@ -1682,23 +1682,25 @@ class UserController extends Controller
     //新用户奖励弹窗
     public function userNewReward(){
 
-        $id = $this->user['id'];
-        $user = User::where('id',$id)->first();
-        //查看是否领取奖励  已经领取  不发送
-        if($user['is_reward'] == 3 || $user['is_reward'] == 4){
-            return  success([]);
-        }
-
-        //大于三天后不返回奖励
-        $user_ctime = strtotime("+3 day",strtotime($user['created_at']));
-        if(time() > $user_ctime){
-            //未发送消息
-            if($user['is_reward'] == 0){
-                // 发送消息
-                // Message->
-                User::where("id",$id)->update(['is_reward' => 1,]);
+        if(!empty($this->user['id'])){
+            $id = $this->user['id'];
+            $user = User::where('id',$id)->first();
+            //查看是否领取奖励  已经领取  不发送
+            if($user['is_reward'] == 3 || $user['is_reward'] == 4){
+                return  success([]);
             }
-            return success([]);
+
+            //大于三天后不返回奖励
+            $user_ctime = strtotime("+3 day",strtotime($user['created_at']));
+            if(time() > $user_ctime){
+                //未发送消息
+                if($user['is_reward'] == 0){
+                    // 发送消息
+                    // Message->
+                    User::where("id",$id)->update(['is_reward' => 1,]);
+                }
+                return success([]);
+            }
         }
         $works_id = explode(',',ConfigModel::getData(91));
         $works = Works::select([
@@ -1711,6 +1713,9 @@ class UserController extends Controller
 
     // 领取新用户奖励
     public function userReceive(){
+        if(empty($this->user['id'])){
+            return success();
+        }
         $id = $this->user['id'];
         $user = User::where('id',$id)->first();
         //查看是否领取奖励  已经领取

@@ -33,7 +33,8 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 });
 
 Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
-
+    Route::any('user/reward', 'UserController@userNewReward');
+    Route::any('user/receive', 'UserController@userReceive');
     //手机号归属地查询
     Route::get('index/phoneRegion', 'IndexController@phoneRegion');
 
@@ -302,8 +303,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 
     Route::group(['middleware' => ['auth.jwt']], function () {
-        Route::any('user/reward', 'UserController@userNewReward');
-        Route::any('user/receive', 'UserController@userReceive');
+
         Route::get('user/coupon', 'UserController@getUserCoupon');
         Route::get('user/base', 'UserController@base');
         Route::get('user/account', 'UserController@account');
