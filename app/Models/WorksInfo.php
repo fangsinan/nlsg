@@ -97,60 +97,6 @@ class WorksInfo extends Base
                     $works_data[$key]['info_is_like'] = ContentLike::isLike([5],$relation_id,$user_id,$val['id']);
                 }
             }
-            /*if($type==3 && in_array($works_id,[647,699])){ //45天精英少年成长计划 学习人数固定不动 20230410
-                if($works_id==647){ //一阶
-                    switch ($val['id']){
-                        case 6762:$works_data[$key]['view_num']=10036;break;
-                        case 6763:$works_data[$key]['view_num']=10012;break;
-                        case 6764:$works_data[$key]['view_num']=10430;break;
-                        case 6769:$works_data[$key]['view_num']=10293;break;
-                        case 6770:$works_data[$key]['view_num']=10953;break;
-                        case 6796:$works_data[$key]['view_num']=8998;break;
-                        case 6797:$works_data[$key]['view_num']=9882;break;
-                        case 6798:$works_data[$key]['view_num']=9532;break;
-                        case 6799:$works_data[$key]['view_num']=9787;break;
-                        case 6800:$works_data[$key]['view_num']=10248;break;
-                        case 6801:$works_data[$key]['view_num']=9189;break;
-                        case 6802:$works_data[$key]['view_num']=9069;break;
-                        case 6803:$works_data[$key]['view_num']=8983;break;
-                        case 6804:$works_data[$key]['view_num']=8997;break;
-                        case 6805:$works_data[$key]['view_num']=9894;break;
-                        case 6806:$works_data[$key]['view_num']=8903;break;
-                        case 6808:$works_data[$key]['view_num']=9508;break;
-                        case 6809:$works_data[$key]['view_num']=9426;break;
-                        case 6810:$works_data[$key]['view_num']=9369;break;
-                        case 6811:$works_data[$key]['view_num']=8428;break;
-                        case 6812:$works_data[$key]['view_num']=8713;break;
-                        case 6813:$works_data[$key]['view_num']=8893;break;
-                        case 6814:$works_data[$key]['view_num']=9312;break;
-                        case 6815:$works_data[$key]['view_num']=8993;break;
-                        case 6816:$works_data[$key]['view_num']=9677;break;
-                        case 6817:$works_data[$key]['view_num']=8838;break;
-                        case 6818:$works_data[$key]['view_num']=9328;break;
-                        case 6819:$works_data[$key]['view_num']=8613;break;
-                        case 6820:$works_data[$key]['view_num']=9993;break;
-                        case 6844:$works_data[$key]['view_num']=10427;break;
-                        case 6847:$works_data[$key]['view_num']=10818;break;
-                        case 6848:$works_data[$key]['view_num']=10447;break;
-                        case 6850:$works_data[$key]['view_num']=11648;break;
-                        case 6853:$works_data[$key]['view_num']=11353;break;
-                        case 6854:$works_data[$key]['view_num']=11628;break;
-                        case 6856:$works_data[$key]['view_num']=11663;break;
-                        case 6858:$works_data[$key]['view_num']=12011;break;
-                        case 6860:$works_data[$key]['view_num']=10777;break;
-                        case 6862:$works_data[$key]['view_num']=11870;break;
-                        case 6898:$works_data[$key]['view_num']=11238;break;
-                        case 6900:$works_data[$key]['view_num']=10768;break;
-                        case 6902:$works_data[$key]['view_num']=10858;break;
-                        case 6941:$works_data[$key]['view_num']=12178;break;
-                        case 6943:$works_data[$key]['view_num']=13758;break;
-                        case 6945:$works_data[$key]['view_num']=21128;break;
-                    }
-                }else{ //二阶
-
-                }
-
-            }*/
         }
 
         return $works_data;
@@ -1025,13 +971,13 @@ class WorksInfo extends Base
         $Dir = str_replace(basename($url),'',parse_url($url,PHP_URL_PATH));
         $time = time()+$time_v;
         $t =dechex($time);
-        // $rlimit= 5;
+//        $rlimit= 5;
         $us= rand(100000,999999);
-        // $sign = md5($key . $Dir . $t  . $rlimit . $us );
+//        $sign = md5($key . $Dir . $t  . $rlimit . $us );
         $sign = md5($key . $Dir . $t   . $us );
         $query = http_build_query([
             "t" => $t,
-            // "rlimit" => $rlimit,
+//            "rlimit" => $rlimit,
             "us" => $us,
             "sign" => $sign,
         ]);
