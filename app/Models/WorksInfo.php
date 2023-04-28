@@ -1027,7 +1027,7 @@ class WorksInfo extends Base
         $t =dechex($time);
         // $rlimit= 5;
         $us= rand(100000,999999);
-        $sign = md5($key . $Dir . $t  . $rlimit . $us );
+        // $sign = md5($key . $Dir . $t  . $rlimit . $us );
         $sign = md5($key . $Dir . $t   . $us );
         $query = http_build_query([
             "t" => $t,
