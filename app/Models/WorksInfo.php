@@ -1025,12 +1025,13 @@ class WorksInfo extends Base
         $Dir = str_replace(basename($url),'',parse_url($url,PHP_URL_PATH));
         $time = time()+$time_v;
         $t =dechex($time);
-        $rlimit= 5;
+        // $rlimit= 5;
         $us= rand(100000,999999);
         $sign = md5($key . $Dir . $t  . $rlimit . $us );
+        $sign = md5($key . $Dir . $t   . $us );
         $query = http_build_query([
             "t" => $t,
-            "rlimit" => $rlimit,
+            // "rlimit" => $rlimit,
             "us" => $us,
             "sign" => $sign,
         ]);
