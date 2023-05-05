@@ -157,7 +157,7 @@ class DouDianServers
         ]);
 
         //临时使用  补充订单状态
-        $this->orderStatusData();
+//        $this->orderStatusData();
 
         return true;
     }
@@ -1066,7 +1066,7 @@ class DouDianServers
 
                 //解密
                 $temp_res = $this->runDecryptApi([$cipher_infos]);
-
+var_dump([$cipher_infos,$temp_res]);
                 if ($temp_res['code'] === false) {
                     break;
                 }
