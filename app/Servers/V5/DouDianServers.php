@@ -1046,6 +1046,18 @@ class DouDianServers
                         break;
                 }
 
+                if ($i === 1 && empty($cipher_infos['cipher_text'])) {
+                    $check_this_order->decrypt_step = 1;
+                    $check_this_order->save();
+                    continue;
+                }
+
+                if ($i === 2 && empty($cipher_infos['cipher_text'])) {
+                    $check_this_order->decrypt_step = 2;
+                    $check_this_order->save();
+                    continue;
+                }
+
                 if ($i === 3 && empty($cipher_infos['cipher_text'])) {
                     $check_this_order->decrypt_step = 3;
                     $check_this_order->save();
