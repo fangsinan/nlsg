@@ -26,6 +26,7 @@ use App\Servers\ImDocServers;
 use App\Servers\MallRefundJob;
 use App\Servers\LiveConsoleServers;
 use App\Servers\UserWechatServers;
+use App\Servers\V5\DouDianServers;
 use App\Servers\V5\ShareServers;
 use App\Servers\V5\WechatServers;
 use App\Servers\V5\WechatServersNew;
@@ -208,6 +209,7 @@ class Kernel extends ConsoleKernel
             Coupon::clear();//失效优惠券清理
             Works::statistic(); //数据统计
             PayRecordDetailStay::remove();//商城待到帐收益划转
+            (new DouDianServers())->orderStatusData();
         })->dailyAt('03:00');//半夜清理
 
         $schedule->call(function () {
