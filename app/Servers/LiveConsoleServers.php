@@ -183,7 +183,7 @@ class LiveConsoleServers
 
     }
 
-    //定时入库加入直播间
+    //定时入库加入直播间   暂时废弃
     public static function CrontabJoinRedis(){
 
         try {
@@ -437,8 +437,17 @@ class LiveConsoleServers
 
     //抓取手机号地区
     //#*/3 * * * * /usr/bin/curl https://app.v4.api.nlsgapp.com/api/v4/index/phoneRegion
+    //http://127.0.0.1:8000/api/v4/index/phoneRegion
     public static function getPhoneRegion($param=0)
     {
+//        $arr=[169209,214932,187586];
+//        $str= json_encode($arr);
+//        echo $str.'<br>';
+//        var_dump(json_decode($str,true));
+//
+//        $Live_number_str='[169209,214932,187586]';
+//        var_dump(json_decode($Live_number_str,true));
+//        exit;
 
         $redisConfig = config('database.redis.default');
         $Redis = new Client($redisConfig);
