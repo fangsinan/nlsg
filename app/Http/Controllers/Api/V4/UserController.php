@@ -1695,7 +1695,8 @@ class UserController extends Controller
             if(time() > $user_ctime){
                 //未发送消息
                 if($user['is_reward'] == 0){
-                    // 发送消息
+                    // 发送消息  超过三天
+                    Message::pushMessage(0,$this->user['id'],'SYS_NEW_USER');
                     // Message->
                     User::where("id",$id)->update(['is_reward' => 1,]);
                 }
@@ -1749,6 +1750,8 @@ class UserController extends Controller
         User::where("id",$id)->update(['is_reward' => 3,]);
         // 发送消息
         // Messages->
+        Message::pushMessage(0,$this->user['id'],'SYS_USER_REWARD');
+
         // 发送完消息
         User::where("id",$id)->update(['is_reward' => 4,]);
         return success();
