@@ -962,7 +962,7 @@ class WorksInfo extends Base
      */
     public static function UrlKey(string $url, string $duration="60:00"): string
     {
-        return $url;
+        // return $url;
         $ex_times = explode(":",$duration);
         $time_v = $ex_times[0]*60 + $ex_times[1]+3600; //强制增加1小时观看失效，app老出现黑屏
 
