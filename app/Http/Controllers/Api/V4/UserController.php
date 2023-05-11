@@ -1684,7 +1684,7 @@ class UserController extends Controller
 
         if(!empty($this->user['id']) && $this->user['id'] != 166788){
             $id = $this->user['id'];
-            $user = User::where('id',$id)->first();
+            $user = User::where('id',$id)->first()->toArray();
             //查看是否领取奖励  已经领取  不发送
             if($user['is_reward'] == 3 || $user['is_reward'] == 4){
                 return  success([]);
