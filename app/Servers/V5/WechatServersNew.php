@@ -56,8 +56,27 @@ class WechatServersNew
     }
 
 
+
+    public static function checkGetToken(){
+
+        $cache_key_name='public_nlsg_wechat_access_token';
+
+        $Access_Token = self::GetToken(); //获取token
+        $Url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=' . $Access_Token;
+        $params='{}';
+        $content = curlPost($Url, $params);
+        $Rst = json_decode($content, true);
+        if(isset($Rst['errcode']) && $Rst['errcode']==40001){
+            $Access_Token=self::GetToken(1);
+        }
+
+        Redis::setex($cache_key_name,3600,$Access_Token);
+
+    }
+
+
     //获取token
-    public static function GetToken($flag=false){
+    public static function GetToken($flag=false,$is_cache=0){
 
         /*$redisConfig = config('database.redis.default');
         $Redis = new Client($redisConfig);
@@ -78,18 +97,16 @@ class WechatServersNew
             'cache' => "redis"
         ];
 
-        $cache_key_name='public_nlsg_wechat_access_token';
-
         $app = Factory::officialAccount($config);
+
 
         $accessToken = $app->access_token;
 
-        if($flag){ //强制刷新
-
+        //强制刷新
+        if($flag){
             $tokenArr = $accessToken->getToken(true);
             if(isset($tokenArr['access_token']) && !empty($tokenArr['access_token'])){
                 $access_token=$tokenArr['access_token'];
-                Redis::setex($cache_key_name,7000,$access_token);//设置redis缓存
                 return $access_token;
             }
         }
@@ -104,6 +121,7 @@ class WechatServersNew
                 $access_token=$tokenArr['access_token'];
             }
         }
+
         return $access_token;
 
     }
