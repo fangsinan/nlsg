@@ -9,8 +9,8 @@ use App\Models\Message\Message;
 use App\Models\User;
 use App\Models\UserInvite;
 use App\Models\BackendUser;
-use App\Models\VipUser;
 use App\Servers\V5\WechatServersNew;
+use App\Models\VipUser;
 use AppleSignIn\ASDecoder;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -1078,8 +1078,6 @@ class AuthController extends Controller
         return error(0, 'error');
     }
 
-
-
     // 0元购 手机号信息统计
     public function zeroPhoneCollect(Request $request){
         $phone = strval($request->input('phone'));
@@ -1194,4 +1192,6 @@ class AuthController extends Controller
         WechatServersNew::checkGetToken(); //获取token
         return success();
     }
+    
+
 }
