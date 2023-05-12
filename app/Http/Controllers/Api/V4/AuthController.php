@@ -1186,6 +1186,10 @@ class AuthController extends Controller
 
     }
 
+    /**
+     * api/v4/auth/refresh_wechat_token
+     * 刷新公众号token
+     */
     public function refresh_wechat_token(){
         WechatServersNew::GetToken(1);
     }
