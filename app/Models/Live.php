@@ -10,7 +10,7 @@ class Live extends Base
                         'end_at', 'helper','is_free','content','need_virtual','need_virtual_num','steam_end_time','bgp_id',
                         'steam_begin_time','classify','valid_time_range','cover_vertical_img',
                         'is_test','pre_push_time','service_type','hide_sub_count','is_zero',
-                        'zero_poster_show','details_img','app_project_type'
+                        'zero_poster_show','details_img','app_project_type','qr_type',
     ];
     public function getIndexLive($ids)
     {

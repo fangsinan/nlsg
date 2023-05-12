@@ -665,8 +665,8 @@ class WechatPay extends Controller
 				case 14: //5天学习力诊断课
 				    $res = $nickname . ':您已支付' . $live_num . '单 5天学习力诊断课';
 				    break;
-                case 21: //超级记忆线上训练营
-                    $res = $nickname . ':您已支付' . $live_num . '单 超级记忆线上训练营';
+                case 21: //超级记忆力（亲子）训练营
+                    $res = $nickname . ':您已支付' . $live_num . '单 超级记忆力（亲子）训练营';
                     break;
                 case 22: //学习力规划实操课（小学版）
                     $res = $nickname . ':您已支付' . $live_num . '单 学习力规划实操课（小学版）';
@@ -700,6 +700,9 @@ class WechatPay extends Controller
                     break;
                 case 33: //51戈壁亲子成长探索之旅·众筹金
                     $res = $nickname . ':您已支付' . $live_num . '单 51戈壁亲子成长探索之旅·众筹金';
+                    break;
+                case 34: //21天注意力提升亲子训练课
+                    $res = $nickname . ':您已支付' . $live_num . '单 21天注意力提升亲子训练课';
                     break;
             }
         } else if ($type == 18) {
@@ -898,27 +901,29 @@ class WechatPay extends Controller
                 if ($orderRst && $recordRst && $subscribeRst && $userRst && $Profit_Rst) {
                     DB::commit();
 
+                    //9.9刷单推送
+                    if (!empty($orderInfo['remark']) && $orderInfo['remark'] > 0) {
+                        self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $orderInfo['remark'], $orderId, 1);
+                    }
+
 					// 下单记录王琨老师的直播
 					if( isset($userdata['is_test_pay']) &&  $userdata['is_test_pay']==0 && $total_fee>=1){ //刷单用户排除 排除1元用户
 
                         //免费观看时间
                         if($total_fee==1){
-                            $show_end=date('Y-m-d 23:59:59', strtotime('+2 years'));
+                            $live_type=2; //1元课
+                            $show_end=date('Y-m-d 23:59:59', strtotime('+3 months'));
                         }else{
-                            $show_end=date('Y-m-d 23:59:59', strtotime('+2 years'));
+                            $live_type=1; //49元课
+                            $show_end=date('Y-m-d 23:59:59', strtotime('+1 years'));
                         }
 
-                        self::PayTeacherLives($user_id,$liveData,$orderInfo,$show_end);
+                        self::PayTeacherLives($user_id,$liveData,$orderInfo,$show_end,$live_type);
 //						self::PayTeacherLives($user_id,$liveData,$orderInfo,$bind_end);
 					}
 
 					// 内容刷单记录
 					self::PayTestLog($orderId,$userdata);
-
-                    //9.9刷单推送
-                    if (!empty($orderInfo['remark']) && $orderInfo['remark'] > 0) {
-                        self::LiveRedis(11, $liveData['title'], $userdata['nickname'], $orderInfo['remark'], $orderId, 1);
-                    }
 
 					//SMS_211275363
 					//短信
@@ -995,7 +1000,7 @@ class WechatPay extends Controller
             return true;
         }
     }
-    static function PayTeacherLives($user_id,$liveData,$order,$bind_end=''){
+    static function PayTeacherLives($user_id,$liveData,$order,$bind_end='',$live_type=1){
         if(empty($user_id) || empty($liveData) || empty($order)){
             return ;
         }
@@ -1011,6 +1016,7 @@ class WechatPay extends Controller
             'order_id' =>$order['id'],
             'ordernum' =>$order['ordernum'],
             'is_zero' =>$order['is_zero']??1,
+            'live_type' =>$live_type,
             'app_project_type' =>APP_PROJECT_TYPE,
         ]);
         return ;

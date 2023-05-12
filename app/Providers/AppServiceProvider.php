@@ -30,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        return ;
         \Carbon\Carbon::setLocale('zh');
 
         //打印完整sql

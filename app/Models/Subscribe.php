@@ -151,10 +151,22 @@ class Subscribe extends Base
 			if($type == 3 && $is_sub==0){
 				$result = Live::find($target_id);
 				if( $result['user_id'] == 161904 && $result['is_free']==0){
-					$res = LivePayCheck::where([
-						'teacher_id'    => $result['user_id'],
-						'user_id'       => $user_id,
-					])->where("begin_at",'<=',$result['begin_at'])->orderBy('id', 'desc')->first();
+//					$res = LivePayCheck::where([
+//						'teacher_id'    => $result['user_id'],
+//						'user_id'       => $user_id,
+//					])->where("begin_at",'<=',$result['begin_at'])->orderBy('id', 'desc')->first();
+
+                    $query = LivePayCheck::where([
+                        'teacher_id'    => $result['user_id'],
+                        'user_id'       => $user_id,
+                    ])->where("begin_at",'<=',$result['begin_at']);
+
+                    if(isset($result['price']) && $result['price']==1){
+                        $query->whereIn('live_type', [1,2]);
+                    }else if(isset($result['price']) && $result['price']>1){
+                        $query->where('live_type',1); //1元课不能听49元课
+                    }
+                    $res=$query->orderBy('id', 'desc')->first();
 
 					if(!empty($res)){
 						$is_sub = 1;

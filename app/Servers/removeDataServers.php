@@ -1904,7 +1904,7 @@ and o.status = 1 and o.pay_price > 1";
                     $temp_data['give']        = 3;
                     $temp_data['twitter_id']  = $temp_t_user_id;
                     $temp_data['is_flag']     = $v->flag_name;
-                    if ($v->flag_name = '抖音') {
+                    if ($v->flag_name === '抖音') {
                         $temp_data['channel_order_sku'] = '3460976881036350000';
                     } else {
                         $temp_data['channel_order_sku'] = '';

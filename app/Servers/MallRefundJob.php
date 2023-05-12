@@ -21,11 +21,12 @@ class MallRefundJob
 
     private $wechat_pay_config_h5;
     private $wechat_pay_config_app;
+
     public function __construct()
     {
 //        $this->wechat_pay_config_h5 = Config('wechat.payment.old_wx_wechat');
 //        $this->wechat_pay_config_app = Config('wechat.payment.old_default');
-        $this->wechat_pay_config_h5 = Config('wechat.payment.wx_wechat');
+        $this->wechat_pay_config_h5  = Config('wechat.payment.wx_wechat');
         $this->wechat_pay_config_app = Config('wechat.payment.default');
     }
 
@@ -44,33 +45,70 @@ class MallRefundJob
         $list = MallRefundRecord::from('nlsg_mall_refund_record as mrr')
             ->join('nlsg_mall_order as mo', 'mrr.order_id', '=', 'mo.id')
             ->join('nlsg_pay_record as pr', 'pr.ordernum', '=', 'mo.ordernum')
+            ->where('mrr.status','=',50)
             ->where('mrr.run_refund', '=', 2)
             ->where('pr.order_type', '=', 10)
             ->limit(100)
             ->select(['mrr.id as service_id', 'service_num', 'mrr.order_id',
-                'mrr.order_detail_id', 'mrr.type', 'mrr.pay_type',
-                'mrr.status as service_status', 'mrr.user_id', 'pr.transaction_id',
-                'pr.ordernum', 'pr.price as all_price', 'mrr.price as refund_price'])
+                      'mrr.order_detail_id', 'mrr.type', 'mrr.pay_type', 'pr.type as client',
+                      'mrr.status as service_status', 'mrr.user_id', 'pr.transaction_id',
+                      'pr.ordernum', 'pr.price as all_price', 'mrr.price as refund_price'])
             ->get();
 
         ini_set('date.timezone', 'Asia/Shanghai');
 
         foreach ($list as $v) {
-            switch ($v->pay_type) {
+//            switch ($v->pay_type) {
+//                case 1:
+//                    //微信公众号
+//                    $this->weChatRefundCheck($v, 1);
+//                    break;
+//                case 2:
+//                    //微信app
+//                    $this->weChatRefundCheck($v, 2);
+//                    break;
+//                case 3:
+//                    //支付宝app
+//                    $this->aliRefundCheckGrace($v);
+//                    break;
+//            }
+            switch ($v->client) {
                 case 1:
                     //微信公众号
-                    $this->weChatRefundCheck($v, 1);
+                    $temp_res = $this->wechatRefundCheckMethod($v, 1);
                     break;
                 case 2:
                     //微信app
-                    $this->weChatRefundCheck($v, 2);
+                    $temp_res = $this->wechatRefundCheckMethod($v, 2);
                     break;
                 case 3:
                     //支付宝app
-                    $this->aliRefundCheckGrace($v);
+                    $temp_res = $this->aliPayRefundCheckMethod($v);
                     break;
+                default:
+                    return false;
+            }
+
+            if ($temp_res['code'] === true) {
+                if ($v->client !== 3) {
+                    $fee = GetPriceTools::PriceCalc('/', $v->refund_price, 100);
+                } else {
+                    $fee = $v->refund_price;
+                }
+
+                MallRefundRecord::query()
+                    ->where('id', '=', $v->service_id)
+                    ->update([
+                                 'status'     => 60,
+                                 'succeed_at' => date('Y-m-d H:i:s'),
+                                 'run_refund' => 3,
+                                 'refund_fee' => $fee
+                             ]);
+
+
             }
         }
+        return true;
     }
 
     public function mallRefund()
@@ -78,13 +116,14 @@ class MallRefundJob
         $list = MallRefundRecord::from('nlsg_mall_refund_record as mrr')
             ->join('nlsg_mall_order as mo', 'mrr.order_id', '=', 'mo.id')
             ->join('nlsg_pay_record as pr', 'pr.ordernum', '=', 'mo.ordernum')
+            ->where('mrr.status','=',40)
             ->where('mrr.run_refund', '=', 1)
             ->where('pr.order_type', '=', 10)
             ->limit(100)
             ->select(['mrr.id as service_id', 'service_num', 'mrr.order_id',
-                'mrr.order_detail_id', 'mrr.type', 'mrr.pay_type',
-                'mrr.status as service_status', 'mrr.user_id', 'pr.transaction_id',
-                'pr.ordernum', 'pr.price as all_price', 'mrr.price as refund_price'])
+                      'mrr.order_detail_id', 'mrr.type', 'mrr.pay_type',
+                      'mrr.status as service_status', 'mrr.user_id', 'pr.transaction_id',
+                      'pr.ordernum', 'pr.price as all_price', 'mrr.price as refund_price'])
             ->get();
 
         ini_set('date.timezone', 'Asia/Shanghai');
@@ -136,7 +175,7 @@ class MallRefundJob
         }
         try {
             $xml = simplexml_load_string($res, 'SimpleXMLElement',
-                LIBXML_NOCDATA);
+                                         LIBXML_NOCDATA);
             $xml = json_decode(json_encode($xml), true);
 
             if (isset($xml['result_code']) && $xml['result_code'] == 'SUCCESS') {
@@ -167,15 +206,15 @@ class MallRefundJob
         $trade_no                = $v->transaction_id;
 
         $request->setBizContent("{" .
-            "\"trade_no\":\"$trade_no\"," .
-            "\"out_trade_no\":\"\"," .
-            "\"out_request_no\":\"$out_request_no\"" .
-            "}");
+                                "\"trade_no\":\"$trade_no\"," .
+                                "\"out_trade_no\":\"\"," .
+                                "\"out_request_no\":\"$out_request_no\"" .
+                                "}");
 
         try {
             $result       = $aop->execute($request);
             $responseNode = str_replace(".", "_",
-                    $request->getApiMethodName()) . "_response";
+                                        $request->getApiMethodName()) . "_response";
             $resultCode   = $result->$responseNode->code;
             if (!empty($resultCode) && $resultCode == 10000) {
                 $refund_amount = $result->$responseNode->refund_amount; //退款金额
@@ -245,9 +284,9 @@ class MallRefundJob
         try {
             $result = $alipay->refund($order);
             DB::table('wwwww')->insert([
-                'vv' => $now_date,
-                't'  => json_encode($result)
-            ]);
+                                           'vv' => $now_date,
+                                           't'  => json_encode($result)
+                                       ]);
             if (intval($result->code) === 10000) {
                 $mrr                = MallRefundRecord::find($v->service_id);
                 $mrr->status        = 50;
@@ -301,8 +340,8 @@ class MallRefundJob
             );
 
             DB::table('nlsg_wechat_refund_res_log')->insert([
-                'res_json' => json_encode($result)
-            ]);
+                                                                'res_json' => json_encode($result)
+                                                            ]);
 
             $rrrModel             = new RunRefundRecord();
             $rrrModel->order_type = 1;
@@ -314,7 +353,7 @@ class MallRefundJob
             if (
                 ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') ||
                 ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'FAIL' &&
-                    $result['err_code_des'] === '订单已全额退款')
+                 $result['err_code_des'] === '订单已全额退款')
             ) {
                 $mrr                = MallRefundRecord::query()->find($v->service_id);
                 $mrr->status        = 50;
@@ -514,8 +553,8 @@ class MallRefundJob
             ->where('o.is_refund', '=', 0)
             ->limit(30)
             ->select(['o.id', 'o.user_id', 'o.ordernum', 'p.transaction_id',
-                'p.type as client', 'o.pay_price as all_price',
-                'p.type', 'p.price as refund_price', 'o.shill_job_price', 'o.shill_refund_sum'])
+                      'p.type as client', 'o.pay_price as all_price',
+                      'p.type', 'p.price as refund_price', 'o.shill_job_price', 'o.shill_refund_sum'])
             ->get();
         if ($list->isEmpty()) {
             return true;
@@ -536,9 +575,9 @@ class MallRefundJob
 
         //order_erp重新推送
         DB::table('nlsg_order_erp_list')
-            ->whereIn('order_id',$id_list)
-            ->where('flag','=',2)
-            ->update(['flag'=>1]);
+            ->whereIn('order_id', $id_list)
+            ->where('flag', '=', 2)
+            ->update(['flag' => 1]);
 
         foreach ($list as $v) {
             $temp_res = [];
@@ -582,8 +621,8 @@ class MallRefundJob
                     OrderRefundLog::query()->where('ordernum', '=', $v->ordernum)
                         ->where('status', '=', 1)
                         ->update([
-                            'status' => 10
-                        ]);
+                                     'status' => 10
+                                 ]);
                 }
             } else {
                 $update_data['is_refund'] = 9;
@@ -641,8 +680,8 @@ class MallRefundJob
         );
 
         DB::table('nlsg_wechat_refund_res_log')->insert([
-            'res_json' => json_encode($result)
-        ]);
+                                                            'res_json' => json_encode($result)
+                                                        ]);
 
         if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {
             return ['code' => true, 'refund_id' => $result['refund_id'], 'this_time' => 1];
@@ -663,7 +702,7 @@ class MallRefundJob
             ->where('o.is_refund', '=', 2)
             ->where('o.status', '=', 1)
             ->select(['o.id', 'op.id as op_id', 'o.user_id', 'o.ordernum', 'o.refund_no as service_num', 'o.activity_tag',
-                'op.pay_price', 'op.refund_price', 'pr.type as client', 'o.type as order_type', 'o.relation_id'])
+                      'op.pay_price', 'op.refund_price', 'pr.type as client', 'o.type as order_type', 'o.relation_id'])
             ->get();
 
         if ($list->isEmpty()) {
@@ -706,15 +745,15 @@ class MallRefundJob
                         ->where('user_id', '=', $v->user_id)
                         ->where('order_id', '=', $v->id)
                         ->update([
-                            'status' => 0
-                        ]);
+                                     'status' => 0
+                                 ]);
                 }
 
                 OrderRefundLog::query()->where('ordernum', '=', $v->ordernum)
                     ->where('status', '=', 10)
                     ->update([
-                        'status' => 20
-                    ]);
+                                 'status' => 20
+                             ]);
 
                 //9精品课  15讲座
                 if ($v->order_type == 9 || $v->order_type == 15) {
@@ -759,22 +798,22 @@ class MallRefundJob
                                 ->update(['status' => 0]);
                         }
                     }
-                }elseif ($v->order_type == 14){
+                } elseif ($v->order_type == 14) {
                     //14 线下产品(门票类)
-                    if($v->relation_id == 8){
-                            Subscribe::query()->where('user_id','=',$v->user_id)
-                                ->where('type','=',2)
-                                ->where('relation_id','=',594)
-                                ->where('give','=',3)
-                                ->update(['status'=>0]);
+                    if ($v->relation_id == 8) {
+                        Subscribe::query()->where('user_id', '=', $v->user_id)
+                            ->where('type', '=', 2)
+                            ->where('relation_id', '=', 594)
+                            ->where('give', '=', 3)
+                            ->update(['status' => 0]);
 
-                            Subscribe::query()->where('user_id','=',$v->user_id)
-                                ->where('type','=',6)
-                                ->where('relation_id','=',440)
-                                ->where('give','=',3)
-                                ->update(['status'=>0]);
+                        Subscribe::query()->where('user_id', '=', $v->user_id)
+                            ->where('type', '=', 6)
+                            ->where('relation_id', '=', 440)
+                            ->where('give', '=', 3)
+                            ->update(['status' => 0]);
                     }
-                }elseif ($v->order_type == 10){
+                } elseif ($v->order_type == 10) {
                     //直播
                     Subscribe::query()->where('type', '=', 3)
                         ->where('order_id', '=', $v->id)
@@ -821,8 +860,8 @@ class MallRefundJob
         $result = $app->refund->queryByOutRefundNumber($v->service_num);
 
         DB::table('nlsg_wechat_refund_res_log')->insert([
-            'res_json' => json_encode($result)
-        ]);
+                                                            'res_json' => json_encode($result)
+                                                        ]);
 
         if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {
             return ['code' => true, 'refund_id' => 0];

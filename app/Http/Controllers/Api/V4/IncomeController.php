@@ -63,7 +63,7 @@ class IncomeController extends Controller
         //账户设置
 
         $user_id = $this->user['id'] ?? 0;
-        $cash_info = CashData::where(['user_id'=>$user_id,'is_del'=>1])->first();
+        $cash_info = CashData::where(['user_id'=>$user_id,'is_del'=>1,'app_project_type'=>APP_PROJECT_TYPE])->first();
 
         $is_pass        = 0;
         $amount         = 0;
@@ -160,7 +160,7 @@ class IncomeController extends Controller
     {
         $user_id = $this->user['id'] ?? 0;
 
-        $cash_list = CashData::where(['user_id'=>$user_id,'is_del'=>1])->first();
+        $cash_list = CashData::where(['user_id'=>$user_id,'is_del'=>1,'app_project_type'=>APP_PROJECT_TYPE])->first();
         $user_status  =  0 ;
         if($cash_list){
             if ($cash_list['is_pass']==1 && $cash_list['org_type'] ==1 ) {
@@ -271,7 +271,7 @@ class IncomeController extends Controller
         $type = $request->input('type', 0);//1 获取是否有提交信息  2修改
 
         if($type==1){ //获取数据
-            $cash_info = CashData::where(['user_id'=>$user_id,'is_del'=>1])->first();
+            $cash_info = CashData::where(['user_id'=>$user_id,'is_del'=>1,'app_project_type'=>APP_PROJECT_TYPE])->first();
             $data=[];
             if(!empty($cash_info)){
                 $data['truename']       = $cash_info['truename'];
@@ -407,7 +407,7 @@ class IncomeController extends Controller
         $type = $request->input('type', 0); //1微信  2支付宝
         $user_id = $this->user['id'] ?? 0;
 
-        $CashInfo = CashData::where(['user_id'=> $user_id,'is_pass'=>1])->first('id');
+        $CashInfo = CashData::where(['user_id'=> $user_id,'is_pass'=>1,'is_del'=>1,'app_project_type'=>APP_PROJECT_TYPE])->first('id');
         //已通过审核
         if (empty($CashInfo)) {
             return $this->error(0,'认证未通过审核不能绑定');
@@ -471,7 +471,7 @@ class IncomeController extends Controller
 
         $user_id    = $this->user['id'];
 
-        $cash_list  = CashData::where(['user_id'=>$user_id,'is_del'=>1])->first();
+        $cash_list  = CashData::where(['user_id'=>$user_id,'is_del'=>1,'app_project_type'=>APP_PROJECT_TYPE])->first();
         $bind_type = 0;
         if ($cash_list['is_pass'] == 1 && $cash_list['org_type'] == 1 ) {
             if (!$cash_list['app_wx_account']) {
@@ -613,7 +613,7 @@ class IncomeController extends Controller
             return $this->error(0,'单日限额已超200万');
         }
         //获取对应提现用户
-        $Info = CashData::where(['user_id'=>$user_id,'is_pass'=>1,'is_del'=>1])->first();
+        $Info = CashData::where(['user_id'=>$user_id,'is_pass'=>1,'is_del'=>1,'app_project_type'=>APP_PROJECT_TYPE])->first();
         if (empty($Info)) {
             $this->RedisFlag($user_id,3);
             return $this->error(0,'认证未通过');

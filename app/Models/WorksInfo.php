@@ -962,6 +962,7 @@ class WorksInfo extends Base
      */
     public static function UrlKey(string $url, string $duration="60:00"): string
     {
+        // return $url;
         $ex_times = explode(":",$duration);
         $time_v = $ex_times[0]*60 + $ex_times[1]+3600; //强制增加1小时观看失效，app老出现黑屏
 
@@ -971,12 +972,13 @@ class WorksInfo extends Base
         $Dir = str_replace(basename($url),'',parse_url($url,PHP_URL_PATH));
         $time = time()+$time_v;
         $t =dechex($time);
-        $rlimit= 5;
+//        $rlimit= 5;
         $us= rand(100000,999999);
-        $sign = md5($key . $Dir . $t  . $rlimit . $us );
+//        $sign = md5($key . $Dir . $t  . $rlimit . $us );
+        $sign = md5($key . $Dir . $t   . $us );
         $query = http_build_query([
             "t" => $t,
-            "rlimit" => $rlimit,
+//            "rlimit" => $rlimit,
             "us" => $us,
             "sign" => $sign,
         ]);

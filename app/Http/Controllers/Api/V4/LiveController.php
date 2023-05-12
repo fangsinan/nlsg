@@ -344,7 +344,7 @@ class LiveController extends Controller
         }
         // 不查询测试直播的情况下
         // 需要查询当前用户是否管理员  单独查询管理员的
-        if($is_test == 0 && !empty($this->user['phone'])){
+        if(!empty($this->user['phone'])){
             $query->unionAll(Live::select($fills)
                 ->where('begin_at','>', $day_time)
                 ->where('status', 4)
@@ -1725,9 +1725,11 @@ class LiveController extends Controller
                 $bind_end=date('Y-m-d 23:59:59', strtotime('+3 months'));
                 $order['is_zero'] = 2;// 0元购订单
                 $live_data['begin_at'] = date($live_data['begin_at'],strtotime('+3 months'));
-                if(isset($this->user['is_test_pay']) && $this->user['is_test_pay']==0){
-                    WechatPay::PayTeacherLives($this->user['id'],$live_data,$order,$bind_end);
-                }
+
+                //2023.04.13 确认0元购不享受1元和49.9元观看权限
+//                if(isset($this->user['is_test_pay']) && $this->user['is_test_pay']==0){
+//                    WechatPay::PayTeacherLives($this->user['id'],$live_data,$order,$bind_end);
+//                }
                 WechatPay::LiveRedis(11, "0元购直播间", $user['nickname'],$input['from_live_info_id']??0);
             }else{
 
@@ -2321,6 +2323,19 @@ class LiveController extends Controller
         $order_id = $request->input('order_id')??0;
         $is_wechat = $request->input('is_wechat')??0;
         $user_id = $this->user['id']??0;
+
+        //如果是群二维码  直接返回
+        $res = Qrcodeimg::select("id","qr_url")->where([
+            'relation_type' => $relation_type,
+            'relation_id'   => $relation_id,
+            'status'        => 1,
+            'qr_type'      => 2,
+            'app_project_type'   => APP_PROJECT_TYPE,
+        ])->first();
+        if(!empty($res)){
+            return success($res);
+        }
+
         if($relation_type == 3){
 
             // 绑定默认客服不弹二维码
@@ -2329,7 +2344,7 @@ class LiveController extends Controller
                 "status"    => 1,
             ])->value("id");
             if(!empty($waiter_id)){
-                return success((object)[] );
+                return success( (object)[] );
             }
 
             //relation_type=3时    免费传relation_id=live_id   付费传order_id
@@ -2349,8 +2364,17 @@ class LiveController extends Controller
 //                }
             }
 
+        }else if($relation_type == 7){
+            if(!empty($relation_id)){
+                $relation_id = $relation_id;
+            }
+            //order 准确查询
+            if(!empty($order_id)){  //付费
+                $order = Order::where(['id'=>$order_id])->first();
+                $relation_id = $order['relation_id'];
+            }
         }else{
-            //目前除了直播 其他不需要根据各个具体产品返二维码
+            //目前除了直播 线下课 其他不需要根据各个具体产品返二维码
             $relation_id = 0;
         }
 
@@ -2358,6 +2382,8 @@ class LiveController extends Controller
             'relation_type' => $relation_type,
             'relation_id'   => $relation_id,
             'status'   => 1,
+            'qr_type'      => 1,
+            'app_project_type'   => APP_PROJECT_TYPE,
         ])->first();
 
         if(empty($res)){

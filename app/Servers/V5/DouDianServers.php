@@ -157,7 +157,7 @@ class DouDianServers
         ]);
 
         //临时使用  补充订单状态
-        $this->orderStatusData();
+//        $this->orderStatusData();
 
         return true;
     }
@@ -911,6 +911,7 @@ class DouDianServers
         DouDianOrderLog::query()->create((array)$response);
         $response->job_type     = 2;
         $response->decrypt_text = json_encode($response);
+
         if (!isset($response->data)) {
             return ['code' => false, 'msg' => '结构错误', 'data' => []];
         }
@@ -1043,6 +1044,24 @@ class DouDianServers
                     default:
                         $cipher_infos['cipher_text'] = $v['encrypt_post_addr_detail'];
                         break;
+                }
+
+                if ($i === 1 && empty($cipher_infos['cipher_text'])) {
+                    $check_this_order->decrypt_step = 1;
+                    $check_this_order->save();
+                    continue;
+                }
+
+                if ($i === 2 && empty($cipher_infos['cipher_text'])) {
+                    $check_this_order->decrypt_step = 2;
+                    $check_this_order->save();
+                    continue;
+                }
+
+                if ($i === 3 && empty($cipher_infos['cipher_text'])) {
+                    $check_this_order->decrypt_step = 3;
+                    $check_this_order->save();
+                    continue;
                 }
 
                 //解密

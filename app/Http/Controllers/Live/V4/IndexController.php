@@ -575,6 +575,8 @@ class IndexController extends ControllerBackend
             $zero_poster_show = (int)($input['zero_poster_show'] ?? 0);
             $details_img = $input['details_img'] ?? '';
             $app_project_type = $input['app_project_type'] ?? 1;
+            $qr_type = $input['qr_type'] ?? 0;
+            $qr_code      = $input['qr_code'] ?? '';
 
     		$cover_vertical_img = !empty($input['cover_vertical_img']) ? covert_img($input['cover_vertical_img']) : '';
 
@@ -595,6 +597,10 @@ class IndexController extends ControllerBackend
     		if (empty($classify)) {
     			return error(1000, '请选择类型');
     		}
+
+            if (!empty($qr_code) && empty($qr_type)){
+                return $this->error(1000,'选择二维码必须选择对应的类型');
+            }
 
     		if (!empty($steam_begin_time)) {
     			$Y = substr($steam_begin_time, 0, 1);
@@ -619,7 +625,7 @@ class IndexController extends ControllerBackend
     		}
 
     		$is_test      = (int)($input['is_test'] ?? 0);
-    		$qr_code      = $input['qr_code'] ?? '';
+
     		$channel_show = $input['channel_show'] ?? [];
 
     		$data = [
@@ -651,6 +657,7 @@ class IndexController extends ControllerBackend
                 'zero_poster_show'=>$zero_poster_show,
                 'details_img'=>$details_img,
                 'app_project_type'=>$app_project_type,
+                'qr_type'=>$qr_type,
     		];
 
     		$lcModel            = new LiveConsole();
@@ -739,7 +746,8 @@ class IndexController extends ControllerBackend
     				[
     					'relation_type' => 3,
     					'relation_id'   => $live_info_data['live_pid'],
-    					'qr_url'        => $qr_code
+    					'qr_url'        => $qr_code,
+                        'qr_type'=>$qr_type,
     				],
     				[
     					'status' => 1,
@@ -1073,7 +1081,7 @@ class IndexController extends ControllerBackend
     			->select('id', 'title', 'describe', 'cover_img', 'user_id', 'begin_at', 'end_at','service_type',
     				'price', 'twitter_money', 'helper', 'content', 'need_virtual', 'need_virtual_num', 'is_test','bgp_id',
     				'steam_end_time', 'steam_begin_time','pre_push_time','classify','valid_time_range','cover_vertical_img',
-                    'hide_sub_count','is_zero','zero_poster_show','app_project_type','details_img'
+                    'hide_sub_count','is_zero','zero_poster_show','app_project_type','details_img','qr_type'
     			)
     //            ->with(['livePoster'])
     			->where('id', $id)->first();

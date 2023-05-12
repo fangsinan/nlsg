@@ -313,21 +313,21 @@ class Lists extends Model
     {
         return $this->belongsToMany('App\Models\Works',
             'nlsg_lists_work', 'lists_id', 'works_id')->where('state',1)
-            ->where('app_project_type','=',APP_PROJECT_TYPE);
+            ->where('nlsg_lists_work.app_project_type','=',APP_PROJECT_TYPE);
     }
 
     public function wiki()
     {
         return $this->belongsTo('App\Models\Wiki',
             'nlsg_lists_work', 'lists_id', 'works_id')
-            ->where('app_project_type','=',APP_PROJECT_TYPE);
+            ->where('nlsg_lists_work.app_project_type','=',APP_PROJECT_TYPE);
     }
 
     public function listGoods()
     {
         return $this->belongsToMany('App\Models\MallGoods',
             'nlsg_lists_work', 'lists_id', 'works_id')
-            ->where('app_project_type','=',APP_PROJECT_TYPE);
+            ->where('nlsg_lists_work.app_project_type','=',APP_PROJECT_TYPE);
     }
 
 
