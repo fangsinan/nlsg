@@ -78,20 +78,18 @@ class Kernel extends ConsoleKernel
         $schedule->command('command:LiveOnline 6')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
 
         //抓取微信公众号关注用户
-//        $schedule->command('command:LiveOnline 11')->everyMinute()->between('08:40', '17:50')->withoutOverlapping(2)->runInBackground()->onOneServer();
-        ////识别手机号归属地
-        $schedule->command('command:LiveOnline 21')->everyFiveMinutes()->withoutOverlapping(6)->runInBackground()->onOneServer();
+       // $schedule->command('command:LiveOnline 11')->everyMinute()->between('13:22', '17:50')->withoutOverlapping(2)->runInBackground()->onOneServer();
+        ////识别手机号归属地 everyFiveMinutes
+        $schedule->command('command:LiveOnline 21')->everyMinute()->between('00:02', '06:10')->withoutOverlapping(6)->runInBackground()->onOneServer();
 
-        $schedule->call(function () {
-//             WechatServersNew::CeshiTemplate();//加入测试数据
-        })->dailyAt('09:19');
-        $schedule->call(function () {
-//             WechatServersNew::TemplateLive(1); //测试发送
-        })->dailyAt('09:25');
+        // $schedule->call(function () {
+        //     WechatServersNew::CeshiTemplate();//加入测试数据
+        // })->dailyAt('13:53');
+        // $schedule->call(function () {
+        //     WechatServersNew::TemplateLive(1); //测试发送
+        // })->dailyAt('13:54');
 
-        $schedule->call(function () {
-//            WechatServersNew::TemplateLive();
-        })->dailyAt('10:01');
+        // $schedule->call(function () {  WechatServersNew::TemplateLive();  })->dailyAt('17:01');
 
 		$schedule->call(function () {
 			JpushService::TimedPush();
