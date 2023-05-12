@@ -5,6 +5,7 @@ namespace App\Servers\V5;
 use App\Models\WechatOpenid;
 use App\Models\WorksInfo;
 use App\Servers\LiveConsoleServers;
+use Illuminate\Support\Facades\Redis;
 use Predis\Client;
 use EasyWeChat\Factory;
 
@@ -77,6 +78,8 @@ class WechatServersNew
             'cache' => "redis"
         ];
 
+        $cache_key_name='public_nlsg_wechat_access_token';
+
         $app = Factory::officialAccount($config);
 
         $accessToken = $app->access_token;
@@ -86,6 +89,7 @@ class WechatServersNew
             $tokenArr = $accessToken->getToken(true);
             if(isset($tokenArr['access_token']) && !empty($tokenArr['access_token'])){
                 $access_token=$tokenArr['access_token'];
+                Redis::setex($cache_key_name,7000,$access_token);//设置redis缓存
                 return $access_token;
             }
         }
