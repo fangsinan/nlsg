@@ -125,6 +125,8 @@ class OrderController extends Controller
         if(!empty($PayIncomeObj)){ //唐山客服  type=2&&$target_id=686
             if(!($type==2 && in_array($target_id,[686,699]))){
                 $tweeter_code=0;
+            }else if(!($type==6 && in_array($target_id,[780]))){
+                $tweeter_code=0;
             }
         }
 
