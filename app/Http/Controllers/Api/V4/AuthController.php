@@ -1190,8 +1190,11 @@ class AuthController extends Controller
      * api/v4/auth/refresh_wechat_token
      * 刷新公众号token
      */
-    public function refresh_wechat_token(){
-        $res=WechatServersNew::GetToken(1);
+    public function refresh_wechat_token(Request $request){
+
+        $flag=$request->input('flag',0);
+
+        $res=WechatServersNew::GetToken($flag);
         return success($res);
     }
 }
