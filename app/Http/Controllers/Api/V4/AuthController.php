@@ -1192,6 +1192,6 @@ class AuthController extends Controller
         WechatServersNew::checkGetToken(); //获取token
         return success();
     }
-    
+
 
 }
