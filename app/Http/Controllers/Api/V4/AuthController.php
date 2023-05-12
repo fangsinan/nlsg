@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\UserInvite;
 use App\Models\BackendUser;
 use App\Models\VipUser;
+use App\Servers\V5\WechatServersNew;
 use AppleSignIn\ASDecoder;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -1185,4 +1186,7 @@ class AuthController extends Controller
 
     }
 
+    public function refresh_wechat_token(){
+        WechatServersNew::GetToken(1);
+    }
 }
