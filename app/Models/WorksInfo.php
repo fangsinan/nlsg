@@ -964,7 +964,8 @@ class WorksInfo extends Base
     {
         // return $url;
         $ex_times = explode(":",$duration);
-        $time_v = $ex_times[0]*60 + $ex_times[1]+3600; //强制增加1小时观看失效，app老出现黑屏
+        // $time_v = $ex_times[0]*60 + $ex_times[1]+3600; //强制增加1小时观看失效，app老出现黑屏
+        $time_v = $ex_times[0]*60 + $ex_times[1];//+3600;
 
         $url = str_replace("http://1308168117.vod2.myqcloud.com/",
             "https://vod.cloud.nlsgapp.com/",$url);
