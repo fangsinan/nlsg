@@ -259,20 +259,31 @@ where sub.relation_id = $works_id and sub.type = 7 and sub.`status` = 1 and sub.
             $is_start=1;
         }
 
-        $StudyLogModel= new StudyLogModel();
+        $StudyLogModel=StudyLogModel::query()->where([
+            'user_id'=>$user_id,
+            'relation_id'=>$data['relation_id'],
+            'relation_type'=>$data['relation_type'],
+            'info_id'=>$data['works_info_id'],
+            'time_number'=>$data['time_number'],
+        ])->first();
+        if(!$StudyLogModel){
+            $StudyLogModel= new StudyLogModel();
+        }
+
         $StudyLogModel->relation_id=$data['relation_id'];
         $StudyLogModel->relation_type=$data['relation_type'];
         $StudyLogModel->info_id=$data['works_info_id']??0;
         $StudyLogModel->user_id=$user_id;
         $StudyLogModel->time_number=10;
         $StudyLogModel->is_start=$is_start;
+        $StudyLogModel->time_number=$data['time_number'];
         $StudyLogModel->continuity_days=$yesterday_continuity_days+1;
         $StudyLogModel->date=date('Y-m-d');
         $StudyLogModel->year=date('Y');
         $StudyLogModel->month=date('m');
         $StudyLogModel->day=date('d');
-
         $StudyLogModel->save();
+
         return true;
     }
 }

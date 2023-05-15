@@ -409,6 +409,7 @@ class WorksController extends Controller
             'relation_type'=>$relation_type,
             'relation_id'=>$relation_id,
             'works_info_id'=>$works_info_id,
+            'time_number'=>$time_number,
         ]);
 
         return $this->success();
