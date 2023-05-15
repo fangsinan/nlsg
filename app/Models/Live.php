@@ -268,14 +268,40 @@ class Live extends Base
 
 
     //父母日课单独返回训练营
-    public static function getWorksInfoLive($live_id)
+    public static function getWorksInfoLive($live_id,$user_id=0)
     {
-        return Live::select("id","title","cover_img","order_num","begin_at","end_at")->where([
+        $live = Live::select("id","title","cover_img","order_num","begin_at","end_at","price","is_free")->where([
             "id" => $live_id,
             "status" => 4,   // 状态为上线
             "is_finish" => 0,
             "app_project_type" => APP_PROJECT_TYPE,
-        ])->first() ?? (object)[];
+        ])->first();
+        if(empty($live)){
+            return (object)[];
+        }
+        $live = $live->toArray();
+        $live['is_sub'] = Subscribe::isSubscribe($user_id, $live_id, 3);
+
+        $live_info = LiveInfo::select("is_begin","is_finish")->where([
+            "id" => $live_id,])->first()->toArray();
+        $live['live_status'] = self::getLiveStatus($live_info['is_begin'],$live_info['is_finish']);
+        return $live;
+    }
+
+
+    /**
+     * getLiveStatus 根据返回直播状态
+     * return 1未开始  2已结束  3直播中
+     * */
+    public static function getLiveStatus($live_is_begin=0,$live_is_finish=0){
+
+        if ($live_is_begin == 0 && $live_is_finish== 0) {
+            return 1;
+        } elseif ($live_is_begin == 1 && $live_is_finish == 0) {
+            return 3;
+        } elseif ($live_is_begin == 0 && $live_is_finish == 1) {
+            return 2;
+        }
     }
 
 }

@@ -661,7 +661,7 @@ class ColumnController extends Controller
         }
 
         //查看是否配置直播id
-        $column['info_live'] = Live::getWorksInfoLive($column['info_live_id']);
+        $column['info_live'] = Live::getWorksInfoLive($column['info_live_id'],$user_id);
 
         return $this->success([
             'column_info' => $column,
