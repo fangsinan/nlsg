@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V5;
 
 use App\Http\Controllers\Controller;
+use App\Models\Column;
 use App\Models\ConfigModel;
 use App\Models\Live;
 use App\Models\LiveConsole;
@@ -17,6 +18,8 @@ use App\Models\Subscribe;
 use App\Models\User;
 use App\Models\LivePush;
 use App\Models\LivePushQrcode;
+use App\Models\Works;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
@@ -545,4 +548,24 @@ class LiveController extends Controller
             'is_sub' => $is_sub,
         ]);
     }
+
+
+    /**
+     * getWorksInfoLive 父母日课单独返回训练营
+     */
+    public function getWorksInfoLive(Request $request): JsonResponse
+    {
+        $works_id    = $request->input("id",0);
+        $live_id = Column::where('id',$works_id)->value("info_live_id");
+
+        $live = Live::select("id","title","cover_img","order_num","begin_at","end_at")->where([
+            "id" => $live_id,
+            "status" => 4,   // 状态为上线
+            "is_finish" => 0,
+            "app_project_type" => APP_PROJECT_TYPE,
+        ])->first();
+
+        return success($live??[]);
+    }
+
 }
