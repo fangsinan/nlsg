@@ -17,6 +17,7 @@ use App\Models\Works;
 use App\Models\WorksCategory;
 use App\Models\WorksCategoryRelation;
 use App\Models\WorksInfo;
+use App\Servers\V5\CampServers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -403,6 +404,13 @@ class WorksController extends Controller
 
         //更新学习进度
         History::where('id',$id)->update($edit_data);
+
+        CampServers::add_study_log($user_id,[
+            'relation_type'=>$relation_type,
+            'relation_id'=>$relation_id,
+            'works_info_id'=>$works_info_id,
+        ]);
+
         return $this->success();
     }
 

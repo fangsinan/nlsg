@@ -265,4 +265,17 @@ class Live extends Base
 		$query->update(['zero_poster_show'=>0]);
 		return true;
 	}
+
+
+    //父母日课单独返回训练营
+    public static function getWorksInfoLive($live_id)
+    {
+        return Live::select("id","title","cover_img","order_num","begin_at","end_at")->where([
+            "id" => $live_id,
+            "status" => 4,   // 状态为上线
+            "is_finish" => 0,
+            "app_project_type" => APP_PROJECT_TYPE,
+        ])->first() ?? (object)[];
+    }
+
 }

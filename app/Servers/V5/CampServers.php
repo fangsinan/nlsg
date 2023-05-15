@@ -2,10 +2,12 @@
 
 namespace App\Servers\V5;
 
+use App\Models\StudyLogModel;
 use App\Models\Column;
 use App\Models\Subscribe;
 use App\Models\WorksInfo;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class CampServers
 {
@@ -222,4 +224,55 @@ where sub.relation_id = $works_id and sub.type = 7 and sub.`status` = 1 and sub.
 
     }
 
+    /**
+     * 添加学习日志
+     */
+    public static function add_study_log($user_id,$data=[]){
+
+        $validator = Validator::make($data, [
+            'relation_id' => 'required|numeric',
+            'relation_type' => 'required|numeric',
+            'works_info_id' => 'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return $validator->messages()->first();
+        }
+
+        //获取昨天连续学习时长
+        $yesterday_continuity_days=StudyLogModel::query()->where('user_id',$user_id)->where('date',date("Y-m-d",strtotime("-1 day")))->orderBy('id','desc')->value('continuity_days')??0;
+
+
+        //判断是否为开始学习 学习记录间隔超过10秒 为开始学习
+        $is_start=0;
+        $LastStudyLogModel=StudyLogModel::query()->where([
+            'user_id'=>$user_id,
+            'relation_id'=>$data['relation_id'],
+            'relation_type'=>$data['relation_type'],
+            'info_id'=>$data['works_info_id']
+        ])->orderBy('id','desc')->first();
+        if($LastStudyLogModel){
+            $time=$LastStudyLogModel->created_at;
+            if((time()-strtotime($time))>15){
+                $is_start=1;
+            }
+        }else{
+            $is_start=1;
+        }
+
+        $StudyLogModel= new StudyLogModel();
+        $StudyLogModel->relation_id=$data['relation_id'];
+        $StudyLogModel->relation_type=$data['relation_type'];
+        $StudyLogModel->info_id=$data['works_info_id']??0;
+        $StudyLogModel->user_id=$user_id;
+        $StudyLogModel->time_number=10;
+        $StudyLogModel->is_start=$is_start;
+        $StudyLogModel->continuity_days=$yesterday_continuity_days+1;
+        $StudyLogModel->date=date('Y-m-d');
+        $StudyLogModel->year=date('Y');
+        $StudyLogModel->month=date('m');
+        $StudyLogModel->day=date('d');
+
+        $StudyLogModel->save();
+        return true;
+    }
 }
