@@ -9,6 +9,7 @@ use App\Models\Column;
 use App\Models\ColumnOutline;
 use App\Models\GetPriceTools;
 use App\Models\History;
+use App\Models\Live;
 use App\Models\OfflineProducts;
 use App\Models\Recommend;
 use App\Models\Subscribe;
@@ -615,7 +616,7 @@ class ColumnController extends Controller
         }
         $field = ['id', 'name', 'title', 'subtitle', 'type', 'column_type', 'user_id', 'message',
             'original_price', 'price', 'online_time', 'works_update_time', 'index_pic','cover_pic', 'details_pic',
-            'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start','show_info_num','can_h5'];
+            'is_end', 'subscribe_num', 'info_num', 'is_free', 'category_id', 'collection_num','is_start','show_info_num','can_h5','info_live_id'];
         $column = Column::getColumnInfo($column_id, $field, $user_id);
         if (empty($column)) {
             return $this->error(0, '专栏不存在不能为空');
@@ -658,6 +659,9 @@ class ColumnController extends Controller
         if(!empty($PosterArr)){
             $column['poster']=$PosterArr;
         }
+
+        //查看是否配置直播id
+        $column['info_live'] = Live::getWorksInfoLive($column['info_live_id']);
 
         return $this->success([
             'column_info' => $column,
