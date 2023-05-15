@@ -275,7 +275,7 @@ class Live extends Base
             "status" => 4,   // 状态为上线
             "is_finish" => 0,
             "app_project_type" => APP_PROJECT_TYPE,
-        ])->first() ?? [];
+        ])->first() ?? (object)[];
     }
 
 }
