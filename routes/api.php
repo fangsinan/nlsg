@@ -565,6 +565,7 @@ Route::group(['namespace' => 'Api\V4', 'prefix' => 'v4'], function () {
 
 Route::group(['namespace' => 'Api\V5', 'prefix' => 'v5'], function () {
 
+    Route::any('wecom/get_we_com', 'WeComController@GetWeCom'); //测试获取企业微信信息
     Route::any('es/index', 'EsController@index');
     Route::any('live/notlisten', 'LiveNotListeningController@LiveNot');
     Route::any('live/LiveOnlineAdd', 'LiveNotListeningController@LiveOnline');
