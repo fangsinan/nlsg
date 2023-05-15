@@ -445,7 +445,7 @@ class SearchController extends Controller
             //商品
             $res['goods'] = MallGoods::search($keywords);
             //线下门票
-            $res['products'] = OfflineProducts::search($keywords);
+            $res['products'] = OfflineProducts::search($keywords,$app_project_type);
             $res['vip']['res'][] = ['id'=>1,'type' => 6, 'text'=>'幸福360会员','img'=>'/nlsg/works/20210105102849884378.png','price'=>360.00];
             $res['live'] = Live::search($keywords,$user_id,$app_project_type);
             $res['live_urls'] = LiveUrl::search($keywords);

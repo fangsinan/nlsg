@@ -9,12 +9,12 @@ class OfflineProducts extends Base
     protected $table = 'nlsg_offline_products';
 
 
-    static function search($keywords)
+    static function search($keywords,$app_project_type=1)
     {
         $res = OfflineProducts::query()
                               ->select('id', 'title', 'subtitle', 'total_price', 'price', 'cover_img')
                               ->where('is_del', 0)
-                              ->where('app_project_type', '=', APP_PROJECT_TYPE)
+                              ->where('app_project_type', '=', $app_project_type)
                               ->where(function ($query) use ($keywords) {
                                   $query->orWhere('title', 'LIKE', "%$keywords%");
                                   $query->orWhere('subtitle', 'LIKE', "%$keywords%");
