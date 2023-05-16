@@ -42,6 +42,9 @@ class ReplyController extends Controller
     {
         $user_id  = $this->user['id'];
         $input    = $request->all();
+
+        $app_project_type=$input['app_project_type']??APP_PROJECT_TYPE;
+
         $input['comment_type'] = $input['comment_type']??1;
         if(!empty($input['comment_type']) && $input['comment_type'] == 1){
             $comment = Comment::where('id', $input['comment_id'])->first();
@@ -52,7 +55,9 @@ class ReplyController extends Controller
                 'comment_id'=> $input['comment_id'],
                 'from_uid'  => $user_id,
                 'to_uid'    => $comment->user_id,
-                'content'   => $input['content']
+                'content'   => $input['content'],
+                'app_project_type' => $app_project_type,
+
             ];
             $c_type = $comment['type'];
             $Video_id = $comment['relation_id'];
@@ -70,7 +75,8 @@ class ReplyController extends Controller
                 'reply_pid'     => $input['comment_id'],
                 'from_uid'      => $user_id,
                 'to_uid'        => $comment->from_uid,
-                'content'       => $input['content']
+                'content'       => $input['content'],
+                'app_project_type' => $app_project_type,
             ];
 
 
