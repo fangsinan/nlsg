@@ -1155,8 +1155,8 @@ GROUP BY
 
                 $temp_wechat_kf = $cloModel->getKeFuInfoByUidLid($v->user_id,$v->live_id);
 
-                $v->admin_qw_name = $temp_wechat_kf->qw_name ?? '';
-                $v->admin_qw_phone = $temp_wechat_kf->phone ?? '';
+                $v->admin_qw_name = $temp_wechat_kf->AdminWechatInfo->qw_name ?? '';
+                $v->admin_qw_phone = $temp_wechat_kf->AdminWechatInfo->phone ?? '';
             }
         }
         return $res;
