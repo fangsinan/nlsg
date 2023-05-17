@@ -6,12 +6,14 @@ namespace App\Servers;
 
 use App\Models\BackendLiveRole;
 use App\Models\CacheTools;
+use App\Models\Crm\CrmLiveOrder;
 use App\Models\Live;
 use App\Models\LiveDeal;
 use App\Models\LiveInfo;
 use App\Models\LiveLogin;
 use App\Models\LiveOnlineUser;
 use App\Models\LiveSonFlagPoster;
+use App\Models\MallAddress;
 use App\Models\Order;
 use App\Models\Subscribe;
 use App\Models\User;
@@ -1134,6 +1136,28 @@ GROUP BY
         if (empty($excel_flag)) {
             $custom = collect(['live_user_id' => $check_live_id->user_id]);
             return $custom->merge($res);
+        }else{
+            //如果是导出,需要查询收货地址和客服
+            $mallAddress = new MallAddress();
+            $cloModel = new CrmLiveOrder();
+            foreach ($res as &$v){
+                $temp_address_info = $mallAddress->getList($v->user_id,0,1);
+                $temp_address_info = $temp_address_info[0] ?? [];
+
+                $v->address_detail = trim(
+                    ($temp_address_info['province_name'] ?? '').' '.
+                    ($temp_address_info['city_name']?? '').' '.
+                    ($temp_address_info['area_name']?? '').' '.
+                                     ($temp_address_info['details']?? '')
+                );
+                $v->address_detail_phone = $temp_address_info['phone'] ?? '';
+                $v->address_detail_name = $temp_address_info['name'] ?? '';
+
+                $temp_wechat_kf = $cloModel->getKeFuInfoByUidLid($v->user_id,$v->live_id);
+
+                $v->admin_qw_name = $temp_wechat_kf->qw_name ?? '';
+                $v->admin_qw_phone = $temp_wechat_kf->phone ?? '';
+            }
         }
         return $res;
     }
