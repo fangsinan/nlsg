@@ -1757,6 +1757,7 @@ class XiaoeTechServers
 
                 if ($VipUserModel) {
 
+                    $VipUserModel->user_id=$User->id;
                     $VipUserModel->group_id=$group_id;
 
                     $VipUserModel->save();
