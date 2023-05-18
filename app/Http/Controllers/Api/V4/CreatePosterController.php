@@ -86,7 +86,7 @@ class CreatePosterController extends Controller
             $expire_num = 60;
         }
 
-        //海报二维码  [客户端生成]
+        //海报二维码  [客户端生成]  5 精品课 7 商品 8 专栏 讲座 训练营 10 直播 23 360分享海报  24 双十一360分享海报
         if ($is_qrcode === 1) {
 
             $cache_key_name = 'qr_' . $is_qrcode . '_' . $uid . '_' . $post_type . '_' . $live_id . '_' . $live_info_id . '_' . $gid . '_' . $flag. '_' . $info_id;
@@ -150,7 +150,7 @@ class CreatePosterController extends Controller
                 case 7://优品海报
                     $source_name = 'shangpin@2x.png';
                     break;
-                case 8://专栏
+                case 8://专栏  讲座  训练营
                     $temp_get_gid = Column::find($gid);
                     $gid = $temp_get_gid['id'];
                     $g_t_id = $temp_get_gid['id'];
