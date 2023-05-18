@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
 use Libraries\ImClient;
 use Predis\Client;
+use function Symfony\Component\String\b;
 
 class UserWechatServers
 {
@@ -40,6 +41,76 @@ class UserWechatServers
 //
 //        var_dump($detail_res);
 //    }
+
+    /**
+     * 企业标签
+     * https://developer.work.weixin.qq.com/document/path/92117
+     * http://127.0.0.1:8000/api/v5/wecom/get_we_com?WeComType=100010
+     */
+    public function getEnterpriseLabel($WeComType){
+        switch ($WeComType){
+            case 100010: //获取企业标签列表
+                $getTagList_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_corp_tag_list?access_token=" . $this->token;
+                $data=[
+                    "group_id"=>
+                    [
+                        "etk8dJEQAAJ42TXVJWSzvCy8oUzPG5BQ",
+                    ]
+                ];
+                $res = ImClient::curlPost($getTagList_url, json_encode($data));
+                break;
+            case 100020: //创建企业标签
+                $addTagList_url='https://qyapi.weixin.qq.com/cgi-bin/externalcontact/add_corp_tag?access_token='. $this->token;
+                $data=[
+//                    "group_id"=>"20230515",
+                    "group_name"=>"手机号归属",
+                    "order"=>100,
+                    "tag"=>[
+//                        [
+//                            "name"=>"北京市",
+//                            "order"=>1
+//                        ],
+//                        [
+//                            "name"=>"郑州",
+//                            "order"=> 2
+//                        ],
+                        [
+                            "name"=>"重庆0001",
+                            "order"=> 3
+                        ]
+                    ],
+//                     "agentid"=>1000014
+                ];
+                $res = ImClient::curlPost($addTagList_url, json_encode($data));
+                break;
+            case 100030://获取标签成员
+
+                break;
+            case 100031://增加标签成员
+
+                break;
+            default: //未识别返回空
+                return [];
+        }
+
+        $res = json_decode($res, true);
+        if ($res['errcode'] == 0) {
+            switch ($WeComType){
+                case 100010:
+                    $tagRst=$res['tag_group'];
+                    break;
+                case 100020:
+                    $tagRst=['tag_group'=>$res['tag_group']];
+                    break;
+
+            }
+            return $tagRst;
+        }else{
+            return ['errcode'=>$res['errcode'],'errmsg'=>$res['errmsg']];
+        }
+
+
+    }
 
     /**
      * @return mixed

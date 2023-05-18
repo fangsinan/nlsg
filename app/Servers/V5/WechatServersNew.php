@@ -263,11 +263,11 @@ class WechatServersNew
     public  static function sendBespeakClass($Url,$open_id){
 
 //        $hrefurl='https://wechat.nlsgapp.com/appv4/liveBroadcast?live_info_id=749&time=1669023081250&inviter=211370';
-        $hrefurl='https://xfsgxs.nlsgapp.net/appv4/liveBroadcast?live_info_id=873&inviter=158291&live_id=873&isNoLogin=1';
-		$hello='如何经营婚姻、教育孩子，学习成长自己？';
-		$title='《如何经营幸福的家庭》直播课';
-		$teacher='王琨老师';
-		$time='2023年5月6日 19:00';
+        $hrefurl='https://a.nlsgapp.net/a/2EP';
+		$hello='如何让孩子爱上学习，自动、自发、自主？';
+		$title='《4招激活孩子学习动力》直播课';
+		$teacher='汤蓓老师';
+		$time='2023年5月16日 19:30';
 		$remarks="点击下面详情按钮保存直播链接，以免错过课程~";
 
         $data=[

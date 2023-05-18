@@ -267,7 +267,7 @@ class Live extends Base
 	}
 
 
-    //父母日课单独返回训练营
+    //父母日课单独返回训练营  nlsg_column.info_live_id
     public static function getWorksInfoLive($live_id,$user_id=0)
     {
         $live = Live::select("id","title","cover_img","order_num","begin_at","end_at","price","is_free")->where([

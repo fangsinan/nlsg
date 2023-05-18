@@ -58,6 +58,12 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
+        //手机归属地信息查询部分
+//        $schedule->command('command:GetPhoneRegion 1')->everyMinute()->withoutOverlapping(2)->runInBackground()->onOneServer();
+//        $schedule->command('command:GetPhoneRegion 2')->everyFiveMinutes()->runInBackground()->onOneServer();
+//        $schedule->command('command:GetPhoneRegion 3')->everyFiveMinutes()->runInBackground()->onOneServer();
+//        $schedule->command('command:GetPhoneRegion 4')->everyFiveMinutes()->runInBackground()->onOneServer();
+
 //        $schedule->call(function () {
 //            LiveConsoleServers::CrontabOnlineUserRedis();//直播间在线人数存入redis
 //        })->everyMinute()->runInBackground();//每分
