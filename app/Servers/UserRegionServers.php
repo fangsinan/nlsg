@@ -48,7 +48,17 @@ class UserRegionServers
         }
 
         $temp_str = explode('@', $str);
+        $user_id  = $temp_str[0];
         $phone    = $temp_str[1];
+
+        $check_job = UserPhoneRegion::query()
+            ->where('user_id', '=', $user_id)
+            ->select(['id'])
+            ->first();
+        if ($check_job) {
+            echo '跑过了';
+            return;
+        }
 
         $res = $this->api($phone);
 
