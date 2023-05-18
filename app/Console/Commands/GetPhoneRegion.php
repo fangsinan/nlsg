@@ -19,12 +19,12 @@ class GetPhoneRegion extends Command
 
     public function handle()
     {
-        $type = $this->argument('type')??'';
+        $type = $this->argument('type') ?? '';
 
         $s = new UserRegionServers();
-        if ($type === '1'){
-            $s->toAddList();
-        }else{
+        if ($type === '1') {
+            $s->toAddListNew();
+        } else {
             $s->toRun();
         }
         return 0;

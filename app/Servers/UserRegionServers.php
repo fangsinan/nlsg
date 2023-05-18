@@ -2,6 +2,7 @@
 
 namespace App\Servers;
 
+use App\Models\User;
 use App\Models\UserPhoneRegion;
 use Illuminate\Support\Facades\DB;
 use Predis\Client;
@@ -23,7 +24,7 @@ class UserRegionServers
     {
         $redisConfig = config('database.redis.default');
         $Redis       = new Client($redisConfig);
-        $Redis->select(0);
+        $Redis->select(5);
         return $Redis;
     }
 
@@ -55,10 +56,18 @@ class UserRegionServers
             ->where('user_id', '=', $user_id)
             ->select(['id'])
             ->first();
+
         if ($check_job) {
-            echo '跑过了';
+            echo '跑过了:', $user_id, PHP_EOL;
+            User::query()
+                ->where('id', '=', $user_id)
+                ->update([
+                             'phone_region_job' => 1
+                         ]);
             return;
         }
+
+        echo $phone, PHP_EOL;
 
         $res = $this->api($phone);
 
@@ -68,7 +77,7 @@ class UserRegionServers
 
         UserPhoneRegion::query()
             ->insertOrIgnore([
-                                 'user_id'   => $temp_str[0],
+                                 'user_id'   => $user_id,
                                  'phone'     => $phone,
                                  'prov'      => $res['data']['prov'] ?? '',
                                  'city'      => $res['data']['city'] ?? '',
@@ -76,6 +85,12 @@ class UserRegionServers
                                  'post_code' => $res['data']['postCode'] ?? '',
                                  'type'      => $res['data']['type'] ?? 0
                              ]);
+
+        User::query()
+            ->where('id', '=', $user_id)
+            ->update([
+                         'phone_region_job' => 1
+                     ]);
     }
 
 
@@ -89,9 +104,46 @@ class UserRegionServers
         $this->rc->sadd(self::LIST_KEY, [$string]);
     }
 
+
+    public function toAddListNew()
+    {
+        $job_counts = $this->rc->scard(self::LIST_KEY);
+        echo '现在有', $job_counts, '条', PHP_EOL;
+
+        $sql = "SELECT
+	CONCAT( id, '@', phone ) AS str
+FROM
+	nlsg_user
+WHERE
+	phone LIKE '1%'
+	AND LENGTH( phone ) = 11
+	AND `status` = 1
+	AND ref = 0
+	AND is_robot = 0
+	AND updated_at > ? and phone_region_job = 0
+	LIMIT ?";
+
+        $list = DB::select(
+            $sql,
+            [
+                date('Y-m-d H:i:00', strtotime('-5 minutes')),
+                1000
+            ]
+        );
+        $list = array_column($list, 'str');
+
+        if (empty($list)) {
+            echo '没有数据了', PHP_EOL;
+            return;
+        }
+
+        $this->rc->sadd(self::LIST_KEY, $list);
+    }
+
     public function toAddList()
     {
         $job_counts = $this->rc->scard(self::LIST_KEY);
+        echo '现在又:', $job_counts, '条', PHP_EOL;
         if ($job_counts > 10000) {
             return;
         }
@@ -105,6 +157,7 @@ LIMIT 5000";
         $list = DB::select($sql);
 
         if ($list) {
+            echo '添加了任务', PHP_EOL;
             $this->rc->sadd(self::LIST_KEY, array_column($list, 'str'));
         }
     }
@@ -144,5 +197,33 @@ LIMIT 5000";
 
     }
 
+    public function changePhoneRegionJob()
+    {
+        return;
+//        $begin = 1;
+//        $size  = 1000;
+//        while (true) {
+//            $end = $begin + $size;
+//
+//            $id_list = UserPhoneRegion::query()
+//                ->whereBetween('id', [$begin, $end])
+//                ->pluck('user_id')
+//                ->toArray();
+//
+//            echo $begin, '->', $end, PHP_EOL;
+//
+//            if (empty($id_list)) {
+//                dd('完了');
+//            }
+//
+//            User::query()
+//                ->whereIn('id', $id_list)
+//                ->update([
+//                             'phone_region_job' => 1
+//                         ]);
+//
+//            $begin = $end;
+//        }
+    }
 
 }
