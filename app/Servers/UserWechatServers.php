@@ -7,6 +7,7 @@ namespace App\Servers;
 use App\Jobs\jobOfCytx;
 use App\Jobs\JobOfSocket;
 use App\Models\User;
+use App\Models\UserPhoneRegionTag;
 use App\Models\UserWechat;
 use App\Models\UserWechatFollow;
 use App\Models\UserWechatName;
@@ -47,47 +48,75 @@ class UserWechatServers
      * https://developer.work.weixin.qq.com/document/path/92117
      * http://127.0.0.1:8000/api/v5/wecom/get_we_com?WeComType=100010
      */
-    public function getEnterpriseLabel($WeComType){
-        switch ($WeComType){
+    public function getEnterpriseLabel($WeComType)
+    {
+        switch ($WeComType) {
             case 100010: //获取企业标签列表
                 $getTagList_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_corp_tag_list?access_token=" . $this->token;
-                $data=[
-                    "group_id"=>
-                    [
-                        "etk8dJEQAAJ42TXVJWSzvCy8oUzPG5BQ",
-                    ]
+                $data           = [
+                    "group_id" =>
+                        [
+                            "etk8dJEQAA09rgffPF8QB7GJcXcSB63A",
+                        ]
                 ];
-                $res = ImClient::curlPost($getTagList_url, json_encode($data));
+                $res            = ImClient::curlPost($getTagList_url, json_encode($data));
                 break;
             case 100020: //创建企业标签
-                $addTagList_url='https://qyapi.weixin.qq.com/cgi-bin/externalcontact/add_corp_tag?access_token='. $this->token;
-                $data=[
-//                    "group_id"=>"20230515",
-                    "group_name"=>"手机号归属",
-                    "order"=>100,
-                    "tag"=>[
-//                        [
-//                            "name"=>"北京市",
-//                            "order"=>1
-//                        ],
-//                        [
-//                            "name"=>"郑州",
-//                            "order"=> 2
-//                        ],
-                        [
-                            "name"=>"重庆0001",
-                            "order"=> 3
-                        ]
-                    ],
-//                     "agentid"=>1000014
+                dd('添加完毕,必要重复添加');
+                $addTagList_url = 'https://qyapi.weixin.qq.com/cgi-bin/externalcontact/add_corp_tag?access_token=' . $this->token;
+
+                $list = UserPhoneRegionTag::query()
+                    ->select([
+                                 DB::raw('concat(prov,"-",city) as name'),
+                                 'id as order'
+                             ])
+                    ->get()
+                    ->toArray();
+
+                $data = [
+                    //"group_id"   => "etk8dJEQAAhIDeLD3ceX89xeBg5kMr-w",
+                    "group_name" => "手机号归属",
+                    "tag"        => $list,
                 ];
+
                 $res = ImClient::curlPost($addTagList_url, json_encode($data));
+
+                $r      = json_decode($res, true);
+                $r_body = $r['tag_group'];
+                foreach ($r_body['tag'] as $v) {
+                    UserPhoneRegionTag::query()
+                        ->where('id', '=', $v['order'])
+                        ->update([
+                                     'tag_id' => $v['id']
+                                 ]);
+                }
                 break;
             case 100030://获取标签成员
 
                 break;
             case 100031://增加标签成员
-
+                $addTagList_url = 'https://qyapi.weixin.qq.com/cgi-bin/externalcontact/mark_tag?access_token=' . $this->token;
+                $data           = [
+                    'userid'          => 'WangXinHan',
+                    'external_userid' => 'wmk8dJEQAAmr4p_dNCimZ14pW60XcS2Q',
+                    'add_tag'         => ['etk8dJEQAASb8vkAIuVuY0l_LXlrZYVA'],
+                ];
+                $res            = ImClient::curlPost($addTagList_url, json_encode($data));
+                break;
+            case 100032://删除
+                $addTagList_url = 'https://qyapi.weixin.qq.com/cgi-bin/externalcontact/del_corp_tag?access_token=' . $this->token;
+                $data           = [
+//                    'tag_id' => [
+//                        'etk8dJEQAASb8vkAIuVuY0l_LXlrZYVA',
+//                        'etk8dJEQAAS_vPb7_ZGJZRifF0Bwsscg',
+//                        'etk8dJEQAAFTDCCcjEZys1aVOk4fhfKA',
+//                    ]
+'group_id' => [
+    'etk8dJEQAA09rgffPF8QB7GJcXcSB63A',
+]
+                ];
+                $res            = ImClient::curlPost($addTagList_url, json_encode($data));
+                dd($res);
                 break;
             default: //未识别返回空
                 return [];
@@ -95,18 +124,23 @@ class UserWechatServers
 
         $res = json_decode($res, true);
         if ($res['errcode'] == 0) {
-            switch ($WeComType){
+            $tagRst = [];
+            switch ($WeComType) {
                 case 100010:
-                    $tagRst=$res['tag_group'];
+                    $tagRst = $res['tag_group'];
                     break;
                 case 100020:
-                    $tagRst=['tag_group'=>$res['tag_group']];
+                    $tagRst = ['tag_group' => $res['tag_group']];
+                    break;
+                case 100031:
+                case 100032:
+                    $tagRst = ['msg' => 'ok'];
                     break;
 
             }
             return $tagRst;
-        }else{
-            return ['errcode'=>$res['errcode'],'errmsg'=>$res['errmsg']];
+        } else {
+            return ['errcode' => $res['errcode'], 'errmsg' => $res['errmsg']];
         }
 
 
@@ -119,15 +153,15 @@ class UserWechatServers
     public function getAccess_token()
     {
 
-        $key = 'redis_wechat_user_access_token';
+        $key   = 'redis_wechat_user_access_token';
         $token = Redis::get($key);
         if (empty($token)) {
             $corpid = "wwb4a68b6963803c46";
             $Secret = "RB7XUdI7hZy8Y7hDgJ0cw5BqeULPZK0FBgvljcrsY8Q";
-            $url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=$corpid&corpsecret=$Secret";
-            $res = ImClient::curlGet($url);
-            $res = json_decode($res, true);
-            $token = $res['access_token'];
+            $url    = "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=$corpid&corpsecret=$Secret";
+            $res    = ImClient::curlGet($url);
+            $res    = json_decode($res, true);
+            $token  = $res['access_token'];
             Redis::setex($key, 7200, $token);
         }
 
@@ -142,8 +176,8 @@ class UserWechatServers
     {
 
         $getDetail_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get_follow_user_list?access_token=" . $this->token;
-        $detail_res = ImClient::curlGet($getDetail_url);
-        $detail_res = json_decode($detail_res, true);
+        $detail_res    = ImClient::curlGet($getDetail_url);
+        $detail_res    = json_decode($detail_res, true);
         if ($detail_res['errcode'] == 0) {
             return $detail_res['follow_user'];
         }
@@ -158,8 +192,8 @@ class UserWechatServers
     {
 
         $getDetail_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/list?access_token=" . $this->token . '&userid=' . $userid;
-        $detail_res = ImClient::curlGet($getDetail_url);
-        $detail_res = json_decode($detail_res, true);
+        $detail_res    = ImClient::curlGet($getDetail_url);
+        $detail_res    = json_decode($detail_res, true);
 
         if ($detail_res['errcode'] == 0) {
             return $detail_res['external_userid'];
@@ -174,7 +208,7 @@ class UserWechatServers
      * @return bool|mixed
      * 获取客户详情
      */
-    public function get_user_info($external_userid,$follow_user_userid='')
+    public function get_user_info($external_userid, $follow_user_userid = '')
     {
 
         $getDetail_url = "https://qyapi.weixin.qq.com/cgi-bin/externalcontact/get?access_token=" . $this->token . '&external_userid=' . $external_userid;
@@ -188,84 +222,84 @@ class UserWechatServers
 
             $UserWechat = UserWechat::query()->where('external_userid', $external_userid)->first();
 
-            $follow_user_arr=$detail_res['follow_user'];
+            $follow_user_arr = $detail_res['follow_user'];
 
             if ($UserWechat) {
 
                 //获取销售列表
-                $saleArr=UserWechatName::query()->where('is_sale',2)->pluck('follow_user_userid')->toArray();
+                $saleArr = UserWechatName::query()->where('is_sale', 2)->pluck('follow_user_userid')->toArray();
 
-                $first_follow_user=[];
+                $first_follow_user = [];
 
-                $farmat_follow_user=[];
+                $farmat_follow_user = [];
 
-                foreach ($follow_user_arr as $val){
-                    $farmat_follow_user[$val['userid']]=$val;
-                    if(empty($first_follow_user) && in_array($val['userid'],$saleArr)){
-                        $first_follow_user=$val;
+                foreach ($follow_user_arr as $val) {
+                    $farmat_follow_user[$val['userid']] = $val;
+                    if (empty($first_follow_user) && in_array($val['userid'], $saleArr)) {
+                        $first_follow_user = $val;
                     }
                 }
 
 
-                if($follow_user_userid && isset($farmat_follow_user[$follow_user_userid])){
+                if ($follow_user_userid && isset($farmat_follow_user[$follow_user_userid])) {
 
                     //分配员工
-                    $follow_user=$farmat_follow_user[$follow_user_userid];
+                    $follow_user = $farmat_follow_user[$follow_user_userid];
 
-                }elseif (empty($follow_user) && $first_follow_user){
+                } elseif (empty($follow_user) && $first_follow_user) {
 
                     //最早添加的销售员工的企业微信
-                    $follow_user=$first_follow_user;
+                    $follow_user = $first_follow_user;
 
-                }elseif(empty($follow_user) && isset($farmat_follow_user[$UserWechat->source_follow_user_userid])){
+                } elseif (empty($follow_user) && isset($farmat_follow_user[$UserWechat->source_follow_user_userid])) {
 
                     //来源员工
-                    $follow_user=$farmat_follow_user[$UserWechat->source_follow_user_userid];
+                    $follow_user = $farmat_follow_user[$UserWechat->source_follow_user_userid];
 
-                } elseif(empty($follow_user) && isset($farmat_follow_user[$UserWechat->follow_user_userid])){
+                } elseif (empty($follow_user) && isset($farmat_follow_user[$UserWechat->follow_user_userid])) {
 
                     //当前用户所属员工
-                    $follow_user=$farmat_follow_user[$UserWechat->follow_user_userid];
+                    $follow_user = $farmat_follow_user[$UserWechat->follow_user_userid];
 
                 }
 
-                if(empty($follow_user)){
+                if (empty($follow_user)) {
 
                     //第一个员工
-                    $follow_user=$follow_user_arr[0];
+                    $follow_user = $follow_user_arr[0];
 
                 }
 
-            }else{
+            } else {
 
-                $follow_user=$follow_user_arr[0];
+                $follow_user = $follow_user_arr[0];
 
-                $UserWechat = new UserWechat();
-                $created_at = date('Y-m-d H:i:s', $follow_user['createtime']);
-                $UserWechat->created_at = $created_at;
+                $UserWechat                                  = new UserWechat();
+                $created_at                                  = date('Y-m-d H:i:s', $follow_user['createtime']);
+                $UserWechat->created_at                      = $created_at;
                 $UserWechat->source_follow_user_tags_add_way = $follow_user['add_way'] ?? '';
-                $UserWechat->source_follow_user_userid = $follow_user['userid'] ?? '';
+                $UserWechat->source_follow_user_userid       = $follow_user['userid'] ?? '';
             }
 
-            $UserWechat->follow_user_userid = $follow_user['userid'] ?? '';
-            $UserWechat->follow_user_remark = $follow_user['remark'] ?? '';
-            $UserWechat->follow_user_description = $follow_user['description'] ?? '';
-            $UserWechat->follow_user_createtime = $follow_user['createtime'] ?? '';
+            $UserWechat->follow_user_userid           = $follow_user['userid'] ?? '';
+            $UserWechat->follow_user_remark           = $follow_user['remark'] ?? '';
+            $UserWechat->follow_user_description      = $follow_user['description'] ?? '';
+            $UserWechat->follow_user_createtime       = $follow_user['createtime'] ?? '';
             $UserWechat->follow_user_tags_oper_userid = $follow_user['oper_userid'] ?? '';
-            $UserWechat->follow_user_tags_add_way = $follow_user['add_way'] ?? '';
+            $UserWechat->follow_user_tags_add_way     = $follow_user['add_way'] ?? '';
 
-            $UserWechat->external_userid = $detail_res['external_contact']['external_userid'] ?? "";
-            $UserWechat->name = $detail_res['external_contact']['name'] ?? "";
-            $UserWechat->type = $detail_res['external_contact']['type'] ?? "";
-            $UserWechat->avatar = $detail_res['external_contact']['avatar'] ?? "";
-            $UserWechat->gender = $detail_res['external_contact']['gender'] ?? "";
-            $UserWechat->unionid = $detail_res['external_contact']['unionid'] ?? "";
-            $UserWechat->follow_user_userid_list = implode(',',array_column($follow_user_arr,'userid'));
-            if(count($follow_user_arr)==1){
-                $UserWechat->is_multiple_staff=1;
+            $UserWechat->external_userid         = $detail_res['external_contact']['external_userid'] ?? "";
+            $UserWechat->name                    = $detail_res['external_contact']['name'] ?? "";
+            $UserWechat->type                    = $detail_res['external_contact']['type'] ?? "";
+            $UserWechat->avatar                  = $detail_res['external_contact']['avatar'] ?? "";
+            $UserWechat->gender                  = $detail_res['external_contact']['gender'] ?? "";
+            $UserWechat->unionid                 = $detail_res['external_contact']['unionid'] ?? "";
+            $UserWechat->follow_user_userid_list = implode(',', array_column($follow_user_arr, 'userid'));
+            if (count($follow_user_arr) == 1) {
+                $UserWechat->is_multiple_staff = 1;
 
-            }else{
-                $UserWechat->is_multiple_staff=2;
+            } else {
+                $UserWechat->is_multiple_staff = 2;
             }
             $UserWechat->save();
 
@@ -279,7 +313,7 @@ class UserWechatServers
 
     /**
      * @param $userid_list 员工userid 数组
-     * 批量获取客户详情
+     *                     批量获取客户详情
      */
     public function batch_get_by_user($userid_list, $cursor = "")
     {
@@ -290,8 +324,8 @@ class UserWechatServers
 
         $data = [
             "userid_list" => $userid_list,
-            "limit" => 100,
-            "cursor" => $cursor,
+            "limit"       => 100,
+            "cursor"      => $cursor,
         ];
 
         $detail_res = ImClient::curlPost('https://qyapi.weixin.qq.com/cgi-bin/externalcontact/batch/get_by_user?access_token=' . $this->token, json_encode($data));
@@ -331,9 +365,9 @@ class UserWechatServers
         }
 
         $user_list = UserWechat::query()->whereIn('id', $userids_arr)
-            ->where('follow_user_userid','<>',$data['takeover_userid'])
+            ->where('follow_user_userid', '<>', $data['takeover_userid'])
             ->where('transfer_status', '<>', UserWechat::TRANSFER_STATUS_WAIT)
-            ->get(['id', 'external_userid','follow_user_userid'])->toArray();
+            ->get(['id', 'external_userid', 'follow_user_userid'])->toArray();
 
         $user_list_count = count($user_list);
 
@@ -348,36 +382,36 @@ class UserWechatServers
         DB::beginTransaction();
 
         //添加转移记录
-        $UserWechatTransferRecord = new UserWechatTransferRecord();
+        $UserWechatTransferRecord                  = new UserWechatTransferRecord();
         $UserWechatTransferRecord->takeover_userid = $staff_user->follow_user_userid;
-        $UserWechatTransferRecord->total = $user_list_count;
-        $res = $UserWechatTransferRecord->save();
+        $UserWechatTransferRecord->total           = $user_list_count;
+        $res                                       = $UserWechatTransferRecord->save();
         if (!$res) {
             DB::rollBack();
             return '操作失败';
         }
 
-        $format_user_list=[];
-        foreach ($user_list as $user){
-            $format_user_list[$user['follow_user_userid']][$user['external_userid']]=$user;
+        $format_user_list = [];
+        foreach ($user_list as $user) {
+            $format_user_list[$user['follow_user_userid']][$user['external_userid']] = $user;
         }
 
-        $res=UserWechat::query()->whereIn('external_userid', array_column($user_list,'external_userid'))
-            ->update(['transfer_record_id'=>$UserWechatTransferRecord->id,'transfer_start_time'=>date('Y-m-d H:i:s'),'transfer_status' => UserWechat::TRANSFER_STATUS_WAIT, 'updated_at' => date('Y-m-d H:i:s')]);
+        $res = UserWechat::query()->whereIn('external_userid', array_column($user_list, 'external_userid'))
+            ->update(['transfer_record_id' => $UserWechatTransferRecord->id, 'transfer_start_time' => date('Y-m-d H:i:s'), 'transfer_status' => UserWechat::TRANSFER_STATUS_WAIT, 'updated_at' => date('Y-m-d H:i:s')]);
 
-        if(!$res){
+        if (!$res) {
             DB::rollBack();
             return '操作失败';
         }
 
         $redisConfig = config('database.redis.default');
-        $Redis = new Client($redisConfig);
+        $Redis       = new Client($redisConfig);
 
-        $Redis->rpush('user_wechat_transfer_customer',json_encode([
-            'transfer_record_id'=>$UserWechatTransferRecord->id,
-            'format_user_list'=>$format_user_list,
-            'takeover_userid'=>$data['takeover_userid']
-        ]));
+        $Redis->rpush('user_wechat_transfer_customer', json_encode([
+                                                                       'transfer_record_id' => $UserWechatTransferRecord->id,
+                                                                       'format_user_list'   => $format_user_list,
+                                                                       'takeover_userid'    => $data['takeover_userid']
+                                                                   ]));
 
         DB::commit();
 
@@ -387,33 +421,34 @@ class UserWechatServers
     /**
      * 消费redis转移客户队列
      */
-    public function consume_redis_transfer_customer(){
+    public function consume_redis_transfer_customer()
+    {
 
-        add_log('consume_redis_transfer_customer-1','开始请求客户转移');
+        add_log('consume_redis_transfer_customer-1', '开始请求客户转移');
 
         $redisConfig = config('database.redis.default');
-        $Redis = new Client($redisConfig);
+        $Redis       = new Client($redisConfig);
         while ($msg = $Redis->rPop('user_wechat_transfer_customer')) {
 
-            add_log('consume_redis_transfer_customer-2',$msg);
+            add_log('consume_redis_transfer_customer-2', $msg);
 
-            $data=json_decode($msg,true);
+            $data = json_decode($msg, true);
 
-            $transfer_record_id=$data['transfer_record_id'];
-            $takeover_userid=$data['takeover_userid'];
-            $format_user_list=$data['format_user_list'];
+            $transfer_record_id = $data['transfer_record_id'];
+            $takeover_userid    = $data['takeover_userid'];
+            $format_user_list   = $data['format_user_list'];
 
-            foreach ($format_user_list as $handover_userid=>$user_list){
-                $this->transfer_customer_api($transfer_record_id,$handover_userid,$takeover_userid,$user_list);
+            foreach ($format_user_list as $handover_userid => $user_list) {
+                $this->transfer_customer_api($transfer_record_id, $handover_userid, $takeover_userid, $user_list);
             }
         }
-        add_log('consume_redis_transfer_customer-3','执行完成');
+        add_log('consume_redis_transfer_customer-3', '执行完成');
 
     }
 
 
-
-    public function transfer_customer_api($transfer_record_id,$handover_userid,$takeover_userid,$user_list){
+    public function transfer_customer_api($transfer_record_id, $handover_userid, $takeover_userid, $user_list)
+    {
 
         $staff_user = UserWechatName::query()->where('follow_user_userid', $takeover_userid)->first();
 
@@ -425,26 +460,26 @@ class UserWechatServers
         }
         $UserWechatTransfer->handover_userid = $handover_userid;
         $UserWechatTransfer->takeover_userid = $takeover_userid;
-        $UserWechatTransfer->status = UserWechatTransfer::STATUS_WAIT;//等待接替
-        $res = $UserWechatTransfer->save();
+        $UserWechatTransfer->status          = UserWechatTransfer::STATUS_WAIT;//等待接替
+        $res                                 = $UserWechatTransfer->save();
 
         if (!$res) {
             DB::rollBack();
             return '操作失败';
         }
 
-        $external_userid_arr=array_column($user_list, 'external_userid');
+        $external_userid_arr = array_column($user_list, 'external_userid');
 
-        $external_userid_chunk=array_chunk($external_userid_arr,100);
+        $external_userid_chunk = array_chunk($external_userid_arr, 100);
 
 
-        foreach ($external_userid_chunk as $external_userid){
+        foreach ($external_userid_chunk as $external_userid) {
 
             //调用企业微信接口
             $data = [
-                'handover_userid' => $handover_userid,
-                'takeover_userid' => $takeover_userid,
-                'external_userid' => $external_userid,
+                'handover_userid'      => $handover_userid,
+                'takeover_userid'      => $takeover_userid,
+                'external_userid'      => $external_userid,
                 "transfer_success_msg" => "您好，您的服务已升级，后续将由我的同事" . $staff_user->qw_name . "接替我的工作，继续为您服务。"
             ];
 
@@ -452,7 +487,7 @@ class UserWechatServers
 
 //            var_dump($detail_res);
 
-            add_log('transfer_customer_api','迁移微信客户', $detail_res);
+            add_log('transfer_customer_api', '迁移微信客户', $detail_res);
 
             $detail_res = json_decode($detail_res, true);
 
@@ -465,17 +500,17 @@ class UserWechatServers
 
                 $save_data = [
 
-                    'transfer_id' => $UserWechatTransfer->id,
+                    'transfer_id'        => $UserWechatTransfer->id,
                     'transfer_record_id' => $transfer_record_id,
 
-                    'user_wechat_id' => $user_list[$customer['external_userid']]['id'],
+                    'user_wechat_id'  => $user_list[$customer['external_userid']]['id'],
                     'external_userid' => $customer['external_userid'],
 
 
                     'handover_userid' => $handover_userid,
 
                     'takeover_userid' => $takeover_userid,
-                    'takeover_time' => time(),
+                    'takeover_time'   => time(),
 
                     'created_at' => date('Y-m-d H:i:s'),
 
@@ -484,17 +519,17 @@ class UserWechatServers
                 ];
 
 
-                if (!in_array($customer['errcode'],[0,40129])) {
+                if (!in_array($customer['errcode'], [0, 40129])) {
 
                     //转移失败
                     $save_data['status'] = -1;
 
                     //修改客户的接替状态为 等待接替
                     UserWechat::query()->where('external_userid', $customer['external_userid'])->update([
-                        'transfer_status' => UserWechat::TRANSFER_STATUS_FAIL,//分配失败
-                        'updated_at' => date('Y-m-d H:i:s'),
-                        'errcode'=>$customer['errcode']
-                    ]);
+                                                                                                            'transfer_status' => UserWechat::TRANSFER_STATUS_FAIL,//分配失败
+                                                                                                            'updated_at'      => date('Y-m-d H:i:s'),
+                                                                                                            'errcode'         => $customer['errcode']
+                                                                                                        ]);
 
                 }
 
@@ -520,12 +555,12 @@ class UserWechatServers
     public function transfer_result()
     {
 
-       add_log('transfer_result',  'start',date('Y-m-d H:i:s') );
+        add_log('transfer_result', 'start', date('Y-m-d H:i:s'));
 
         //查询需要监测的转移客户任务
         $list = UserWechatTransfer::query()->where('status', UserWechatTransfer::STATUS_WAIT)->get();
 
-        add_log('transfer_result',  '查询需要监测的转移客户任务',json_encode($list) );
+        add_log('transfer_result', '查询需要监测的转移客户任务', json_encode($list));
 
         DB::beginTransaction();
 
@@ -543,28 +578,28 @@ class UserWechatServers
 
         DB::commit();
 
-        add_log('transfer_result',  'end',date('Y-m-d H:i:s'));
+        add_log('transfer_result', 'end', date('Y-m-d H:i:s'));
 
         return true;
     }
 
     /**
      * @param UserWechatTransfer $transfer
-     * @param $cursor
+     * @param                    $cursor
      * @return bool
      * 查询客户转移结果
      */
     public function transfer_result_api(UserWechatTransfer $transfer, $cursor)
     {
 
-        $transfer_id = $transfer->id;
+        $transfer_id     = $transfer->id;
         $handover_userid = $transfer->handover_userid;
         $takeover_userid = $transfer->takeover_userid;
 
         $data = [
             'handover_userid' => $handover_userid,
             'takeover_userid' => $takeover_userid,
-            'cursor' => $cursor,
+            'cursor'          => $cursor,
         ];
 
         $detail_res = ImClient::curlPost('https://qyapi.weixin.qq.com/cgi-bin/externalcontact/transfer_result?access_token=' . $this->token, json_encode($data));
@@ -592,7 +627,7 @@ class UserWechatServers
                 $UserWechat = UserWechat::query()->where('transfer_status', UserWechat::TRANSFER_STATUS_WAIT)->where('external_userid', $customer['external_userid'])->first();
                 if ($UserWechat) {
                     $UserWechat->transfer_status = $customer['status'];
-                    $res = $UserWechat->save();
+                    $res                         = $UserWechat->save();
                     if (!$res) {
                         return false;
                     }
@@ -602,22 +637,22 @@ class UserWechatServers
                 if ($customer['status'] == UserWechat::TRANSFER_STATUS_FINISH && $UserWechat) {
 
                     //更新微信客户信息
-                    $this->get_user_info($customer['external_userid'],$takeover_userid);
+                    $this->get_user_info($customer['external_userid'], $takeover_userid);
 
                     //修改之前的跟进记录
                     UserWechatFollow::query()->where('external_userid', $customer['external_userid'])->where('status', UserWechatFollow::STATUS_ING)->update([
-                        'status' => UserWechatFollow::STATUS_END,
-                        'updated_at' => date('Y-m-d H:i:s')
-                    ]);
+                                                                                                                                                                 'status'     => UserWechatFollow::STATUS_END,
+                                                                                                                                                                 'updated_at' => date('Y-m-d H:i:s')
+                                                                                                                                                             ]);
 
                     //添加新的跟进记录
-                    $UserWechatFollow = new UserWechatFollow();
+                    $UserWechatFollow                 = new UserWechatFollow();
                     $UserWechatFollow->user_wechat_id = $UserWechat->id;
 
 
-                    $UserWechatFollow->external_userid = $customer['external_userid'];
+                    $UserWechatFollow->external_userid    = $customer['external_userid'];
                     $UserWechatFollow->follow_user_userid = $transfer->takeover_userid;
-                    $res = $UserWechatFollow->save();
+                    $res                                  = $UserWechatFollow->save();
                     if (!$res) {
                         return false;
                     }
@@ -703,21 +738,22 @@ class UserWechatServers
      * 1、清楚长时间等待转移的客户
      * 2、清理转移失败的客户
      */
-    public function clear_user_wechat_data(){
+    public function clear_user_wechat_data()
+    {
 
         add_log('clear_user_wechat_data', '清理微信客户数据');
 
-        $time=date('Y-m-d H:i:s',time()-3*24*60*60);
+        $time = date('Y-m-d H:i:s', time() - 3 * 24 * 60 * 60);
 
-        $user_list=UserWechat::query()
-            ->whereIn('transfer_status',[-1,2])
-            ->where('transfer_record_id','>',0)
-            ->where('transfer_start_time','<=',$time)->get();
+        $user_list = UserWechat::query()
+            ->whereIn('transfer_status', [-1, 2])
+            ->where('transfer_record_id', '>', 0)
+            ->where('transfer_start_time', '<=', $time)->get();
 
-        foreach ($user_list as $user){
+        foreach ($user_list as $user) {
 
             $this->get_user_info($user->external_userid);
-            $user->transfer_status=0;
+            $user->transfer_status = 0;
             $user->save();
         }
     }
@@ -726,24 +762,94 @@ class UserWechatServers
     /**
      * 批量查询企业微信客户的用户id
      */
-    public function set_wechat_user_id(){
+    public function set_wechat_user_id()
+    {
 
-        $userModel=new User();
+        $userModel = new User();
 
-        $list=UserWechat::query()
-            ->from(UserWechat::DB_TABLE.' as UserWechat')
-            ->leftJoin($userModel->getTable().' as User','User.unionid','=','UserWechat.unionid')
-            ->select(['UserWechat.id','User.id as u_id'])
+        $list = UserWechat::query()
+            ->from(UserWechat::DB_TABLE . ' as UserWechat')
+            ->leftJoin($userModel->getTable() . ' as User', 'User.unionid', '=', 'UserWechat.unionid')
+            ->select(['UserWechat.id', 'User.id as u_id'])
             ->whereNotNull('User.id')
-            ->where('UserWechat.user_id',0)
-            ->where('UserWechat.unionid','<>','')->limit(50000)->get();
+            ->where('UserWechat.user_id', 0)
+            ->where('UserWechat.unionid', '<>', '')->limit(50000)->get();
 
-        foreach ($list as $UserWechat){
-            $UserWechat->user_id=$UserWechat->u_id;
+        foreach ($list as $UserWechat) {
+            $UserWechat->user_id = $UserWechat->u_id;
             $UserWechat->save();
         }
 
-        add_log('set_wechat_user_id', '批量查询企业微信客户的用户id-'.count($list));
+        add_log('set_wechat_user_id', '批量查询企业微信客户的用户id-' . count($list));
 
     }
+
+
+    //同步user_wechat表的用户标签
+    public function runAddUserPhoneRegionTag()
+    {
+        //23-05-18 19:20  最大id 708851
+        $addTagList_url = 'https://qyapi.weixin.qq.com/cgi-bin/externalcontact/mark_tag?access_token=' .
+                          $this->token;
+
+
+        $urs = new UserRegionServers();
+        $rc  = $urs->getRedis();
+        $key = 'UserWechatIdList202305';
+
+        $id = $rc->spop($key);
+        if (empty($id)) {
+            echo $key,'跑完了',PHP_EOL;
+            return;
+        }
+
+        $data = UserWechat::query()
+            ->where('id', '=', $id)
+            ->select([
+                         'user_id', 'external_userid', 'follow_user_userid', 'wx_tag_job'
+                     ])
+            ->first();
+
+        if (!$data) {
+            return;
+        }
+
+        if ($data->wx_tag_job == 1) {
+            //echo $id, '跳过', PHP_EOL;
+            return;
+        }
+
+        $tag_info = DB::table('nlsg_user_phone_region as upr')
+            ->join('nlsg_user_phone_region_tag as uprt',
+                   'upr.area_code', '=', 'uprt.area_code'
+            )
+            ->where('upr.user_id', '=', $data->user_id)
+            ->value('tag_id');
+
+        if (!$tag_info) {
+            return;
+        }
+
+        $arr = [
+            'userid'          => $data->follow_user_userid,
+            'external_userid' => $data->external_userid,
+            'add_tag'         => [
+                $tag_info
+            ]
+        ];
+
+        $res = ImClient::curlPost($addTagList_url, json_encode($arr));
+        $res = json_decode($res, true);
+        if (($res['errcode'] ?? 1) == 0) {
+            //echo $id, '成功', PHP_EOL,
+            UserWechat::query()
+                ->where('id', '=', $id)
+                ->update([
+                             'wx_tag_job' => 1
+                         ]);
+        }
+
+
+    }
+
 }

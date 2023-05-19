@@ -8,7 +8,7 @@ use Illuminate\Console\Command;
 class GetPhoneRegion extends Command
 {
 
-    protected $signature = 'command:GetPhoneRegion  {type}';
+    protected $signature = 'command:GetPhoneRegion {type}';
 
     protected $description = 'Command description';
 

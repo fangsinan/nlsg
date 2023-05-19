@@ -4,6 +4,8 @@ namespace App\Servers;
 
 use App\Models\User;
 use App\Models\UserPhoneRegion;
+use App\Models\UserPhoneRegionTag;
+use App\Models\UserWechat;
 use Illuminate\Support\Facades\DB;
 use Predis\Client;
 use Illuminate\Support\Facades\Http;
@@ -91,6 +93,8 @@ class UserRegionServers
             ->update([
                          'phone_region_job' => 1
                      ]);
+
+        $this->addTag($res['data']['areaCode'], $res['data']['city'], $res['data']['prov']);
     }
 
 
@@ -192,7 +196,6 @@ LIMIT 5000";
         if ($ret_code === 0) {
             return ['code' => true, 'msg' => '', 'data' => $res['showapi_res_body']];
         }
-
         return ['code' => false, 'msg' => '错误', 'data' => []];
 
     }
@@ -224,6 +227,82 @@ LIMIT 5000";
 //
 //            $begin = $end;
 //        }
+    }
+
+    public function addTag($area_code, $city = '', $prov = '')
+    {
+        if (!$area_code) {
+            return;
+        }
+
+        $old_city = UserPhoneRegionTag::query()
+            ->where('area_code', '=', $area_code)
+            ->value('city');
+        if ($old_city) {
+            //比现在短就替换
+            if (mb_strlen($city) < mb_strlen($old_city)) {
+                UserPhoneRegionTag::query()
+                    ->where('area_code', '=', $area_code)
+                    ->update([
+                                 'city' => $city
+                             ]);
+
+            }
+        } else {
+            //没有旧记录
+            $city_data = UserPhoneRegion::query()
+                ->where('area_code', '=', $area_code)
+                ->where('city', '<>', '')
+                ->orderByRaw('CHAR_LENGTH(city)')
+                ->select(['id', 'city', 'prov'])
+                ->first();
+
+            $city = $city_data->city;
+            $prov = $city_data->prov;
+
+            UserPhoneRegionTag::query()
+                ->insert([
+                             'area_code' => $area_code,
+                             'prov'      => $prov,
+                             'city'      => $city
+                         ]);
+        }
+
+    }
+
+    public function addTagOldJob()
+    {
+        $list = UserPhoneRegion::query()
+            ->where('area_code', '<>', '')
+            ->groupBy('area_code')
+            ->pluck('area_code')
+            ->toArray();
+
+        foreach ($list as $v) {
+            echo $v, PHP_EOL;
+            $this->addTag($v);
+        }
+
+        dd($list);
+    }
+
+
+    //临时,创建user_wechat的队列
+    public function addUserWechatIdList()
+    {
+        $key = 'UserWechatIdList202305';
+
+        $line = date('Y-m-d H:i:00', strtotime('-5 minutes'));
+
+        $id_list = UserWechat::query()
+            ->where('updated_at', '>', $line)
+            ->pluck('id')
+            ->toArray();
+
+        if ($id_list) {
+            $this->rc->sadd($key, $id_list);
+        }
+
     }
 
 }
