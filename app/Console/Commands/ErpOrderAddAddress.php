@@ -20,7 +20,7 @@ class ErpOrderAddAddress extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = '用户完善地址后同步推送任务';
 
     /**
      * Create a new command instance.

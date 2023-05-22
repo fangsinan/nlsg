@@ -20,7 +20,7 @@ class ErpOrderPush extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = '训练营教材订单推送';
 
     /**
      * Create a new command instance.

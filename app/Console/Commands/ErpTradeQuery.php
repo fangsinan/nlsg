@@ -21,7 +21,7 @@ class ErpTradeQuery extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = '主动查询ERP订单详情同步物流信息';
 
     /**
      * Create a new command instance.

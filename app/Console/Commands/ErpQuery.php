@@ -20,7 +20,7 @@ class ErpQuery extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'ERP物流回调回写';
 
     /**
      * Create a new command instance.

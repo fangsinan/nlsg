@@ -12,6 +12,7 @@ use App\Models\MallOrder;
 use App\Models\MallOrderDetails;
 use App\Models\Order;
 use App\Models\OrderErpList;
+use App\Models\Xfxs\XfxsOrder;
 use App\Servers\V5\erpOrderServers;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +28,35 @@ class ErpServers
     public $logistics_sync_query;//物流同步查询
     public $logistics_sync_ack;//物流同步回写
 
-    //推送触发时机:支付,取消订单,确认收货
+
+    //⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇商城订单部分⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇
+    //商城订单推送
+    public function pushRun()
+    {
+        $while_flag = true;
+
+        while ($while_flag) {
+            $list = MallErpList::where('flag', '=', 1)->limit(30)->select(['id', 'order_id'])->get();
+            if ($list->isEmpty()) {
+                $while_flag = false;
+            } else {
+                $list          = $list->toArray();
+                $id_list       = array_column($list, 'id');
+                $order_id_list = array_column($list, 'order_id');
+                $res           = $this->startPush($order_id_list);//订单推送
+//                if ($res['code']) {
+                MallErpList::whereIn('id', $id_list)
+                    ->update([
+                                 'flag' => 2
+                             ]);
+//                }
+            }
+        }
+
+        return true;
+    }
+
+    //商城订单推送动作 推送触发时机:支付,取消订单,确认收货
     public function startPush($id)
     {
         if (!is_array($id)) {
@@ -161,256 +190,43 @@ class ErpServers
 
     }
 
-    //订单推送动作
-    private function pushOrderJob($trade_list)
-    {
-        if (empty($trade_list) || !is_array($trade_list)) {
-            return ['code' => false, 'msg' => '数据不正确'];
-        }
+    //⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆商城订单部分⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆
 
-        $c = new WdtClient();
 
-        $c->sid        = $this->sid;
-        $c->appkey     = $this->appkey;
-        $c->appsecret  = $this->appsecret;
-        $c->gatewayUrl = $this->trade_push;
-
-        $c->putApiParam('shop_no', $this->shop_no);
-        $c->putApiParam('switch', 1);
-        $c->putApiParam('trade_list', json_encode($trade_list, JSON_UNESCAPED_UNICODE));
-        $json = $c->wdtOpenApi();
-
-        $error_data             = [];
-        $error_data['ordernum'] = '';
-        $error_data['error']    = $json;
-        $error_data['type']     = 4;
-        DB::table('nlsg_mall_order_erp_error')->insert($error_data);
-
-        $json = json_decode($json, true);
-
-        if ($json['code'] == 0) {
-            return ['code' => true, 'msg' => '成功:' . $json['new_count'] . ':' . $json['chg_count']];
-        } else {
-            return ['code' => false, 'msg' => $json['message']];
-        }
-    }
-
-    //物流同步
-    public function logisticsSync()
+    //⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇用户完善地址后同步任务⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇
+    public function orderUpdateAddressId()
     {
 
-        $list = $this->logisticsSyncQuery();
+        $list = DB::table('nlsg_order_erp_list as oel')
+            ->join('nlsg_order as o', 'oel.order_id', '=', 'o.id')
+            ->where('oel.flag', '=', 1)
+            ->where('o.address_id', '=', 0)
+            ->select(['oel.*', 'o.user_id', 'o.address_id'])
+            ->limit(400)
+            ->get();
 
-        if (!empty($list)) {
-            $expressCompany = ExpressCompany::where('status', '=', 1)
-                ->select(['id', 'erp_type_id'])
-                ->get()->toArray();
-            $expressCompany = array_column($expressCompany, 'id', 'erp_type_id');
-
-            $orderServers = new MallOrderServers();
-            $ack_data     = [];//需要回传的id
-
+        if ($list->isNotEmpty()) {
             foreach ($list as $v) {
+                $temp_address = MallAddress::query()
+                    ->where('user_id', '=', $v->user_id)
+                    ->where('is_default', '=', 1)
+                    ->where('is_del', '=', 0)
+                    ->first();
 
-//                DB::table('nlsg_erp_logistics_log')->insert(['info'=>json_encode($v)]);
-
-                $send_data_temp = [];
-
-                $check_order_type = substr($v['tid'], -2);
-
-                if ($check_order_type === '01') {
-                    //商城部分
-                    $tid = MallOrder::query()
-                        ->where('ordernum', '=', $v['tid'])
-                        ->select(['id'])->first();
-
-                    if ($v['is_part_sync'] == 1) {
-                        //1是拆分了,走oids
-                        $oids = explode(',', $v['oids']);
-                    } else {
-                        //0是没拆分,走tid
-                        $oids = MallOrderDetails::where('order_id', '=', $tid->id)->pluck('id')->toArray();
-                        foreach ($oids as &$oidsv) {
-                            $oidsv = $tid->id . '_' . $oidsv;
-                        }
-                    }
-
-                    foreach ($oids as $vv) {
-                        $send_data               = [];
-                        $temp_oids               = explode('_', $vv);
-                        $send_data['express_id'] = $expressCompany[$v['logistics_type']] ?? 0;
-                        if (!$send_data['express_id']) {
-                            continue;
-                        }
-                        $send_data['num']             = $v['logistics_no'];
-                        $send_data['order_id']        = $tid->id ?? 0;
-                        $send_data['order_detail_id'] = $temp_oids[1] ?? 0;
-                        $send_data_temp[]             = $send_data;
-                    }
-
-                    $send_res                = $orderServers->send($send_data_temp);
-                    $temp_ack_data           = [];
-                    $temp_ack_data['rec_id'] = $v['rec_id'];
-                    if ($send_res['code'] == true) {
-                        $temp_ack_data['status']  = 0;
-                        $temp_ack_data['message'] = '成功';
-                    } else {
-                        $temp_ack_data['status']  = 1;
-                        $temp_ack_data['message'] = $send_res['msg'] ?? '失败';
-                    }
-                    $ack_data[] = $temp_ack_data;
-                } else {
-                    $now_date = date('Y-m-d H:i:s');
-                    //训练营教材订单
-                    $send_data['express_id']      = $expressCompany[$v['logistics_type']] ?? 0;
-                    $send_data['num']             = $v['logistics_no'] ?? '';
-                    $send_data['order_id']        = $tid->id ?? 0;
-                    $send_data['order_detail_id'] = 0;
-
-                    $check_ex = ExpressInfo::query()
-                        ->where('express_id', '=', $send_data['express_id'])
-                        ->where('express_num', '=', $send_data['num'])
-                        ->first();
-
-                    if ($check_ex && !empty($send_data['num'])) {
-                        $express_info_id = $check_ex->id;
-                    } else {
-                        $ex_data['express_id']  = $send_data['express_id'];
-                        $ex_data['express_num'] = $send_data['num'];
-
-                        if (!empty($send_data['num'])) {
-                            $express_company_info = ExpressCompany::query()->find($send_data['express_id']);
-                            $history              = [];
-                            $history['number']    = $v['logistics_no'];
-
-                            $history['type']          = $express_company_info->code ?? '';
-                            $history['typename']      = $express_company_info->name ?? $v['logistics_name'];
-                            $history['express_phone'] = $express_company_info->phone ?? '';
-                            $history['logo']          = $express_company_info->logo ?? '';
-
-                            $history['list'] = [
-                                [
-                                    'time'   => $now_date,
-                                    'status' => '商家发货'
-                                ]
-                            ];
-
-                            $ex_data['history'] = json_encode($history);
-
-                            $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;
-                            $express_info_id       = DB::table('nlsg_express_info')->insertGetId($ex_data);
-                            if (!$express_info_id) {
-                                continue;
-                            }
-                        }
-                    }
-
-                    if (!empty($send_data['num']) && isset($express_info_id)) {
-                        $order_express_info_res = Order::query()->where('ordernum', '=', $v['tid'])
-                            ->update([
-                                         'express_info_id' => $express_info_id
-                                     ]);
-                    } else {
-                        $order_express_info_res = true;
-                    }
-
-                    $temp_ack_data           = [];
-                    $temp_ack_data['rec_id'] = $v['rec_id'];
-                    if ($order_express_info_res) {
-                        $temp_ack_data['status']  = 0;
-                        $temp_ack_data['message'] = '成功';
-                    } else {
-                        $temp_ack_data['status']  = 1;
-                        $temp_ack_data['message'] = '失败';
-                    }
-                    $ack_data[] = $temp_ack_data;
+                if ($temp_address) {
+                    Order::query()
+                        ->where('id', '=', $v->order_id)
+                        ->update([
+                                     'address_id' => $temp_address->id
+                                 ]);
                 }
-
-            }
-            if (!empty($ack_data)) {
-                $this->logisticsSyncAck($ack_data);
-            }
-            $this->logisticsSync();
-        } else {
-            return true;
-        }
-
-    }
-
-    //物流查询动作
-    private function logisticsSyncQuery()
-    {
-        $c             = new WdtClient();
-        $c->sid        = $this->sid;
-        $c->appkey     = $this->appkey;
-        $c->appsecret  = $this->appsecret;
-        $c->gatewayUrl = $this->logistics_sync_query;
-
-        $c->putApiParam('shop_no', $this->shop_no);
-        $c->putApiParam('is_part_sync_able', 1);
-        $c->putApiParam('limit', 100);
-        $json = $c->wdtOpenApi();
-        $json = json_decode($json, true);
-
-        if (!empty($json['code'])) {
-            $temp_error_data['ordernum'] = 'query';
-            $temp_error_data['error']    = $json['code'] . ':' . $json['message'];
-            $temp_error_data['type']     = 2;
-            DB::table('nlsg_mall_order_erp_error')->insert($temp_error_data);
-        }
-        DB::table('nlsg_erp_logistics_log')->insert(['info' => json_encode($json)]);
-        return $json['trades'] ?? [];
-    }
-
-    //物流回写动作
-    private function logisticsSyncAck($ack_data)
-    {
-        $c             = new WdtClient();
-        $c->sid        = $this->sid;
-        $c->appkey     = $this->appkey;
-        $c->appsecret  = $this->appsecret;
-        $c->gatewayUrl = $this->logistics_sync_ack;
-        $c->putApiParam('logistics_list', json_encode($ack_data, JSON_UNESCAPED_UNICODE));
-        $json = $c->wdtOpenApi();
-        $json = json_decode($json, true);
-        if (!empty($json['code'])) {
-            $temp_error_data['ordernum'] = 'ack';
-            $temp_error_data['error']    = $json['code'] . ':' . $json['message'];
-            $temp_error_data['type']     = 3;
-            DB::table('nlsg_mall_order_erp_error')->insert($temp_error_data);
-        }
-    }
-
-    //商城订单推送
-    public function pushRun()
-    {
-        $while_flag = true;
-
-        while ($while_flag) {
-            $list = MallErpList::where('flag', '=', 1)->limit(30)->select(['id', 'order_id'])->get();
-            if ($list->isEmpty()) {
-                $while_flag = false;
-            } else {
-                $list          = $list->toArray();
-                $id_list       = array_column($list, 'id');
-                $order_id_list = array_column($list, 'order_id');
-
-                $res = $this->startPush($order_id_list);//订单推送
-
-//                if ($res['code']) {
-                MallErpList::whereIn('id', $id_list)
-                    ->update([
-                                 'flag' => 2
-                             ]);
-//                }
             }
         }
-
-        return true;
-        //订单推送场景   支付成功,取消订单
-//        return $this->startPush([10523,10524]);//订单推送
     }
+    //⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆用户完善地址后同步任务⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆
 
+
+    //⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇训练营教材订单推送⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇
     //训练营教材订单推送
     public function pushRunForOrder($order_id_list = []): bool
     {
@@ -537,85 +353,252 @@ class ErpServers
         }
         return true;
     }
+    //⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆训练营教材订单推送⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆
 
-    public function orderUpdateAddressId()
+
+    //⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇接收ERP物流信息并反馈⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇
+    //物流同步
+    public function logisticsSync()
     {
 
-        $list = DB::table('nlsg_order_erp_list as oel')
-            ->join('nlsg_order as o', 'oel.order_id', '=', 'o.id')
-            ->where('oel.flag', '=', 1)
-            ->where('o.address_id', '=', 0)
-            ->select(['oel.*', 'o.user_id', 'o.address_id'])
-            ->limit(400)
-            ->get();
+        $list = $this->logisticsSyncQuery();
 
-        if ($list->isNotEmpty()) {
+        if (!empty($list)) {
+            $expressCompany = ExpressCompany::where('status', '=', 1)
+                ->select(['id', 'erp_type_id'])
+                ->get()->toArray();
+            $expressCompany = array_column($expressCompany, 'id', 'erp_type_id');
+
+            $orderServers = new MallOrderServers();
+            $ack_data     = [];//需要回传的id
+
             foreach ($list as $v) {
-                $temp_address = MallAddress::query()
-                    ->where('user_id', '=', $v->user_id)
-                    ->where('is_default', '=', 1)
-                    ->where('is_del', '=', 0)
-                    ->first();
 
-                if ($temp_address) {
-                    Order::query()
-                        ->where('id', '=', $v->order_id)
-                        ->update([
-                                     'address_id' => $temp_address->id
-                                 ]);
+//                DB::table('nlsg_erp_logistics_log')->insert(['info'=>json_encode($v)]);
+
+                $send_data_temp = [];
+
+                $check_order_type = substr($v['tid'], -2);
+
+                //检查订单类型  1能量时光虚拟  2幸福学社虚拟 3能量时光商城  0错误
+                $order_project_type = (function ()use($v) {
+                    $ordernum = $v['tid'];
+                    if (!$ordernum) {
+                        return 0;
+                    }
+
+                    $check_order = Order::query()
+                        ->where('ordernum', '=', $ordernum)
+                        ->where('status', '=', 1)
+                        ->select(['id'])
+                        ->first();
+                    if ($check_order) {
+                        return 1;
+                    }
+
+                    $check_order = XfxsOrder::query()
+                        ->where('ordernum', '=', $ordernum)
+                        ->where('status', '=', 1)
+                        ->select(['id'])
+                        ->first();
+                    if ($check_order) {
+                        return 2;
+                    }
+
+                    $check_order = MallOrder::query()
+                        ->where('ordernum', '=', $ordernum)
+                        ->where('status', '=', 1)
+                        ->select(['id'])
+                        ->first();
+
+                    if ($check_order) {
+                        return 3;
+                    }
+
+                    return 0;
+                })();
+
+                if ($order_project_type === 0){
+                    continue;
+                }
+
+                $now_date = date('Y-m-d H:i:s');
+
+                if ($order_project_type === 3) {
+                    //商城部分
+                    $tid = MallOrder::query()
+                        ->where('ordernum', '=', $v['tid'])
+                        ->select(['id'])->first();
+
+                    if ($v['is_part_sync'] == 1) {
+                        //1是拆分了,走oids
+                        $oids = explode(',', $v['oids']);
+                    } else {
+                        //0是没拆分,走tid
+                        $oids = MallOrderDetails::where('order_id', '=', $tid->id)->pluck('id')->toArray();
+                        foreach ($oids as &$oidsv) {
+                            $oidsv = $tid->id . '_' . $oidsv;
+                        }
+                    }
+
+                    foreach ($oids as $vv) {
+                        $send_data               = [];
+                        $temp_oids               = explode('_', $vv);
+                        $send_data['express_id'] = $expressCompany[$v['logistics_type']] ?? 0;
+                        if (!$send_data['express_id']) {
+                            continue;
+                        }
+                        $send_data['num']             = $v['logistics_no'];
+                        $send_data['order_id']        = $tid->id ?? 0;
+                        $send_data['order_detail_id'] = $temp_oids[1] ?? 0;
+                        $send_data_temp[]             = $send_data;
+                    }
+
+                    $send_res                = $orderServers->send($send_data_temp);
+                    $temp_ack_data           = [];
+                    $temp_ack_data['rec_id'] = $v['rec_id'];
+                    if ($send_res['code'] == true) {
+                        $temp_ack_data['status']  = 0;
+                        $temp_ack_data['message'] = '成功';
+                    } else {
+                        $temp_ack_data['status']  = 1;
+                        $temp_ack_data['message'] = $send_res['msg'] ?? '失败';
+                    }
+                    $ack_data[] = $temp_ack_data;
+                } else{
+
+                    //训练营教材订单
+                    $send_data['express_id']      = $expressCompany[$v['logistics_type']] ?? 0;
+                    $send_data['num']             = $v['logistics_no'] ?? '';
+                    $send_data['order_id']        = $tid->id ?? 0;
+                    $send_data['order_detail_id'] = 0;
+
+                    $check_ex = ExpressInfo::query()
+                        ->where('express_id', '=', $send_data['express_id'])
+                        ->where('express_num', '=', $send_data['num'])
+                        ->first();
+
+                    if ($check_ex && !empty($send_data['num'])) {
+                        $express_info_id = $check_ex->id;
+                    } else {
+                        $ex_data['express_id']  = $send_data['express_id'];
+                        $ex_data['express_num'] = $send_data['num'];
+
+                        if (!empty($send_data['num'])) {
+                            $express_company_info = ExpressCompany::query()->find($send_data['express_id']);
+                            $history              = [];
+                            $history['number']    = $v['logistics_no'];
+
+                            $history['type']          = $express_company_info->code ?? '';
+                            $history['typename']      = $express_company_info->name ?? $v['logistics_name'];
+                            $history['express_phone'] = $express_company_info->phone ?? '';
+                            $history['logo']          = $express_company_info->logo ?? '';
+
+                            $history['list'] = [
+                                [
+                                    'time'   => $now_date,
+                                    'status' => '商家发货'
+                                ]
+                            ];
+
+                            $ex_data['history'] = json_encode($history);
+
+                            $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;
+                            $express_info_id       = DB::table('nlsg_express_info')->insertGetId($ex_data);
+                            if (!$express_info_id) {
+                                continue;
+                            }
+                        }
+                    }
+
+                    if (!empty($send_data['num']) && isset($express_info_id)) {
+
+                        if ($order_project_type === 1){
+                            $order_express_info_res = Order::query()->where('ordernum', '=', $v['tid'])
+                                ->update([
+                                             'express_info_id' => $express_info_id
+                                         ]);
+                        }else{
+                            $order_express_info_res = XfxsOrder::query()->where('ordernum', '=', $v['tid'])
+                                ->update([
+                                             'express_info_id' => $express_info_id
+                                         ]);
+                        }
+
+
+                    } else {
+                        $order_express_info_res = true;
+                    }
+
+                    $temp_ack_data           = [];
+                    $temp_ack_data['rec_id'] = $v['rec_id'];
+                    if ($order_express_info_res) {
+                        $temp_ack_data['status']  = 0;
+                        $temp_ack_data['message'] = '成功';
+                    } else {
+                        $temp_ack_data['status']  = 1;
+                        $temp_ack_data['message'] = '失败';
+                    }
+                    $ack_data[] = $temp_ack_data;
                 }
             }
+            if (!empty($ack_data)) {
+                $this->logisticsSyncAck($ack_data);
+            }
+            $this->logisticsSync();
+        } else {
+            return true;
         }
-
-
-//        $while_flag = true;
-//        while ($while_flag) {
-//            $list = DB::table('nlsg_order_erp_list as oel')
-//                ->join('nlsg_order as o', 'oel.order_id', '=', 'o.id')
-//                ->where('oel.flag', '=', 1)
-//                ->where('o.address_id', '=', 0)
-//                ->select(['oel.*', 'o.user_id', 'o.address_id'])
-//                ->limit(100)
-//                ->get();
-//            if ($list->isEmpty()) {
-//                $while_flag = false;
-//            } else {
-//                foreach ($list as $v) {
-//                    $temp_address = MallAddress::query()
-//                        ->where('user_id', '=', $v->user_id)
-//                        ->where('is_default', '=', 1)
-//                        ->where('is_del', '=', 0)
-//                        ->first();
-//
-//                    if ($temp_address) {
-//                        Order::query()
-//                            ->where('id', '=', $v->order_id)
-//                            ->update([
-//                                'address_id' => $temp_address->id
-//                            ]);
-//                    }
-//                }
-//            }
-//        }
 
     }
 
-    public function tradeQueryJob($ordernum)
+    //物流查询动作
+    private function logisticsSyncQuery()
     {
         $c             = new WdtClient();
         $c->sid        = $this->sid;
         $c->appkey     = $this->appkey;
         $c->appsecret  = $this->appsecret;
-        $c->gatewayUrl = 'https://api.wangdian.cn/openapi2/trade_query.php';
+        $c->gatewayUrl = $this->logistics_sync_query;
 
         $c->putApiParam('shop_no', $this->shop_no);
         $c->putApiParam('is_part_sync_able', 1);
         $c->putApiParam('limit', 100);
-        $c->putApiParam('src_tid', $ordernum);
         $json = $c->wdtOpenApi();
-        return json_decode($json, true);
+        $json = json_decode($json, true);
+
+        if (!empty($json['code'])) {
+            $temp_error_data['ordernum'] = 'query';
+            $temp_error_data['error']    = $json['code'] . ':' . $json['message'];
+            $temp_error_data['type']     = 2;
+            DB::table('nlsg_mall_order_erp_error')->insert($temp_error_data);
+        }
+        DB::table('nlsg_erp_logistics_log')->insert(['info' => json_encode($json)]);
+        return $json['trades'] ?? [];
     }
 
+    //物流回写动作
+    private function logisticsSyncAck($ack_data)
+    {
+        $c             = new WdtClient();
+        $c->sid        = $this->sid;
+        $c->appkey     = $this->appkey;
+        $c->appsecret  = $this->appsecret;
+        $c->gatewayUrl = $this->logistics_sync_ack;
+        $c->putApiParam('logistics_list', json_encode($ack_data, JSON_UNESCAPED_UNICODE));
+        $json = $c->wdtOpenApi();
+        $json = json_decode($json, true);
+        if (!empty($json['code'])) {
+            $temp_error_data['ordernum'] = 'ack';
+            $temp_error_data['error']    = $json['code'] . ':' . $json['message'];
+            $temp_error_data['type']     = 3;
+            DB::table('nlsg_mall_order_erp_error')->insert($temp_error_data);
+        }
+    }
+    //⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆接收ERP物流信息并反馈⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆
+
+
+    //⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇主动查询ERP订单详情同步物流信息⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇
     //订单主动查询
     public function tradeQuery(): int
     {
@@ -628,8 +611,8 @@ class ErpServers
             $list = (new erpOrderServers())->list(
                 [
                     'send_status' => 1,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    'shill_status' => 1,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            'order_info_flag' => 'push_erp',
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            'shill_status' => 1,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                'order_info_flag' => 'push_erp',
                     'page'        => $page,
                     'size'        => 20,
                     'created_at'  => "$begin_date,$end_date",
@@ -724,56 +707,12 @@ class ErpServers
 
 
         return 0;
-//        if (0) {
-//            $list = Order::query()->where('express_info_id', '=', 5649)
-//                ->where('created_at', '>', '2022-04-06 00:00:00')
-//                ->select(['id', 'express_info_id', 'created_at'])
-//                ->get()
-//                ->toArray();
-//
-//            $log = [];
-//
-//            DB::beginTransaction();
-//            foreach ($list as $v) {
-//                $now_date = date('Y-m-d 10', strtotime($v['created_at'] . ' +1 day'));
-//                $now_date = $now_date . ':' . rand(10, 50) . ':' . rand(10, 50);
-//
-//                $history                  = [];
-//                $history['number']        = '';
-//                $history['type']          = '';
-//                $history['typename']      = '无单号物流';
-//                $history['express_phone'] = '';
-//                $history['logo']          = '';
-//                $history['list']          = [
-//                    [
-//                        'time'   => $now_date,
-//                        'status' => '商家发货'
-//                    ]
-//                ];
-//                $ex_data['express_id']    = 0;
-//                $ex_data['express_num']   = '';
-//                $ex_data['history']       = json_encode($history);
-//
-//                $ex_data['created_at'] = $ex_data['updated_at'] = $now_date;
-//
-//                $express_info_id = DB::table('nlsg_express_info')->insertGetId($ex_data);
-//                Order::query()->where('id', '=', $v['id'])
-//                    ->update([
-//                        'express_info_id' => $express_info_id
-//                    ]);
-//
-//                $log[] = $v['id'] . '-' . $express_info_id;
-//            }
-//            DB::commit();
-//            dd($log);
-//        }
-
     }
 
     public function tradeQueryMall()
     {
-        $page     = 1;
-        $size     = 50;
+        $page = 1;
+        $size = 50;
 
         $expressCompany = ExpressCompany::query()->where('status', '=', 1)
             ->select(['id', 'erp_type_id'])
@@ -834,6 +773,59 @@ class ErpServers
 
 
     }
+    //⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆主动查询ERP订单详情同步物流信息⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆
+
+
+    //⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇公共部分⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇
+    //订单推送动作
+    private function pushOrderJob($trade_list)
+    {
+        if (empty($trade_list) || !is_array($trade_list)) {
+            return ['code' => false, 'msg' => '数据不正确'];
+        }
+
+        $c = new WdtClient();
+
+        $c->sid        = $this->sid;
+        $c->appkey     = $this->appkey;
+        $c->appsecret  = $this->appsecret;
+        $c->gatewayUrl = $this->trade_push;
+
+        $c->putApiParam('shop_no', $this->shop_no);
+        $c->putApiParam('switch', 1);
+        $c->putApiParam('trade_list', json_encode($trade_list, JSON_UNESCAPED_UNICODE));
+        $json = $c->wdtOpenApi();
+
+        $error_data             = [];
+        $error_data['ordernum'] = '';
+        $error_data['error']    = $json;
+        $error_data['type']     = 4;
+        DB::table('nlsg_mall_order_erp_error')->insert($error_data);
+
+        $json = json_decode($json, true);
+
+        if ($json['code'] == 0) {
+            return ['code' => true, 'msg' => '成功:' . $json['new_count'] . ':' . $json['chg_count']];
+        } else {
+            return ['code' => false, 'msg' => $json['message']];
+        }
+    }
+
+    public function tradeQueryJob($ordernum)
+    {
+        $c             = new WdtClient();
+        $c->sid        = $this->sid;
+        $c->appkey     = $this->appkey;
+        $c->appsecret  = $this->appsecret;
+        $c->gatewayUrl = 'https://api.wangdian.cn/openapi2/trade_query.php';
+
+        $c->putApiParam('shop_no', $this->shop_no);
+        $c->putApiParam('is_part_sync_able', 1);
+        $c->putApiParam('limit', 100);
+        $c->putApiParam('src_tid', $ordernum);
+        $json = $c->wdtOpenApi();
+        return json_decode($json, true);
+    }
 
     public function __construct()
     {
@@ -866,4 +858,6 @@ class ErpServers
             },
             $str);
     }
+
+    //⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆公共部分⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆
 }
