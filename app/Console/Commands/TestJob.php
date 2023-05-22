@@ -2,10 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\MallOrder;
-use App\Models\Order;
-use App\Models\Xfxs\XfxsOrder;
-use App\Servers\ErpXfxsServers;
 use App\Servers\V5\XiaoeTechServers;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -48,8 +44,6 @@ class TestJob extends Command
      */
     public function handle()
     {
-        $s = new ErpXfxsServers();
-        $s->orderUpdateAddressId();
 //        $this->expressList();
 //        $task = $this->argument('task')??'';
 //        if(empty($task)){
