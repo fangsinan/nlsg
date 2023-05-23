@@ -1789,7 +1789,7 @@ class WechatPay extends Controller
                         $shareSyRst = PayRecordDetail::create($map);
                         //5%返现
                         //Profit::ServiceIncome($out_trade_no,7,$ProfitPrice,$twitter_id);
-                        GetPriceTools::ServiceIncome($out_trade_no, 7, $ProfitPrice, $twitter_id);
+//                        GetPriceTools::ServiceIncome($out_trade_no, 7, $ProfitPrice, $twitter_id);
                     }
                 }
 
