@@ -144,17 +144,19 @@ class Kernel extends ConsoleKernel
 		//vip新增课程追加订阅
 		$schedule->command('command:VipWorksListAppendSub')->everyFiveMinutes()->withoutOverlapping(1)->runInBackground()->onOneServer();
 
-		//order表推送到erp
-		$schedule->command('command:ErpOrderPush')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
 
-		$schedule->command('command:ErpOrderAddAddress')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
+        //⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇ERP部分,测试不跑⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇⬇
+        //order表推送到erp
+//        $schedule->command('command:ErpOrderPush')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
+//        $schedule->command('command:ErpOrderAddAddress')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
+//        //mall order表推送到erp
+//        $schedule->command('command:ErpMallOrderPush')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
+//        //erp物流回写
+//        $schedule->command('command:ErpQuery')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
+//        $schedule->command('command:ErpTradeQuery')->dailyAt('00:10');
+//        $schedule->command('command:ErpTradeQueryMall')->twiceDaily(2,15);
+        //⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆ERP部分,测试不跑⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆⬆
 
-		//mall order表推送到erp
-		$schedule->command('command:ErpMallOrderPush')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
-
-		//erp物流回写
-		$schedule->command('command:ErpQuery')->everyMinute()->withoutOverlapping(1)->runInBackground()->onOneServer();
-		$schedule->command('command:ErpTradeQuery')->dailyAt('00:10');
 
         //队列消息发送
         $schedule->call(function () {
@@ -297,7 +299,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('XiaoTechJob sync_distributor_customer_list 1 0')->dailyAt('10:00')->runInBackground()->onOneServer()->withoutOverlapping();
 		$schedule->command('XiaoTechJob sync_distributor_customer_list 0 1')->everyMinute()->runInBackground()->onOneServer()->withoutOverlapping();//每分钟执行一次
 
-		$schedule->command('command:ErpTradeQueryMall')->twiceDaily(2,15);
+
 
 		$schedule->command('XiaoTechJob sync_xe_xfxs 0 0')->dailyAt('0:01')->runInBackground()->onOneServer()->withoutOverlapping();//每小时执行一次
 
