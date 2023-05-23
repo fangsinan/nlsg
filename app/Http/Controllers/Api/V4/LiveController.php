@@ -2336,6 +2336,7 @@ class LiveController extends Controller
             return success($res);
         }
 
+        //relation_type   3.直播  7线下课   9 精品课  10 讲座
         if($relation_type == 3){
 
             // 绑定默认客服不弹二维码
@@ -2372,6 +2373,10 @@ class LiveController extends Controller
             if(!empty($order_id)){  //付费
                 $order = Order::where(['id'=>$order_id])->first();
                 $relation_id = $order['relation_id'];
+            }
+        }else if(in_array($relation_type,[9,10])){ //9 精品课  10 讲座
+            if(empty($relation_id)){
+                return error(0, '作品ID信息有误');
             }
         }else{
             //目前除了直播 线下课 其他不需要根据各个具体产品返二维码
