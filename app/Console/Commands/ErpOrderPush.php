@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\CommandJobLog;
 use App\Servers\ErpServers;
+use App\Servers\ErpXfxsServers;
 use Illuminate\Console\Command;
 
 class ErpOrderPush extends Command
@@ -42,6 +43,9 @@ class ErpOrderPush extends Command
         CommandJobLog::add(__METHOD__,$this->arguments());
         $s = new ErpServers();
         $s->pushRunForOrder();
+        (new ErpXfxsServers())->pushRunForOrder();
+        return 0;
     }
+
 }
 

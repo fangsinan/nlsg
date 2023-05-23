@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\CommandJobLog;
 use App\Servers\ErpServers;
+use App\Servers\ErpXfxsServers;
 use Illuminate\Console\Command;
 
 class ErpOrderAddAddress extends Command
@@ -42,5 +43,7 @@ class ErpOrderAddAddress extends Command
         CommandJobLog::add(__METHOD__,$this->arguments());
         $s = new ErpServers();
         $s->orderUpdateAddressId();
+        (new ErpXfxsServers())->orderUpdateAddressId();
+        return 0;
     }
 }
