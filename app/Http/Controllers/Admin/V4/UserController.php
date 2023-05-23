@@ -27,6 +27,11 @@ class UserController extends ControllerBackend
         $is_author = $request->get('is_author');
         $start = $request->get('start');
         $end = $request->get('end');
+        // 新用户奖励
+        $reward_start = $request->get('reward_start');
+        $reward_end = $request->get('reward_end');
+        $is_reward = $request->get('is_reward');
+
         $query = User::query()->where('phone','like','1%')->where('ref', '=', '0')->where('is_robot', '=', '0')->whereRaw(DB::raw('length(phone) =11'))
             ->when($phone, function ($query) use ($phone) {
                 $query->where('phone', 'like', $phone . '%');
@@ -48,10 +53,19 @@ class UserController extends ControllerBackend
                     Carbon::parse($start)->startOfDay()->toDateTimeString(),
                     Carbon::parse($end)->endOfDay()->toDateTimeString(),
                 ]);
+            })
+            ->when(! is_null($is_reward), function ($query) use ($is_reward) {
+                $query->where('is_reward', $is_reward);
+            })
+            ->when($reward_start && $reward_end, function ($query) use ($reward_start, $reward_end) {
+                $query->whereBetween('reward_time', [
+                    Carbon::parse($reward_start)->startOfDay()->toDateTimeString(),
+                    Carbon::parse($reward_end)->endOfDay()->toDateTimeString(),
+                ]);
             });
 
-        $lists = $query->select('id', 'nickname', 'phone', 'sex', 'level', 'province', 'city','created_at')
-            ->orderBy('created_at', 'desc')
+        $lists = $query->select('id', 'nickname', 'phone', 'sex', 'level', 'province', 'city','created_at','is_reward','reward_time')
+            ->orderBy('id', 'desc')
             ->paginate(10)
             ->toArray();
         return success($lists);
