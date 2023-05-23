@@ -1747,12 +1747,14 @@ class UserController extends Controller
                 'end_time' => date("Y-m-d H:i:s", time()),
             ]);
         }
-        User::where("id",$id)->update(['is_reward' => 3,]);
+        //根据状态
+        User::where("id",$id)->update(['is_reward' => 3,'reward_time'=>date("Y-m-d H:i:s", time())]);
         // 发送消息
         // Messages->
         Message::pushMessage(0,$this->user['id'],'SYS_USER_REWARD');
 
         // 发送完消息
+        // 需要根据状态 处理前端消息显示按钮
         User::where("id",$id)->update(['is_reward' => 4,]);
         return success();
     }
